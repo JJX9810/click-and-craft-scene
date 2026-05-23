@@ -124,31 +124,59 @@
 }
 .animate-fade-up { animation: fade-up 0.8s ease-out both; }
 
-/* Subtle dark wood-grain background using layered repeating gradients */
+/* Premium diagonal laminate plank background */
 .bg-wood-grain {
-  background-color: oklch(0.16 0.012 60);
+  background-color: oklch(0.14 0.014 55);
   background-image:
-    radial-gradient(ellipse at 18% 0%, oklch(0.26 0.03 55 / 0.45) 0%, transparent 55%),
-    radial-gradient(ellipse at 92% 90%, oklch(0.22 0.025 50 / 0.35) 0%, transparent 60%),
+    /* Ambient lighting for depth */
+    radial-gradient(ellipse at 20% 5%, oklch(0.34 0.04 60 / 0.55) 0%, transparent 55%),
+    radial-gradient(ellipse at 85% 100%, oklch(0.08 0.01 50 / 0.75) 0%, transparent 60%),
+    /* Fine grain striations along plank length (-22deg) */
     repeating-linear-gradient(
-      91deg,
-      oklch(0.16 0.012 60) 0px,
-      oklch(0.185 0.02 55) 2px,
-      oklch(0.16 0.012 60) 5px,
-      oklch(0.195 0.022 50) 8px,
-      oklch(0.165 0.014 58) 13px,
-      oklch(0.18 0.018 55) 19px,
-      oklch(0.16 0.012 60) 26px
-    ),
-    repeating-linear-gradient(
-      89deg,
+      -22deg,
       transparent 0px,
-      oklch(0.24 0.03 50 / 0.05) 90px,
-      transparent 180px,
-      oklch(0.13 0.01 60 / 0.07) 280px,
-      transparent 380px
-    );
+      oklch(0.24 0.03 60 / 0.16) 1px,
+      transparent 2px,
+      transparent 6px,
+      oklch(0.08 0.008 52 / 0.2) 7px,
+      transparent 8px,
+      transparent 13px,
+      oklch(0.22 0.028 58 / 0.1) 14px,
+      transparent 15px,
+      transparent 22px
+    ),
+    /* Wider tonal bands giving wood character */
+    repeating-linear-gradient(
+      -22deg,
+      oklch(0.19 0.024 60 / 0.55) 0px,
+      oklch(0.16 0.018 55 / 0.35) 60px,
+      oklch(0.21 0.03 62 / 0.5) 130px,
+      oklch(0.15 0.016 52 / 0.4) 200px,
+      oklch(0.19 0.024 60 / 0.55) 280px
+    ),
+    /* Plank long-edge seams (perpendicular to grain) */
+    repeating-linear-gradient(
+      68deg,
+      transparent 0px,
+      transparent 138px,
+      oklch(0.05 0.006 50 / 0.9) 139px,
+      oklch(0.03 0.004 50 / 0.95) 140px,
+      oklch(0.28 0.035 62 / 0.35) 141px,
+      transparent 142px
+    ),
+    /* Plank short-edge seams (staggered) */
+    repeating-linear-gradient(
+      -22deg,
+      transparent 0px,
+      transparent 419px,
+      oklch(0.04 0.005 50 / 0.8) 420px,
+      oklch(0.26 0.03 60 / 0.25) 421px,
+      transparent 422px
+    ),
+    /* Base wood tone */
+    linear-gradient(135deg, oklch(0.21 0.03 62) 0%, oklch(0.12 0.014 50) 100%);
 }
+
 
 @media (prefers-reduced-motion: reduce) {
   .animate-hero-float,
