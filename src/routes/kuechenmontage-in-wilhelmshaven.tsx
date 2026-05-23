@@ -1,0 +1,104 @@
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { PageHero, Section, Bullet, CtaBlock } from "@/components/site/PageShell";
+import {
+  Accordion, AccordionContent, AccordionItem, AccordionTrigger,
+} from "@/components/ui/accordion";
+import { ArrowRight } from "lucide-react";
+
+export const Route = createFileRoute("/kuechenmontage-in-wilhelmshaven")({
+  component: Page,
+  head: () => ({
+    meta: [
+      { title: "Küchenmontage in Wilhelmshaven – Aufbau, Restmontage, Arbeitsplatte" },
+      { name: "description", content: "Küchenmontage in Wilhelmshaven & Umgebung: Aufbau nach Umzug, Restmontage, Arbeitsplatten, Spüle und Armatur. Saubere Ausführung von Verlegt & Verschraubt." },
+      { property: "og:title", content: "Küchenmontage in Wilhelmshaven & Umgebung" },
+      { property: "og:description", content: "Aufbau, Restmontage und Anpassung Ihrer Küche – sauber und zuverlässig." },
+      { property: "og:url", content: "/kuechenmontage-in-wilhelmshaven" },
+    ],
+    links: [{ rel: "canonical", href: "/kuechenmontage-in-wilhelmshaven" }],
+  }),
+});
+
+const scope = [
+  { t: "Küche nach Umzug aufbauen", d: "Bestehende Küche im neuen Raum aufstellen, ausrichten und anschließen." },
+  { t: "Restmontage einer Küche", d: "Sie haben angefangen oder etwas fehlt – wir bringen es sauber zu Ende." },
+  { t: "Neue Küchenmodule montieren", d: "Korpusse, Hängeschränke, Fronten – ausgerichtet und stabil befestigt." },
+  { t: "Arbeitsplatten", d: "Zuschnitt, Einpassung, Verbindungen und saubere Abschlüsse." },
+  { t: "Spüle & Armatur", d: "Einbau, Anschluss an vorhandene Anschlüsse, Dichtungen sauber gesetzt." },
+  { t: "Abschlussleisten & Silikon", d: "Sockel, Lichtleisten, Silikonfugen – ordentlich und unauffällig." },
+];
+
+const faqs = [
+  { q: "Montiert ihr Küchen nach einem Umzug?", a: "Ja. Wir bauen bestehende Küchen ab, transportieren sie und bauen sie im neuen Zuhause sauber wieder auf." },
+  { q: "Schließt ihr Herd oder Starkstrom an?", a: "Nein. Elektroinstallationen übernehmen Fachbetriebe. Bei Bedarf stimmen wir uns ab." },
+  { q: "Macht ihr Sanitäranschlüsse?", a: "Wasseranschlüsse an bestehende Eckventile inklusive Spüle und Armatur ja, neue Sanitäranlagen nein." },
+  { q: "Was muss vor dem Termin vorhanden sein?", a: "Komplette Küche bzw. fehlende Teile, Anschlüsse für Wasser/Strom und ein zugänglicher Raum." },
+];
+
+function Page() {
+  return (
+    <>
+      <PageHero
+        eyebrow="Leistung"
+        title="Küchenmontage in Wilhelmshaven & Umgebung"
+        intro="Aufbau nach Umzug, Restmontage, neue Module, Arbeitsplatten und Anschluss von Spüle und Armatur. Saubere Ausführung mit ordentlichen Übergängen und einer dokumentierten Übergabe."
+        breadcrumbs={[{ label: "Leistungen" }, { label: "Küchenmontage" }]}
+      />
+
+      <Section eyebrow="Leistungsumfang" title="Was wir bei der Küchenmontage übernehmen">
+        <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+          {scope.map((s) => (
+            <article key={s.t} className="rounded-2xl border border-border/70 bg-card/50 p-6 backdrop-blur">
+              <h3 className="text-lg font-semibold">{s.t}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{s.d}</p>
+            </article>
+          ))}
+        </div>
+      </Section>
+
+      <Section eyebrow="Voraussetzungen" title="Was wir nicht übernehmen" bordered>
+        <ul className="grid gap-3 text-sm text-muted-foreground sm:grid-cols-2">
+          <Bullet>Keine Elektroinstallation (kein Herdanschluss, kein Starkstrom)</Bullet>
+          <Bullet>Keine neuen Sanitäranlagen oder Leitungsverlegungen</Bullet>
+          <Bullet>Keine Fliesen- oder Wandarbeiten an tragenden Wänden</Bullet>
+          <Bullet>Spezialgeräte gemäß Herstellervorgabe nur in Abstimmung</Bullet>
+        </ul>
+        <p className="mt-6 text-sm text-muted-foreground">
+          Für Elektro- und Sanitärarbeiten stimmen wir uns auf Wunsch mit Fachbetrieben ab.
+        </p>
+      </Section>
+
+      <Section eyebrow="Preisfaktoren" title="Was den Preis beeinflusst">
+        <ul className="grid gap-3 text-sm text-muted-foreground sm:grid-cols-2 lg:grid-cols-3">
+          <Bullet>Küchenlänge & Anzahl Schränke</Bullet>
+          <Bullet>Komplette Montage oder Restmontage</Bullet>
+          <Bullet>Arbeitsplatte: Material, Zuschnitt, Verbindungen</Bullet>
+          <Bullet>Spüle, Armatur, Geräteanschlüsse</Bullet>
+          <Bullet>Hängeschränke und Lichtleisten</Bullet>
+          <Bullet>Anfahrt und Region</Bullet>
+        </ul>
+        <div className="mt-8">
+          <Link to="/preise" className="inline-flex items-center text-sm text-accent hover:underline">
+            Zum Preisrechner <ArrowRight className="ml-1 h-4 w-4" />
+          </Link>
+        </div>
+      </Section>
+
+      <Section eyebrow="FAQ" title="Häufige Fragen zur Küchenmontage" bordered>
+        <Accordion type="single" collapsible className="max-w-3xl">
+          {faqs.map((f, i) => (
+            <AccordionItem key={i} value={`k-${i}`} className="border-border/70">
+              <AccordionTrigger className="text-left text-base font-medium">{f.q}</AccordionTrigger>
+              <AccordionContent className="text-sm leading-relaxed text-muted-foreground">{f.a}</AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
+      </Section>
+
+      <CtaBlock
+        title="Küchenprojekt anfragen"
+        text="Senden Sie Fotos der Küche und Anschlüsse – wir geben eine realistische Einschätzung."
+      />
+    </>
+  );
+}
