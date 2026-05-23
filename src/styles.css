@@ -99,21 +99,19 @@
   --shadow-plank: 0 25px 50px -12px oklch(0.08 0.02 50 / 0.8);
 }
 
-@keyframes plank-install {
-  0%   { transform: translate(-50%, -160%) rotate(-22deg); opacity: 0; }
-  10%  { opacity: 1; }
-  40%  { transform: translate(-50%, -55%) rotate(-14deg); opacity: 1; }
-  65%  { transform: translate(-50%, -8%) rotate(-3deg); }
-  78%  { transform: translate(-50%, 0%) rotate(0deg); }
-  82%  { transform: translate(-50%, -2%) rotate(0deg); }
-  88%  { transform: translate(-50%, 0%) rotate(0deg); }
-  100% { transform: translate(-50%, 0%) rotate(0deg); opacity: 1; }
+@keyframes hero-float {
+  0%, 100% { transform: translateY(0) scale(1); filter: brightness(1); }
+  50%      { transform: translateY(-6px) scale(1.012); filter: brightness(1.06); }
 }
 
-.animate-plank { animation: plank-install 5.5s cubic-bezier(0.65, 0, 0.35, 1) infinite; }
+.animate-hero-float {
+  animation: hero-float 7s ease-in-out infinite;
+  transform-origin: center center;
+  will-change: transform, filter;
+}
 
 @media (prefers-reduced-motion: reduce) {
-  .animate-plank { animation: none; transform: translate(-50%, 0) rotate(0); }
+  .animate-hero-float { animation: none; }
 }
 
 .dark {
