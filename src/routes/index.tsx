@@ -408,13 +408,13 @@ function Index() {
             <ul className="mt-8 flex flex-wrap gap-2">
               {areas.map((a) => (
                 <li key={a}>
-                  <Link
-                    to={`/handwerkerservice-${a.toLowerCase()}` as string}
+                  <a
+                    href={`/handwerkerservice-${a.toLowerCase()}`}
                     className="inline-flex items-center rounded-full border border-border bg-card/50 px-4 py-2 text-sm backdrop-blur hover:border-accent/60 hover:text-accent"
                   >
                     <MapPin className="mr-1.5 h-3.5 w-3.5 text-accent" />
                     {a}
-                  </Link>
+                  </a>
                 </li>
               ))}
             </ul>
