@@ -2,7 +2,6 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Hammer } from "lucide-react";
 import heroScene from "@/assets/hero-flooring.png";
-import plank from "@/assets/wood-plank.png";
 
 export const Route = createFileRoute("/")({
   component: Index,
