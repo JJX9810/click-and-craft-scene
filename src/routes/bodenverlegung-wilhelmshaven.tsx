@@ -1,0 +1,131 @@
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { PageHero, Section, Bullet, CtaBlock } from "@/components/site/PageShell";
+import {
+  Accordion, AccordionContent, AccordionItem, AccordionTrigger,
+} from "@/components/ui/accordion";
+import { ArrowRight } from "lucide-react";
+
+export const Route = createFileRoute("/bodenverlegung-wilhelmshaven")({
+  component: Page,
+  head: () => ({
+    meta: [
+      { title: "Bodenverlegung in Wilhelmshaven – Vinyl, Laminat, PVC, Teppich" },
+      { name: "description", content: "Bodenverlegung in Wilhelmshaven & Umgebung: Vinyl, Laminat, PVC und Teppich. Sauber verlegt, mit Untergrundprüfung und Sockelleisten." },
+      { property: "og:title", content: "Bodenverlegung in Wilhelmshaven & Umgebung" },
+      { property: "og:description", content: "Vinyl, Laminat, PVC und Teppich – fachgerecht verlegt von Verlegt & Verschraubt." },
+      { property: "og:url", content: "/bodenverlegung-wilhelmshaven" },
+    ],
+    links: [{ rel: "canonical", href: "/bodenverlegung-wilhelmshaven" }],
+  }),
+});
+
+const sub = [
+  { t: "Vinylboden verlegen", d: "Klick- und Klebevinyl, hochwertige Optiken, ruhig und strapazierfähig." },
+  { t: "Laminat verlegen", d: "Click-Systeme, sauberer Plankenverlauf, Diagonalverlegung möglich." },
+  { t: "PVC verlegen", d: "Pflegeleichter Bodenbelag für Küche, Bad und Nebenräume." },
+  { t: "Teppich verlegen", d: "Spannteppich oder verklebt – schalldämpfend und behaglich." },
+  { t: "Treppenverlegung mit Teppich", d: "Stufen sauber bezogen, kantenrein und rutschsicher." },
+  { t: "Sockelleisten & Übergänge", d: "Saubere Abschlüsse, passende Übergangsschienen, ordentliche Ecken." },
+];
+
+const faqs = [
+  { q: "Wie wird der Untergrund geprüft?", a: "Wir prüfen Ebenheit, Restfeuchte und Tragfähigkeit. Bei Bedarf gleichen wir Unebenheiten aus oder empfehlen die passende Vorbereitung." },
+  { q: "Müssen die Räume leer sein?", a: "Idealerweise ja. Auf Wunsch übernehmen wir Möbelumstellung im überschaubaren Rahmen oder organisieren das gemeinsam." },
+  { q: "Entfernt ihr den Altbelag?", a: "Ja. Altbelag entfernen, entsorgen und Untergrund vorbereiten gehört zum Leistungsumfang." },
+  { q: "Was kostet Bodenverlegung in Wilhelmshaven?", a: "Der Preis hängt von Bodenart, m², Vorbereitung und Zubehör ab. Im Preisrechner bekommen Sie eine erste Orientierung." },
+];
+
+function Page() {
+  return (
+    <>
+      <PageHero
+        eyebrow="Leistung"
+        title="Bodenverlegung in Wilhelmshaven & Umgebung"
+        intro="Vinyl, Laminat, PVC, Teppich, Treppen und Sockelleisten – sauber verlegt, mit ordentlichen Kanten und stimmigem Verlegebild. Für Privatkunden in Wilhelmshaven, Schortens, Sande, Jever, Varel und Wangerland."
+        breadcrumbs={[{ label: "Leistungen" }, { label: "Bodenverlegung" }]}
+      />
+
+      <Section eyebrow="Kurzfassung" title="Was wir verlegen">
+        <p className="max-w-3xl text-base leading-relaxed text-muted-foreground">
+          Verlegt &amp; Verschraubt verlegt für Privatkunden in Wilhelmshaven und
+          Umgebung verschiedene Bodenbeläge. Dazu gehören Untergrundprüfung,
+          Altbelag entfernen, Verlegung sowie der saubere Abschluss mit Sockelleisten
+          und Übergängen. Eine erste Einschätzung ist anhand von Fotos, Maßen und
+          kurzer Beschreibung möglich.
+        </p>
+        <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+          {sub.map((s) => (
+            <article key={s.t} className="rounded-2xl border border-border/70 bg-card/50 p-6 backdrop-blur">
+              <h3 className="text-lg font-semibold">{s.t}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{s.d}</p>
+            </article>
+          ))}
+        </div>
+      </Section>
+
+      <Section eyebrow="Vorbereitung" title="Untergrund &amp; Altbelag" bordered>
+        <div className="grid gap-10 lg:grid-cols-2">
+          <div>
+            <h3 className="text-lg font-semibold">Untergrund prüfen und vorbereiten</h3>
+            <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
+              <Bullet>Ebenheit prüfen, kleine Unebenheiten ausgleichen</Bullet>
+              <Bullet>Saugfähigkeit und Tragfähigkeit beurteilen</Bullet>
+              <Bullet>Sauberer, trockener Untergrund vor Verlegebeginn</Bullet>
+            </ul>
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold">Altbelag entfernen</h3>
+            <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
+              <Bullet>Teppich, PVC, Laminat oder Vinyl rückbauen</Bullet>
+              <Bullet>Kleberückstände beurteilen und entfernen</Bullet>
+              <Bullet>Fachgerechte Entsorgung auf Wunsch</Bullet>
+            </ul>
+          </div>
+        </div>
+      </Section>
+
+      <Section eyebrow="Ablauf" title="So arbeiten wir">
+        <ol className="grid gap-6 md:grid-cols-4">
+          {["Anfrage & Fotos", "Einschätzung & Termin", "Vorbereitung & Verlegung", "Abschluss & Übergabe"].map((t, i) => (
+            <li key={t} className="rounded-2xl border border-border/70 bg-card/40 p-6">
+              <p className="text-[11px] uppercase tracking-[0.25em] text-muted-foreground">Schritt {i + 1}</p>
+              <h3 className="mt-1 text-base font-semibold">{t}</h3>
+            </li>
+          ))}
+        </ol>
+      </Section>
+
+      <Section eyebrow="Preisfaktoren" title="Was den Preis beeinflusst" bordered>
+        <ul className="grid gap-3 text-sm text-muted-foreground sm:grid-cols-2 lg:grid-cols-3">
+          <Bullet>Bodenart (Vinyl, Laminat, PVC, Teppich)</Bullet>
+          <Bullet>Quadratmeter und Raumzuschnitt</Bullet>
+          <Bullet>Untergrundvorbereitung</Bullet>
+          <Bullet>Altbelag entfernen ja/nein</Bullet>
+          <Bullet>Sockelleisten & Übergänge</Bullet>
+          <Bullet>Türen, Heizungsrohre, Schrägen</Bullet>
+        </ul>
+        <div className="mt-8">
+          <Link to="/preise" className="inline-flex items-center text-sm text-accent hover:underline">
+            Zum Preisrechner <ArrowRight className="ml-1 h-4 w-4" />
+          </Link>
+        </div>
+      </Section>
+
+      <Section eyebrow="FAQ" title="Häufige Fragen zur Bodenverlegung">
+        <Accordion type="single" collapsible className="max-w-3xl">
+          {faqs.map((f, i) => (
+            <AccordionItem key={i} value={`b-${i}`} className="border-border/70">
+              <AccordionTrigger className="text-left text-base font-medium">{f.q}</AccordionTrigger>
+              <AccordionContent className="text-sm leading-relaxed text-muted-foreground">{f.a}</AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
+      </Section>
+
+      <CtaBlock
+        title="Bodenprojekt in Wilhelmshaven anfragen"
+        text="Senden Sie Fotos vom Raum und ein paar Maße – Sie erhalten eine ehrliche Einschätzung."
+      />
+    </>
+  );
+}

@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import {
   Accordion,
@@ -8,7 +8,6 @@ import {
 } from "@/components/ui/accordion";
 import {
   ArrowRight,
-  Hammer,
   Layers,
   Wrench,
   Trash2,
@@ -23,7 +22,7 @@ import {
   ClipboardCheck,
   FileText,
   CheckCircle2,
-  Menu,
+  Star,
 } from "lucide-react";
 import heroScene from "@/assets/hero-flooring.png";
 
@@ -38,7 +37,7 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Handwerkerservice aus Wilhelmshaven: Z.O.Z. – Zuverlässig, Ordentlich, Zügig. Bodenverlegung, Küchenmontage und Entrümpelung für Privatkunden.",
+          "Handwerkerservice aus Wilhelmshaven: Z.O.Z. – Zuverlässig, Ordentlich, Zügig. Bodenverlegung, Küchenmontage und Entrümpelung für Privatkunden in Wilhelmshaven & Umgebung.",
       },
       {
         property: "og:title",
@@ -49,53 +48,55 @@ export const Route = createFileRoute("/")({
         content:
           "Z.O.Z. – Zuverlässig. Ordentlich. Zügig. Bodenverlegung, Küchenmontage und Entrümpelung in Wilhelmshaven & Umgebung.",
       },
+      { property: "og:url", content: "/" },
+    ],
+    links: [{ rel: "canonical", href: "/" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "HomeAndConstructionBusiness",
+          name: "Verlegt & Verschraubt Handwerkerservice",
+          founder: "Justus Brosch",
+          telephone: "+49 163 4799286",
+          email: "justus.brosch@verlegt-verschraubt.de",
+          address: {
+            "@type": "PostalAddress",
+            streetAddress: "Weichselstraße 12",
+            postalCode: "26388",
+            addressLocality: "Wilhelmshaven",
+            addressCountry: "DE",
+          },
+          areaServed: ["Wilhelmshaven", "Schortens", "Sande", "Jever", "Varel", "Wangerland"],
+          slogan: "Z.O.Z. – Zuverlässig. Ordentlich. Zügig.",
+        }),
+      },
     ],
   }),
 });
-
-const marqueeWords = [
-  "Wilhelmshaven",
-  "Zuverlässig",
-  "Ordentlich",
-  "Zügig",
-  "Bodenverlegung",
-  "Küchenmontage",
-  "Entrümpelung",
-  "Direkter Ansprechpartner",
-  "Saubere Ausführung",
-  "Z.O.Z.",
-];
 
 const services = [
   {
     icon: Layers,
     title: "Bodenverlegung",
     desc: "Laminat, Vinyl, PVC und Teppich – fachgerecht verlegt mit sauberen Kanten und stimmigem Verlegebild.",
-    points: [
-      "Laminat, Vinyl, PVC & Teppich",
-      "Sockelleisten & Übergangsschienen",
-      "Untergrundprüfung & Vorbereitung",
-    ],
+    points: ["Vinyl, Laminat, PVC & Teppich", "Sockelleisten & Übergänge", "Untergrund prüfen & vorbereiten"],
+    to: "/bodenverlegung-wilhelmshaven",
   },
   {
     icon: Wrench,
     title: "Küchenmontage",
-    desc: "Aufbau und Anschluss neuer oder umgestellter Küchen – von der Front bis zur Arbeitsplatte.",
-    points: [
-      "Korpusse, Fronten & Arbeitsplatten",
-      "Spüle, Armaturen & Geräteanschluss",
-      "Sauberes, dokumentiertes Ergebnis",
-    ],
+    desc: "Aufbau, Restmontage und Anpassung – von der Front über die Arbeitsplatte bis zur Spüle.",
+    points: ["Küche nach Umzug aufbauen", "Restmontage & neue Module", "Arbeitsplatte, Spüle, Armatur"],
+    to: "/kuechenmontage-in-wilhelmshaven",
   },
   {
     icon: Trash2,
     title: "Entrümpelung & Entsorgung",
-    desc: "Wohnung, Keller, Garage – wir räumen zuverlässig und übergeben besenrein.",
-    points: [
-      "Komplett- oder Teilentrümpelung",
-      "Fachgerechte Trennung & Entsorgung",
-      "Diskret und planbar",
-    ],
+    desc: "Wohnung, Keller, Dachboden – wir räumen zuverlässig und übergeben besenrein.",
+    points: ["Wohnungs-, Keller-, Dachbodenräumung", "Möbel & Sperrmüll entsorgen", "Räumung vor Renovierung"],
+    to: "/entruempelung-entsorgung-in-wilhelmshaven",
   },
 ];
 
@@ -103,110 +104,55 @@ const reasons = [
   { icon: Target, title: "Klare Spezialisierung", desc: "Fokus auf Boden, Küche und Entrümpelung – kein Bauchladen." },
   { icon: Sparkles, title: "Saubere Ausführung", desc: "Ordentliche Kanten, ordentliche Übergaben, ordentliche Räume." },
   { icon: MessageSquare, title: "Direkte Kommunikation", desc: "Sie sprechen direkt mit dem Inhaber. Kurze Wege." },
-  { icon: ShieldCheck, title: "Realistische Einschätzung", desc: "Ehrliches Angebot. Keine Überraschungen auf der Rechnung." },
+  { icon: ShieldCheck, title: "Realistische Einschätzung", desc: "Ehrlich vorab. Keine Überraschungen auf der Rechnung." },
 ];
 
 const steps = [
-  { icon: Send, title: "Anfrage senden", desc: "Per Telefon, E-Mail oder WhatsApp – kurz schildern, worum es geht." },
-  { icon: ClipboardCheck, title: "Aufwand prüfen", desc: "Wir klären Details, bei Bedarf vor Ort oder anhand von Fotos." },
-  { icon: FileText, title: "Angebot erhalten", desc: "Transparentes Festpreis-Angebot – ohne Kleingedrucktes." },
-  { icon: CheckCircle2, title: "Sauber umsetzen", desc: "Termingerechte Ausführung. Sauber. Pünktlich. Fertig." },
+  { icon: Send, title: "Anfrage senden", desc: "Kurz schildern, worum es geht – per Telefon, E-Mail oder Formular." },
+  { icon: ClipboardCheck, title: "Fotos & Maße", desc: "Bilder und ein paar Zahlen genügen für die erste Einschätzung." },
+  { icon: FileText, title: "Einschätzung", desc: "Realistischer Aufwand, Termin und Preisrahmen – transparent." },
+  { icon: CheckCircle2, title: "Saubere Ausführung", desc: "Termin, Umsetzung, Übergabe – ordentlich und zügig." },
 ];
 
 const areas = ["Wilhelmshaven", "Schortens", "Sande", "Jever", "Varel", "Wangerland"];
 
-const references = [
-  { t: "Vinyl-Klick im Wohnzimmer", d: "60 m² · saubere Übergänge" },
-  { t: "Küchenmontage Neubau", d: "Arbeitsplatte mit Spüle eingepasst" },
-  { t: "Komplettentrümpelung", d: "Wohnung besenrein übergeben" },
-  { t: "Laminat im Flur", d: "Diagonalverlegung mit Schienen" },
-  { t: "Teppich Schlafzimmer", d: "Verklebt, kantenrein" },
-  { t: "Küchenumzug", d: "Abbau, Transport, Aufbau" },
+const reviews = [
+  {
+    name: "Ricarda F.",
+    src: "MyHammer",
+    text: "Sehr lösungsorientiert bei den Arbeitsplatten – die Küche sieht jetzt richtig stimmig aus.",
+    cat: "Küchenlösung",
+  },
+  {
+    name: "Pass Pass2",
+    src: "Google",
+    text: "Küche nach unserem Umzug komplett aufgebaut. Saubere Arbeit, alles funktioniert.",
+    cat: "Küchenmontage",
+  },
+  {
+    name: "Haysam B.",
+    src: "Google",
+    text: "Laminat im ganzen Wohnzimmer verlegt – ordentlich, schnell, ohne Diskussion.",
+    cat: "Bodenverlegung",
+  },
+  {
+    name: "Pauline G.",
+    src: "Google",
+    text: "Sehr zuverlässig und flexibel bei einem kurzfristigen Termin.",
+    cat: "Zuverlässigkeit",
+  },
 ];
 
 const faqs = [
-  { q: "Wie wird der Preis ermittelt?", a: "Nach kurzer Beschreibung – bei Bedarf mit Fotos oder Vor-Ort-Termin – erhalten Sie ein transparentes Festpreis-Angebot. Keine versteckten Posten." },
-  { q: "Welche Leistungen bieten Sie an?", a: "Bodenverlegung (Laminat, Vinyl, PVC, Teppich), Küchenmontage sowie Entrümpelung und fachgerechte Entsorgung – ausschließlich für Privatkunden." },
-  { q: "Wie schnell bekomme ich eine Einschätzung?", a: "In der Regel innerhalb von 24 Stunden an Werktagen. Bei dringenden Anliegen einfach anrufen." },
+  { q: "Reichen Fotos für eine erste Einschätzung?", a: "Ja. Mit ein paar Fotos, groben Maßen und einer kurzen Beschreibung können wir den Aufwand in den meisten Fällen gut einschätzen." },
   { q: "In welchem Gebiet arbeiten Sie?", a: "Wilhelmshaven und Umgebung: Schortens, Sande, Jever, Varel und Wangerland. Andere Orte gerne auf Anfrage." },
-  { q: "Bringen Sie das Material mit?", a: "Auf Wunsch übernehmen wir die Materialbeschaffung. Sie können Material aber auch selbst bereitstellen." },
+  { q: "Schließt ihr Herd oder Starkstrom an?", a: "Nein. Elektroinstallationen und Sanitäränderungen übernehmen Fachbetriebe. Bei Bedarf stimmen wir uns ab." },
+  { q: "Wie schnell bekomme ich eine Rückmeldung?", a: "An Werktagen in der Regel innerhalb von 24 Stunden. Dringend? Einfach anrufen." },
 ];
-
-function Marquee() {
-  const items = [...marqueeWords, ...marqueeWords];
-  return (
-    <div
-      aria-hidden
-      className="relative overflow-hidden border-y border-border/60 bg-background/60 py-3 backdrop-blur"
-    >
-      <div className="flex w-max animate-marquee gap-10 whitespace-nowrap pl-10">
-        {items.map((w, i) => (
-          <span key={i} className="flex items-center gap-10 text-xs uppercase tracking-[0.35em] text-muted-foreground/80 sm:text-sm">
-            {w}
-            <span className="h-1 w-1 rounded-full bg-accent/70" />
-          </span>
-        ))}
-      </div>
-      <div className="pointer-events-none absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-background to-transparent" />
-      <div className="pointer-events-none absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-background to-transparent" />
-    </div>
-  );
-}
-
-function Header() {
-  return (
-    <header className="sticky top-0 z-30 border-b border-border/50 bg-background/70 backdrop-blur-md">
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-6 py-4">
-        <a href="#top" className="flex items-center gap-2">
-          <span className="flex h-8 w-8 items-center justify-center rounded-md bg-accent/15 text-accent">
-            <Hammer className="h-4 w-4" />
-          </span>
-          <span className="text-sm font-semibold uppercase tracking-[0.2em]">
-            Verlegt &amp; Verschraubt
-          </span>
-        </a>
-        <nav className="hidden gap-7 text-xs uppercase tracking-[0.2em] text-muted-foreground lg:flex">
-          <a href="#leistungen" className="hover:text-foreground">Leistungen</a>
-          <a href="#gebiet" className="hover:text-foreground">Einsatzorte</a>
-          <a href="#referenzen" className="hover:text-foreground">Referenzen</a>
-          <a href="#preise" className="hover:text-foreground">Preise</a>
-          <a href="#kontakt" className="hover:text-foreground">Kontakt</a>
-          <a href="#faq" className="hover:text-foreground">Mehr</a>
-        </nav>
-        <div className="flex items-center gap-2">
-          <a
-            href="mailto:justus.brosch@verlegt-verschraubt.de"
-            aria-label="E-Mail schreiben"
-            className="hidden h-10 w-10 items-center justify-center rounded-full border border-border/60 text-muted-foreground hover:text-foreground sm:flex"
-          >
-            <Mail className="h-4 w-4" />
-          </a>
-          <Button
-            asChild
-            size="sm"
-            className="h-10 rounded-full bg-accent px-5 text-accent-foreground hover:bg-accent/90"
-          >
-            <a href="tel:+4916347992866" className="gap-2">
-              <Phone className="h-4 w-4" />
-              <span className="hidden sm:inline">Anrufen</span>
-              <span className="sm:hidden">Call</span>
-            </a>
-          </Button>
-          <button aria-label="Menü" className="flex h-10 w-10 items-center justify-center rounded-full border border-border/60 text-muted-foreground lg:hidden">
-            <Menu className="h-4 w-4" />
-          </button>
-        </div>
-      </div>
-    </header>
-  );
-}
 
 function Index() {
   return (
-    <main className="bg-wood-grain relative min-h-screen overflow-x-hidden text-foreground">
-      <Marquee />
-      <Header />
-
+    <>
       {/* HERO */}
       <section id="top" className="relative">
         <div
@@ -221,11 +167,11 @@ function Index() {
             </span>
             <h1 className="mt-6 text-balance text-4xl font-semibold leading-[1.05] tracking-tight sm:text-5xl lg:text-[3.5rem]">
               Bodenverlegung, Küchenmontage &amp; Entrümpelung in{" "}
-              <span className="text-accent">Wilhelmshaven</span>
+              <span className="text-accent">Wilhelmshaven</span> &amp; Umgebung
             </h1>
             <p className="mt-6 max-w-lg text-base leading-relaxed text-muted-foreground sm:text-lg">
-              Saubere Arbeiten im Innenbereich – zuverlässig, ordentlich und zügig.
-              Für Privatkunden in Wilhelmshaven und Umgebung.
+              Verlegt &amp; Verschraubt unterstützt Privatkunden bei sauberen
+              Innenarbeiten – zuverlässig, ordentlich und zügig.
             </p>
             <div className="mt-10 flex flex-wrap gap-3">
               <Button
@@ -233,10 +179,10 @@ function Index() {
                 size="lg"
                 className="group h-12 rounded-full bg-accent px-7 text-accent-foreground shadow-lg shadow-accent/20 hover:bg-accent/90"
               >
-                <a href="#kontakt">
-                  Kostenlose Ersteinschätzung anfragen
+                <Link to="/kontakt">
+                  Projekt anfragen
                   <ArrowRight className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                </a>
+                </Link>
               </Button>
               <Button
                 asChild
@@ -244,36 +190,33 @@ function Index() {
                 variant="outline"
                 className="h-12 rounded-full border-border bg-transparent px-7 hover:bg-card"
               >
-                <a href="#referenzen">Referenzen ansehen</a>
+                <a href="tel:+4916347992866">
+                  <Phone className="mr-1 h-4 w-4" /> Direkt anrufen
+                </a>
               </Button>
             </div>
 
-            <dl className="mt-14 grid max-w-md grid-cols-3 gap-6 border-t border-border/70 pt-8">
+            <dl className="mt-12 grid max-w-md grid-cols-3 gap-6 border-t border-border/70 pt-8">
               <div>
-                <dt className="text-2xl font-semibold">15+</dt>
-                <dd className="mt-1 text-[11px] uppercase tracking-[0.2em] text-muted-foreground">Jahre Erfahrung</dd>
+                <dt className="text-2xl font-semibold">Lokal</dt>
+                <dd className="mt-1 text-[11px] uppercase tracking-[0.2em] text-muted-foreground">Wilhelmshaven</dd>
               </div>
               <div>
-                <dt className="text-2xl font-semibold">500+</dt>
-                <dd className="mt-1 text-[11px] uppercase tracking-[0.2em] text-muted-foreground">Projekte</dd>
+                <dt className="text-2xl font-semibold">Direkt</dt>
+                <dd className="mt-1 text-[11px] uppercase tracking-[0.2em] text-muted-foreground">Inhaber-Kontakt</dd>
               </div>
               <div>
-                <dt className="text-2xl font-semibold">100%</dt>
-                <dd className="mt-1 text-[11px] uppercase tracking-[0.2em] text-muted-foreground">Sauber</dd>
+                <dt className="text-2xl font-semibold">Sauber</dt>
+                <dd className="mt-1 text-[11px] uppercase tracking-[0.2em] text-muted-foreground">Übergabe</dd>
               </div>
             </dl>
           </div>
 
-          {/* Hero visual — slot ready for 3D animation */}
           <div className="relative">
-            <div
-              id="hero-3d-slot"
-              data-hero-3d-placeholder
-              className="relative aspect-[16/11] w-full overflow-hidden rounded-3xl border border-border/60 shadow-2xl"
-            >
+            <div className="relative aspect-[16/11] w-full overflow-hidden rounded-3xl border border-border/60 shadow-2xl">
               <img
                 src={heroScene}
-                alt="Stilisierter Bodenleger in Holzoptik verlegt eine Laminatplanke auf dunklem Holzboden"
+                alt="Bodenleger verlegt Laminatplanke in Holzoptik auf dunklem Holzboden"
                 className="animate-hero-float h-full w-full object-cover"
                 width={1024}
                 height={704}
@@ -285,14 +228,44 @@ function Index() {
                     "linear-gradient(180deg, transparent 55%, oklch(0.14 0.012 60 / 0.55) 100%), linear-gradient(90deg, oklch(0.16 0.012 60 / 0.45) 0%, transparent 40%)",
                 }}
               />
-              <div className="absolute bottom-4 left-4 rounded-full border border-border/60 bg-background/70 px-3 py-1 text-[10px] uppercase tracking-[0.25em] text-muted-foreground backdrop-blur">
-                Keyvisual · 3D-Bereich
-              </div>
             </div>
-            <p className="mt-4 text-right text-[11px] uppercase tracking-[0.25em] text-muted-foreground">
-              Click-System Laminat · ruhige, präzise Bewegung
-            </p>
           </div>
+        </div>
+      </section>
+
+      {/* TRUST / BEWERTUNGEN */}
+      <section className="border-y border-border/60 bg-background/40">
+        <div className="mx-auto max-w-7xl px-6 py-16">
+          <div className="flex flex-wrap items-center justify-between gap-6">
+            <div>
+              <p className="text-xs uppercase tracking-[0.28em] text-accent">Bewertungen</p>
+              <h2 className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">
+                Echte Stimmen von Kunden
+              </h2>
+            </div>
+            <Button asChild variant="outline" className="rounded-full border-border bg-transparent">
+              <Link to="/referenzen">Alle Referenzen ansehen <ArrowRight className="ml-1 h-4 w-4" /></Link>
+            </Button>
+          </div>
+          <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {reviews.map((r) => (
+              <article key={r.name} className="rounded-2xl border border-border/70 bg-card/50 p-5 backdrop-blur">
+                <div className="flex items-center gap-1 text-accent">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <Star key={i} className="h-3.5 w-3.5 fill-current" />
+                  ))}
+                </div>
+                <p className="mt-3 text-sm leading-relaxed text-foreground/90">„{r.text}"</p>
+                <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground">
+                  <span className="font-medium text-foreground">{r.name}</span>
+                  <span>{r.src} · {r.cat}</span>
+                </div>
+              </article>
+            ))}
+          </div>
+          <p className="mt-6 text-xs text-muted-foreground">
+            Auszüge aus Bewertungen auf Google, MyHammer, Das Telefonbuch und Facebook.
+          </p>
         </div>
       </section>
 
@@ -324,19 +297,24 @@ function Index() {
                     </li>
                   ))}
                 </ul>
-                <a
-                  href="#kontakt"
-                  className="mt-7 inline-flex items-center gap-1 text-xs font-medium uppercase tracking-[0.2em] text-accent hover:gap-2"
-                >
-                  Anfragen <ArrowRight className="h-3.5 w-3.5" />
-                </a>
+                <div className="mt-7 flex items-center justify-between">
+                  <Link
+                    to={s.to}
+                    className="inline-flex items-center gap-1 text-xs font-medium uppercase tracking-[0.2em] text-accent hover:gap-2"
+                  >
+                    Details <ArrowRight className="h-3.5 w-3.5" />
+                  </Link>
+                  <Link to="/kontakt" className="text-xs uppercase tracking-[0.2em] text-muted-foreground hover:text-foreground">
+                    Anfragen
+                  </Link>
+                </div>
               </article>
             ))}
           </div>
         </div>
       </section>
 
-      {/* WARUM WIR */}
+      {/* WARUM */}
       <section className="border-y border-border/60 bg-background/40">
         <div className="mx-auto max-w-7xl px-6 py-24">
           <div className="max-w-2xl">
@@ -390,12 +368,32 @@ function Index() {
         </ol>
       </section>
 
+      {/* PREISE */}
+      <section id="preise" className="border-y border-border/60 bg-background/40">
+        <div className="mx-auto max-w-3xl px-6 py-20 text-center">
+          <p className="text-xs uppercase tracking-[0.28em] text-accent">Preise</p>
+          <h2 className="mt-3 text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
+            Was kostet mein Projekt ungefähr?
+          </h2>
+          <p className="mt-4 text-base leading-relaxed text-muted-foreground">
+            Mit unserem Preisrechner bekommen Sie eine erste Orientierung für
+            Bodenverlegung, Küchenmontage oder Entrümpelung – ohne Fachchinesisch
+            und ohne Verbindlichkeit.
+          </p>
+          <div className="mt-8 flex flex-wrap justify-center gap-3">
+            <Button asChild size="lg" className="h-12 rounded-full bg-accent px-7 text-accent-foreground hover:bg-accent/90">
+              <Link to="/preise">Zum Preisrechner <ArrowRight className="ml-1 h-4 w-4" /></Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+
       {/* EINSATZGEBIET */}
-      <section id="gebiet" className="relative border-y border-border/60">
+      <section id="gebiet" className="relative">
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0"
-          style={{ background: "var(--gradient-hero)", opacity: 0.7 }}
+          style={{ background: "var(--gradient-hero)", opacity: 0.65 }}
         />
         <div className="relative mx-auto grid max-w-7xl gap-12 px-6 py-24 lg:grid-cols-2 lg:items-center">
           <div>
@@ -404,16 +402,19 @@ function Index() {
               Wilhelmshaven &amp; Umgebung.
             </h2>
             <p className="mt-4 max-w-lg text-base leading-relaxed text-muted-foreground">
-              Wir arbeiten lokal – kurze Wege, schnelle Termine. Andere Orte gerne auf Anfrage.
+              Wir arbeiten lokal – kurze Wege, schnelle Termine. Andere Orte
+              gerne auf Anfrage.
             </p>
             <ul className="mt-8 flex flex-wrap gap-2">
               {areas.map((a) => (
-                <li
-                  key={a}
-                  className="rounded-full border border-border bg-card/50 px-4 py-2 text-sm backdrop-blur"
-                >
-                  <MapPin className="mr-1.5 inline h-3.5 w-3.5 text-accent" />
-                  {a}
+                <li key={a}>
+                  <a
+                    href={`/handwerkerservice-${a.toLowerCase()}`}
+                    className="inline-flex items-center rounded-full border border-border bg-card/50 px-4 py-2 text-sm backdrop-blur hover:border-accent/60 hover:text-accent"
+                  >
+                    <MapPin className="mr-1.5 h-3.5 w-3.5 text-accent" />
+                    {a}
+                  </a>
                 </li>
               ))}
             </ul>
@@ -429,77 +430,30 @@ function Index() {
         </div>
       </section>
 
-      {/* REFERENZEN */}
-      <section id="referenzen" className="mx-auto max-w-7xl px-6 py-24">
-        <div className="max-w-2xl">
-          <p className="text-xs uppercase tracking-[0.28em] text-accent">Referenzen</p>
+      {/* FAQ */}
+      <section id="faq" className="border-t border-border/60">
+        <div className="mx-auto max-w-3xl px-6 py-24">
+          <p className="text-xs uppercase tracking-[0.28em] text-accent">FAQ</p>
           <h2 className="mt-3 text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
-            Einblicke aus der Praxis.
+            Häufige Fragen.
           </h2>
-        </div>
-        <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {references.map((p) => (
-            <article
-              key={p.t}
-              className="group overflow-hidden rounded-2xl border border-border/70 bg-card/40"
-            >
-              <div
-                className="aspect-[4/3] w-full transition-transform duration-700 group-hover:scale-105"
-                style={{
-                  background:
-                    "linear-gradient(135deg, oklch(0.34 0.04 55) 0%, oklch(0.18 0.012 60) 100%)",
-                }}
-              />
-              <div className="p-5">
-                <h3 className="text-base font-semibold">{p.t}</h3>
-                <p className="mt-1 text-sm text-muted-foreground">{p.d}</p>
-              </div>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      {/* PREISE */}
-      <section id="preise" className="border-y border-border/60 bg-background/40">
-        <div className="mx-auto max-w-3xl px-6 py-24 text-center">
-          <p className="text-xs uppercase tracking-[0.28em] text-accent">Preise</p>
-          <h2 className="mt-3 text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
-            Transparent. Festpreis. Ohne Überraschungen.
-          </h2>
-          <p className="mt-4 text-base leading-relaxed text-muted-foreground">
-            Jedes Projekt ist anders. Nach kurzer Beschreibung – bei Bedarf mit Fotos
-            oder Vor-Ort-Termin – erhalten Sie ein klares Festpreis-Angebot. Kein
-            Stundenhonorar-Roulette, keine versteckten Posten.
-          </p>
-          <div className="mt-10 flex justify-center">
-            <Button
-              asChild
-              size="lg"
-              className="h-12 rounded-full bg-accent px-7 text-accent-foreground hover:bg-accent/90"
-            >
-              <a href="#kontakt">Angebot anfordern <ArrowRight className="ml-1 h-4 w-4" /></a>
-            </Button>
+          <Accordion type="single" collapsible className="mt-10">
+            {faqs.map((f, i) => (
+              <AccordionItem key={i} value={`item-${i}`} className="border-border/70">
+                <AccordionTrigger className="text-left text-base font-medium">{f.q}</AccordionTrigger>
+                <AccordionContent className="text-sm leading-relaxed text-muted-foreground">{f.a}</AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+          <div className="mt-8">
+            <Link to="/faq" className="text-sm text-accent hover:underline">
+              Alle Fragen ansehen →
+            </Link>
           </div>
         </div>
       </section>
 
-      {/* FAQ */}
-      <section id="faq" className="mx-auto max-w-3xl px-6 py-24">
-        <p className="text-xs uppercase tracking-[0.28em] text-accent">FAQ</p>
-        <h2 className="mt-3 text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
-          Häufige Fragen.
-        </h2>
-        <Accordion type="single" collapsible className="mt-10">
-          {faqs.map((f, i) => (
-            <AccordionItem key={i} value={`item-${i}`} className="border-border/70">
-              <AccordionTrigger className="text-left text-base font-medium">{f.q}</AccordionTrigger>
-              <AccordionContent className="text-sm leading-relaxed text-muted-foreground">{f.a}</AccordionContent>
-            </AccordionItem>
-          ))}
-        </Accordion>
-      </section>
-
-      {/* KONTAKT */}
+      {/* KONTAKT-CTA */}
       <section id="kontakt" className="relative border-t border-border/60">
         <div
           aria-hidden
@@ -510,21 +464,17 @@ function Index() {
           <div>
             <p className="text-xs uppercase tracking-[0.28em] text-accent">Kontakt</p>
             <h2 className="mt-3 text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
-              Lassen Sie uns kurz reden.
+              Unsicher, ob Ihr Auftrag machbar ist?
             </h2>
             <p className="mt-4 max-w-lg text-base leading-relaxed text-muted-foreground">
-              Schildern Sie Ihr Vorhaben – Sie erhalten eine ehrliche
+              Senden Sie Fotos und ein paar Maße – wir geben eine ehrliche
               Ersteinschätzung, in der Regel innerhalb von 24 Stunden.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Button
-                asChild
-                size="lg"
-                className="h-12 rounded-full bg-accent px-7 text-accent-foreground hover:bg-accent/90"
-              >
-                <a href="mailto:justus.brosch@verlegt-verschraubt.de">
+              <Button asChild size="lg" className="h-12 rounded-full bg-accent px-7 text-accent-foreground hover:bg-accent/90">
+                <Link to="/kontakt">
                   Anfrage senden <ArrowRight className="ml-1 h-4 w-4" />
-                </a>
+                </Link>
               </Button>
               <Button
                 asChild
@@ -559,24 +509,12 @@ function Index() {
                 <span className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background">
                   <MapPin className="h-4 w-4 text-accent" />
                 </span>
-                <span>Wilhelmshaven &amp; Umgebung</span>
+                <span>Weichselstraße 12, 26388 Wilhelmshaven</span>
               </li>
             </ul>
           </div>
         </div>
       </section>
-
-      {/* FOOTER */}
-      <footer className="border-t border-border/60">
-        <div className="mx-auto flex max-w-7xl flex-col items-start justify-between gap-4 px-6 py-10 text-xs text-muted-foreground sm:flex-row sm:items-center">
-          <div className="flex items-center gap-2">
-            <Hammer className="h-4 w-4 text-accent" />
-            <span className="uppercase tracking-[0.2em]">Verlegt &amp; Verschraubt Handwerkerservice</span>
-          </div>
-          <p className="uppercase tracking-[0.2em]">Z.O.Z. · Zuverlässig · Ordentlich · Zügig</p>
-          <p>© {new Date().getFullYear()} Justus Brosch · Wilhelmshaven</p>
-        </div>
-      </footer>
-    </main>
+    </>
   );
 }
