@@ -17,6 +17,12 @@ import { Route as PartnerRouteImport } from './routes/partner'
 import { Route as KuechenmontageInWilhelmshavenRouteImport } from './routes/kuechenmontage-in-wilhelmshaven'
 import { Route as KontaktRouteImport } from './routes/kontakt'
 import { Route as ImpressumRouteImport } from './routes/impressum'
+import { Route as HandwerkerserviceWilhelmshavenRouteImport } from './routes/handwerkerservice-wilhelmshaven'
+import { Route as HandwerkerserviceWangerlandRouteImport } from './routes/handwerkerservice-wangerland'
+import { Route as HandwerkerserviceVarelRouteImport } from './routes/handwerkerservice-varel'
+import { Route as HandwerkerserviceSchortensRouteImport } from './routes/handwerkerservice-schortens'
+import { Route as HandwerkerserviceSandeRouteImport } from './routes/handwerkerservice-sande'
+import { Route as HandwerkerserviceJeverRouteImport } from './routes/handwerkerservice-jever'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as EntruempelungEntsorgungInWilhelmshavenRouteImport } from './routes/entruempelung-entsorgung-in-wilhelmshaven'
 import { Route as DatenschutzRouteImport } from './routes/datenschutz'
@@ -64,6 +70,39 @@ const ImpressumRoute = ImpressumRouteImport.update({
   path: '/impressum',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HandwerkerserviceWilhelmshavenRoute =
+  HandwerkerserviceWilhelmshavenRouteImport.update({
+    id: '/handwerkerservice-wilhelmshaven',
+    path: '/handwerkerservice-wilhelmshaven',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const HandwerkerserviceWangerlandRoute =
+  HandwerkerserviceWangerlandRouteImport.update({
+    id: '/handwerkerservice-wangerland',
+    path: '/handwerkerservice-wangerland',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const HandwerkerserviceVarelRoute = HandwerkerserviceVarelRouteImport.update({
+  id: '/handwerkerservice-varel',
+  path: '/handwerkerservice-varel',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HandwerkerserviceSchortensRoute =
+  HandwerkerserviceSchortensRouteImport.update({
+    id: '/handwerkerservice-schortens',
+    path: '/handwerkerservice-schortens',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const HandwerkerserviceSandeRoute = HandwerkerserviceSandeRouteImport.update({
+  id: '/handwerkerservice-sande',
+  path: '/handwerkerservice-sande',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HandwerkerserviceJeverRoute = HandwerkerserviceJeverRouteImport.update({
+  id: '/handwerkerservice-jever',
+  path: '/handwerkerservice-jever',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FaqRoute = FaqRouteImport.update({
   id: '/faq',
   path: '/faq',
@@ -98,6 +137,12 @@ export interface FileRoutesByFullPath {
   '/datenschutz': typeof DatenschutzRoute
   '/entruempelung-entsorgung-in-wilhelmshaven': typeof EntruempelungEntsorgungInWilhelmshavenRoute
   '/faq': typeof FaqRoute
+  '/handwerkerservice-jever': typeof HandwerkerserviceJeverRoute
+  '/handwerkerservice-sande': typeof HandwerkerserviceSandeRoute
+  '/handwerkerservice-schortens': typeof HandwerkerserviceSchortensRoute
+  '/handwerkerservice-varel': typeof HandwerkerserviceVarelRoute
+  '/handwerkerservice-wangerland': typeof HandwerkerserviceWangerlandRoute
+  '/handwerkerservice-wilhelmshaven': typeof HandwerkerserviceWilhelmshavenRoute
   '/impressum': typeof ImpressumRoute
   '/kontakt': typeof KontaktRoute
   '/kuechenmontage-in-wilhelmshaven': typeof KuechenmontageInWilhelmshavenRoute
@@ -113,6 +158,12 @@ export interface FileRoutesByTo {
   '/datenschutz': typeof DatenschutzRoute
   '/entruempelung-entsorgung-in-wilhelmshaven': typeof EntruempelungEntsorgungInWilhelmshavenRoute
   '/faq': typeof FaqRoute
+  '/handwerkerservice-jever': typeof HandwerkerserviceJeverRoute
+  '/handwerkerservice-sande': typeof HandwerkerserviceSandeRoute
+  '/handwerkerservice-schortens': typeof HandwerkerserviceSchortensRoute
+  '/handwerkerservice-varel': typeof HandwerkerserviceVarelRoute
+  '/handwerkerservice-wangerland': typeof HandwerkerserviceWangerlandRoute
+  '/handwerkerservice-wilhelmshaven': typeof HandwerkerserviceWilhelmshavenRoute
   '/impressum': typeof ImpressumRoute
   '/kontakt': typeof KontaktRoute
   '/kuechenmontage-in-wilhelmshaven': typeof KuechenmontageInWilhelmshavenRoute
@@ -129,6 +180,12 @@ export interface FileRoutesById {
   '/datenschutz': typeof DatenschutzRoute
   '/entruempelung-entsorgung-in-wilhelmshaven': typeof EntruempelungEntsorgungInWilhelmshavenRoute
   '/faq': typeof FaqRoute
+  '/handwerkerservice-jever': typeof HandwerkerserviceJeverRoute
+  '/handwerkerservice-sande': typeof HandwerkerserviceSandeRoute
+  '/handwerkerservice-schortens': typeof HandwerkerserviceSchortensRoute
+  '/handwerkerservice-varel': typeof HandwerkerserviceVarelRoute
+  '/handwerkerservice-wangerland': typeof HandwerkerserviceWangerlandRoute
+  '/handwerkerservice-wilhelmshaven': typeof HandwerkerserviceWilhelmshavenRoute
   '/impressum': typeof ImpressumRoute
   '/kontakt': typeof KontaktRoute
   '/kuechenmontage-in-wilhelmshaven': typeof KuechenmontageInWilhelmshavenRoute
@@ -146,6 +203,12 @@ export interface FileRouteTypes {
     | '/datenschutz'
     | '/entruempelung-entsorgung-in-wilhelmshaven'
     | '/faq'
+    | '/handwerkerservice-jever'
+    | '/handwerkerservice-sande'
+    | '/handwerkerservice-schortens'
+    | '/handwerkerservice-varel'
+    | '/handwerkerservice-wangerland'
+    | '/handwerkerservice-wilhelmshaven'
     | '/impressum'
     | '/kontakt'
     | '/kuechenmontage-in-wilhelmshaven'
@@ -161,6 +224,12 @@ export interface FileRouteTypes {
     | '/datenschutz'
     | '/entruempelung-entsorgung-in-wilhelmshaven'
     | '/faq'
+    | '/handwerkerservice-jever'
+    | '/handwerkerservice-sande'
+    | '/handwerkerservice-schortens'
+    | '/handwerkerservice-varel'
+    | '/handwerkerservice-wangerland'
+    | '/handwerkerservice-wilhelmshaven'
     | '/impressum'
     | '/kontakt'
     | '/kuechenmontage-in-wilhelmshaven'
@@ -176,6 +245,12 @@ export interface FileRouteTypes {
     | '/datenschutz'
     | '/entruempelung-entsorgung-in-wilhelmshaven'
     | '/faq'
+    | '/handwerkerservice-jever'
+    | '/handwerkerservice-sande'
+    | '/handwerkerservice-schortens'
+    | '/handwerkerservice-varel'
+    | '/handwerkerservice-wangerland'
+    | '/handwerkerservice-wilhelmshaven'
     | '/impressum'
     | '/kontakt'
     | '/kuechenmontage-in-wilhelmshaven'
@@ -192,6 +267,12 @@ export interface RootRouteChildren {
   DatenschutzRoute: typeof DatenschutzRoute
   EntruempelungEntsorgungInWilhelmshavenRoute: typeof EntruempelungEntsorgungInWilhelmshavenRoute
   FaqRoute: typeof FaqRoute
+  HandwerkerserviceJeverRoute: typeof HandwerkerserviceJeverRoute
+  HandwerkerserviceSandeRoute: typeof HandwerkerserviceSandeRoute
+  HandwerkerserviceSchortensRoute: typeof HandwerkerserviceSchortensRoute
+  HandwerkerserviceVarelRoute: typeof HandwerkerserviceVarelRoute
+  HandwerkerserviceWangerlandRoute: typeof HandwerkerserviceWangerlandRoute
+  HandwerkerserviceWilhelmshavenRoute: typeof HandwerkerserviceWilhelmshavenRoute
   ImpressumRoute: typeof ImpressumRoute
   KontaktRoute: typeof KontaktRoute
   KuechenmontageInWilhelmshavenRoute: typeof KuechenmontageInWilhelmshavenRoute
@@ -260,6 +341,48 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ImpressumRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/handwerkerservice-wilhelmshaven': {
+      id: '/handwerkerservice-wilhelmshaven'
+      path: '/handwerkerservice-wilhelmshaven'
+      fullPath: '/handwerkerservice-wilhelmshaven'
+      preLoaderRoute: typeof HandwerkerserviceWilhelmshavenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/handwerkerservice-wangerland': {
+      id: '/handwerkerservice-wangerland'
+      path: '/handwerkerservice-wangerland'
+      fullPath: '/handwerkerservice-wangerland'
+      preLoaderRoute: typeof HandwerkerserviceWangerlandRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/handwerkerservice-varel': {
+      id: '/handwerkerservice-varel'
+      path: '/handwerkerservice-varel'
+      fullPath: '/handwerkerservice-varel'
+      preLoaderRoute: typeof HandwerkerserviceVarelRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/handwerkerservice-schortens': {
+      id: '/handwerkerservice-schortens'
+      path: '/handwerkerservice-schortens'
+      fullPath: '/handwerkerservice-schortens'
+      preLoaderRoute: typeof HandwerkerserviceSchortensRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/handwerkerservice-sande': {
+      id: '/handwerkerservice-sande'
+      path: '/handwerkerservice-sande'
+      fullPath: '/handwerkerservice-sande'
+      preLoaderRoute: typeof HandwerkerserviceSandeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/handwerkerservice-jever': {
+      id: '/handwerkerservice-jever'
+      path: '/handwerkerservice-jever'
+      fullPath: '/handwerkerservice-jever'
+      preLoaderRoute: typeof HandwerkerserviceJeverRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/faq': {
       id: '/faq'
       path: '/faq'
@@ -305,6 +428,12 @@ const rootRouteChildren: RootRouteChildren = {
   EntruempelungEntsorgungInWilhelmshavenRoute:
     EntruempelungEntsorgungInWilhelmshavenRoute,
   FaqRoute: FaqRoute,
+  HandwerkerserviceJeverRoute: HandwerkerserviceJeverRoute,
+  HandwerkerserviceSandeRoute: HandwerkerserviceSandeRoute,
+  HandwerkerserviceSchortensRoute: HandwerkerserviceSchortensRoute,
+  HandwerkerserviceVarelRoute: HandwerkerserviceVarelRoute,
+  HandwerkerserviceWangerlandRoute: HandwerkerserviceWangerlandRoute,
+  HandwerkerserviceWilhelmshavenRoute: HandwerkerserviceWilhelmshavenRoute,
   ImpressumRoute: ImpressumRoute,
   KontaktRoute: KontaktRoute,
   KuechenmontageInWilhelmshavenRoute: KuechenmontageInWilhelmshavenRoute,
@@ -317,3 +446,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
