@@ -124,21 +124,23 @@
 }
 .animate-fade-up { animation: fade-up 0.8s ease-out both; }
 
-/* Premium diagonal laminate plank background using real wood photography */
+/* Premium dark laminate background — subtle real wood photo with heavy darkening */
 .bg-wood-grain {
   position: relative;
-  background-color: oklch(0.12 0.012 50);
+  background-color: oklch(0.1 0.008 50);
   background-image:
+    /* Strong dark overlay so the photo stays subtle */
     linear-gradient(
       to bottom,
-      oklch(0.1 0.008 50 / 0.55) 0%,
-      oklch(0.12 0.012 50 / 0.35) 35%,
-      oklch(0.08 0.008 50 / 0.6) 100%
+      oklch(0.08 0.008 50 / 0.78) 0%,
+      oklch(0.1 0.01 50 / 0.7) 40%,
+      oklch(0.06 0.006 50 / 0.85) 100%
     ),
     url("/wood-bg.png");
-  background-size: cover, 1400px auto;
+  background-size: cover, cover;
   background-position: center, center;
-  background-repeat: no-repeat, repeat;
+  background-repeat: no-repeat, no-repeat;
+  background-attachment: scroll, fixed;
   background-blend-mode: multiply, normal;
 }
 .bg-wood-grain::before {
@@ -147,8 +149,8 @@
   inset: 0;
   pointer-events: none;
   background:
-    radial-gradient(ellipse at 20% 0%, oklch(0.35 0.04 60 / 0.25) 0%, transparent 55%),
-    radial-gradient(ellipse at 80% 100%, oklch(0.04 0.005 50 / 0.55) 0%, transparent 60%);
+    radial-gradient(ellipse at 70% 20%, oklch(0.4 0.06 60 / 0.18) 0%, transparent 55%),
+    radial-gradient(ellipse at 10% 100%, oklch(0.03 0.004 50 / 0.6) 0%, transparent 60%);
 }
 
 
