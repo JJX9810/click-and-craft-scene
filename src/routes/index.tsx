@@ -96,39 +96,10 @@ function Index() {
             <img
               src={heroScene}
               alt="Bodenleger als stilisierte Holzfigur verlegt eine Laminatplanke"
-              className="h-full w-full object-cover"
+              className="animate-hero-float h-full w-full object-cover"
               width={1024}
               height={640}
             />
-
-            {/* Animated plank overlay */}
-            <div
-              className="pointer-events-none absolute"
-              style={{
-                left: "32%",
-                top: "78%",
-                width: "30%",
-                aspectRatio: "4 / 1",
-                transformOrigin: "center bottom",
-                filter: "drop-shadow(var(--shadow-plank))",
-              }}
-            >
-              <img
-                src={plank}
-                alt=""
-                aria-hidden="true"
-                className="animate-plank h-full w-full object-cover"
-                style={{
-                  transform: "translate(-50%, 0)",
-                  position: "absolute",
-                  left: "50%",
-                  bottom: 0,
-                  borderRadius: "2px",
-                }}
-                width={1024}
-                height={256}
-              />
-            </div>
 
             {/* Subtle vignette for legibility */}
             <div
@@ -139,6 +110,7 @@ function Index() {
               }}
             />
           </div>
+
 
           <p className="mt-4 text-right text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
             Animiertes Keyvisual · Click-System Laminat
