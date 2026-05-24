@@ -72,6 +72,7 @@ export function OrtsSeite({
         </Section>
       )}
 
+      <Section eyebrow="Ablauf" title={`So läuft eine Anfrage in ${ort}`}>
         <ol className="grid gap-6 md:grid-cols-4">
           {["Anfrage senden", "Fotos & Maße", "Einschätzung", "Saubere Umsetzung"].map((t, i) => (
             <li key={t} className="rounded-2xl border border-border/70 bg-card/40 p-6">
