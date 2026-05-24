@@ -12,7 +12,6 @@ import appCss from "../styles.css?url";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { Toaster } from "@/components/ui/sonner";
-import { SunlightHaze } from "@/components/site/SunlightHaze";
 
 function NotFoundComponent() {
   return (
@@ -116,6 +115,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "Verlegt & Verschraubt Handwerkerservice" },
       { property: "og:locale", content: "de_DE" },
+      { property: "og:title", content: "Verlegt & Verschraubt Handwerkerservice – Wilhelmshaven" },
+      { name: "twitter:title", content: "Verlegt & Verschraubt Handwerkerservice – Wilhelmshaven" },
+      { name: "description", content: "Modern 3D animation for a flooring service website hero section." },
+      { property: "og:description", content: "Modern 3D animation for a flooring service website hero section." },
+      { name: "twitter:description", content: "Modern 3D animation for a flooring service website hero section." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/1a21868c-6b8f-4e1f-9039-5d77cfb5373d/id-preview-9667b727--f5d29d93-5561-4833-bff7-bc7bdc9b3a86.lovable.app-1779618947775.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/1a21868c-6b8f-4e1f-9039-5d77cfb5373d/id-preview-9667b727--f5d29d93-5561-4833-bff7-bc7bdc9b3a86.lovable.app-1779618947775.png" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
       {
@@ -156,15 +163,12 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <div className="bg-wood-grain relative flex min-h-screen flex-col overflow-x-hidden text-foreground">
-        <SunlightHaze className="fixed inset-0 z-0" />
-        <div className="relative z-10 flex min-h-screen flex-col">
-          <Header />
-          <main className="flex-1">
-            <Outlet />
-          </main>
-          <Footer />
-          <Toaster />
-        </div>
+        <Header />
+        <main className="flex-1">
+          <Outlet />
+        </main>
+        <Footer />
+        <Toaster />
       </div>
     </QueryClientProvider>
   );
