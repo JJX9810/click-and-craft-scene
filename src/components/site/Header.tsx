@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Hammer, Phone, Mail, Menu, ChevronDown, X } from "lucide-react";
+import { Phone, Mail, Menu, ChevronDown, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import logo from "@/assets/logo.png";
 
 type NavItem =
   | { label: string; to: string }
@@ -42,13 +43,15 @@ export function Header() {
   return (
     <header className="sticky top-0 z-40 border-b border-border/50 bg-background/80 backdrop-blur-md">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-6 py-3.5">
-        <Link to="/" className="flex items-center gap-2.5">
-          <span className="flex h-9 w-9 items-center justify-center rounded-md bg-accent/15 text-accent">
-            <Hammer className="h-4 w-4" />
-          </span>
-          <span className="hidden text-sm font-semibold uppercase tracking-[0.18em] sm:inline">
-            Verlegt &amp; Verschraubt
-          </span>
+        <Link to="/" className="flex items-center gap-3">
+          <img
+            src={logo}
+            alt="Verlegt & Verschraubt Handwerkerservice"
+            className="h-10 w-auto sm:h-12"
+            width={120}
+            height={48}
+          />
+          <span className="sr-only">Verlegt & Verschraubt Handwerkerservice</span>
         </Link>
 
         {/* Desktop nav */}

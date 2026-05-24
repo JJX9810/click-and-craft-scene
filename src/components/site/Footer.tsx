@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
-import { Hammer, Phone, Mail, MapPin, ArrowRight } from "lucide-react";
+import { Phone, Mail, MapPin, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import logo from "@/assets/logo.png";
 
 export function Footer() {
   return (
@@ -8,13 +9,14 @@ export function Footer() {
       <div className="mx-auto max-w-7xl px-6 py-16">
         <div className="grid gap-10 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
           <div>
-            <div className="flex items-center gap-2">
-              <span className="flex h-9 w-9 items-center justify-center rounded-md bg-accent/15 text-accent">
-                <Hammer className="h-4 w-4" />
-              </span>
-              <span className="text-sm font-semibold uppercase tracking-[0.18em]">
-                Verlegt &amp; Verschraubt
-              </span>
+            <div className="flex items-center gap-3">
+              <img
+                src={logo}
+                alt="Verlegt & Verschraubt Handwerkerservice"
+                className="h-12 w-auto"
+                width={140}
+                height={56}
+              />
             </div>
             <p className="mt-4 max-w-sm text-sm leading-relaxed text-muted-foreground">
               Handwerkerservice aus Wilhelmshaven für Privatkunden:

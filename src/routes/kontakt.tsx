@@ -3,6 +3,7 @@ import { useState } from "react";
 import { PageHero, Section } from "@/components/site/PageShell";
 import { Button } from "@/components/ui/button";
 import { Phone, Mail, MapPin, ArrowRight } from "lucide-react";
+import { EinsatzgebietMap } from "@/components/site/EinsatzgebietMap";
 
 export const Route = createFileRoute("/kontakt")({
   component: Page,
@@ -108,6 +109,24 @@ function Page() {
               <p className="mt-2">Schnelle Anfrage mit Foto direkt per WhatsApp senden.</p>
             </a>
           </aside>
+        </div>
+      </Section>
+
+      <Section eyebrow="Einsatzgebiet" title="Wilhelmshaven & Umgebung" bordered>
+        <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground">
+          Wir arbeiten lokal – kurze Wege, schnelle Termine. Der markierte
+          Umkreis zeigt unser reguläres Einsatzgebiet rund um Wilhelmshaven.
+          Andere Orte gerne auf Anfrage.
+        </p>
+        <div className="mt-8">
+          <EinsatzgebietMap height="500px" zoom={9} />
+        </div>
+        <div className="mt-6 flex flex-wrap gap-2 text-sm text-muted-foreground">
+          {["Wilhelmshaven", "Schortens", "Sande", "Jever", "Varel", "Wangerland", "Hooksiel"].map((o) => (
+            <span key={o} className="inline-flex items-center gap-1.5 rounded-full border border-border/70 bg-card/40 px-3 py-1.5">
+              <MapPin className="h-3.5 w-3.5 text-accent" /> {o}
+            </span>
+          ))}
         </div>
       </Section>
     </>
