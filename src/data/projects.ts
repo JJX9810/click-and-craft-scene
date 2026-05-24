@@ -143,6 +143,60 @@ export const projects: Project[] = [
           "Detailaufnahme im Schlafzimmer: Der Schlingenteppich liegt sauber an Möbeln und Sockelleisten an. Die exakten Anschlüsse und das ruhige Verlegebild zeigen die sorgfältige Ausführung im Detail.",
         phase: "Detail",
       },
+      {
+        type: "image",
+        src: "/projects/coldewei-11-untergrund-flur.jpg",
+        alt: "Freigelegter Untergrund im Eingangsbereich in Coldewei vor der neuen Bodenverlegung",
+        caption: "Vorbereitung im Flur: Altbelag entfernt und Untergrund für den neuen Boden freigelegt.",
+        longDescription:
+          "Zusätzliche Vorher-Aufnahme aus Coldewei: Im Eingangsbereich wurde der alte Belag entfernt, der Untergrund sichtbar gemacht und für die weitere Bodenverlegung vorbereitet. Die Aufnahme dokumentiert den Sanierungszustand rund um Treppe und Flur.",
+        phase: "Vorbereitung",
+      },
+      {
+        type: "image",
+        src: "/projects/coldewei-12-teppich-podest.jpg",
+        alt: "Schlingenteppich auf dem Podest in der oberen Etage in Coldewei, Wilhelmshaven",
+        caption: "Obere Etage mit fertig verlegtem Schlingenteppich am Podest und in den Zimmerzugängen.",
+        longDescription:
+          "Weiteres Referenzbild der oberen Etage in Coldewei: Der Schlingenteppich wurde sauber bis an die Türzargen und entlang der Treppe geführt. Das Bild zeigt die ruhige Wirkung des Belags auf dem Podestbereich.",
+        phase: "Nachher",
+      },
+      {
+        type: "image",
+        src: "/projects/coldewei-13-vinyl-flur-treppe-oben.jpg",
+        alt: "Vinylboden im Flur und an der offenen Treppe in Coldewei, Wilhelmshaven",
+        caption: "Vinylboden im Flur mit sauberem Anschluss an Treppe und angrenzende Räume.",
+        longDescription:
+          "Diese Aufnahme zeigt den fertig verlegten Vinylboden im Flur von Coldewei aus erhöhter Perspektive. Sichtbar sind die exakten Anschlüsse an die offene Holztreppe sowie die gleichmäßige Verlegung bis in die angrenzenden Räume.",
+        phase: "Nachher",
+      },
+      {
+        type: "image",
+        src: "/projects/coldewei-14-uebergangsschiene-detail.jpg",
+        alt: "Detail einer weißen Übergangsschiene zwischen zwei Bodenbereichen in Coldewei",
+        caption: "Detailaufnahme der Übergangsschiene zwischen Flur und angrenzendem Raum.",
+        longDescription:
+          "Nahaufnahme eines sauber ausgeführten Bodenübergangs in Coldewei. Die weiße Übergangsschiene bildet einen ordentlichen Abschluss zwischen zwei Bereichen und unterstreicht die präzise Detailarbeit der Verlegung.",
+        phase: "Detail",
+      },
+      {
+        type: "image",
+        src: "/projects/coldewei-15-untergrund-material.jpg",
+        alt: "Vorbereitung im Flur mit Material und freigelegtem Untergrund in Coldewei",
+        caption: "Sanierungsphase im Flur mit vorbereitetem Untergrund und angeliefertem Material.",
+        longDescription:
+          "Weitere Dokumentation der Vorbereitungsarbeiten in Coldewei: Im Flur liegt der freigelegte Untergrund bereit, während das Material für die nachfolgende Boden- und Teppichverlegung bereits vor Ort ist.",
+        phase: "Vorbereitung",
+      },
+      {
+        type: "image",
+        src: "/projects/coldewei-16-vinyl-wohnzimmer-kamin.jpg",
+        alt: "Vinylboden im Wohnzimmer mit Kaminofen in Coldewei, Wilhelmshaven",
+        caption: "Wohnzimmeransicht mit fertig verlegtem Vinylboden rund um den Kaminofen.",
+        longDescription:
+          "Zusätzliche Nachher-Aufnahme aus dem Wohnzimmer in Coldewei. Der Vinylboden in Holzoptik läuft sauber durch den Raum und wirkt besonders harmonisch im Bereich rund um den freistehenden Kaminofen.",
+        phase: "Nachher",
+      },
     ],
   },
   {
@@ -174,17 +228,26 @@ export const projects: Project[] = [
     category: "Küchenmontage",
     description:
       "Moderne weiße Einbauküche in Schortens montiert und sauber ausgerichtet. Arbeitsplatte, Spüle, Kochfeld, Dunstabzug, Hochschrank und integrierte Geräte stimmig eingebaut.",
-    cover: `${BASE}/kuechenmontage-nobilia-kueche-schortens-verlegt-verschraubt.jpg-scaled.png`,
-    coverAlt: "Weiße Einbauküche in Schortens",
+    cover: "/projects/kueche-schortens-modern-02.png",
+    coverAlt: "Weiße Einbauküche in Schortens mit grifflosen Fronten und integrierten Geräten",
     featured: false,
     media: [
       {
         type: "image",
-        src: `${BASE}/kuechenmontage-nobilia-kueche-schortens-verlegt-verschraubt.jpg-scaled.png`,
-        alt: "Weiße Einbauküche montiert in Schortens",
-        caption: "Weiße Küche mit Arbeitsplatte, Spüle, Kochfeld, Dunstabzug, Hochschrank und integrierten Geräten.",
+        src: "/projects/kueche-schortens-modern-02.png",
+        alt: "Moderne weiße Einbauküche mit schwarzem Geräteblock in Schortens",
+        caption: "Moderne Einbauküche in Schortens mit klaren Fronten, Gerätehochschrank und Holzoptikboden.",
         longDescription:
-          "Moderne weiße Einbauküche in Schortens mit Hochschrank, integrierten Geräten und klaren Linien. Dieses Bild wird im nächsten Upload-Paket noch auf eine lokale Datei umgestellt.",
+          "Diese in Schortens montierte Einbauküche zeigt eine minimalistische Linienführung mit weißen Fronten, integrierten Siemens-Geräten, beleuchtetem Arbeitsbereich und hochwertigem Boden in Holzoptik. Die Montage wurde präzise ausgerichtet und sauber abgeschlossen.",
+        phase: "Nachher",
+      },
+      {
+        type: "image",
+        src: "/projects/kueche-schortens-modern-01.png",
+        alt: "Weiße L-Küche mit grauer Arbeitsplatte in Schortens",
+        caption: "Zweite Perspektive der weißen Einbauküche mit langer Zeile und Hochschrank.",
+        longDescription:
+          "Weitere Ansicht der modernen Küchenmontage in Schortens. Sichtbar sind die durchgehende graue Arbeitsplatte, die klare Frontaufteilung und die großzügige Raumsituation mit offener Anbindung an den Wohnbereich.",
         phase: "Nachher",
       },
     ],
@@ -196,17 +259,17 @@ export const projects: Project[] = [
     category: "Küchenfolierung",
     description:
       "In einer Ferienwohnung in Hooksiel wurde eine vorhandene Küche durch Folierung optisch aufgewertet – ohne Komplettaustausch.",
-    cover: `${BASE}/kuechenmontage-nobilia-kueche-schortens-verlegt-verschraubt.jpg-scaled.png`,
-    coverAlt: "Küchenfolierung Ferienwohnung in Hooksiel",
+    cover: "/projects/kuechenfolierung-hooksiel-poster.jpg",
+    coverAlt: "Küchenfolierung in einer Ferienwohnung in Hooksiel",
     featured: true,
     media: [
       {
         type: "video",
-        src: `${BASE}/kuechenfolierung-hooksiel-verlegt-verschraubt.mp4.mp4`,
+        src: "/projects/kuechenfolierung-hooksiel.mp4",
         alt: "Video einer Küchenfolierung in einer Ferienwohnung in Hooksiel",
         caption: "Vorhandene Küche optisch aufgefrischt und modernisiert – per Folierung.",
         longDescription:
-          "Kurzvideo einer Küchenfolierung in Hooksiel. Das Material folgt im nächsten Upload-Paket als lokale Datei, damit auch dieses Projekt domain-sicher ausgeliefert wird.",
+          "Kurzvideo aus Hooksiel: In einer Ferienwohnung wurde eine bestehende Küche durch Folierung modernisiert. Das Projekt zeigt die optische Aufwertung ohne kompletten Küchenaustausch und ist jetzt vollständig als lokale Datei eingebunden.",
       },
     ],
   },
@@ -355,11 +418,11 @@ export const projects: Project[] = [
       },
       {
         type: "image",
-        src: `${BASE}/bodenleger-wilhelmshaven-vinylboden-verlegt-verlegt-verschraubt.jpg-scaled.png`,
-        alt: "Vinylboden in Wilhelmshaven verlegt",
-        caption: "Weitere Ansicht des fertig verlegten Vinylbodens in Wilhelmshaven.",
+        src: "/projects/vinyl-wohnraum-wilhelmshaven-02.png",
+        alt: "Großer Wohnraum mit fertig verlegtem Vinylboden in Wilhelmshaven",
+        caption: "Weitere Referenzansicht des verlegten Vinylbodens im Wohnraum in Wilhelmshaven.",
         longDescription:
-          "Zusätzliche Referenzansicht des Projekts in Wilhelmshaven. Diese Datei wird mit dem nächsten Bildpaket ebenfalls noch auf eine lokale Projektdatei umgestellt.",
+          "Zusätzliche Nachher-Aufnahme aus Wilhelmshaven: Der Vinylboden in grauer Holzoptik wurde großflächig und gleichmäßig verlegt. Die Perspektive zeigt die ruhige Raumwirkung und die sauberen Anschlüsse im offenen Wohnbereich.",
         phase: "Nachher",
       },
     ],
