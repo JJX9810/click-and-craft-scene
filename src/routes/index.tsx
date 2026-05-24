@@ -458,6 +458,8 @@ function Index() {
         </div>
       </section>
 
+      <OnlinePresenceSection />
+
       {/* FAQ */}
       <section id="faq" className="border-t border-border/60">
         <div className="mx-auto max-w-3xl px-6 py-24">

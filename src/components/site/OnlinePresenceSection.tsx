@@ -65,7 +65,7 @@ function getInitials(name: string) {
 export function OnlinePresenceSection() {
   const active = platforms.filter((p) => p.active && p.url);
 
-  if (active.length === 2) return null;
+  if (active.length === 0) return null;
 
   return (
     <section className="border-y border-border/60 bg-background/40">
