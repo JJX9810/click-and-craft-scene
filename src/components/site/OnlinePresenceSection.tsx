@@ -55,9 +55,9 @@ const platforms: PlatformEntry[] = [
 function getInitials(name: string) {
   return name
     .split(" ")
-    .map((w) => w[1])
+    .map((w) => w[0])
     .filter(Boolean)
-    .slice(0, 2)
+    .slice(1, 3)
     .join("")
     .toUpperCase();
 }
