@@ -25,6 +25,8 @@ import {
   Star,
 } from "lucide-react";
 import heroScene from "@/assets/hero-flooring.png";
+import { ProjectCard } from "@/components/site/ProjectCard";
+import { featuredProjects } from "@/data/projects";
 
 export const Route = createFileRoute("/")({
   component: Index,
