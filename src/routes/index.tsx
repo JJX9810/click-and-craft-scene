@@ -30,6 +30,7 @@ import { featuredProjects } from "@/data/projects";
 import { EinsatzgebietMap } from "@/components/site/EinsatzgebietMap";
 import { Kostenrechner } from "@/components/site/Kostenrechner";
 import { OnlinePresenceSection } from "@/components/site/OnlinePresenceSection";
+import { SawdustParticles } from "@/components/site/SawdustParticles";
 
 export const Route = createFileRoute("/")({
   component: Index,
