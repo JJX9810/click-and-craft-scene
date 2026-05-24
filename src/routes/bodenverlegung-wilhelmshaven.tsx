@@ -113,7 +113,23 @@ function Page() {
         </div>
       </Section>
 
-      <Section eyebrow="FAQ" title="Häufige Fragen zur Bodenverlegung">
+      <Section eyebrow="Referenzen" title="Bodenprojekte aus der Region">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {projects
+            .filter((p) => ["Bodenverlegung", "Treppenbelag", "Detailarbeiten"].includes(p.category))
+            .slice(0, 6)
+            .map((p, i) => (
+              <ProjectCard key={p.slug} project={p} eager={i === 0} />
+            ))}
+        </div>
+        <div className="mt-8">
+          <Link to="/showroom" className="inline-flex items-center text-sm text-accent hover:underline">
+            Alle Projekte im Showroom <ArrowRight className="ml-1 h-4 w-4" />
+          </Link>
+        </div>
+      </Section>
+
+      <Section eyebrow="FAQ" title="Häufige Fragen zur Bodenverlegung" bordered>
         <Accordion type="single" collapsible className="max-w-3xl">
           {faqs.map((f, i) => (
             <AccordionItem key={i} value={`b-${i}`} className="border-border/70">
