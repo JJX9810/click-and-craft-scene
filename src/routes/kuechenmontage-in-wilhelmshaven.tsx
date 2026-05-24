@@ -97,6 +97,22 @@ function Page() {
         </Accordion>
       </Section>
 
+      <Section eyebrow="Referenzen" title="Küchen-Projekte aus der Region">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {projects
+            .filter((p) => ["Küchenmontage", "Küchenfolierung"].includes(p.category) || p.slug === "silikonfuge-wilhelmshaven")
+            .map((p, i) => (
+              <ProjectCard key={p.slug} project={p} eager={i === 0} />
+            ))}
+        </div>
+        <div className="mt-8">
+          <Link to="/showroom" className="inline-flex items-center text-sm text-accent hover:underline">
+            Alle Projekte im Showroom <ArrowRight className="ml-1 h-4 w-4" />
+          </Link>
+        </div>
+      </Section>
+
+
       <CtaBlock
         title="Küchenprojekt anfragen"
         text="Senden Sie Fotos der Küche und Anschlüsse – wir geben eine realistische Einschätzung."
