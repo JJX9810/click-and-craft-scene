@@ -1,0 +1,7 @@
+/**
+ * Tailwind v4 Entry für IONOS-Build.
+ * Importiert das vollständige Design-System aus dem Hauptprojekt
+ * und ergänzt den ionos-export-Pfad als zusätzliche Source.
+ */
+@import "../../src/styles.css";
+@source "../src";
