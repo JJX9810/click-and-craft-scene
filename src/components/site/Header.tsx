@@ -136,7 +136,7 @@ export function Header() {
 
       {/* Mobile menu – inline dropdown unter dem Header */}
       {mobileOpen && (
-        <div className="border-t border-border/60 bg-background/95 backdrop-blur-md lg:hidden">
+        <div className="border-t border-border/60 bg-background/95 backdrop-blur-md xl:hidden">
           <div className="mx-auto max-w-7xl px-6 py-4">
             <nav className="flex flex-col gap-1">
               {nav.map((item) =>
