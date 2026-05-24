@@ -325,7 +325,7 @@ function Index() {
             {services.map((s) => (
               <article
                 key={s.title}
-                className="group relative overflow-hidden rounded-2xl border border-border/70 bg-card/50 p-7 backdrop-blur transition-all hover:-translate-y-1 hover:border-accent/60 hover:shadow-xl hover:shadow-accent/10"
+                className="tile-shader group relative overflow-hidden rounded-2xl border border-border/70 bg-card/50 p-7 backdrop-blur transition-all hover:-translate-y-1 hover:border-accent/60 hover:shadow-xl hover:shadow-accent/10"
               >
                 <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-accent/15 text-accent">
                   <s.icon className="h-5 w-5" />
