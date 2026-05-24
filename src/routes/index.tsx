@@ -271,6 +271,32 @@ function Index() {
         </div>
       </section>
 
+      {/* SHOWROOM-VORSCHAU */}
+      <section id="referenzen" className="relative">
+        <div className="mx-auto max-w-7xl px-6 py-24">
+          <div className="flex flex-wrap items-end justify-between gap-6">
+            <div className="max-w-2xl">
+              <p className="text-xs uppercase tracking-[0.28em] text-accent">Showroom</p>
+              <h2 className="mt-3 text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
+                Ausgewählte Projekte aus der Region.
+              </h2>
+              <p className="mt-4 max-w-xl text-base leading-relaxed text-muted-foreground">
+                Echte Arbeiten aus Wilhelmshaven, Coldewei, Schortens und Hooksiel –
+                Bodenverlegung, Küchenmontage, Folierung und Treppenbeläge.
+              </p>
+            </div>
+            <Button asChild variant="outline" className="rounded-full border-border bg-transparent">
+              <Link to="/showroom">Zum gesamten Showroom <ArrowRight className="ml-1 h-4 w-4" /></Link>
+            </Button>
+          </div>
+          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {featuredProjects.slice(0, 3).map((p, i) => (
+              <ProjectCard key={p.slug} project={p} eager={i === 0} />
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* LEISTUNGEN */}
       <section id="leistungen" className="relative">
         <div className="mx-auto max-w-7xl px-6 py-24">
