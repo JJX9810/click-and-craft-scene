@@ -28,7 +28,7 @@ const sub = [
   { t: "Boden ausgleichen", d: "Untergrund spachteln und nivellieren – Voraussetzung für ein ruhiges Verlegebild." },
   { t: "PVC verlegen", d: "Pflegeleichter Bodenbelag für Küche, Bad und Nebenräume." },
   { t: "Teppich verlegen", d: "Spannteppich oder verklebt – schalldämpfend und behaglich." },
-  { t: "Treppenverlegung mit Teppich", d: "Stufen sauber bezogen, kantenrein und rutschsicher." },
+  { t: "Treppenverkleidung mit Vinyl & Teppich", d: "Stufen sauber bezogen, kantenrein und rutschsicher – Vinyl und Teppich nach Wunsch." },
   { t: "Sockelleisten & Übergänge", d: "Mit Eckstücken oder auf Gehrung – passende Übergangsschienen, ordentliche Ecken." },
 ];
 
