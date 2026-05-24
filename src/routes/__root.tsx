@@ -105,6 +105,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { name: "google-site-verification", content: "TDh9EUozWlH9ooXcek1xTUxdzAmmLgSj9dY6jk3OVng" },
       { title: "Verlegt & Verschraubt Handwerkerservice – Wilhelmshaven" },
       {
         name: "description",
