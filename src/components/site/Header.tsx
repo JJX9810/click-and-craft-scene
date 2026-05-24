@@ -51,7 +51,14 @@ export function Header() {
             width={120}
             height={48}
           />
-          <span className="sr-only">Verlegt & Verschraubt Handwerkerservice</span>
+          <span className="hidden flex-col leading-tight sm:flex">
+            <span className="text-sm font-semibold tracking-tight text-foreground">
+              Verlegt &amp; Verschraubt
+            </span>
+            <span className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
+              Handwerkerservice
+            </span>
+          </span>
         </Link>
 
         {/* Desktop nav */}
