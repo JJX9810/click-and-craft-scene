@@ -28,10 +28,10 @@ export function SunlightHaze({ className, intensity = "soft" }: Props) {
       />
       {/* schmaler Lichtstrahl / Schleier */}
       <div
-        className="absolute -inset-x-10 top-0 h-[140%] rotate-[14deg] opacity-[0.06] animate-shimmer"
+        className="absolute -inset-x-10 top-0 h-[140%] rotate-[14deg] opacity-[0.03] animate-shimmer"
         style={{
           background:
-            "linear-gradient(90deg, transparent 0%, oklch(0.95 0.04 80 / 0.6) 50%, transparent 100%)",
+            "linear-gradient(90deg, transparent 0%, oklch(0.95 0.04 80 / 0.4) 50%, transparent 100%)",
           width: "30%",
         }}
       />
