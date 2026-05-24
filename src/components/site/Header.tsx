@@ -131,25 +131,11 @@ export function Header() {
         </div>
       </div>
 
-      {/* Mobile menu */}
+      {/* Mobile menu – inline dropdown unter dem Header */}
       {mobileOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden">
-          <div
-            className="absolute inset-0 bg-background/80 backdrop-blur"
-            onClick={() => setMobileOpen(false)}
-          />
-          <div className="absolute right-0 top-0 h-full w-[88%] max-w-sm overflow-y-auto border-l border-border/60 bg-background p-6 shadow-2xl">
-            <div className="flex items-center justify-between">
-              <span className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Menü</span>
-              <button
-                aria-label="Menü schließen"
-                onClick={() => setMobileOpen(false)}
-                className="flex h-10 w-10 items-center justify-center rounded-full border border-border/60"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-            <nav className="mt-6 flex flex-col gap-1">
+        <div className="border-t border-border/60 bg-background/95 backdrop-blur-md lg:hidden">
+          <div className="mx-auto max-w-7xl px-6 py-4">
+            <nav className="flex flex-col gap-1">
               {nav.map((item) =>
                 "to" in item ? (
                   <Link
@@ -192,10 +178,10 @@ export function Header() {
                 ),
               )}
             </nav>
-            <div className="mt-8 flex flex-col gap-3">
+            <div className="mt-5 flex flex-col gap-2">
               <Button
                 asChild
-                className="h-12 rounded-full bg-accent text-accent-foreground hover:bg-accent/90"
+                className="h-11 rounded-full bg-accent text-accent-foreground hover:bg-accent/90"
               >
                 <a href="tel:+4916347992866">
                   <Phone className="mr-2 h-4 w-4" /> 0163 4799286
@@ -204,7 +190,7 @@ export function Header() {
               <Button
                 asChild
                 variant="outline"
-                className="h-12 rounded-full border-border bg-transparent"
+                className="h-11 rounded-full border-border bg-transparent"
               >
                 <Link to="/kontakt" onClick={() => setMobileOpen(false)}>
                   Anfrage senden
