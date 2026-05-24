@@ -28,6 +28,8 @@ import { Route as EntruempelungEntsorgungInWilhelmshavenRouteImport } from './ro
 import { Route as DatenschutzRouteImport } from './routes/datenschutz'
 import { Route as BodenverlegungWilhelmshavenRouteImport } from './routes/bodenverlegung-wilhelmshaven'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ShowroomIndexRouteImport } from './routes/showroom.index'
+import { Route as ShowroomSlugRouteImport } from './routes/showroom.$slug'
 
 const WirUnterstuetzenRoute = WirUnterstuetzenRouteImport.update({
   id: '/wir-unterstuetzen',
@@ -130,6 +132,16 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ShowroomIndexRoute = ShowroomIndexRouteImport.update({
+  id: '/showroom/',
+  path: '/showroom/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShowroomSlugRoute = ShowroomSlugRouteImport.update({
+  id: '/showroom/$slug',
+  path: '/showroom/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -151,6 +163,8 @@ export interface FileRoutesByFullPath {
   '/referenzen': typeof ReferenzenRoute
   '/ueber-uns': typeof UeberUnsRoute
   '/wir-unterstuetzen': typeof WirUnterstuetzenRoute
+  '/showroom/$slug': typeof ShowroomSlugRoute
+  '/showroom/': typeof ShowroomIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -172,6 +186,8 @@ export interface FileRoutesByTo {
   '/referenzen': typeof ReferenzenRoute
   '/ueber-uns': typeof UeberUnsRoute
   '/wir-unterstuetzen': typeof WirUnterstuetzenRoute
+  '/showroom/$slug': typeof ShowroomSlugRoute
+  '/showroom': typeof ShowroomIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -194,6 +210,8 @@ export interface FileRoutesById {
   '/referenzen': typeof ReferenzenRoute
   '/ueber-uns': typeof UeberUnsRoute
   '/wir-unterstuetzen': typeof WirUnterstuetzenRoute
+  '/showroom/$slug': typeof ShowroomSlugRoute
+  '/showroom/': typeof ShowroomIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -217,6 +235,8 @@ export interface FileRouteTypes {
     | '/referenzen'
     | '/ueber-uns'
     | '/wir-unterstuetzen'
+    | '/showroom/$slug'
+    | '/showroom/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -238,6 +258,8 @@ export interface FileRouteTypes {
     | '/referenzen'
     | '/ueber-uns'
     | '/wir-unterstuetzen'
+    | '/showroom/$slug'
+    | '/showroom'
   id:
     | '__root__'
     | '/'
@@ -259,6 +281,8 @@ export interface FileRouteTypes {
     | '/referenzen'
     | '/ueber-uns'
     | '/wir-unterstuetzen'
+    | '/showroom/$slug'
+    | '/showroom/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -281,6 +305,8 @@ export interface RootRouteChildren {
   ReferenzenRoute: typeof ReferenzenRoute
   UeberUnsRoute: typeof UeberUnsRoute
   WirUnterstuetzenRoute: typeof WirUnterstuetzenRoute
+  ShowroomSlugRoute: typeof ShowroomSlugRoute
+  ShowroomIndexRoute: typeof ShowroomIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -418,6 +444,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/showroom/': {
+      id: '/showroom/'
+      path: '/showroom'
+      fullPath: '/showroom/'
+      preLoaderRoute: typeof ShowroomIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/showroom/$slug': {
+      id: '/showroom/$slug'
+      path: '/showroom/$slug'
+      fullPath: '/showroom/$slug'
+      preLoaderRoute: typeof ShowroomSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -442,6 +482,8 @@ const rootRouteChildren: RootRouteChildren = {
   ReferenzenRoute: ReferenzenRoute,
   UeberUnsRoute: UeberUnsRoute,
   WirUnterstuetzenRoute: WirUnterstuetzenRoute,
+  ShowroomSlugRoute: ShowroomSlugRoute,
+  ShowroomIndexRoute: ShowroomIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

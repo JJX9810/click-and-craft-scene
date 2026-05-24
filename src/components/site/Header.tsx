@@ -8,36 +8,27 @@ type NavItem =
   | { label: string; children: { label: string; to: string }[] };
 
 const nav: NavItem[] = [
-  { label: "Startseite", to: "/" },
+  { label: "Start", to: "/" },
+  { label: "Bodenverlegung", to: "/bodenverlegung-wilhelmshaven" },
+  { label: "Küchenmontage", to: "/kuechenmontage-in-wilhelmshaven" },
+  { label: "Entrümpelung", to: "/entruempelung-entsorgung-in-wilhelmshaven" },
+  { label: "Showroom", to: "/showroom" },
+  { label: "Preise", to: "/preise" },
+  { label: "FAQ", to: "/faq" },
+  { label: "Kontakt", to: "/kontakt" },
   {
-    label: "Leistungen",
+    label: "Mehr",
     children: [
-      { label: "Bodenverlegung", to: "/bodenverlegung-wilhelmshaven" },
-      { label: "Küchenmontage", to: "/kuechenmontage-in-wilhelmshaven" },
-      { label: "Entrümpelung & Entsorgung", to: "/entruempelung-entsorgung-in-wilhelmshaven" },
-    ],
-  },
-  {
-    label: "Einsatzorte",
-    children: [
+      { label: "Über uns", to: "/ueber-uns" },
+      { label: "Referenzen", to: "/referenzen" },
       { label: "Wilhelmshaven", to: "/handwerkerservice-wilhelmshaven" },
       { label: "Schortens", to: "/handwerkerservice-schortens" },
       { label: "Sande", to: "/handwerkerservice-sande" },
       { label: "Jever", to: "/handwerkerservice-jever" },
       { label: "Varel", to: "/handwerkerservice-varel" },
       { label: "Wangerland", to: "/handwerkerservice-wangerland" },
-    ],
-  },
-  { label: "Referenzen", to: "/referenzen" },
-  { label: "Preise", to: "/preise" },
-  { label: "Über uns", to: "/ueber-uns" },
-  { label: "Kontakt", to: "/kontakt" },
-  {
-    label: "Mehr",
-    children: [
       { label: "Wir unterstützen", to: "/wir-unterstuetzen" },
       { label: "Partner", to: "/partner" },
-      { label: "FAQ", to: "/faq" },
       { label: "Impressum", to: "/impressum" },
       { label: "Datenschutz", to: "/datenschutz" },
     ],

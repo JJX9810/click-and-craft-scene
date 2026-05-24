@@ -1,8 +1,21 @@
 import { Link } from "@tanstack/react-router";
 import { PageHero, Section, Bullet, CtaBlock } from "@/components/site/PageShell";
 import { Layers, Wrench, Trash2, ArrowRight } from "lucide-react";
+import { ProjectCard } from "@/components/site/ProjectCard";
+import { projects, type Project } from "@/data/projects";
 
-export function OrtsSeite({ ort, umgebung }: { ort: string; umgebung: string[] }) {
+export function OrtsSeite({
+  ort,
+  umgebung,
+  projectSlugs,
+}: {
+  ort: string;
+  umgebung: string[];
+  projectSlugs?: string[];
+}) {
+  const ortProjects: Project[] = projectSlugs
+    ? (projectSlugs.map((s) => projects.find((p) => p.slug === s)).filter(Boolean) as Project[])
+    : projects.filter((p) => p.ort.toLowerCase().includes(ort.toLowerCase()));
   const services = [
     { icon: Layers, title: `Bodenverlegung in ${ort}`, desc: "Vinyl, Laminat, PVC und Teppich – sauber verlegt.", to: "/bodenverlegung-wilhelmshaven" },
     { icon: Wrench, title: `Küchenmontage in ${ort}`, desc: "Aufbau nach Umzug, Restmontage, Arbeitsplatten.", to: "/kuechenmontage-in-wilhelmshaven" },
@@ -43,6 +56,21 @@ export function OrtsSeite({ ort, umgebung }: { ort: string; umgebung: string[] }
           <Bullet>Wunschzeitraum und Erreichbarkeit</Bullet>
         </ul>
       </Section>
+
+      {ortProjects.length > 0 && (
+        <Section eyebrow="Referenzen" title={`Projekte in ${ort} und Umgebung`}>
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {ortProjects.map((p, i) => (
+              <ProjectCard key={p.slug} project={p} eager={i === 0} />
+            ))}
+          </div>
+          <div className="mt-8">
+            <Link to="/showroom" className="inline-flex items-center text-sm text-accent hover:underline">
+              Alle Projekte im Showroom <ArrowRight className="ml-1 h-4 w-4" />
+            </Link>
+          </div>
+        </Section>
+      )}
 
       <Section eyebrow="Ablauf" title={`So läuft eine Anfrage in ${ort}`}>
         <ol className="grid gap-6 md:grid-cols-4">
