@@ -1,0 +1,27 @@
+{
+  "include": ["src/**/*.ts", "src/**/*.tsx", "../src/**/*.ts", "../src/**/*.tsx", "vite.config.ts"],
+  "exclude": ["../src/routes/sitemap[.]xml.ts", "../src/server.ts", "../src/start.ts", "../src/router.tsx", "../src/routeTree.gen.ts", "../src/lib/error-page.ts", "../src/lib/error-capture.ts"],
+  "compilerOptions": {
+    "target": "ES2022",
+    "jsx": "react-jsx",
+    "module": "ESNext",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "types": ["vite/client", "node"],
+    "moduleResolution": "Bundler",
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": false,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "strict": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noFallthroughCasesInSwitch": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "paths": {
+      "@/*": ["../src/*"],
+      "@tanstack/react-router": ["./src/tanstack-shim.tsx"],
+      "@tanstack/react-start": ["./src/tanstack-shim.tsx"]
+    }
+  }
+}
