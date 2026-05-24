@@ -86,7 +86,7 @@ export function SawdustParticles({ density = 70, className }: Props) {
         ctx.arc(p.x, p.y, p.r * 4, 0, Math.PI * 2);
         ctx.fill();
 
-        ctx.fillStyle = `hsla(${p.hue}, 80%, 80%, ${Math.min(1, p.alpha + 0.2)})`;
+        ctx.fillStyle = `hsla(${p.hue}, 80%, 80%, ${Math.min(0.5, p.alpha + 0.08)})`;
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
         ctx.fill();
