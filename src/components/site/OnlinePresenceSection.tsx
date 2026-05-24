@@ -113,7 +113,7 @@ export function OnlinePresenceSection() {
                   <a
                     href={p.url}
                     target="_blank"
-                    rel="noopener noreferrer nofollow"
+                    rel="noopener noreferrer"
                   >
                     Eintrag ansehen
                     <ExternalLink className="ml-1.5 h-3.5 w-3.5" />
