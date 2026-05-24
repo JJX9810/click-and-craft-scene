@@ -24,11 +24,11 @@ import {
   CheckCircle2,
   Star,
 } from "lucide-react";
+import heroScene from "@/assets/hero-flooring.png";
 import { ProjectCard } from "@/components/site/ProjectCard";
 import { featuredProjects } from "@/data/projects";
 import { EinsatzgebietMap } from "@/components/site/EinsatzgebietMap";
 import { Kostenrechner } from "@/components/site/Kostenrechner";
-import { HeroPlankAnimation } from "@/components/site/HeroPlankAnimation";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -217,21 +217,21 @@ function Index() {
           </div>
 
           <div className="relative">
-            <div className="relative aspect-[16/11] w-full overflow-hidden rounded-3xl border border-border/60 bg-[#0d0d0d] shadow-2xl">
-              <HeroPlankAnimation />
+            <div className="relative aspect-[16/11] w-full overflow-hidden rounded-3xl border border-border/60 shadow-2xl">
+              <img
+                src={heroScene}
+                alt="Bodenleger verlegt Laminatplanke in Holzoptik auf dunklem Holzboden"
+                className="animate-hero-float h-full w-full object-cover"
+                width={1024}
+                height={704}
+              />
               <div
                 className="pointer-events-none absolute inset-0"
                 style={{
                   background:
-                    "linear-gradient(180deg, transparent 60%, oklch(0.14 0.012 60 / 0.6) 100%)",
+                    "linear-gradient(180deg, transparent 55%, oklch(0.14 0.012 60 / 0.55) 100%), linear-gradient(90deg, oklch(0.16 0.012 60 / 0.45) 0%, transparent 40%)",
                 }}
               />
-              <div className="pointer-events-none absolute bottom-4 left-4 flex items-center gap-2 rounded-full border border-border/60 bg-background/40 px-3 py-1.5 backdrop-blur">
-                <span className="h-1.5 w-1.5 rounded-full bg-accent" />
-                <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
-                  Verlegt &amp; Verschraubt
-                </span>
-              </div>
             </div>
           </div>
         </div>
