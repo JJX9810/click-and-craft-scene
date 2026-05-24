@@ -37,13 +37,12 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       {
-        title:
-          "Verlegt & Verschraubt – Bodenverlegung, Küchenmontage & Entrümpelung Wilhelmshaven",
+        title: "Verlegt & Verschraubt – Handwerker Wilhelmshaven",
       },
       {
         name: "description",
         content:
-          "Handwerkerservice aus Wilhelmshaven: Z.O.Z. – Zuverlässig, Ordentlich, Zügig. Bodenverlegung, Küchenmontage und Entrümpelung für Privatkunden in Wilhelmshaven & Umgebung.",
+          "Handwerkerservice Wilhelmshaven: Bodenverlegung, Küchenmontage und Entrümpelung. Z.O.Z. – zuverlässig, ordentlich, zügig.",
       },
       {
         property: "og:title",

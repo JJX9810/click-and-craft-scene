@@ -8,8 +8,8 @@ export const Route = createFileRoute("/wir-unterstuetzen")({
   component: Page,
   head: () => ({
     meta: [
-      { title: "Wir unterstützen Bildung & Tierschutz | Verlegt & Verschraubt Wilhelmshaven" },
-      { name: "description", content: "Verlegt & Verschraubt Handwerkerservice aus Wilhelmshaven unterstützt Kinderbildung durch Lehrmaterial-Spenden und engagiert sich für den Tierschutz durch Spenden an Tierschutzvereine." },
+      { title: "Wir unterstützen Bildung & Tierschutz" },
+      { name: "description", content: "Verlegt & Verschraubt aus Wilhelmshaven unterstützt Kinderbildung und Tierschutz durch Spenden und Lehrmaterialien." },
       { property: "og:title", content: "Wir unterstützen – Bildung & Tierschutz" },
       { property: "og:description", content: "Lokale Verantwortung: Lehrmaterial-Spenden für Kinder und Spenden an Tierschutzvereine." },
       { property: "og:url", content: "/wir-unterstuetzen" },
