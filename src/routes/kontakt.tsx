@@ -54,6 +54,16 @@ function Page() {
                 </select>
               </Field>
               <Field label="Gewünschter Zeitraum"><input className={input} placeholder="z. B. nächste 2 Wochen" /></Field>
+              <Field label="Geplantes Budget (ca.)">
+                <select className={input}>
+                  <option>Noch unklar / auf Angebot angewiesen</option>
+                  <option>unter 500 €</option>
+                  <option>500 – 1.500 €</option>
+                  <option>1.500 – 3.000 €</option>
+                  <option>3.000 – 5.000 €</option>
+                  <option>über 5.000 €</option>
+                </select>
+              </Field>
               <Field label="Kurze Beschreibung" className="sm:col-span-2">
                 <textarea rows={5} className={input} placeholder="Räume, ungefähre Größe, Besonderheiten…" />
               </Field>
