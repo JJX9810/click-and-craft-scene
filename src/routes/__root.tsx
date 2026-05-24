@@ -71,6 +71,11 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 }
 
 const PROFILE_URLS = [
+  "https://share.google/47AcEDNTSDkltR1un",
+  "https://www.facebook.com/profile.php?id=61579455697023",
+  "https://www.my-hammer.de/auftragnehmer/justus-1",
+  "https://www.kleinanzeigen.de/s-bestandsliste.html?userId=162496234",
+  "https://www.gelbeseiten.de/gsbiz/cb6b8b66-db85-4b56-8397-4a920963c6d1",
   "https://www.11880.com/branchenbuch/wilhelmshaven/060690823B113934961/verlegt-verschraubt-handwerkerservice.html",
   "https://adresse.dastelefonbuch.de/Wilhelmshaven/2-Holzfu%C3%9Fb%C3%B6den-Verlegt-Verschraubt-Handwerkerservice-Wilhelmshaven-Weichselstr.html",
   "https://www.golocal.de/wilhelmshaven/bodenbelaege/verlegtverschraubt-handwerkerservice-YVD9o/",
