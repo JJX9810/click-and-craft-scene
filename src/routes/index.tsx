@@ -29,6 +29,7 @@ import { ProjectCard } from "@/components/site/ProjectCard";
 import { featuredProjects } from "@/data/projects";
 import { EinsatzgebietMap } from "@/components/site/EinsatzgebietMap";
 import { Kostenrechner } from "@/components/site/Kostenrechner";
+import { OnlinePresenceSection } from "@/components/site/OnlinePresenceSection";
 
 export const Route = createFileRoute("/")({
   component: Index,
