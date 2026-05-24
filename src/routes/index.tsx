@@ -236,6 +236,8 @@ function Index() {
                 className="animate-hero-float h-full w-full object-cover"
                 width={1024}
                 height={704}
+                fetchPriority="high"
+                decoding="async"
               />
               <div
                 className="pointer-events-none absolute inset-0"
