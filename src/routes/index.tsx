@@ -368,7 +368,7 @@ function Index() {
           </div>
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {reasons.map((r, i) => (
-              <div key={r.title} className="group rounded-2xl border border-border/70 bg-card/40 p-6 transition-colors hover:border-accent/50">
+              <div key={r.title} className="tile-shader group rounded-2xl border border-border/70 bg-card/40 p-6 transition-colors hover:border-accent/50">
                 <div className="flex items-center justify-between">
                   <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent/15 text-accent">
                     <r.icon className="h-5 w-5" />
