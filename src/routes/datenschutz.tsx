@@ -7,6 +7,8 @@ export const Route = createFileRoute("/datenschutz")({
     meta: [
       { title: "Datenschutz – Verlegt & Verschraubt Handwerkerservice" },
       { name: "description", content: "Datenschutzerklärung von Verlegt & Verschraubt Handwerkerservice." },
+      { property: "og:title", content: "Datenschutz – Verlegt & Verschraubt" },
+      { property: "og:description", content: "Datenschutzerklärung von Verlegt & Verschraubt Handwerkerservice." },
       { property: "og:url", content: "/datenschutz" },
       { name: "robots", content: "noindex" },
     ],
