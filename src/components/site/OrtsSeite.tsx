@@ -57,7 +57,21 @@ export function OrtsSeite({
         </ul>
       </Section>
 
-      <Section eyebrow="Ablauf" title={`So läuft eine Anfrage in ${ort}`}>
+      {ortProjects.length > 0 && (
+        <Section eyebrow="Referenzen" title={`Projekte in ${ort} und Umgebung`}>
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {ortProjects.map((p, i) => (
+              <ProjectCard key={p.slug} project={p} eager={i === 0} />
+            ))}
+          </div>
+          <div className="mt-8">
+            <Link to="/showroom" className="inline-flex items-center text-sm text-accent hover:underline">
+              Alle Projekte im Showroom <ArrowRight className="ml-1 h-4 w-4" />
+            </Link>
+          </div>
+        </Section>
+      )}
+
         <ol className="grid gap-6 md:grid-cols-4">
           {["Anfrage senden", "Fotos & Maße", "Einschätzung", "Saubere Umsetzung"].map((t, i) => (
             <li key={t} className="rounded-2xl border border-border/70 bg-card/40 p-6">
