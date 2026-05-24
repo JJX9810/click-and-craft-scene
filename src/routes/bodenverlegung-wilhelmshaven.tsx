@@ -30,6 +30,7 @@ const sub = [
   { t: "Teppich verlegen", d: "Spannteppich oder verklebt – schalldämpfend und behaglich." },
   { t: "Treppenverkleidung mit Vinyl & Teppich", d: "Stufen sauber bezogen, kantenrein und rutschsicher – Vinyl und Teppich nach Wunsch." },
   { t: "Sockelleisten & Übergänge", d: "Mit Eckstücken oder auf Gehrung – passende Übergangsschienen, ordentliche Ecken." },
+  { t: "Acryl-Versiegeln von Leisten", d: "Sockelleisten und Treppenleisten sauber mit Acryl versiegelt – geschützt gegen Feuchtigkeit und haltbar." },
 ];
 
 const faqs = [
