@@ -212,6 +212,7 @@
   .animate-aurora-shift,
   .animate-shimmer,
   .animate-fade-up { animation: none; }
+  .tile-shader::after { transition: none; }
 }
 
 .dark {
