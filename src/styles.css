@@ -140,6 +140,42 @@
 }
 .animate-shimmer { animation: shimmer-line 3.5s ease-in-out infinite; }
 
+/* Shader-artiger Glanz auf Kacheln: dezenter iridescenter Sheen + Sweep on hover */
+.tile-shader {
+  position: relative;
+  isolation: isolate;
+}
+.tile-shader::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background:
+    radial-gradient(120% 80% at 0% 0%, oklch(0.85 0.06 80 / 0.06), transparent 55%),
+    radial-gradient(120% 80% at 100% 100%, oklch(0.55 0.10 50 / 0.05), transparent 55%);
+  z-index: 0;
+}
+.tile-shader::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(115deg, transparent 30%, oklch(0.95 0.04 80 / 0.18) 50%, transparent 70%);
+  transform: translateX(-120%);
+  transition: transform 1.1s ease;
+  z-index: 0;
+  mix-blend-mode: screen;
+}
+.tile-shader:hover::after {
+  transform: translateX(120%);
+}
+.tile-shader > * {
+  position: relative;
+  z-index: 1;
+}
+
 /* Premium dark laminate background — subtle real wood photo with heavy darkening */
 .bg-wood-grain {
   position: relative;
@@ -176,6 +212,7 @@
   .animate-aurora-shift,
   .animate-shimmer,
   .animate-fade-up { animation: none; }
+  .tile-shader::after { transition: none; }
 }
 
 .dark {

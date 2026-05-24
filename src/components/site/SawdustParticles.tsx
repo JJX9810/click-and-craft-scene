@@ -49,7 +49,7 @@ export function SawdustParticles({ density = 70, className }: Props) {
     };
 
     const seed = () => {
-      const count = Math.max(20, Math.floor((w * h) / 18000));
+      const count = Math.max(10, Math.floor((w * h) / 38000));
       const target = Math.min(count, density);
       particles = Array.from({ length: target }, () => makeParticle(true));
     };
@@ -57,13 +57,14 @@ export function SawdustParticles({ density = 70, className }: Props) {
     const makeParticle = (initial = false): Particle => ({
       x: Math.random() * w,
       y: initial ? Math.random() * h : h + Math.random() * 40,
-      vx: (Math.random() - 0.5) * 0.15,
-      vy: -0.15 - Math.random() * 0.35,
-      r: 0.6 + Math.random() * 1.6,
-      alpha: 0.15 + Math.random() * 0.45,
+      vx: (Math.random() - 0.5) * 0.08,
+      vy: -0.08 - Math.random() * 0.18,
+      r: 0.4 + Math.random() * 1.0,
+      alpha: 0.06 + Math.random() * 0.18,
       drift: Math.random() * Math.PI * 2,
-      hue: 38 + Math.random() * 12, // warm gold/amber range
+      hue: 38 + Math.random() * 12,
     });
+
 
     const step = (t: number) => {
       ctx.clearRect(0, 0, w, h);
@@ -85,7 +86,7 @@ export function SawdustParticles({ density = 70, className }: Props) {
         ctx.arc(p.x, p.y, p.r * 4, 0, Math.PI * 2);
         ctx.fill();
 
-        ctx.fillStyle = `hsla(${p.hue}, 80%, 80%, ${Math.min(1, p.alpha + 0.2)})`;
+        ctx.fillStyle = `hsla(${p.hue}, 80%, 80%, ${Math.min(0.5, p.alpha + 0.08)})`;
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
         ctx.fill();

@@ -12,6 +12,7 @@ import appCss from "../styles.css?url";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { Toaster } from "@/components/ui/sonner";
+import { SunlightHaze } from "@/components/site/SunlightHaze";
 
 function NotFoundComponent() {
   return (
@@ -155,12 +156,15 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <div className="bg-wood-grain relative flex min-h-screen flex-col overflow-x-hidden text-foreground">
-        <Header />
-        <main className="flex-1">
-          <Outlet />
-        </main>
-        <Footer />
-        <Toaster />
+        <SunlightHaze className="fixed inset-0 z-0" />
+        <div className="relative z-10 flex min-h-screen flex-col">
+          <Header />
+          <main className="flex-1">
+            <Outlet />
+          </main>
+          <Footer />
+          <Toaster />
+        </div>
       </div>
     </QueryClientProvider>
   );
