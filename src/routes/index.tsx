@@ -266,7 +266,7 @@ function Index() {
           </div>
           <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {reviews.map((r) => (
-              <article key={r.name} className="rounded-2xl border border-border/70 bg-card/50 p-5 backdrop-blur">
+              <article key={r.name} className="tile-shader rounded-2xl border border-border/70 bg-card/50 p-5 backdrop-blur">
                 <div className="flex items-center gap-1 text-accent">
                   {Array.from({ length: 5 }).map((_, i) => (
                     <Star key={i} className="h-3.5 w-3.5 fill-current" />
