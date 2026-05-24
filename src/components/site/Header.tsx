@@ -125,7 +125,7 @@ export function Header() {
             aria-label={mobileOpen ? "Menü schließen" : "Menü öffnen"}
             aria-expanded={mobileOpen}
             onClick={() => setMobileOpen((v) => !v)}
-            className="flex h-10 items-center gap-2 rounded-full border border-accent/60 bg-accent/15 px-4 text-sm font-semibold text-foreground shadow-sm transition hover:bg-accent/25 lg:hidden"
+            className="flex h-10 items-center gap-2 rounded-full border border-accent/60 bg-accent/15 px-4 text-sm font-semibold text-foreground shadow-sm transition hover:bg-accent/25 xl:hidden"
           >
             <Menu className="h-4 w-4" />
             <span>Menü</span>
