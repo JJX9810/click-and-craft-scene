@@ -123,9 +123,10 @@ export function Header() {
           <button
             aria-label="Menü öffnen"
             onClick={() => setMobileOpen(true)}
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-border/60 text-muted-foreground lg:hidden"
+            className="flex h-10 items-center gap-2 rounded-full border border-accent/60 bg-accent/15 px-4 text-sm font-semibold text-foreground shadow-sm transition hover:bg-accent/25 lg:hidden"
           >
             <Menu className="h-4 w-4" />
+            <span>Menü</span>
           </button>
         </div>
       </div>
