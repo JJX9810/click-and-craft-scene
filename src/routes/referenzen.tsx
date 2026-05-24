@@ -54,6 +54,20 @@ function Page() {
         </ul>
       </Section>
 
+      <Section eyebrow="Showroom" title="Echte Projekte ansehen">
+        <p className="max-w-2xl text-base leading-relaxed text-muted-foreground">
+          Im Showroom finden Sie ausgewählte Projekte mit Bildern und Videos – sortiert nach Leistung und Ort.
+        </p>
+        <Link
+          to="/showroom"
+          className="mt-6 inline-flex items-center gap-1 rounded-full bg-accent px-5 py-2.5 text-xs uppercase tracking-[0.2em] text-accent-foreground hover:bg-accent/90"
+        >
+          Zum Showroom <ArrowRight className="h-3.5 w-3.5" />
+        </Link>
+      </Section>
+
+
+
       <Section eyebrow="Bewertungen" title="Stimmen unserer Kunden" bordered>
         <div className="flex flex-wrap gap-2">
           {cats.map((c) => (
