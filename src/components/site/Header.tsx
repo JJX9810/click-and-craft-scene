@@ -42,27 +42,27 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-border/50 bg-background/80 backdrop-blur-md">
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-6 py-3.5">
-        <Link to="/" className="flex items-center gap-3">
+      <div className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-6 xl:gap-8">
+        <Link to="/" className="flex shrink-0 items-center gap-3 max-w-[280px]">
           <img
             src={logo}
             alt="Verlegt & Verschraubt Handwerkerservice"
-            className="h-10 w-auto sm:h-12"
+            className="h-10 w-auto shrink-0"
             width={120}
             height={48}
           />
-          <span className="hidden flex-col leading-tight sm:flex">
-            <span className="text-sm font-semibold tracking-tight text-foreground">
+          <span className="hidden flex-col leading-tight md:flex">
+            <span className="text-sm font-semibold tracking-tight text-foreground whitespace-nowrap">
               Verlegt &amp; Verschraubt
             </span>
-            <span className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
+            <span className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground whitespace-nowrap">
               Handwerkerservice
             </span>
           </span>
         </Link>
 
         {/* Desktop nav */}
-        <nav className="hidden items-center gap-1 lg:flex">
+        <nav className="hidden flex-1 items-center justify-end gap-0.5 xl:flex">
           {nav.map((item) =>
             "to" in item ? (
               <Link
@@ -71,7 +71,7 @@ export function Header() {
                 activeOptions={{ exact: item.to === "/" }}
                 activeProps={{ className: "text-foreground" }}
                 inactiveProps={{ className: "text-muted-foreground" }}
-                className="rounded-md px-3 py-2 text-[13px] font-medium tracking-wide hover:text-foreground"
+                className="rounded-md px-2.5 py-2 text-[13px] font-medium tracking-wide whitespace-nowrap hover:text-foreground"
               >
                 {item.label}
               </Link>
@@ -79,18 +79,18 @@ export function Header() {
               <div key={item.label} className="group relative">
                 <button
                   type="button"
-                  className="flex items-center gap-1 rounded-md px-3 py-2 text-[13px] font-medium tracking-wide text-muted-foreground hover:text-foreground"
+                  className="flex items-center gap-1 rounded-md px-2.5 py-2 text-[13px] font-medium tracking-wide whitespace-nowrap text-muted-foreground hover:text-foreground"
                 >
                   {item.label}
                   <ChevronDown className="h-3.5 w-3.5 transition-transform group-hover:rotate-180" />
                 </button>
-                <div className="invisible absolute left-0 top-full pt-2 opacity-0 transition-all group-hover:visible group-hover:opacity-100">
+                <div className="invisible absolute right-0 top-full pt-2 opacity-0 transition-all group-hover:visible group-hover:opacity-100">
                   <div className="min-w-[230px] overflow-hidden rounded-xl border border-border/70 bg-card/95 p-1.5 shadow-2xl backdrop-blur-xl">
                     {item.children.map((c) => (
                       <Link
                         key={c.to}
                         to={c.to}
-                        className="block rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-accent/10 hover:text-foreground"
+                        className="block rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-accent/10 hover:text-foreground whitespace-nowrap"
                       >
                         {c.label}
                       </Link>
@@ -102,7 +102,8 @@ export function Header() {
           )}
         </nav>
 
-        <div className="flex items-center gap-2">
+        <div className="flex shrink-0 items-center gap-2 ml-auto xl:ml-0">
+
           <a
             href="mailto:justus.brosch@verlegt-verschraubt.de"
             aria-label="E-Mail schreiben"
