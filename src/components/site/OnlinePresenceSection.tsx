@@ -10,6 +10,40 @@ export interface PlatformEntry {
 
 const platforms: PlatformEntry[] = [
   {
+    name: "Google",
+    url: "https://share.google/47AcEDNTSDkltR1un",
+    description:
+      "Google Unternehmensprofil mit Standort, Kontakt und Bewertungen.",
+    active: true,
+  },
+  {
+    name: "Facebook",
+    url: "https://www.facebook.com/profile.php?id=61579455697023",
+    description:
+      "Offizielle Facebook-Seite von Verlegt & Verschraubt mit Updates und Projekten.",
+    active: true,
+  },
+  {
+    name: "MyHammer",
+    url: "https://www.my-hammer.de/auftragnehmer/justus-1",
+    description:
+      "Profil auf MyHammer – Handwerker-Plattform mit Bewertungen und Aufträgen.",
+    active: true,
+  },
+  {
+    name: "Kleinanzeigen",
+    url: "https://www.kleinanzeigen.de/s-bestandsliste.html?userId=162496234",
+    description:
+      "Aktuelle Anzeigen und Angebote auf Kleinanzeigen.de.",
+    active: true,
+  },
+  {
+    name: "Gelbe Seiten",
+    url: "https://www.gelbeseiten.de/gsbiz/cb6b8b66-db85-4b56-8397-4a920963c6d1",
+    description: "Branchenverzeichniseintrag mit Unternehmensdaten.",
+    active: true,
+  },
+  {
     name: "11880",
     url: "https://www.11880.com/branchenbuch/wilhelmshaven/060690823B113934961/verlegt-verschraubt-handwerkerservice.html",
     description:
@@ -29,26 +63,6 @@ const platforms: PlatformEntry[] = [
     description:
       "Lokaler Unternehmenseintrag für Verlegt & Verschraubt im Bereich Bodenbeläge.",
     active: true,
-  },
-  {
-    name: "MyHammer",
-    description: "Handwerker-Plattform für lokale Aufträge.",
-    active: false,
-  },
-  {
-    name: "Facebook",
-    description: "Soziales Netzwerk für lokale Updates.",
-    active: false,
-  },
-  {
-    name: "Kleinanzeigen",
-    description: "Lokale Kleinanzeigen-Plattform.",
-    active: false,
-  },
-  {
-    name: "Gelbe Seiten",
-    description: "Branchenverzeichnis für Handwerker.",
-    active: false,
   },
 ];
 
