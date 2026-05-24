@@ -2,7 +2,13 @@ import { createFileRoute } from "@tanstack/react-router";
 import { OrtsSeite } from "@/components/site/OrtsSeite";
 
 export const Route = createFileRoute("/handwerkerservice-wangerland")({
-  component: () => <OrtsSeite ort="Wangerland" umgebung={["Wilhelmshaven", "Schortens", "Jever", "Varel"]} />,
+  component: () => (
+    <OrtsSeite
+      ort="Wangerland"
+      umgebung={["Hooksiel", "Wilhelmshaven", "Schortens", "Jever", "Varel"]}
+      projectSlugs={["kuechenfolierung-hooksiel"]}
+    />
+  ),
   head: () => ({
     meta: [
       { title: "Handwerkerservice Wangerland – Boden, Küche, Entrümpelung" },
