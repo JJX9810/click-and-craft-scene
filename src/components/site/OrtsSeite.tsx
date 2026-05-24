@@ -1,8 +1,21 @@
 import { Link } from "@tanstack/react-router";
 import { PageHero, Section, Bullet, CtaBlock } from "@/components/site/PageShell";
 import { Layers, Wrench, Trash2, ArrowRight } from "lucide-react";
+import { ProjectCard } from "@/components/site/ProjectCard";
+import { projects, type Project } from "@/data/projects";
 
-export function OrtsSeite({ ort, umgebung }: { ort: string; umgebung: string[] }) {
+export function OrtsSeite({
+  ort,
+  umgebung,
+  projectSlugs,
+}: {
+  ort: string;
+  umgebung: string[];
+  projectSlugs?: string[];
+}) {
+  const ortProjects: Project[] = projectSlugs
+    ? (projectSlugs.map((s) => projects.find((p) => p.slug === s)).filter(Boolean) as Project[])
+    : projects.filter((p) => p.ort.toLowerCase().includes(ort.toLowerCase()));
   const services = [
     { icon: Layers, title: `Bodenverlegung in ${ort}`, desc: "Vinyl, Laminat, PVC und Teppich – sauber verlegt.", to: "/bodenverlegung-wilhelmshaven" },
     { icon: Wrench, title: `Küchenmontage in ${ort}`, desc: "Aufbau nach Umzug, Restmontage, Arbeitsplatten.", to: "/kuechenmontage-in-wilhelmshaven" },
