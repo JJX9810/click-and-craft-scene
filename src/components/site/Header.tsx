@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Phone, Mail, Menu, ChevronDown, X } from "lucide-react";
-void X;
+import { Phone, Mail, Menu, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import logo from "@/assets/logo.png";
 
