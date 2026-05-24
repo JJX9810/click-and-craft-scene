@@ -57,7 +57,7 @@ function getInitials(name: string) {
     .split(" ")
     .map((w) => w[0])
     .filter(Boolean)
-    .slice(1, 3)
+    .slice(0, 2)
     .join("")
     .toUpperCase();
 }
