@@ -8,7 +8,7 @@ interface Props {
  * Reine CSS-Radial-Gradients mit langsamer Bewegung – kein Canvas, kein JS.
  */
 export function SunlightHaze({ className, intensity = "soft" }: Props) {
-  const opacity = intensity === "medium" ? 0.55 : 0.32;
+  const opacity = intensity === "medium" ? 0.32 : 0.16;
   return (
     <div
       aria-hidden
