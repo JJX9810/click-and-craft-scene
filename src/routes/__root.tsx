@@ -88,8 +88,8 @@ const ORG_JSONLD = {
   description:
     "Bodenverlegung, Küchenmontage, Entrümpelung und kleine Reparaturen in Wilhelmshaven & Umgebung.",
   url: "https://verlegt-verschraubt.de/",
-  image: "https://verlegt-verschraubt.de/wp-content/uploads/2026/05/image003.png",
-  logo: "https://verlegt-verschraubt.de/wp-content/uploads/2026/05/image003.png",
+  image: "https://verlegt-verschraubt.de/logo.png",
+  logo: "https://verlegt-verschraubt.de/logo.png",
   areaServed: "Wilhelmshaven und Umgebung",
   address: {
     "@type": "PostalAddress",

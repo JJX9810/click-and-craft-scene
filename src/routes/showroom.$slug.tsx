@@ -38,11 +38,19 @@ function MediaItem({ m, eager }: { m: ProjectMedia; eager?: boolean }) {
             alt={m.alt}
             loading={eager ? "eager" : "lazy"}
             decoding="async"
+            onError={(e) => {
+              const img = e.currentTarget;
+              if (img.dataset.fallback !== "1") {
+                img.dataset.fallback = "1";
+                img.src = "/wood-bg.png";
+              }
+            }}
             className="h-full w-full object-cover"
           />
         ) : (
           <video
             src={m.src}
+            poster="/wood-bg.png"
             controls
             preload="metadata"
             playsInline

@@ -16,6 +16,13 @@ export function ProjectCard({ project, eager = false }: { project: Project; eage
           alt={project.coverAlt}
           loading={eager ? "eager" : "lazy"}
           decoding="async"
+          onError={(e) => {
+            const img = e.currentTarget;
+            if (img.dataset.fallback !== "1") {
+              img.dataset.fallback = "1";
+              img.src = "/wood-bg.png";
+            }
+          }}
           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
         <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-background/85 to-transparent" />
