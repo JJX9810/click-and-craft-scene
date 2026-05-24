@@ -63,7 +63,7 @@
 
 :root {
   --radius: 0.5rem;
-  --background: oklch(0.18 0.012 60);
+  --background: oklch(0.26 0.014 60);
   --foreground: oklch(0.95 0.015 70);
   --card: oklch(0.22 0.015 60);
   --card-foreground: oklch(0.95 0.015 70);
@@ -184,14 +184,14 @@
 /* Premium dark laminate background — subtle real wood photo with heavy darkening */
 .bg-wood-grain {
   position: relative;
-  background-color: oklch(0.1 0.008 50);
+  background-color: oklch(0.2 0.012 55);
   background-image:
-    /* Strong dark overlay so the photo stays subtle */
+    /* Lighter overlay so the wood photo shows through more */
     linear-gradient(
       to bottom,
-      oklch(0.08 0.008 50 / 0.78) 0%,
-      oklch(0.1 0.01 50 / 0.7) 40%,
-      oklch(0.06 0.006 50 / 0.85) 100%
+      oklch(0.2 0.012 55 / 0.55) 0%,
+      oklch(0.22 0.014 55 / 0.45) 40%,
+      oklch(0.18 0.01 55 / 0.6) 100%
     ),
     url("/wood-bg.png");
   background-size: cover, cover;
@@ -206,8 +206,8 @@
   inset: 0;
   pointer-events: none;
   background:
-    radial-gradient(ellipse at 70% 20%, oklch(0.4 0.06 60 / 0.18) 0%, transparent 55%),
-    radial-gradient(ellipse at 10% 100%, oklch(0.03 0.004 50 / 0.6) 0%, transparent 60%);
+    radial-gradient(ellipse at 70% 20%, oklch(0.55 0.07 65 / 0.18) 0%, transparent 55%),
+    radial-gradient(ellipse at 10% 100%, oklch(0.12 0.008 50 / 0.4) 0%, transparent 60%);
 }
 
 
