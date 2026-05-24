@@ -2,7 +2,20 @@ import { createFileRoute } from "@tanstack/react-router";
 import { OrtsSeite } from "@/components/site/OrtsSeite";
 
 export const Route = createFileRoute("/handwerkerservice-wilhelmshaven")({
-  component: () => <OrtsSeite ort="Wilhelmshaven" umgebung={["Schortens", "Sande", "Jever", "Varel", "Wangerland"]} />,
+  component: () => (
+    <OrtsSeite
+      ort="Wilhelmshaven"
+      umgebung={["Schortens", "Sande", "Jever", "Varel", "Wangerland"]}
+      projectSlugs={[
+        "bodenverlegung-coldewei-wilhelmshaven",
+        "bodenverlegung-wohnbereich-wilhelmshaven",
+        "treppenbelag-wilhelmshaven",
+        "vinylboden-uebergang-wilhelmshaven",
+        "kueche-holzarbeitsplatte-wilhelmshaven",
+        "vinylboden-wohnraum-wilhelmshaven",
+      ]}
+    />
+  ),
   head: () => ({
     meta: [
       { title: "Handwerkerservice Wilhelmshaven – Boden, Küche, Entrümpelung" },
