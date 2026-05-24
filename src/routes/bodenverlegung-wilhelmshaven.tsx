@@ -4,6 +4,8 @@ import {
   Accordion, AccordionContent, AccordionItem, AccordionTrigger,
 } from "@/components/ui/accordion";
 import { ArrowRight } from "lucide-react";
+import { ProjectCard } from "@/components/site/ProjectCard";
+import { projects } from "@/data/projects";
 
 export const Route = createFileRoute("/bodenverlegung-wilhelmshaven")({
   component: Page,
