@@ -1,7 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { PageHero, Section, CtaBlock } from "@/components/site/PageShell";
-import { Star } from "lucide-react";
+import { Star, ArrowRight } from "lucide-react";
 
 export const Route = createFileRoute("/referenzen")({
   component: Page,
