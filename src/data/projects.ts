@@ -10,6 +10,8 @@ export type ProjectMedia = {
   src: string;
   alt: string;
   caption?: string;
+  /** Ausführliche, SEO-relevante Beschreibung (Ort, Material, Arbeitsschritte). */
+  longDescription?: string;
   phase?: "Vorher" | "Vorbereitung" | "Nachher" | "Detail";
 };
 
@@ -46,79 +48,99 @@ export const projects: Project[] = [
     ],
     description:
       "In Coldewei, Wilhelmshaven wurde der vorhandene Teppichboden entfernt und der Untergrund vorbereitet. Untere Etage: Vinylboden in Holzoptik. Obere Etage: Schlingenteppich. Fokus auf saubere Übergänge, Sockelleisten auf Gehrung und ein stimmiges Gesamtbild.",
-    cover: `${BASE}/WhatsApp-Image-2026-05-19-at-17.55.19.jpeg`,
-    coverAlt: "Vinylboden im Wohnzimmer in Coldewei, Wilhelmshaven",
+    cover: "/projects/coldewei-06-vinyl-wohnzimmer.jpeg",
+    coverAlt: "Vinylboden in Holzoptik im Wohnzimmer in Coldewei, Wilhelmshaven",
     featured: true,
     detail: true,
     media: [
       {
         type: "image",
-        src: `${BASE}/WhatsApp-Image-2026-05-23-at-23.13.55-1.jpeg`,
-        alt: "Vorherbild Bodenverlegung im Flur in Coldewei",
-        caption: "Ausgangszustand im Flur- und Treppenbereich vor der neuen Bodenverlegung.",
+        src: "/projects/coldewei-01-vorher-flur.jpeg",
+        alt: "Vorher: Flur mit Materialkartons vor der Bodenverlegung in Coldewei, Wilhelmshaven",
+        caption: "Ausgangszustand im Flur- und Treppenbereich vor Beginn der Bodenverlegung.",
+        longDescription:
+          "Vorher-Aufnahme aus dem Einfamilienhaus in Coldewei, Wilhelmshaven: Im Flur stehen die angelieferten Vinyldielen und das Verlegezubehör neben der offenen Holztreppe. Der vorhandene Boden ist noch unverändert, Sockelleisten und Wände sind unbeschädigt. Diese Aufnahme dokumentiert den Ausgangszustand vor der Renovierung als Referenz für ein faires Vorher-/Nachher-Vergleichsbild.",
         phase: "Vorher",
       },
       {
         type: "image",
-        src: `${BASE}/WhatsApp-Image-2026-05-23-at-23.13.54.jpeg`,
-        alt: "Untergrund vorbereitet nach Teppichentfernung in Coldewei",
-        caption: "Alter Teppich entfernt, Untergrund für die neue Bodenverlegung vorbereitet.",
+        src: "/projects/coldewei-02-untergrund-vorbereitet.jpeg",
+        alt: "Untergrund nach Entfernen des alten Teppichbodens in Coldewei, Wilhelmshaven",
+        caption: "Alter Teppich entfernt, Estrich gereinigt und für den neuen Vinylboden vorbereitet.",
+        longDescription:
+          "Vorbereitungsphase im Erdgeschoss: Der alte Teppichboden inklusive Klebereste wurde komplett entfernt, der Estrich gereinigt, gesaugt und kontrolliert. Sichtbar sind die Reste der alten Verklebung und das eingesetzte Bauwerkzeug (Industriesauger, Spachtel, Schutzfolie). Ein sauberer, ebener Untergrund ist die Grundlage für eine fugendichte und langlebige Vinylverlegung – wir prüfen Ebenheit, Restfeuchte und Saugfähigkeit, bevor neue Dielen verlegt werden.",
         phase: "Vorbereitung",
       },
       {
         type: "image",
-        src: `${BASE}/WhatsApp-Image-2026-05-19-at-17.54.58-1.jpeg`,
-        alt: "Vinylboden im Flur mit Sockelleisten in Coldewei",
-        caption: "Vinylboden im Flur. Sockelleisten auf Gehrung gesägt, montiert, versiegelt, mit Acryl abgezogen.",
+        src: "/projects/coldewei-03-vinyl-flur.jpeg",
+        alt: "Frisch verlegter Vinylboden in Holzoptik im Flur in Coldewei, Wilhelmshaven",
+        caption: "Vinyl in Holzoptik – frisch verlegt im Flur, noch während der Endmontage.",
+        longDescription:
+          "Frisch verlegter Vinylboden in warmer, rustikaler Holzoptik im Flurbereich. Die Dielen sind sauber im wilden Verband mit versetzten Stößen verlegt, an Türzargen und Glasflächen exakt eingeschnitten. Das Material ist trittschalldämmend, fußwarm und für Mietwohnungen wie für Eigentum gleichermaßen geeignet.",
         phase: "Nachher",
       },
       {
         type: "image",
-        src: `${BASE}/WhatsApp-Image-2026-05-19-at-17.54.58.jpeg`,
-        alt: "Vinylboden im Flurbereich in Coldewei",
-        caption: "Fertig verlegter Vinylboden in Holzoptik im Flurbereich.",
+        src: "/projects/coldewei-04-vinyl-flur-treppe.jpeg",
+        alt: "Vinylboden im Eingangs- und Treppenbereich in Coldewei, Wilhelmshaven",
+        caption: "Vinylboden im Übergang zwischen Eingang, Flur und offener Treppe.",
+        longDescription:
+          "Vinylboden im Eingangs- und Treppenbereich. Die Dielen wurden um die Treppenwange herum exakt zugeschnitten, der Anschluss an die Stufen ist staubdicht ausgeführt. Die Holzoptik nimmt den Farbton der bestehenden Holztreppe auf und sorgt für ein durchgängig ruhiges Gesamtbild im Erdgeschoss.",
         phase: "Nachher",
       },
       {
         type: "image",
-        src: `${BASE}/WhatsApp-Image-2026-05-19-at-17.55.04.jpeg`,
-        alt: "Vinylboden mit Übergangsschiene in Coldewei",
-        caption: "Sauber ausgeführter Raumübergang mit Übergangsschiene.",
+        src: "/projects/coldewei-05-uebergangsschiene.jpeg",
+        alt: "Vinylboden mit sauber gesetzter Übergangsschiene in Coldewei, Wilhelmshaven",
+        caption: "Detail: sauber gesetzte Übergangsschiene zwischen zwei Räumen.",
+        longDescription:
+          "Detailaufnahme eines Raumübergangs: Zwischen Wohnzimmer und Flur wurde eine schmale, weiße Übergangsschiene flächenbündig gesetzt. Sie überbrückt die Dehnungsfuge der schwimmend verlegten Vinyldielen, schützt die Stoßkante vor Aufstemmen und sorgt für einen optisch ruhigen Übergang ohne Stolperkante.",
         phase: "Detail",
       },
       {
         type: "image",
-        src: `${BASE}/WhatsApp-Image-2026-05-19-at-17.55.19.jpeg`,
-        alt: "Vinylboden im Wohnzimmer in Coldewei",
-        caption: "Vinylboden in Holzoptik im Wohnzimmer – ruhiges, modernes Gesamtbild.",
+        src: "/projects/coldewei-06-vinyl-wohnzimmer.jpeg",
+        alt: "Vinylboden in Holzoptik im Wohnzimmer mit Kaminofen in Coldewei, Wilhelmshaven",
+        caption: "Vinylboden im Wohnzimmer – ruhiges, modernes Gesamtbild rund um den Kaminofen.",
+        longDescription:
+          "Vinylboden in heller, gewaschener Holzoptik im Wohnzimmer des Hauses in Coldewei. Die Dielen verlaufen gleichmäßig durch den gesamten Raum, der Kaminofen auf Glas-Funkenschutzplatte ist sauber umfasst. Auch um Heizkörper, Türzargen und das schwere Hemnes-Vitrinenmöbel wurde millimetergenau eingepasst – kein sichtbarer Fugenversatz, keine offenen Anschlüsse.",
         phase: "Nachher",
       },
       {
         type: "image",
-        src: `${BASE}/WhatsApp-Image-2026-05-19-at-17.56.27.jpeg`,
-        alt: "Schlingenteppich im Flur der zweiten Etage in Coldewei",
-        caption: "Schlingenteppich im Flur- und Treppenbereich der zweiten Etage.",
+        src: "/projects/coldewei-07-teppich-2etage.jpeg",
+        alt: "Schlingenteppich im Flur der zweiten Etage in Coldewei, Wilhelmshaven",
+        caption: "Schlingenteppich im Flur- und Treppenpodest der zweiten Etage.",
+        longDescription:
+          "Schlingenteppich in neutralem Beigegrau im oberen Flurbereich. Der Belag wurde fugenlos um die Holztreppe und an die Zimmertüren angearbeitet, an den Wänden sind frisch montierte weiße Sockelleisten gesetzt. Schlingenteppich ist robust, strapazierfähig und akustisch dämpfend – eine gute Wahl für Schlafetage und Kinderzimmerflur.",
         phase: "Nachher",
       },
       {
         type: "image",
-        src: `${BASE}/WhatsApp-Image-2026-05-19-at-17.56.16.jpeg`,
-        alt: "Schlingenteppich mit sauberen Übergängen in Coldewei",
-        caption: "Schlingenteppich mit sauberen Übergängen zu angrenzenden Zimmern.",
+        src: "/projects/coldewei-08-teppich-flur.jpeg",
+        alt: "Schlingenteppich im oberen Flur mit sauberen Übergängen in Coldewei, Wilhelmshaven",
+        caption: "Schlingenteppich auf dem Treppenpodest mit sauberen Anschlüssen zu den Zimmern.",
+        longDescription:
+          "Treppenpodest in der zweiten Etage: Der Schlingenteppich wurde flächig verlegt und an Treppenwange, Wand und beiden Zimmertüren bündig eingeschnitten. Die Anschlüsse zu den angrenzenden Zimmern sind ohne sichtbare Übergangsschiene gelöst – möglich durch denselben Belag in beiden Räumen und sorgfältig gesetzte Klebenähte.",
         phase: "Nachher",
       },
       {
         type: "image",
-        src: `${BASE}/WhatsApp-Image-2026-05-19-at-17.56.45.jpeg`,
-        alt: "Schlingenteppich im Zimmer in Coldewei",
-        caption: "Fertig verlegter Schlingenteppich in einem Zimmer der zweiten Etage.",
+        src: "/projects/coldewei-09-teppich-zimmer.jpeg",
+        alt: "Schlingenteppich in einem Dachschrägen-Zimmer in Coldewei, Wilhelmshaven",
+        caption: "Fertig verlegter Schlingenteppich in einem Zimmer mit Dachschräge.",
+        longDescription:
+          "Frisch verlegter Schlingenteppich in einem Zimmer mit Dachschräge in der oberen Etage. Der Belag wurde an die Schräge, an die Sockelleisten und um den Heizkörper sauber eingepasst. Der weiche, schalldämpfende Teppich macht den Raum sofort wohnlich und ist bereit für die Möblierung.",
         phase: "Nachher",
       },
       {
         type: "image",
-        src: `${BASE}/WhatsApp-Image-2026-05-19-at-17.56.59.jpeg`,
-        alt: "Schlingenteppich mit sauberen Gehrungen in Coldewei",
-        caption: "Detailbild: sauber ausgeführte Gehrungen und ordentliche Anschlüsse.",
+        src: "/projects/coldewei-10-teppich-gehrungen.jpeg",
+        alt: "Detail: Schlingenteppich mit sauberen Anschlüssen in Coldewei, Wilhelmshaven",
+        caption: "Detailbild: sauber ausgeführte Anschlüsse und Sockelleisten an der Wandkante.",
+        longDescription:
+          "Detailaufnahme im Schlafzimmer: Der Schlingenteppich liegt fugenlos am weißen Bettgestell und am Hocker an, die weißen Sockelleisten sind auf Gehrung geschnitten und sauber an die Teppichkante gesetzt. Diese Detailarbeit – exakte Gehrungen, dichte Anschlüsse, kein Klaffen an den Ecken – entscheidet über das hochwertige Gesamtbild eines verlegten Bodens.",
         phase: "Detail",
       },
     ],
