@@ -14,6 +14,16 @@ export const Route = createFileRoute("/showroom/$slug")({
   head: ({ loaderData }) => {
     const p = loaderData?.project;
     if (!p) return {};
+    const imageObjects = p.media
+      .filter((m) => m.type === "image")
+      .map((m) => ({
+        "@type": "ImageObject",
+        contentUrl: m.src,
+        url: m.src,
+        name: m.alt,
+        caption: m.caption,
+        description: m.longDescription ?? m.caption ?? m.alt,
+      }));
     return {
       meta: [
         { title: `${p.title} – Showroom Verlegt & Verschraubt` },
@@ -24,6 +34,20 @@ export const Route = createFileRoute("/showroom/$slug")({
         { property: "og:image", content: p.cover },
       ],
       links: [{ rel: "canonical", href: `/showroom/${p.slug}` }],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "ImageGallery",
+            name: p.title,
+            description: p.description,
+            about: p.category,
+            contentLocation: { "@type": "Place", name: p.ort },
+            image: imageObjects,
+          }),
+        },
+      ],
     };
   },
 });
@@ -63,9 +87,10 @@ function MediaItem({ m, eager }: { m: ProjectMedia; eager?: boolean }) {
           </span>
         )}
       </div>
-      {m.caption && (
-        <figcaption className="px-4 py-3 text-xs leading-relaxed text-muted-foreground">
-          {m.caption}
+      {(m.caption || m.longDescription) && (
+        <figcaption className="space-y-2 px-4 py-3 text-xs leading-relaxed text-muted-foreground">
+          {m.caption && <span className="block font-medium text-foreground/85">{m.caption}</span>}
+          {m.longDescription && <span className="block text-[11px] leading-relaxed text-muted-foreground/85">{m.longDescription}</span>}
         </figcaption>
       )}
     </figure>
