@@ -160,12 +160,22 @@ function Index() {
   return (
     <>
       {/* HERO */}
-      <section id="top" className="relative">
+      <section id="top" className="relative overflow-hidden">
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0"
           style={{ background: "var(--gradient-hero)", opacity: 0.85 }}
         />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 opacity-60 mix-blend-screen animate-aurora-shift"
+          style={{
+            background:
+              "radial-gradient(60% 50% at 20% 30%, oklch(0.55 0.12 60 / 0.35), transparent 60%), radial-gradient(50% 45% at 80% 70%, oklch(0.45 0.10 40 / 0.30), transparent 60%), radial-gradient(40% 40% at 50% 100%, oklch(0.50 0.14 80 / 0.25), transparent 60%)",
+            backgroundSize: "200% 200%",
+          }}
+        />
+        <SawdustParticles density={60} />
         <div className="relative mx-auto grid max-w-7xl grid-cols-1 items-center gap-12 px-6 pb-24 pt-12 lg:grid-cols-2 lg:gap-10 lg:pt-20">
           <div className="relative z-10 max-w-xl animate-fade-up">
             <span className="inline-block rounded-full border border-accent/30 bg-accent/10 px-4 py-1.5 text-[11px] uppercase tracking-[0.28em] text-accent">
