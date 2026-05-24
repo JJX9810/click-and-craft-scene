@@ -400,20 +400,19 @@ function Index() {
 
       {/* PREISE */}
       <section id="preise" className="border-y border-border/60 bg-background/40">
-        <div className="mx-auto max-w-3xl px-6 py-20 text-center">
-          <p className="text-xs uppercase tracking-[0.28em] text-accent">Preise</p>
-          <h2 className="mt-3 text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
-            Was kostet mein Projekt ungefähr?
-          </h2>
-          <p className="mt-4 text-base leading-relaxed text-muted-foreground">
-            Mit unserem Preisrechner bekommen Sie eine erste Orientierung für
-            Bodenverlegung, Küchenmontage oder Entrümpelung – ohne Fachchinesisch
-            und ohne Verbindlichkeit.
-          </p>
-          <div className="mt-8 flex flex-wrap justify-center gap-3">
-            <Button asChild size="lg" className="h-12 rounded-full bg-accent px-7 text-accent-foreground hover:bg-accent/90">
-              <Link to="/preise">Zum Preisrechner <ArrowRight className="ml-1 h-4 w-4" /></Link>
-            </Button>
+        <div className="mx-auto max-w-5xl px-6 py-24">
+          <div className="mx-auto max-w-2xl text-center">
+            <p className="text-xs uppercase tracking-[0.28em] text-accent">Kostenrechner</p>
+            <h2 className="mt-3 text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
+              Was kostet mein Projekt ungefähr?
+            </h2>
+            <p className="mt-4 text-base leading-relaxed text-muted-foreground">
+              Erste Orientierung in unter einer Minute – Anfrage anschließend
+              direkt per WhatsApp inklusive aller Angaben senden.
+            </p>
+          </div>
+          <div className="mt-12">
+            <Kostenrechner />
           </div>
         </div>
       </section>
