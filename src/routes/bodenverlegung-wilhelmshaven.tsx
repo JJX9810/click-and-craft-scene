@@ -23,11 +23,13 @@ export const Route = createFileRoute("/bodenverlegung-wilhelmshaven")({
 
 const sub = [
   { t: "Vinylboden verlegen", d: "Klick- und Klebevinyl, hochwertige Optiken, ruhig und strapazierfähig." },
+  { t: "Designboden verlegen", d: "Designvinyl / SPC / LVT mit edler Holz- oder Steinoptik – langlebig und wertig." },
   { t: "Laminat verlegen", d: "Click-Systeme, sauberer Plankenverlauf, Diagonalverlegung möglich." },
+  { t: "Boden ausgleichen", d: "Untergrund spachteln und nivellieren – Voraussetzung für ein ruhiges Verlegebild." },
   { t: "PVC verlegen", d: "Pflegeleichter Bodenbelag für Küche, Bad und Nebenräume." },
   { t: "Teppich verlegen", d: "Spannteppich oder verklebt – schalldämpfend und behaglich." },
   { t: "Treppenverlegung mit Teppich", d: "Stufen sauber bezogen, kantenrein und rutschsicher." },
-  { t: "Sockelleisten & Übergänge", d: "Saubere Abschlüsse, passende Übergangsschienen, ordentliche Ecken." },
+  { t: "Sockelleisten & Übergänge", d: "Mit Eckstücken oder auf Gehrung – passende Übergangsschienen, ordentliche Ecken." },
 ];
 
 const faqs = [
@@ -99,11 +101,11 @@ function Page() {
 
       <Section eyebrow="Preisfaktoren" title="Was den Preis beeinflusst" bordered>
         <ul className="grid gap-3 text-sm text-muted-foreground sm:grid-cols-2 lg:grid-cols-3">
-          <Bullet>Bodenart (Vinyl, Laminat, PVC, Teppich)</Bullet>
+          <Bullet>Bodenart (Vinyl, Designboden, Laminat, PVC, Teppich)</Bullet>
           <Bullet>Quadratmeter und Raumzuschnitt</Bullet>
-          <Bullet>Untergrundvorbereitung</Bullet>
+          <Bullet>Untergrund ausgleichen / spachteln</Bullet>
           <Bullet>Altbelag entfernen ja/nein</Bullet>
-          <Bullet>Sockelleisten & Übergänge</Bullet>
+          <Bullet>Sockelleisten – mit Eckstücken oder auf Gehrung</Bullet>
           <Bullet>Türen, Heizungsrohre, Schrägen</Bullet>
         </ul>
         <div className="mt-8">

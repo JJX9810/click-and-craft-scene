@@ -27,6 +27,8 @@ import {
 import heroScene from "@/assets/hero-flooring.png";
 import { ProjectCard } from "@/components/site/ProjectCard";
 import { featuredProjects } from "@/data/projects";
+import { EinsatzgebietMap } from "@/components/site/EinsatzgebietMap";
+import { Kostenrechner } from "@/components/site/Kostenrechner";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -447,14 +449,13 @@ function Index() {
               ))}
             </ul>
           </div>
-          <div className="relative aspect-square overflow-hidden rounded-2xl border border-border/70">
-            <iframe
-              title="Karte Einsatzgebiet Wilhelmshaven"
-              src="https://www.openstreetmap.org/export/embed.html?bbox=7.65%2C53.40%2C8.20%2C53.65&layer=mapnik&marker=53.5283%2C8.1117"
-              className="h-full w-full opacity-90 grayscale"
-              loading="lazy"
-            />
-          </div>
+          <EinsatzgebietMap
+            center={[53.5285, 8.1083]}
+            radiusMeters={30000}
+            label="Wilhelmshaven"
+            height="460px"
+            zoom={9}
+          />
         </div>
       </section>
 
