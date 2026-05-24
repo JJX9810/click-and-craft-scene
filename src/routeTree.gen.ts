@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WirUnterstuetzenRouteImport } from './routes/wir-unterstuetzen'
 import { Route as UeberUnsRouteImport } from './routes/ueber-uns'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ReferenzenRouteImport } from './routes/referenzen'
 import { Route as PreiseRouteImport } from './routes/preise'
 import { Route as PartnerRouteImport } from './routes/partner'
@@ -39,6 +40,11 @@ const WirUnterstuetzenRoute = WirUnterstuetzenRouteImport.update({
 const UeberUnsRoute = UeberUnsRouteImport.update({
   id: '/ueber-uns',
   path: '/ueber-uns',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ReferenzenRoute = ReferenzenRouteImport.update({
@@ -161,6 +167,7 @@ export interface FileRoutesByFullPath {
   '/partner': typeof PartnerRoute
   '/preise': typeof PreiseRoute
   '/referenzen': typeof ReferenzenRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/ueber-uns': typeof UeberUnsRoute
   '/wir-unterstuetzen': typeof WirUnterstuetzenRoute
   '/showroom/$slug': typeof ShowroomSlugRoute
@@ -184,6 +191,7 @@ export interface FileRoutesByTo {
   '/partner': typeof PartnerRoute
   '/preise': typeof PreiseRoute
   '/referenzen': typeof ReferenzenRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/ueber-uns': typeof UeberUnsRoute
   '/wir-unterstuetzen': typeof WirUnterstuetzenRoute
   '/showroom/$slug': typeof ShowroomSlugRoute
@@ -208,6 +216,7 @@ export interface FileRoutesById {
   '/partner': typeof PartnerRoute
   '/preise': typeof PreiseRoute
   '/referenzen': typeof ReferenzenRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/ueber-uns': typeof UeberUnsRoute
   '/wir-unterstuetzen': typeof WirUnterstuetzenRoute
   '/showroom/$slug': typeof ShowroomSlugRoute
@@ -233,6 +242,7 @@ export interface FileRouteTypes {
     | '/partner'
     | '/preise'
     | '/referenzen'
+    | '/sitemap.xml'
     | '/ueber-uns'
     | '/wir-unterstuetzen'
     | '/showroom/$slug'
@@ -256,6 +266,7 @@ export interface FileRouteTypes {
     | '/partner'
     | '/preise'
     | '/referenzen'
+    | '/sitemap.xml'
     | '/ueber-uns'
     | '/wir-unterstuetzen'
     | '/showroom/$slug'
@@ -279,6 +290,7 @@ export interface FileRouteTypes {
     | '/partner'
     | '/preise'
     | '/referenzen'
+    | '/sitemap.xml'
     | '/ueber-uns'
     | '/wir-unterstuetzen'
     | '/showroom/$slug'
@@ -303,6 +315,7 @@ export interface RootRouteChildren {
   PartnerRoute: typeof PartnerRoute
   PreiseRoute: typeof PreiseRoute
   ReferenzenRoute: typeof ReferenzenRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   UeberUnsRoute: typeof UeberUnsRoute
   WirUnterstuetzenRoute: typeof WirUnterstuetzenRoute
   ShowroomSlugRoute: typeof ShowroomSlugRoute
@@ -323,6 +336,13 @@ declare module '@tanstack/react-router' {
       path: '/ueber-uns'
       fullPath: '/ueber-uns'
       preLoaderRoute: typeof UeberUnsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/referenzen': {
@@ -480,6 +500,7 @@ const rootRouteChildren: RootRouteChildren = {
   PartnerRoute: PartnerRoute,
   PreiseRoute: PreiseRoute,
   ReferenzenRoute: ReferenzenRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   UeberUnsRoute: UeberUnsRoute,
   WirUnterstuetzenRoute: WirUnterstuetzenRoute,
   ShowroomSlugRoute: ShowroomSlugRoute,
