@@ -4,6 +4,7 @@ import { Layers, Wrench, Trash2, ArrowRight } from "lucide-react";
 import { ProjectCard } from "@/components/site/ProjectCard";
 import { projects, type Project } from "@/data/projects";
 import { InternalLinks } from "@/components/site/InfoBlocks";
+import { PreisrechnerCTA } from "@/components/site/PreisrechnerCTA";
 import { ortFaqItems } from "@/lib/schema";
 
 // Neutrale, faktische Kurzbeschreibungen – keine erfundenen Stadtteile,
@@ -177,6 +178,8 @@ export function OrtsSeite({
         />
       </Section>
 
+
+      <PreisrechnerCTA variant="handwerkerservice" />
 
       <CtaBlock title={`Projekt in ${ort} anfragen`} text="Senden Sie Fotos und Maße – wir geben eine ehrliche Einschätzung." />
     </>

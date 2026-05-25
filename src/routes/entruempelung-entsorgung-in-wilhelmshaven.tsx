@@ -8,6 +8,7 @@ import {
   breadcrumbNode, faqPageNode, jsonLdScript, serviceNode, webPageNode,
 } from "@/lib/schema";
 import { QuickAnswer, FactBox, LimitsBox, InternalLinks } from "@/components/site/InfoBlocks";
+import { PreisrechnerCTA } from "@/components/site/PreisrechnerCTA";
 
 const EN_URL = "https://verlegt-verschraubt.de/entruempelung-entsorgung-in-wilhelmshaven";
 
@@ -87,6 +88,8 @@ function Page() {
         </div>
       </Section>
 
+      <PreisrechnerCTA variant="entruempelung" />
+
       <Section eyebrow="Leistungen" title="Was wir räumen und entsorgen" bordered>
         <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
           {types.map((s) => (
@@ -159,6 +162,8 @@ function Page() {
       </Section>
 
 
+
+      <PreisrechnerCTA variant="entruempelung" />
 
       <CtaBlock
         title="Entrümpelung in Wilhelmshaven anfragen"

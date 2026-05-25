@@ -10,6 +10,7 @@ import {
   breadcrumbNode, faqPageNode, jsonLdScript, serviceNode, webPageNode,
 } from "@/lib/schema";
 import { QuickAnswer, FactBox, LimitsBox, InternalLinks } from "@/components/site/InfoBlocks";
+import { PreisrechnerCTA } from "@/components/site/PreisrechnerCTA";
 
 const PAGE_URL = "https://verlegt-verschraubt.de/bodenverlegung-wilhelmshaven";
 
@@ -92,6 +93,8 @@ function Page() {
           <FactBox />
         </div>
       </Section>
+
+      <PreisrechnerCTA variant="bodenverlegung" />
 
       <Section eyebrow="Kurzfassung" title="Was wir verlegen" bordered>
         <p className="max-w-3xl text-base leading-relaxed text-muted-foreground">
@@ -207,6 +210,8 @@ function Page() {
           />
         </div>
       </Section>
+
+      <PreisrechnerCTA variant="bodenverlegung" />
 
       <CtaBlock
         title="Bodenprojekt in Wilhelmshaven anfragen"
