@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Layers,
   Wrench,
@@ -17,6 +17,25 @@ import {
   CalendarClock,
 } from "lucide-react";
 import { toast } from "sonner";
+import { buildAttributionLines } from "@/lib/attribution";
+import { trackEvent } from "@/lib/tracking";
+
+// Mapping URL-Parameter `?leistung=...` → interne Service-Keys
+const LEISTUNG_PARAM_MAP: Record<string, Service> = {
+  bodenverlegung: "boden",
+  boden: "boden",
+  laminat: "boden",
+  vinyl: "boden",
+  pvc: "boden",
+  teppichboden: "boden",
+  teppich: "boden",
+  kuechenmontage: "kueche",
+  kueche: "kueche",
+  entruempelung: "ent",
+  entsorgung: "ent",
+  handwerkerservice: "sonst",
+  sonstiges: "sonst",
+};
 
 type Service = "boden" | "kueche" | "ent" | "sonst";
 
