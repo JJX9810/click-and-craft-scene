@@ -6,6 +6,11 @@ import {
 import { ArrowRight } from "lucide-react";
 import { ProjectCard } from "@/components/site/ProjectCard";
 import { projects } from "@/data/projects";
+import {
+  breadcrumbNode, faqPageNode, jsonLdScript, serviceNode, webPageNode,
+} from "@/lib/schema";
+
+const PAGE_URL = "https://verlegt-verschraubt.de/bodenverlegung-wilhelmshaven";
 
 export const Route = createFileRoute("/bodenverlegung-wilhelmshaven")({
   component: Page,
@@ -15,14 +20,34 @@ export const Route = createFileRoute("/bodenverlegung-wilhelmshaven")({
       { name: "description", content: "Bodenverlegung in Wilhelmshaven & Umgebung: Vinyl, Laminat, PVC und Teppich. Sauber verlegt, mit Untergrundprüfung und Sockelleisten." },
       { property: "og:title", content: "Bodenverlegung in Wilhelmshaven & Umgebung" },
       { property: "og:description", content: "Vinyl, Laminat, PVC und Teppich – fachgerecht verlegt von Verlegt & Verschraubt." },
-      { property: "og:url", content: "https://verlegt-verschraubt.de/bodenverlegung-wilhelmshaven" },
+      { property: "og:url", content: PAGE_URL },
       { property: "og:image", content: "https://verlegt-verschraubt.de/hero-flooring.png" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Bodenverlegung in Wilhelmshaven & Umgebung" },
       { name: "twitter:description", content: "Vinyl, Laminat, PVC und Teppich – fachgerecht verlegt von Verlegt & Verschraubt." },
       { name: "twitter:image", content: "https://verlegt-verschraubt.de/hero-flooring.png" },
     ],
-    links: [{ rel: "canonical", href: "https://verlegt-verschraubt.de/bodenverlegung-wilhelmshaven" }],
+    links: [{ rel: "canonical", href: PAGE_URL }],
+    scripts: [
+      jsonLdScript([
+        webPageNode({
+          url: PAGE_URL,
+          name: "Bodenverlegung in Wilhelmshaven & Umgebung",
+          description: "Vinyl, Laminat, PVC, Teppich, Treppen und Sockelleisten – sauber verlegt, mit ordentlichen Kanten und stimmigem Verlegebild. Für Privatkunden in Wilhelmshaven, Schortens, Sande, Jever, Varel und Wangerland.",
+        }),
+        serviceNode({
+          url: PAGE_URL,
+          name: "Bodenverlegung in Wilhelmshaven",
+          description: "Verlegung von Vinyl, Designboden, Laminat, PVC und Teppich inklusive Untergrundprüfung, Altbelag entfernen, Treppenverkleidung sowie Sockelleisten und Übergängen.",
+          serviceType: "Bodenverlegung",
+        }),
+        breadcrumbNode([
+          { name: "Startseite", url: "https://verlegt-verschraubt.de/" },
+          { name: "Bodenverlegung", url: PAGE_URL },
+        ]),
+        faqPageNode(faqs),
+      ]),
+    ],
   }),
 });
 
