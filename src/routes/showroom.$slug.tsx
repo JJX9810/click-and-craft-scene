@@ -24,16 +24,22 @@ export const Route = createFileRoute("/showroom/$slug")({
         caption: m.caption,
         description: m.longDescription ?? m.caption ?? m.alt,
       }));
+    const url = `https://verlegt-verschraubt.de/showroom/${p.slug}`;
+    const ogImage = "https://verlegt-verschraubt.de/hero-flooring.png";
     return {
       meta: [
         { title: `${p.title} – Showroom Verlegt & Verschraubt` },
         { name: "description", content: p.description },
         { property: "og:title", content: p.title },
         { property: "og:description", content: p.description },
-        { property: "og:url", content: `/showroom/${p.slug}` },
-        { property: "og:image", content: p.cover },
+        { property: "og:url", content: url },
+        { property: "og:image", content: ogImage },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: p.title },
+        { name: "twitter:description", content: p.description },
+        { name: "twitter:image", content: ogImage },
       ],
-      links: [{ rel: "canonical", href: `/showroom/${p.slug}` }],
+      links: [{ rel: "canonical", href: url }],
       scripts: [
         {
           type: "application/ld+json",
