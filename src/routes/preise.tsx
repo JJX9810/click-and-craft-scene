@@ -68,6 +68,19 @@ function Page() {
         <Kostenrechner />
       </Section>
 
+      <Section eyebrow="Weiterlesen" title="Passende Leistungen ansehen">
+        <InternalLinks
+          links={[
+            { to: "/bodenverlegung-wilhelmshaven", label: "Bodenverlegung in Wilhelmshaven ansehen" },
+            { to: "/kuechenmontage-in-wilhelmshaven", label: "Küchenmontage in Wilhelmshaven anfragen" },
+            { to: "/entruempelung-entsorgung-in-wilhelmshaven", label: "Kosten für Entrümpelung einschätzen" },
+            { to: "/kontakt", label: "Projekt mit Fotos anfragen" },
+          ]}
+        />
+      </Section>
+
+
+
       <CtaBlock
         title="Lieber direkt sprechen?"
         text="Anrufen oder WhatsApp – wir melden uns in der Regel innerhalb von 24 Stunden."
