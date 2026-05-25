@@ -163,6 +163,8 @@ function Page() {
 
 
 
+      <PreisrechnerCTA variant="entruempelung" />
+
       <CtaBlock
         title="Entrümpelung in Wilhelmshaven anfragen"
         text="Schicken Sie Fotos der Räume und ein paar Eckdaten – wir geben eine ehrliche Einschätzung."
