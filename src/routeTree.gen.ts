@@ -26,6 +26,7 @@ import { Route as HandwerkerserviceSchortensRouteImport } from './routes/handwer
 import { Route as HandwerkerserviceSandeRouteImport } from './routes/handwerkerservice-sande'
 import { Route as HandwerkerserviceJeverRouteImport } from './routes/handwerkerservice-jever'
 import { Route as FaqRouteImport } from './routes/faq'
+import { Route as EntruempelungWilhelmshavenRouteImport } from './routes/entruempelung-wilhelmshaven'
 import { Route as EntruempelungEntsorgungInWilhelmshavenRouteImport } from './routes/entruempelung-entsorgung-in-wilhelmshaven'
 import { Route as DatenschutzRouteImport } from './routes/datenschutz'
 import { Route as BodenverlegungWilhelmshavenRouteImport } from './routes/bodenverlegung-wilhelmshaven'
@@ -123,6 +124,12 @@ const FaqRoute = FaqRouteImport.update({
   path: '/faq',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EntruempelungWilhelmshavenRoute =
+  EntruempelungWilhelmshavenRouteImport.update({
+    id: '/entruempelung-wilhelmshaven',
+    path: '/entruempelung-wilhelmshaven',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const EntruempelungEntsorgungInWilhelmshavenRoute =
   EntruempelungEntsorgungInWilhelmshavenRouteImport.update({
     id: '/entruempelung-entsorgung-in-wilhelmshaven',
@@ -161,6 +168,7 @@ export interface FileRoutesByFullPath {
   '/bodenverlegung-wilhelmshaven': typeof BodenverlegungWilhelmshavenRoute
   '/datenschutz': typeof DatenschutzRoute
   '/entruempelung-entsorgung-in-wilhelmshaven': typeof EntruempelungEntsorgungInWilhelmshavenRoute
+  '/entruempelung-wilhelmshaven': typeof EntruempelungWilhelmshavenRoute
   '/faq': typeof FaqRoute
   '/handwerkerservice-jever': typeof HandwerkerserviceJeverRoute
   '/handwerkerservice-sande': typeof HandwerkerserviceSandeRoute
@@ -186,6 +194,7 @@ export interface FileRoutesByTo {
   '/bodenverlegung-wilhelmshaven': typeof BodenverlegungWilhelmshavenRoute
   '/datenschutz': typeof DatenschutzRoute
   '/entruempelung-entsorgung-in-wilhelmshaven': typeof EntruempelungEntsorgungInWilhelmshavenRoute
+  '/entruempelung-wilhelmshaven': typeof EntruempelungWilhelmshavenRoute
   '/faq': typeof FaqRoute
   '/handwerkerservice-jever': typeof HandwerkerserviceJeverRoute
   '/handwerkerservice-sande': typeof HandwerkerserviceSandeRoute
@@ -212,6 +221,7 @@ export interface FileRoutesById {
   '/bodenverlegung-wilhelmshaven': typeof BodenverlegungWilhelmshavenRoute
   '/datenschutz': typeof DatenschutzRoute
   '/entruempelung-entsorgung-in-wilhelmshaven': typeof EntruempelungEntsorgungInWilhelmshavenRoute
+  '/entruempelung-wilhelmshaven': typeof EntruempelungWilhelmshavenRoute
   '/faq': typeof FaqRoute
   '/handwerkerservice-jever': typeof HandwerkerserviceJeverRoute
   '/handwerkerservice-sande': typeof HandwerkerserviceSandeRoute
@@ -239,6 +249,7 @@ export interface FileRouteTypes {
     | '/bodenverlegung-wilhelmshaven'
     | '/datenschutz'
     | '/entruempelung-entsorgung-in-wilhelmshaven'
+    | '/entruempelung-wilhelmshaven'
     | '/faq'
     | '/handwerkerservice-jever'
     | '/handwerkerservice-sande'
@@ -264,6 +275,7 @@ export interface FileRouteTypes {
     | '/bodenverlegung-wilhelmshaven'
     | '/datenschutz'
     | '/entruempelung-entsorgung-in-wilhelmshaven'
+    | '/entruempelung-wilhelmshaven'
     | '/faq'
     | '/handwerkerservice-jever'
     | '/handwerkerservice-sande'
@@ -289,6 +301,7 @@ export interface FileRouteTypes {
     | '/bodenverlegung-wilhelmshaven'
     | '/datenschutz'
     | '/entruempelung-entsorgung-in-wilhelmshaven'
+    | '/entruempelung-wilhelmshaven'
     | '/faq'
     | '/handwerkerservice-jever'
     | '/handwerkerservice-sande'
@@ -315,6 +328,7 @@ export interface RootRouteChildren {
   BodenverlegungWilhelmshavenRoute: typeof BodenverlegungWilhelmshavenRoute
   DatenschutzRoute: typeof DatenschutzRoute
   EntruempelungEntsorgungInWilhelmshavenRoute: typeof EntruempelungEntsorgungInWilhelmshavenRoute
+  EntruempelungWilhelmshavenRoute: typeof EntruempelungWilhelmshavenRoute
   FaqRoute: typeof FaqRoute
   HandwerkerserviceJeverRoute: typeof HandwerkerserviceJeverRoute
   HandwerkerserviceSandeRoute: typeof HandwerkerserviceSandeRoute
@@ -457,6 +471,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FaqRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/entruempelung-wilhelmshaven': {
+      id: '/entruempelung-wilhelmshaven'
+      path: '/entruempelung-wilhelmshaven'
+      fullPath: '/entruempelung-wilhelmshaven'
+      preLoaderRoute: typeof EntruempelungWilhelmshavenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/entruempelung-entsorgung-in-wilhelmshaven': {
       id: '/entruempelung-entsorgung-in-wilhelmshaven'
       path: '/entruempelung-entsorgung-in-wilhelmshaven'
@@ -508,6 +529,7 @@ const rootRouteChildren: RootRouteChildren = {
   DatenschutzRoute: DatenschutzRoute,
   EntruempelungEntsorgungInWilhelmshavenRoute:
     EntruempelungEntsorgungInWilhelmshavenRoute,
+  EntruempelungWilhelmshavenRoute: EntruempelungWilhelmshavenRoute,
   FaqRoute: FaqRoute,
   HandwerkerserviceJeverRoute: HandwerkerserviceJeverRoute,
   HandwerkerserviceSandeRoute: HandwerkerserviceSandeRoute,
