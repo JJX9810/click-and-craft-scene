@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Layers,
   Wrench,
@@ -17,6 +17,25 @@ import {
   CalendarClock,
 } from "lucide-react";
 import { toast } from "sonner";
+import { buildAttributionLines } from "@/lib/attribution";
+import { trackEvent } from "@/lib/tracking";
+
+// Mapping URL-Parameter `?leistung=...` → interne Service-Keys
+const LEISTUNG_PARAM_MAP: Record<string, Service> = {
+  bodenverlegung: "boden",
+  boden: "boden",
+  laminat: "boden",
+  vinyl: "boden",
+  pvc: "boden",
+  teppichboden: "boden",
+  teppich: "boden",
+  kuechenmontage: "kueche",
+  kueche: "kueche",
+  entruempelung: "ent",
+  entsorgung: "ent",
+  handwerkerservice: "sonst",
+  sonstiges: "sonst",
+};
 
 type Service = "boden" | "kueche" | "ent" | "sonst";
 
@@ -414,6 +433,15 @@ function buildWaMessage(s: State, b: Breakdown | null): string {
 
   lines.push("");
   lines.push("Die Berechnung ist eine unverbindliche Ersteinschätzung. Der endgültige Preis wird nach Prüfung bestätigt.");
+
+  // Attribution / Quelle anhängen
+  const attrLines = buildAttributionLines();
+  if (attrLines.length > 0) {
+    lines.push("");
+    lines.push(...attrLines);
+  }
+
+  lines.push("");
   lines.push("Viele Grüße");
   return lines.join("\n");
 }
@@ -423,9 +451,53 @@ export function Kostenrechner() {
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [s, set] = useState<State>(initial);
   const [errors, setErrors] = useState<string[]>([]);
+  const viewTracked = useRef(false);
+  const stepTracked = useRef<Set<number>>(new Set());
 
   const upd = <K extends keyof State>(k: K, v: State[K]) => set((p) => ({ ...p, [k]: v }));
   const breakdown = useMemo(() => computeBreakdown(s), [s]);
+
+  // Leistung über URL-Parameter vorauswählen + view-Event
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (!viewTracked.current) {
+      viewTracked.current = true;
+      const params = new URLSearchParams(window.location.search);
+      const leistung = params.get("leistung");
+      if (leistung) {
+        const mapped = LEISTUNG_PARAM_MAP[leistung.toLowerCase()];
+        if (mapped) {
+          set((p) => (p.service ? p : { ...p, service: mapped }));
+        }
+      }
+      trackEvent("preisrechner_view", { leistung_param: leistung ?? "" });
+    }
+  }, []);
+
+  // Step-Tracking
+  useEffect(() => {
+    if (stepTracked.current.has(step)) return;
+    stepTracked.current.add(step);
+    const stepNames: Record<number, string> = { 1: "leistung", 2: "details", 3: "ergebnis" };
+    trackEvent("preisrechner_step", {
+      step_number: step,
+      step_name: stepNames[step] ?? String(step),
+      selected_service: s.service ?? "",
+    });
+    if (step === 3) {
+      trackEvent("preisrechner_result", {
+        selected_service: s.service ?? "",
+        total: breakdown?.total ?? 0,
+        has_on_request: breakdown?.hasOnRequest ?? false,
+      });
+    }
+  }, [step, s.service, breakdown]);
+
+  // Leistungs-Auswahl tracken
+  useEffect(() => {
+    if (!s.service) return;
+    trackEvent("preisrechner_leistung_selected", { selected_service: s.service });
+  }, [s.service]);
 
   const validate = (): string[] => {
     const e: string[] = [];
@@ -446,6 +518,20 @@ export function Kostenrechner() {
 
   const message = useMemo(() => buildWaMessage(s, breakdown), [s, breakdown]);
   const waUrl = `https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent(message)}`;
+
+  const handleWhatsAppClick = () => {
+    trackEvent("whatsapp_click_preisrechner", {
+      selected_service: s.service ?? "",
+      total: breakdown?.total ?? 0,
+    });
+  };
+
+  const handlePhoneClick = () => {
+    trackEvent("phone_click", {
+      origin: "preisrechner",
+      selected_service: s.service ?? "",
+    });
+  };
 
   const copyMsg = async () => {
     try {
@@ -622,12 +708,14 @@ export function Kostenrechner() {
               href={waUrl}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={handleWhatsAppClick}
               className="inline-flex h-14 items-center justify-center gap-2 rounded-full bg-[#25D366] px-6 text-base font-semibold text-white shadow-lg shadow-[#25D366]/30 transition-transform hover:-translate-y-0.5"
             >
               <MessageCircle className="h-5 w-5" /> Unverbindliche Terminanfrage per WhatsApp
             </a>
             <a
               href={`tel:+${PHONE_NUMBER}`}
+              onClick={handlePhoneClick}
               className="inline-flex h-14 items-center justify-center gap-2 rounded-full border border-accent/40 bg-accent/10 px-6 text-base font-semibold text-accent hover:bg-accent/20"
             >
               <Phone className="h-5 w-5" /> {PHONE_DISPLAY} anrufen

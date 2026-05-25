@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Phone, Mail, MapPin, MessageCircle } from "lucide-react";
 import { EinsatzgebietMap } from "@/components/site/EinsatzgebietMap";
 import { QuickAnswer, FactBox, InternalLinks } from "@/components/site/InfoBlocks";
+import { buildAttributionLines, getAttributionFields } from "@/lib/attribution";
+import { trackEvent } from "@/lib/tracking";
 
 export const Route = createFileRoute("/kontakt")({
   component: Page,
@@ -92,7 +94,7 @@ function validate(f: FormState): Errors {
 }
 
 function buildMessage(f: FormState): string {
-  return [
+  const base = [
     "Neue Projektanfrage über verlegt-verschraubt.de",
     "",
     "Name:",
@@ -121,7 +123,12 @@ function buildMessage(f: FormState): string {
     "",
     "Hinweis:",
     "Diese Anfrage wurde über das Kontaktformular der Website vorbereitet.",
-  ].join("\n");
+  ];
+  const attr = buildAttributionLines();
+  if (attr.length > 0) {
+    base.push("", ...attr);
+  }
+  return base.join("\n");
 }
 
 function Page() {
@@ -147,6 +154,10 @@ function Page() {
       return;
     }
     const body = buildMessage(form);
+    trackEvent("kontaktformular_submit", {
+      submit_mode: mode,
+      selected_service: form.leistung || "",
+    });
     if (mode === "mail") {
       const subject = encodeURIComponent("Projektanfrage über verlegt-verschraubt.de");
       const encBody = encodeURIComponent(body);
@@ -191,6 +202,12 @@ function Page() {
             noValidate
             className="rounded-2xl border border-border/70 bg-card/50 p-6 backdrop-blur sm:p-8"
           >
+            {/* Versteckte Attribution-Felder. Werden bei Formularabsendung
+                über buildMessage() automatisch in die Nachricht eingebettet
+                und stehen zusätzlich für serverseitige Formularsysteme bereit. */}
+            {Object.entries(getAttributionFields()).map(([name, value]) => (
+              <input key={name} type="hidden" name={name} value={value} readOnly />
+            ))}
             <div className="grid gap-5 sm:grid-cols-2">
               <Field label="Name" required error={errors.name}>
                 <input
