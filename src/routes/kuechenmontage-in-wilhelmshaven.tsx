@@ -93,6 +93,8 @@ function Page() {
         </div>
       </Section>
 
+      <PreisrechnerCTA variant="kuechenmontage" />
+
       <Section eyebrow="Leistungsumfang" title="Was wir bei der Küchenmontage übernehmen" bordered>
         <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
           {scope.map((s) => (
