@@ -170,6 +170,17 @@ function Page() {
         breadcrumbs={[{ label: "Kontakt" }]}
       />
 
+      <Section eyebrow="Kurzfassung" title="So erreichen Sie uns am besten">
+        <div className="grid gap-6 lg:grid-cols-2">
+          <QuickAnswer>
+            Anfragen können telefonisch, per E-Mail, Kontaktformular oder mit
+            Fotos gestellt werden. Für eine erste Einschätzung helfen Bilder,
+            Maße, Ort, Wunschzeitraum und eine kurze Beschreibung.
+          </QuickAnswer>
+          <FactBox />
+        </div>
+      </Section>
+
       <Section>
         <div className="grid gap-10 lg:grid-cols-[1.4fr_1fr]">
           <form
