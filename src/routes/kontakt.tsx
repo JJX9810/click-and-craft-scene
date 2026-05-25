@@ -5,6 +5,7 @@ import { PageHero, Section } from "@/components/site/PageShell";
 import { Button } from "@/components/ui/button";
 import { Phone, Mail, MapPin, MessageCircle } from "lucide-react";
 import { EinsatzgebietMap } from "@/components/site/EinsatzgebietMap";
+import { QuickAnswer, FactBox, InternalLinks } from "@/components/site/InfoBlocks";
 
 export const Route = createFileRoute("/kontakt")({
   component: Page,
