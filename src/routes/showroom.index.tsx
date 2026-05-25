@@ -127,7 +127,7 @@ function ShowroomPage() {
               </Link>
             </Button>
             <Button asChild size="lg" variant="outline" className="h-12 rounded-full border-border bg-transparent px-7 hover:bg-card">
-              <a href="tel:+4916347992866"><Phone className="mr-1 h-4 w-4" /> Direkt anrufen</a>
+              <a href="tel:+491634799286"><Phone className="mr-1 h-4 w-4" /> Direkt anrufen</a>
             </Button>
             <Button asChild size="lg" variant="outline" className="h-12 rounded-full border-border bg-transparent px-7 hover:bg-card">
               <Link to="/kontakt">Kontakt aufnehmen</Link>

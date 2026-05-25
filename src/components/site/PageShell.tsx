@@ -59,7 +59,7 @@ export function PageHero({
             variant="outline"
             className="h-12 rounded-full border-border bg-transparent px-7 hover:bg-card"
           >
-            <a href="tel:+4916347992866">
+            <a href="tel:+491634799286">
               <Phone className="mr-1 h-4 w-4" /> 0163 4799286
             </a>
           </Button>
@@ -141,7 +141,7 @@ export function CtaBlock({
             variant="outline"
             className="h-12 rounded-full border-border bg-transparent px-7 hover:bg-card"
           >
-            <a href="tel:+4916347992866">
+            <a href="tel:+491634799286">
               <Phone className="mr-1 h-4 w-4" /> Direkt anrufen
             </a>
           </Button>

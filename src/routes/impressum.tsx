@@ -52,7 +52,7 @@ function Page() {
           <Card icon={Phone} title="Kontakt">
             <p className="flex items-center gap-2">
               <Phone className="h-3.5 w-3.5 text-accent" />
-              <a href="tel:+4916347992866" className="hover:text-foreground">0163 4799286</a>
+              <a href="tel:+491634799286" className="hover:text-foreground">0163 4799286</a>
             </p>
             <p className="flex items-center gap-2">
               <Mail className="h-3.5 w-3.5 text-accent" />
