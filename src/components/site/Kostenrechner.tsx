@@ -499,7 +499,7 @@ export function Kostenrechner() {
                 className={input}
               />
               <p className="mt-1 text-xs text-muted-foreground">
-                Bis 35 km Entfernung ist die Anfahrt inklusive. Ab 35 km berechnen wir 0,70 € pro zusätzlichem Kilometer.
+                Die Anfahrt wird je nach Einsatzort in der Schätzung berücksichtigt.
               </p>
             </Field>
           </div>
