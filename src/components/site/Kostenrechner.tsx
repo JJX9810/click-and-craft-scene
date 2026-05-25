@@ -947,15 +947,26 @@ export function TerminBlock({
 
 export function KalenderPlatzhalter() {
   return (
-    <div className="rounded-2xl border border-dashed border-border/70 bg-background/40 p-5">
+    <div className="rounded-2xl border border-border/70 bg-background/40 p-5">
       <p className="text-xs uppercase tracking-[0.2em] text-accent">Verfügbarkeiten prüfen</p>
       <p className="mt-2 text-sm text-muted-foreground">
-        Hier können künftig freie und blockierte Zeiträume angezeigt werden. Aus Datenschutzgründen werden blockierte Termine nur als „belegt“ angezeigt –
-        ohne Kundennamen, Adressen oder Auftragsdetails.
+        Im Online-Kalender können Sie freie Zeiträume einsehen und einen Wunschtermin senden. Aus Datenschutzgründen werden
+        belegte Termine nur als „belegt“ angezeigt – ohne Kundennamen, Adressen oder Auftragsdetails.
       </p>
-      <div className="mt-3 rounded-xl border border-border/60 bg-card/40 p-6 text-center text-xs text-muted-foreground">
-        Kalender wird eingebunden, sobald die Google-Kalender- oder TimeTree-Verknüpfung eingerichtet ist.
+      <div className="mt-4">
+        <a
+          href={GOOGLE_CALENDAR_BOOKING_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-accent px-6 text-sm font-semibold text-accent-foreground transition-colors hover:bg-accent/90"
+        >
+          <CalendarClock className="h-4 w-4" /> Verfügbarkeit prüfen
+        </a>
       </div>
+      <p className="mt-3 text-xs text-muted-foreground">
+        Der Kalender dient zur unverbindlichen Terminanfrage. Der endgültige Termin wird nach Prüfung von Aufwand,
+        Einsatzort, Materialverfügbarkeit und bestehender Planung bestätigt.
+      </p>
     </div>
   );
 }
