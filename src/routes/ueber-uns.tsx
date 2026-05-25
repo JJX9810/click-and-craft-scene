@@ -9,9 +9,14 @@ export const Route = createFileRoute("/ueber-uns")({
       { name: "description", content: "Inhaber Justus Brosch und das Z.O.Z.-Prinzip: Zuverlässig, Ordentlich, Zügig. Lokal in Wilhelmshaven, ehrlich und bodenständig." },
       { property: "og:title", content: "Über uns – Verlegt & Verschraubt" },
       { property: "og:description", content: "Wer hinter Verlegt & Verschraubt steht und wie wir arbeiten." },
-      { property: "og:url", content: "/ueber-uns" },
+      { property: "og:url", content: "https://verlegt-verschraubt.de/ueber-uns" },
+      { property: "og:image", content: "https://verlegt-verschraubt.de/hero-flooring.png" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Über uns – Verlegt & Verschraubt" },
+      { name: "twitter:description", content: "Wer hinter Verlegt & Verschraubt steht und wie wir arbeiten." },
+      { name: "twitter:image", content: "https://verlegt-verschraubt.de/hero-flooring.png" },
     ],
-    links: [{ rel: "canonical", href: "/ueber-uns" }],
+    links: [{ rel: "canonical", href: "https://verlegt-verschraubt.de/ueber-uns" }],
   }),
 });
 

@@ -9,10 +9,15 @@ export const Route = createFileRoute("/datenschutz")({
       { name: "description", content: "Datenschutzerklärung von Verlegt & Verschraubt Handwerkerservice." },
       { property: "og:title", content: "Datenschutz – Verlegt & Verschraubt" },
       { property: "og:description", content: "Datenschutzerklärung von Verlegt & Verschraubt Handwerkerservice." },
-      { property: "og:url", content: "/datenschutz" },
+      { property: "og:url", content: "https://verlegt-verschraubt.de/datenschutz" },
+      { property: "og:image", content: "https://verlegt-verschraubt.de/hero-flooring.png" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Datenschutz – Verlegt & Verschraubt" },
+      { name: "twitter:description", content: "Datenschutzerklärung von Verlegt & Verschraubt Handwerkerservice." },
+      { name: "twitter:image", content: "https://verlegt-verschraubt.de/hero-flooring.png" },
       { name: "robots", content: "noindex" },
     ],
-    links: [{ rel: "canonical", href: "/datenschutz" }],
+    links: [{ rel: "canonical", href: "https://verlegt-verschraubt.de/datenschutz" }],
   }),
 });
 

@@ -12,9 +12,14 @@ export const Route = createFileRoute("/faq")({
       { name: "description", content: "Antworten zu Anfragen, Preisen, Bodenverlegung, Küchenmontage, Entrümpelung und Einsatzgebiet rund um Wilhelmshaven." },
       { property: "og:title", content: "Häufige Fragen" },
       { property: "og:description", content: "Antworten zu Leistungen, Preisen und Ablauf." },
-      { property: "og:url", content: "/faq" },
+      { property: "og:url", content: "https://verlegt-verschraubt.de/faq" },
+      { property: "og:image", content: "https://verlegt-verschraubt.de/hero-flooring.png" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Häufige Fragen" },
+      { name: "twitter:description", content: "Antworten zu Leistungen, Preisen und Ablauf." },
+      { name: "twitter:image", content: "https://verlegt-verschraubt.de/hero-flooring.png" },
     ],
-    links: [{ rel: "canonical", href: "/faq" }],
+    links: [{ rel: "canonical", href: "https://verlegt-verschraubt.de/faq" }],
     scripts: [{
       type: "application/ld+json",
       children: JSON.stringify({

@@ -15,9 +15,14 @@ export const Route = createFileRoute("/kuechenmontage-in-wilhelmshaven")({
       { name: "description", content: "Küchenmontage in Wilhelmshaven & Umgebung: Aufbau nach Umzug, Restmontage, Arbeitsplatten, Spüle und Armatur. Saubere Ausführung von Verlegt & Verschraubt." },
       { property: "og:title", content: "Küchenmontage in Wilhelmshaven & Umgebung" },
       { property: "og:description", content: "Aufbau, Restmontage und Anpassung Ihrer Küche – sauber und zuverlässig." },
-      { property: "og:url", content: "/kuechenmontage-in-wilhelmshaven" },
+      { property: "og:url", content: "https://verlegt-verschraubt.de/kuechenmontage-in-wilhelmshaven" },
+      { property: "og:image", content: "https://verlegt-verschraubt.de/projects/kueche-wilhelmshaven-01.png" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Küchenmontage in Wilhelmshaven & Umgebung" },
+      { name: "twitter:description", content: "Aufbau, Restmontage und Anpassung Ihrer Küche – sauber und zuverlässig." },
+      { name: "twitter:image", content: "https://verlegt-verschraubt.de/projects/kueche-wilhelmshaven-01.png" },
     ],
-    links: [{ rel: "canonical", href: "/kuechenmontage-in-wilhelmshaven" }],
+    links: [{ rel: "canonical", href: "https://verlegt-verschraubt.de/kuechenmontage-in-wilhelmshaven" }],
   }),
 });
 

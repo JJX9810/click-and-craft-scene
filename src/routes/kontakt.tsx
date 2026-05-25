@@ -13,9 +13,14 @@ export const Route = createFileRoute("/kontakt")({
       { name: "description", content: "Anfrage starten: Telefon 0163 4799286, E-Mail justus.brosch@verlegt-verschraubt.de oder per Formular. Antwort in der Regel innerhalb von 24 Stunden." },
       { property: "og:title", content: "Kontakt aufnehmen" },
       { property: "og:description", content: "Anfrage senden – inklusive Fotos und Maßen für eine schnelle Einschätzung." },
-      { property: "og:url", content: "/kontakt" },
+      { property: "og:url", content: "https://verlegt-verschraubt.de/kontakt" },
+      { property: "og:image", content: "https://verlegt-verschraubt.de/hero-flooring.png" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Kontakt aufnehmen" },
+      { name: "twitter:description", content: "Anfrage senden – inklusive Fotos und Maßen für eine schnelle Einschätzung." },
+      { name: "twitter:image", content: "https://verlegt-verschraubt.de/hero-flooring.png" },
     ],
-    links: [{ rel: "canonical", href: "/kontakt" }],
+    links: [{ rel: "canonical", href: "https://verlegt-verschraubt.de/kontakt" }],
   }),
 });
 

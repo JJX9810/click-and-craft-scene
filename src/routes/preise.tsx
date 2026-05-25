@@ -10,9 +10,14 @@ export const Route = createFileRoute("/preise")({
       { name: "description", content: "Kostenloser Kostenrechner für Bodenverlegung, Küchenmontage und Entrümpelung in Wilhelmshaven – mit direkter WhatsApp-Anfrage." },
       { property: "og:title", content: "Kostenrechner – Verlegt & Verschraubt" },
       { property: "og:description", content: "Erste Preisorientierung in Sekunden – Anfrage direkt per WhatsApp senden." },
-      { property: "og:url", content: "/preise" },
+      { property: "og:url", content: "https://verlegt-verschraubt.de/preise" },
+      { property: "og:image", content: "https://verlegt-verschraubt.de/hero-flooring.png" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Kostenrechner – Verlegt & Verschraubt" },
+      { name: "twitter:description", content: "Erste Preisorientierung in Sekunden – Anfrage direkt per WhatsApp senden." },
+      { name: "twitter:image", content: "https://verlegt-verschraubt.de/hero-flooring.png" },
     ],
-    links: [{ rel: "canonical", href: "/preise" }],
+    links: [{ rel: "canonical", href: "https://verlegt-verschraubt.de/preise" }],
   }),
 });
 
