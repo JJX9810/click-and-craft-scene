@@ -236,7 +236,7 @@ function Page() {
         </p>
         <div className="mt-4">
           <a
-            href="https://calendar.app.google/MbCnvoSqYjuLSAfY9"
+            href={GOOGLE_CALENDAR_BOOKING_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-accent px-6 text-sm font-semibold text-accent-foreground transition-colors hover:bg-accent/90"
