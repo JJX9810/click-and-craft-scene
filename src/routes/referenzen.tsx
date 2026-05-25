@@ -3,6 +3,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { PageHero, Section, CtaBlock } from "@/components/site/PageShell";
 import { Star, ArrowRight } from "lucide-react";
+import { InternalLinks } from "@/components/site/InfoBlocks";
 
 export const Route = createFileRoute("/referenzen")({
   component: Page,
