@@ -1,3 +1,4 @@
+import { breadcrumbNode, jsonLdScript, serviceNode, webPageNode } from "@/lib/schema";
 import { createFileRoute } from "@tanstack/react-router";
 import { OrtsSeite } from "@/components/site/OrtsSeite";
 
@@ -23,5 +24,21 @@ export const Route = createFileRoute("/handwerkerservice-wangerland")({
       { name: "twitter:image", content: "https://verlegt-verschraubt.de/hero-flooring.png" },
     ],
     links: [{ rel: "canonical", href: "https://verlegt-verschraubt.de/handwerkerservice-wangerland" }],
+    scripts: [
+      jsonLdScript([
+        webPageNode({ url: "https://verlegt-verschraubt.de/handwerkerservice-wangerland", name: 'Handwerkerservice im Wangerland', description: 'Bodenverlegung, Küchenmontage und Entrümpelung im Wangerland – Verlegt & Verschraubt aus Wilhelmshaven.' }),
+        serviceNode({
+          url: "https://verlegt-verschraubt.de/handwerkerservice-wangerland",
+          name: 'Handwerkerservice im Wangerland',
+          description: 'Bodenverlegung, Küchenmontage und Entrümpelung im Wangerland und Umgebung. Lokal, sauber und planbar.',
+          serviceType: "Handwerkerservice",
+          areaServed: ["Wangerland", "Hooksiel", "Wilhelmshaven", "Schortens", "Jever", "Varel", "Umgebung"],
+        }),
+        breadcrumbNode([
+          { name: "Startseite", url: "https://verlegt-verschraubt.de/" },
+          { name: 'Handwerkerservice im Wangerland', url: "https://verlegt-verschraubt.de/handwerkerservice-wangerland" },
+        ]),
+      ]),
+    ],
   }),
 });
