@@ -14,25 +14,56 @@ import {
   MapPin,
   Clock,
   ShieldCheck,
+  CalendarClock,
 } from "lucide-react";
 import { toast } from "sonner";
 
 type Service = "boden" | "kueche" | "ent" | "sonst";
 
+// Boden-Preise: feste €/m² pro Variante. null = auf Anfrage.
+const BODEN_VARIANTEN: { key: string; label: string; price: number | null }[] = [
+  { key: "laminat_schwimmend", label: "Laminat schwimmend", price: 16 },
+  { key: "pvc_schwimmend", label: "PVC schwimmend", price: 12 },
+  { key: "pvc_verklebt", label: "PVC verklebt", price: 15 },
+  { key: "vinyl_schwimmend", label: "Vinyl schwimmend", price: 18 },
+  { key: "vinyl_verklebt", label: "Vinyl verklebt", price: 22 },
+  { key: "linoleum_verklebt", label: "Linoleum verklebt", price: null },
+  { key: "teppich_lose", label: "Teppich lose verlegt / lose verklebt", price: 10 },
+  { key: "teppich_vollflaechig", label: "Teppich vollflächig verklebt", price: 12 },
+];
+
+const ALT_PRICE_SCHWIMMEND = 4; // €/m²
+const SOCKEL_PRICE = 5; // €/lfm
+const ANFAHRT_FREI_KM = 35;
+const ANFAHRT_PRO_KM = 0.7;
+
+const DRINGLICHKEIT_OPTIONS = [
+  { key: "flexibel", label: "Flexibel / normal planbar", surcharge: 0 },
+  { key: "14tage", label: "Innerhalb von 14 Tagen", surcharge: 0.1 },
+  { key: "7tage", label: "Innerhalb von 7 Tagen", surcharge: 0.2 },
+  { key: "3tage", label: "Innerhalb von 3 Tagen / sehr kurzfristig", surcharge: null as null | number },
+];
+
 type State = {
   service: Service | null;
   // gemeinsam
+  name: string;
+  telefon: string;
   ort: string;
-  zeitraum: string;
   nachricht: string;
+  // anfahrt
+  anfahrtKm: string;
+  // termin
+  dringlichkeit: string;
+  wunschDatum: string;
+  wunschZeitraum: string;
+  fertigDatum: string;
+  terminHinweise: string;
   // boden
-  bodenart: string;
+  bodenartKey: string;
   qm: string;
-  altEntfernen: "Ja" | "Nein" | "";
-  untergrund: "Nein" | "Leicht ausgleichen" | "Vollflächig spachteln" | "Unsicher" | "";
-  sockel: "Keine" | "Mit Eckstücken" | "Auf Gehrung" | "";
-  tueren: "Ja" | "Nein" | "Unsicher" | "";
-  raeumeLeer: "Ja" | "Nein" | "";
+  altEntfernen: "" | "Nein" | "schwimmend" | "verklebt";
+  sockelLfm: string;
   // küche
   kueArt: string;
   kueMeter: string;
@@ -53,16 +84,20 @@ type State = {
 
 const initial: State = {
   service: null,
+  name: "",
+  telefon: "",
   ort: "",
-  zeitraum: "",
   nachricht: "",
-  bodenart: "Vinyl",
+  anfahrtKm: "",
+  dringlichkeit: "",
+  wunschDatum: "",
+  wunschZeitraum: "",
+  fertigDatum: "",
+  terminHinweise: "",
+  bodenartKey: "vinyl_schwimmend",
   qm: "",
   altEntfernen: "",
-  untergrund: "",
-  sockel: "",
-  tueren: "",
-  raeumeLeer: "",
+  sockelLfm: "",
   kueArt: "Neue Küche",
   kueMeter: "",
   kueArbeit: "",
@@ -82,133 +117,189 @@ const PHONE_NUMBER = "491634799286";
 const PHONE_DISPLAY = "0163 4799286";
 
 const services: { key: Service; label: string; desc: string; icon: any }[] = [
-  { key: "boden", label: "Bodenverlegung", desc: "Vinyl, Laminat, Designboden, PVC, Teppich", icon: Layers },
+  { key: "boden", label: "Bodenverlegung", desc: "Laminat, Vinyl, PVC, Teppich, Linoleum", icon: Layers },
   { key: "kueche", label: "Küchenmontage", desc: "Aufbau, Restmontage, Umbau, Demontage", icon: Wrench },
   { key: "ent", label: "Entrümpelung & Entsorgung", desc: "Wohnung, Keller, Dachboden, Garage", icon: Trash2 },
   { key: "sonst", label: "Sonstiges Projekt", desc: "Beschreiben Sie kurz Ihr Anliegen", icon: Sparkles },
 ];
 
-function fmtEUR(n: number) {
-  return Math.round(n).toLocaleString("de-DE");
+function eur(n: number) {
+  return n.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " €";
 }
 
-function calc(s: State): { min: number; max: number; ok: boolean } | null {
-  if (s.service === "boden") {
-    const qm = Number(s.qm);
-    if (!qm || qm <= 0) return null;
-    const base: Record<string, [number, number]> = {
-      Vinyl: [22, 32],
-      Laminat: [18, 28],
-      Designboden: [28, 42],
-      PVC: [16, 24],
-      Teppich: [14, 22],
-      Sonstiges: [18, 30],
-    };
-    const [bMin, bMax] = base[s.bodenart] ?? base.Vinyl;
-    let min = bMin * qm;
-    let max = bMax * qm;
-    if (s.altEntfernen === "Ja") {
-      min += 4 * qm;
-      max += 7 * qm;
-    }
-    if (s.untergrund === "Leicht ausgleichen") {
-      min += 6 * qm;
-      max += 12 * qm;
-    } else if (s.untergrund === "Vollflächig spachteln") {
-      min += 14 * qm;
-      max += 24 * qm;
-    } else if (s.untergrund === "Unsicher") {
-      min += 4 * qm;
-      max += 18 * qm;
-    }
-    if (s.sockel === "Mit Eckstücken") {
-      min += 3.5 * qm;
-      max += 6 * qm;
-    } else if (s.sockel === "Auf Gehrung") {
-      min += 5 * qm;
-      max += 9 * qm;
-    }
-    if (s.tueren === "Ja") {
-      min += 30;
-      max += 60;
-    } else if (s.tueren === "Unsicher") {
-      min += 0;
-      max += 60;
-    }
-    return { min, max, ok: true };
+type LineItem = {
+  label: string;
+  detail?: string;
+  amount: number | null; // null = auf Anfrage
+  inklusive?: boolean;
+  arbeitsleistung?: boolean; // wird vom Express-Zuschlag erfasst
+};
+
+type Breakdown = {
+  items: LineItem[];
+  anfahrt: LineItem | null;
+  express: LineItem | null;
+  total: number; // Summe berechenbarer Positionen inkl. Express + Anfahrt
+  hasOnRequest: boolean;
+};
+
+function computeAnfahrt(km: number): LineItem {
+  if (km <= ANFAHRT_FREI_KM) {
+    return { label: "Anfahrt", detail: `${km} km – bis 35 km inklusive`, amount: 0, inklusive: true };
   }
-  if (s.service === "kueche") {
+  const extra = km - ANFAHRT_FREI_KM;
+  const amount = +(extra * ANFAHRT_PRO_KM).toFixed(2);
+  return {
+    label: "Anfahrt",
+    detail: `${km} km Entfernung, davon ${extra} Mehrkilometer × 0,70 €`,
+    amount,
+  };
+}
+
+function computeBreakdown(s: State): Breakdown | null {
+  const items: LineItem[] = [];
+  let arbeitssumme = 0;
+  let sonstSumme = 0;
+  let hasOnRequest = false;
+
+  if (s.service === "boden") {
+    const variante = BODEN_VARIANTEN.find((b) => b.key === s.bodenartKey);
+    const qm = Number(s.qm);
+    if (!variante || !qm || qm <= 0) return null;
+
+    if (variante.price === null) {
+      items.push({
+        label: `${variante.label} verlegen`,
+        detail: `${qm} m² – Preis nach Besichtigung / auf Anfrage`,
+        amount: null,
+      });
+      hasOnRequest = true;
+    } else {
+      const a = +(qm * variante.price).toFixed(2);
+      items.push({
+        label: `${variante.label} verlegen`,
+        detail: `${qm} m² × ${eur(variante.price)} = ${eur(a)}`,
+        amount: a,
+        arbeitsleistung: true,
+      });
+      arbeitssumme += a;
+    }
+
+    items.push({ label: "Baustelleneinrichtung", amount: 0, inklusive: true });
+
+    if (s.altEntfernen === "schwimmend") {
+      const a = +(qm * ALT_PRICE_SCHWIMMEND).toFixed(2);
+      items.push({
+        label: "Alten schwimmend verlegten Boden entfernen",
+        detail: `${qm} m² × ${eur(ALT_PRICE_SCHWIMMEND)} = ${eur(a)}`,
+        amount: a,
+        arbeitsleistung: true,
+      });
+      arbeitssumme += a;
+    } else if (s.altEntfernen === "verklebt") {
+      items.push({
+        label: "Entfernung verklebter Böden",
+        detail: "nach Besichtigung / auf Anfrage",
+        amount: null,
+      });
+      hasOnRequest = true;
+    }
+
+    items.push({ label: "Alten Boden entsorgen", amount: 0, inklusive: true });
+    items.push({ label: "Trittschalldämmung verlegen", amount: 0, inklusive: true });
+
+    const lfm = Number(s.sockelLfm);
+    if (lfm > 0) {
+      const a = +(lfm * SOCKEL_PRICE).toFixed(2);
+      items.push({
+        label: "Sockelleisten montieren (ohne Acrylfuge)",
+        detail: `${lfm} lfm × ${eur(SOCKEL_PRICE)} = ${eur(a)}`,
+        amount: a,
+        arbeitsleistung: true,
+      });
+      arbeitssumme += a;
+    }
+  } else if (s.service === "kueche") {
     const m = Number(s.kueMeter);
     if (!m || m <= 0) return null;
-    let min = m * 110;
-    let max = m * 170;
-    if (s.kueArbeit === "Ja") {
-      min += 120;
-      max += 280;
+    items.push({
+      label: "Küchenmontage / -arbeiten",
+      detail: `Geschätzter Aufwand für ca. ${m} m Küchenlänge – exakte Berechnung nach Besichtigung`,
+      amount: null,
+    });
+    hasOnRequest = true;
+  } else if (s.service === "ent") {
+    if (!s.entMenge) return null;
+    items.push({
+      label: "Entrümpelung & Entsorgung",
+      detail: `${s.entObjekt}, Menge: ${s.entMenge} – Preis nach Besichtigung / Foto-Einschätzung`,
+      amount: null,
+    });
+    hasOnRequest = true;
+  } else if (s.service === "sonst") {
+    if (!s.sonstText.trim()) return null;
+    items.push({
+      label: "Individuelles Projekt",
+      detail: "Preis nach Besichtigung / Rücksprache",
+      amount: null,
+    });
+    hasOnRequest = true;
+  } else {
+    return null;
+  }
+
+  // Anfahrt
+  let anfahrt: LineItem | null = null;
+  const kmStr = s.anfahrtKm.trim();
+  if (kmStr !== "") {
+    const km = Number(kmStr);
+    if (!isNaN(km) && km >= 0) {
+      anfahrt = computeAnfahrt(km);
+      if (anfahrt.amount && !anfahrt.inklusive) sonstSumme += anfahrt.amount;
     }
-    if (s.kueGeraete === "Ja") {
-      min += 80;
-      max += 200;
-    }
-    if (s.kueSpuele === "Ja") {
-      min += 80;
-      max += 180;
-    }
-    if (s.kueDemontage === "Ja") {
-      min += m * 35;
-      max += m * 65;
-    }
-    if (s.kueTransport === "Ja") {
-      min += 120;
-      max += 280;
-    }
-    if (s.kueArt === "Küchenabbau") {
-      // overwrite: pure abbau
-      min = m * 60;
-      max = m * 110;
-      if (s.kueTransport === "Ja") {
-        min += 120;
-        max += 280;
+  } else {
+    anfahrt = { label: "Anfahrt", detail: "wird nach Einsatzort geprüft", amount: null };
+  }
+
+  // Express-Zuschlag
+  let express: LineItem | null = null;
+  if (s.dringlichkeit) {
+    const d = DRINGLICHKEIT_OPTIONS.find((o) => o.key === s.dringlichkeit);
+    if (d) {
+      if (d.surcharge === null) {
+        express = {
+          label: "Sehr kurzfristiger Termin (≤ 3 Tage)",
+          detail: "nur nach Rücksprache möglich – Expresszuschlag individuell",
+          amount: null,
+        };
+      } else if (d.surcharge > 0 && arbeitssumme > 0) {
+        const a = +(arbeitssumme * d.surcharge).toFixed(2);
+        express = {
+          label: `Expresszuschlag (${Math.round(d.surcharge * 100)} %)`,
+          detail: `${d.label} – ${Math.round(d.surcharge * 100)} % auf Arbeitsleistungen (${eur(arbeitssumme)})`,
+          amount: a,
+        };
+        sonstSumme += a;
+      } else if (d.surcharge === 0) {
+        express = {
+          label: "Termin",
+          detail: "flexibel / normal planbar – kein Expresszuschlag",
+          amount: 0,
+          inklusive: true,
+        };
       }
     }
-    return { min, max, ok: true };
   }
-  if (s.service === "ent") {
-    if (!s.entMenge) return null;
-    const baseByObjekt: Record<string, [number, number]> = {
-      Wohnung: [380, 650],
-      Haus: [800, 1500],
-      Keller: [250, 500],
-      Garage: [220, 480],
-      Dachboden: [280, 560],
-      Garten: [200, 450],
-      Sonstiges: [300, 600],
-    };
-    const factor: Record<string, number> = { klein: 1, mittel: 1.7, groß: 2.6, "sehr groß": 4 };
-    const [bMin, bMax] = baseByObjekt[s.entObjekt] ?? baseByObjekt.Wohnung;
-    const f = factor[s.entMenge] ?? 1;
-    let min = bMin * f;
-    let max = bMax * f;
-    const etage = Number(s.entEtage) || 0;
-    if (etage > 1 && s.entAufzug !== "Ja") {
-      const m = 1 + (etage - 1) * 0.08;
-      min *= m;
-      max *= m;
-    }
-    if (s.entEntsorgen === "Ja") {
-      min += 80;
-      max += 220;
-    }
-    return { min, max, ok: true };
-  }
-  return null;
+
+  const total = +(arbeitssumme + sonstSumme).toFixed(2);
+  return { items, anfahrt, express, total, hasOnRequest };
 }
 
-function buildWaMessage(s: State, price: { min: number; max: number } | null): string {
+function buildWaMessage(s: State, b: Breakdown | null): string {
   const lines: string[] = [];
   lines.push("Hallo Verlegt & Verschraubt,");
   lines.push("");
-  lines.push("ich habe gerade den Kostenrechner auf Ihrer Website genutzt und möchte eine Einschätzung für mein Projekt anfragen.");
+  lines.push("ich möchte eine unverbindliche Anfrage stellen.");
   lines.push("");
   const serviceLabel =
     s.service === "boden"
@@ -218,53 +309,75 @@ function buildWaMessage(s: State, price: { min: number; max: number } | null): s
         : s.service === "ent"
           ? "Entrümpelung & Entsorgung"
           : "Sonstiges Projekt";
+  if (s.name.trim()) lines.push(`Name: ${s.name.trim()}`);
+  if (s.telefon.trim()) lines.push(`Telefon: ${s.telefon.trim()}`);
+  if (s.ort.trim()) lines.push(`Ort / Einsatzadresse: ${s.ort.trim()}`);
   lines.push(`Leistung: ${serviceLabel}`);
 
-  const push = (label: string, value?: string | number) => {
-    if (value === undefined || value === null) return;
-    const v = typeof value === "string" ? value.trim() : String(value);
-    if (!v) return;
-    lines.push(`${label}: ${v}`);
-  };
-
   if (s.service === "boden") {
-    push("Bodenart", s.bodenart);
-    push("Fläche", s.qm ? `${s.qm} m²` : "");
-    push("Altbelag entfernen", s.altEntfernen);
-    push("Untergrundvorbereitung", s.untergrund);
-    push("Sockelleisten", s.sockel);
-    push("Türen kürzen", s.tueren);
-    push("Räume leer", s.raeumeLeer);
+    const v = BODEN_VARIANTEN.find((x) => x.key === s.bodenartKey);
+    if (v) lines.push(`Bodenart: ${v.label}`);
+    if (s.qm) lines.push(`Fläche: ${s.qm} m²`);
+    if (s.altEntfernen) lines.push(`Alter Boden: ${s.altEntfernen}`);
+    if (s.sockelLfm) lines.push(`Sockelleisten: ${s.sockelLfm} lfm`);
   } else if (s.service === "kueche") {
-    push("Projektart", s.kueArt);
-    push("Küchenlänge", s.kueMeter ? `${s.kueMeter} m` : "");
-    push("Arbeitsplatte zuschneiden", s.kueArbeit);
-    push("Geräte einbauen", s.kueGeraete);
-    push("Spüle montieren", s.kueSpuele);
-    push("Demontage alte Küche", s.kueDemontage);
-    push("Transport nötig", s.kueTransport);
+    if (s.kueArt) lines.push(`Projektart: ${s.kueArt}`);
+    if (s.kueMeter) lines.push(`Küchenlänge: ${s.kueMeter} m`);
   } else if (s.service === "ent") {
-    push("Objektart", s.entObjekt);
-    push("Geschätzte Menge", s.entMenge);
-    push("Etage", s.entEtage);
-    push("Aufzug vorhanden", s.entAufzug);
-    push("Entsorgung nötig", s.entEntsorgen);
+    if (s.entObjekt) lines.push(`Objekt: ${s.entObjekt}`);
+    if (s.entMenge) lines.push(`Menge: ${s.entMenge}`);
+    if (s.entEtage) lines.push(`Etage: ${s.entEtage}`);
   } else if (s.service === "sonst") {
-    push("Beschreibung", s.sonstText);
+    if (s.sonstText.trim()) lines.push(`Beschreibung: ${s.sonstText.trim()}`);
   }
-  push("Ort / PLZ", s.ort);
-  push("Wunschzeitraum", s.zeitraum);
-  if (price) {
-    lines.push(`Grobe Kosteneinschätzung laut Rechner: ca. ${fmtEUR(price.min)} – ${fmtEUR(price.max)} €`);
+
+  if (b) {
+    lines.push("");
+    lines.push("Positionen:");
+    for (const it of b.items) {
+      if (it.inklusive) lines.push(`- ${it.label}: inklusive`);
+      else if (it.amount === null) lines.push(`- ${it.label}: auf Anfrage${it.detail ? ` (${it.detail})` : ""}`);
+      else lines.push(`- ${it.detail ?? `${it.label}: ${eur(it.amount)}`}`);
+    }
+    if (b.anfahrt) {
+      if (b.anfahrt.inklusive) lines.push(`- Anfahrt: bis 35 km inklusive`);
+      else if (b.anfahrt.amount === null) lines.push(`- Anfahrt: wird nach Einsatzort geprüft`);
+      else lines.push(`- Anfahrt: ${b.anfahrt.detail} = ${eur(b.anfahrt.amount)}`);
+    }
+    if (b.express) {
+      if (b.express.amount === null) lines.push(`- ${b.express.label}: ${b.express.detail}`);
+      else if (b.express.inklusive) lines.push(`- ${b.express.label}: ${b.express.detail}`);
+      else lines.push(`- ${b.express.label}: ${b.express.detail} = ${eur(b.express.amount)}`);
+    }
+    if (b.total > 0) {
+      lines.push("");
+      lines.push(`Geschätzte Gesamtsumme: ${eur(b.total)}`);
+    }
+    if (b.hasOnRequest) {
+      lines.push("(Einzelne Positionen werden separat nach Besichtigung kalkuliert.)");
+    }
   }
+
+  lines.push("");
+  lines.push("Wunschtermin:");
+  if (s.wunschDatum) lines.push(`- Wunschdatum: ${s.wunschDatum}`);
+  if (s.wunschZeitraum) lines.push(`- Wunschzeitraum: ${s.wunschZeitraum}`);
+  if (s.fertigDatum) lines.push(`- Fertigstellung gewünscht bis: ${s.fertigDatum}`);
+  if (s.dringlichkeit) {
+    const d = DRINGLICHKEIT_OPTIONS.find((o) => o.key === s.dringlichkeit);
+    if (d) lines.push(`- Dringlichkeit: ${d.label}`);
+  }
+  if (s.terminHinweise.trim()) lines.push(`- Hinweise: ${s.terminHinweise.trim()}`);
+  lines.push("- Terminstatus: unverbindliche Anfrage, Bestätigung nach Prüfung");
+
   if (s.nachricht.trim()) {
     lines.push("");
     lines.push("Zusätzliche Nachricht:");
     lines.push(s.nachricht.trim());
   }
+
   lines.push("");
-  lines.push("Ich kann Ihnen gerne Bilder für eine genauere Einschätzung senden.");
-  lines.push("");
+  lines.push("Bitte prüfen Sie, ob der Termin möglich ist.");
   lines.push("Viele Grüße");
   return lines.join("\n");
 }
@@ -275,7 +388,7 @@ export function Kostenrechner() {
   const [errors, setErrors] = useState<string[]>([]);
 
   const upd = <K extends keyof State>(k: K, v: State[K]) => set((p) => ({ ...p, [k]: v }));
-  const price = useMemo(() => calc(s), [s]);
+  const breakdown = useMemo(() => computeBreakdown(s), [s]);
 
   const validate = (): string[] => {
     const e: string[] = [];
@@ -294,7 +407,7 @@ export function Kostenrechner() {
     if (e.length === 0) setStep(3);
   };
 
-  const message = useMemo(() => buildWaMessage(s, price), [s, price]);
+  const message = useMemo(() => buildWaMessage(s, breakdown), [s, breakdown]);
   const waUrl = `https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent(message)}`;
 
   const copyMsg = async () => {
@@ -356,7 +469,9 @@ export function Kostenrechner() {
         <div className="mt-8 space-y-6">
           <div>
             <h3 className="text-lg font-semibold sm:text-xl">Details zu Ihrem Projekt</h3>
-            <p className="mt-1 text-sm text-muted-foreground">Pflichtfelder sind mit * markiert. Restliches gerne so genau wie möglich.</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Alle Preise sind Endkundenpreise. Verlegt &amp; Verschraubt arbeitet als Kleinunternehmer nach § 19 UStG – es wird keine Umsatzsteuer ausgewiesen.
+            </p>
           </div>
 
           {s.service === "boden" && <BodenForm s={s} upd={upd} />}
@@ -364,27 +479,38 @@ export function Kostenrechner() {
           {s.service === "ent" && <EntForm s={s} upd={upd} />}
           {s.service === "sonst" && <SonstForm s={s} upd={upd} />}
 
-          <Field label="Ort / PLZ *">
-            <input
-              value={s.ort}
-              onChange={(e) => upd("ort", e.target.value)}
-              maxLength={120}
-              placeholder="z. B. Wilhelmshaven 26388"
-              className={input}
-            />
-          </Field>
-          <Field label="Wunschzeitraum">
-            <Choice
-              value={s.zeitraum}
-              onChange={(v) => upd("zeitraum", v)}
-              options={["Schnellstmöglich", "Innerhalb 2 Wochen", "Innerhalb 1 Monats", "Flexibel"]}
-            />
-          </Field>
+          <div className="grid gap-5 sm:grid-cols-2">
+            <Field label="Ort / PLZ *">
+              <input
+                value={s.ort}
+                onChange={(e) => upd("ort", e.target.value)}
+                maxLength={120}
+                placeholder="z. B. Wilhelmshaven 26388"
+                className={input}
+              />
+            </Field>
+            <Field label="Entfernung vom Firmensitz in km">
+              <input
+                type="number"
+                min={0}
+                value={s.anfahrtKm}
+                onChange={(e) => upd("anfahrtKm", e.target.value)}
+                placeholder="z. B. 25"
+                className={input}
+              />
+              <p className="mt-1 text-xs text-muted-foreground">
+                Bis 35 km Entfernung ist die Anfahrt inklusive. Ab 35 km berechnen wir 0,70 € pro zusätzlichem Kilometer.
+              </p>
+            </Field>
+          </div>
+
+          <TerminBlock s={s} upd={upd} />
+
           <Field label="Zusatznachricht (optional)">
             <textarea
               value={s.nachricht}
               onChange={(e) => upd("nachricht", e.target.value)}
-              rows={4}
+              rows={3}
               maxLength={1000}
               placeholder="Besonderheiten, Zugang, Termine, Fragen…"
               className={input}
@@ -424,25 +550,69 @@ export function Kostenrechner() {
       {step === 3 && (
         <div className="mt-8 space-y-6">
           <div className="rounded-2xl border border-accent/40 bg-gradient-to-br from-accent/15 via-background/60 to-background/40 p-6 sm:p-8">
-            <p className="text-xs uppercase tracking-[0.25em] text-accent">Ihre grobe Ersteinschätzung ist da.</p>
-            {price && s.service !== "sonst" ? (
-              <p className="mt-3 text-3xl font-semibold sm:text-4xl">
-                ca. {fmtEUR(price.min)} – {fmtEUR(price.max)} €
-              </p>
+            <p className="text-xs uppercase tracking-[0.25em] text-accent">Ihre unverbindliche Ersteinschätzung</p>
+            {breakdown && breakdown.total > 0 ? (
+              <p className="mt-3 text-3xl font-semibold sm:text-4xl">Gesamtsumme: {eur(breakdown.total)}</p>
             ) : (
               <p className="mt-3 text-2xl font-semibold sm:text-3xl">Individuelles Angebot</p>
             )}
-            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-              Damit wir Ihr Projekt genauer bewerten können, senden Sie uns Ihre
-              Angaben direkt per WhatsApp. Bilder vom Raum, Boden, der Küche oder
-              der Fläche helfen uns besonders bei einer schnellen Einschätzung.
-            </p>
             <p className="mt-2 text-xs text-muted-foreground">
-              Diese Einschätzung ist unverbindlich. Endpreis nach Foto- oder
-              Vor-Ort-Prüfung – abhängig von Untergrund, Material, Zugang und
-              Sonderfaktoren.
+              Endkundenpreise · keine Umsatzsteuer (§ 19 UStG / Kleinunternehmer)
             </p>
           </div>
+
+          {breakdown && (
+            <div className="rounded-2xl border border-border/70 bg-background/40 p-5 sm:p-6">
+              <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Positionen</p>
+              <ul className="mt-3 space-y-2 text-sm">
+                {breakdown.items.map((it, i) => (
+                  <li key={i} className="flex flex-col gap-0.5 border-b border-border/40 pb-2 last:border-0 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4">
+                    <span>
+                      <span className="font-medium">{it.label}</span>
+                      {it.detail && <span className="ml-1 text-muted-foreground">– {it.detail}</span>}
+                    </span>
+                    <span className="shrink-0 text-right text-muted-foreground">
+                      {it.inklusive ? "inklusive" : it.amount === null ? "auf Anfrage" : eur(it.amount)}
+                    </span>
+                  </li>
+                ))}
+                {breakdown.anfahrt && (
+                  <li className="flex flex-col gap-0.5 border-b border-border/40 pb-2 last:border-0 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4">
+                    <span>
+                      <span className="font-medium">{breakdown.anfahrt.label}</span>
+                      {breakdown.anfahrt.detail && <span className="ml-1 text-muted-foreground">– {breakdown.anfahrt.detail}</span>}
+                    </span>
+                    <span className="shrink-0 text-right text-muted-foreground">
+                      {breakdown.anfahrt.inklusive ? "inklusive" : breakdown.anfahrt.amount === null ? "wird geprüft" : eur(breakdown.anfahrt.amount)}
+                    </span>
+                  </li>
+                )}
+                {breakdown.express && (
+                  <li className="flex flex-col gap-0.5 pb-2 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4">
+                    <span>
+                      <span className="font-medium">{breakdown.express.label}</span>
+                      {breakdown.express.detail && <span className="ml-1 text-muted-foreground">– {breakdown.express.detail}</span>}
+                    </span>
+                    <span className="shrink-0 text-right text-muted-foreground">
+                      {breakdown.express.inklusive ? "—" : breakdown.express.amount === null ? "auf Anfrage" : eur(breakdown.express.amount)}
+                    </span>
+                  </li>
+                )}
+              </ul>
+              {breakdown.total > 0 && (
+                <div className="mt-4 flex items-baseline justify-between border-t border-border/60 pt-3 text-base font-semibold">
+                  <span>Gesamtsumme berechenbarer Positionen</span>
+                  <span>{eur(breakdown.total)}</span>
+                </div>
+              )}
+              <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
+                Die Berechnung ist eine unverbindliche Ersteinschätzung. Der endgültige Preis kann je nach Untergrund, Zustand,
+                Zuschnitten, Raumaufteilung, Einsatzort, Terminwunsch und Zusatzarbeiten abweichen.
+              </p>
+            </div>
+          )}
+
+          <KalenderPlatzhalter />
 
           <div className="grid gap-3 sm:grid-cols-2">
             <a
@@ -451,7 +621,7 @@ export function Kostenrechner() {
               rel="noopener noreferrer"
               className="inline-flex h-14 items-center justify-center gap-2 rounded-full bg-[#25D366] px-6 text-base font-semibold text-white shadow-lg shadow-[#25D366]/30 transition-transform hover:-translate-y-0.5"
             >
-              <MessageCircle className="h-5 w-5" /> Jetzt per WhatsApp anfragen
+              <MessageCircle className="h-5 w-5" /> Unverbindliche Terminanfrage per WhatsApp
             </a>
             <a
               href={`tel:+${PHONE_NUMBER}`}
@@ -462,9 +632,8 @@ export function Kostenrechner() {
           </div>
 
           <p className="text-xs text-muted-foreground">
-            Mit dem Klick auf den WhatsApp-Button öffnen Sie WhatsApp und können
-            Ihre Angaben freiwillig an uns senden. Es werden keine Daten
-            automatisch ohne Ihre Bestätigung übertragen.
+            Der gewünschte Termin wird nach Aufwand, Einsatzort, Materialverfügbarkeit und bestehender Planung geprüft.
+            Der Termin wird erst nach unserer Rückbestätigung verbindlich.
           </p>
 
           <div className="flex flex-wrap gap-3">
@@ -493,7 +662,7 @@ export function Kostenrechner() {
             <div className="flex items-center gap-2"><Check className="h-4 w-4 text-accent" /> Kostenlose Ersteinschätzung</div>
             <div className="flex items-center gap-2"><Clock className="h-4 w-4 text-accent" /> Schnelle Rückmeldung</div>
             <div className="flex items-center gap-2"><Camera className="h-4 w-4 text-accent" /> Bilder per WhatsApp ergänzbar</div>
-            <div className="flex items-center gap-2"><MapPin className="h-4 w-4 text-accent" /> Regional in Wilhelmshaven & Umgebung</div>
+            <div className="flex items-center gap-2"><MapPin className="h-4 w-4 text-accent" /> Regional in Wilhelmshaven &amp; Umgebung</div>
           </div>
         </div>
       )}
@@ -555,24 +724,27 @@ function Choice({
 }: {
   value: string;
   onChange: (v: string) => void;
-  options: string[];
+  options: { value: string; label: string }[] | string[];
 }) {
+  const norm = (options as any[]).map((o) =>
+    typeof o === "string" ? { value: o, label: o } : (o as { value: string; label: string }),
+  );
   return (
     <div className="flex flex-wrap gap-2">
-      {options.map((o) => {
-        const active = value === o;
+      {norm.map((o) => {
+        const active = value === o.value;
         return (
           <button
-            key={o}
+            key={o.value}
             type="button"
-            onClick={() => onChange(active ? "" : o)}
+            onClick={() => onChange(active ? "" : o.value)}
             className={`rounded-full border px-4 py-2 text-sm transition-colors ${
               active
                 ? "border-accent bg-accent/15 text-accent"
                 : "border-border bg-background text-muted-foreground hover:text-foreground"
             }`}
           >
-            {o}
+            {o.label}
           </button>
         );
       })}
@@ -587,35 +759,46 @@ function Grid2({ children }: { children: React.ReactNode }) {
 function BodenForm({ s, upd }: { s: State; upd: <K extends keyof State>(k: K, v: State[K]) => void }) {
   return (
     <div className="space-y-5">
+      <Field label="Bodenart / Verlegeart">
+        <Choice
+          value={s.bodenartKey}
+          onChange={(v) => upd("bodenartKey", v || "vinyl_schwimmend")}
+          options={BODEN_VARIANTEN.map((b) => ({
+            value: b.key,
+            label: b.price === null ? `${b.label} (auf Anfrage)` : `${b.label} · ${b.price.toFixed(2).replace(".", ",")} €/m²`,
+          }))}
+        />
+      </Field>
       <Grid2>
-        <Field label="Bodenart">
-          <Choice value={s.bodenart} onChange={(v) => upd("bodenart", v || "Vinyl")} options={["Vinyl", "Laminat", "Designboden", "PVC", "Teppich", "Sonstiges"]} />
-        </Field>
         <Field label="Fläche in m² *">
           <input type="number" min={1} value={s.qm} onChange={(e) => upd("qm", e.target.value)} className={input} placeholder="z. B. 28" />
         </Field>
+        <Field label="Sockelleisten in lfm (laufende Meter)">
+          <input type="number" min={0} value={s.sockelLfm} onChange={(e) => upd("sockelLfm", e.target.value)} className={input} placeholder="z. B. 40" />
+          <p className="mt-1 text-xs text-muted-foreground">
+            Sockelleisten montieren ohne Acrylfuge: 5,00 € pro laufendem Meter. Acrylfuge / Versiegelung nicht enthalten – auf Wunsch separat kalkuliert.
+          </p>
+        </Field>
       </Grid2>
-      <Field label="Alter Boden muss entfernt werden">
-        <Choice value={s.altEntfernen} onChange={(v) => upd("altEntfernen", v as State["altEntfernen"])} options={["Ja", "Nein"]} />
-      </Field>
-      <Field label="Untergrundvorbereitung / ausgleichen">
+      <Field label="Alten Boden entfernen">
         <Choice
-          value={s.untergrund}
-          onChange={(v) => upd("untergrund", v as State["untergrund"])}
-          options={["Nein", "Leicht ausgleichen", "Vollflächig spachteln", "Unsicher"]}
+          value={s.altEntfernen}
+          onChange={(v) => upd("altEntfernen", v as State["altEntfernen"])}
+          options={[
+            { value: "Nein", label: "Nein" },
+            { value: "schwimmend", label: "Schwimmend verlegt (4,00 €/m²)" },
+            { value: "verklebt", label: "Verklebt (auf Anfrage)" },
+          ]}
         />
       </Field>
-      <Field label="Sockelleisten">
-        <Choice value={s.sockel} onChange={(v) => upd("sockel", v as State["sockel"])} options={["Keine", "Mit Eckstücken", "Auf Gehrung"]} />
-      </Field>
-      <Grid2>
-        <Field label="Türen kürzen nötig">
-          <Choice value={s.tueren} onChange={(v) => upd("tueren", v as State["tueren"])} options={["Ja", "Nein", "Unsicher"]} />
-        </Field>
-        <Field label="Räume leer">
-          <Choice value={s.raeumeLeer} onChange={(v) => upd("raeumeLeer", v as State["raeumeLeer"])} options={["Ja", "Nein"]} />
-        </Field>
-      </Grid2>
+      <div className="rounded-md border border-border/60 bg-background/40 p-3 text-xs text-muted-foreground">
+        <p className="font-medium text-foreground">Inklusive im Preis:</p>
+        <ul className="mt-1 list-disc pl-4">
+          <li>Baustelleneinrichtung</li>
+          <li>Alten Boden entsorgen</li>
+          <li>Trittschalldämmung verlegen</li>
+        </ul>
+      </div>
     </div>
   );
 }
@@ -649,7 +832,7 @@ function KuecheForm({ s, upd }: { s: State; upd: <K extends keyof State>(k: K, v
         <Choice value={s.kueTransport} onChange={(v) => upd("kueTransport", v as State["kueTransport"])} options={["Ja", "Nein"]} />
       </Field>
       <p className="rounded-md border border-border/60 bg-background/40 p-3 text-xs text-muted-foreground">
-        Hinweis: Elektro- und Gas-/Wasseranschlüsse übernehmen Fachbetriebe. Wir koordinieren das auf Wunsch.
+        Küchenmontage wird nach Besichtigung kalkuliert. Elektro- und Gas-/Wasseranschlüsse übernehmen Fachbetriebe; wir koordinieren das auf Wunsch.
       </p>
     </div>
   );
@@ -698,13 +881,89 @@ function SonstForm({ s, upd }: { s: State; upd: <K extends keyof State>(k: K, v:
   );
 }
 
+export function TerminBlock({
+  s,
+  upd,
+}: {
+  s: State;
+  upd: <K extends keyof State>(k: K, v: State[K]) => void;
+}) {
+  return (
+    <div className="space-y-5 rounded-2xl border border-border/70 bg-background/40 p-5">
+      <div className="flex items-start gap-3">
+        <CalendarClock className="mt-0.5 h-5 w-5 text-accent" />
+        <div>
+          <p className="text-sm font-semibold">Wunschtermin anfragen</p>
+          <p className="mt-0.5 text-xs text-muted-foreground">
+            Wählen Sie Ihren bevorzugten Zeitraum aus. Der Terminwunsch wird geprüft und erst nach unserer Rückbestätigung verbindlich eingeplant.
+          </p>
+        </div>
+      </div>
+      <Grid2>
+        <Field label="Wunschdatum">
+          <input type="date" value={s.wunschDatum} onChange={(e) => upd("wunschDatum", e.target.value)} className={input} />
+        </Field>
+        <Field label="Wunschzeitraum">
+          <Choice
+            value={s.wunschZeitraum}
+            onChange={(v) => upd("wunschZeitraum", v)}
+            options={["Vormittag", "Mittag", "Nachmittag", "Abend", "ganztägig flexibel"]}
+          />
+        </Field>
+      </Grid2>
+      <Field label="Fertigstellung gewünscht bis">
+        <input type="date" value={s.fertigDatum} onChange={(e) => upd("fertigDatum", e.target.value)} className={input} />
+      </Field>
+      <Field label="Dringlichkeit">
+        <Choice
+          value={s.dringlichkeit}
+          onChange={(v) => upd("dringlichkeit", v)}
+          options={DRINGLICHKEIT_OPTIONS.map((o) => ({ value: o.key, label: o.label }))}
+        />
+        <p className="mt-1 text-xs text-muted-foreground">
+          Kurzfristige Termine mit zeitnahem Fertigstellungsdatum können teurer sein, weil Planung, Personal und Material schneller organisiert werden müssen.
+          Der Expresszuschlag wird sichtbar als eigene Position ausgewiesen und nur auf berechenbare Arbeitsleistungen angewendet.
+        </p>
+      </Field>
+      <Field label="Besondere Hinweise zum Termin">
+        <textarea
+          value={s.terminHinweise}
+          onChange={(e) => upd("terminHinweise", e.target.value)}
+          rows={2}
+          maxLength={500}
+          placeholder="z. B. nur werktags, bestimmte Uhrzeit, Zugang…"
+          className={input}
+        />
+      </Field>
+      <p className="text-xs text-muted-foreground">
+        Unverbindliche Terminanfrage – kein automatisch gebuchter Termin. Bestätigung erfolgt nach Prüfung von Aufwand, Einsatzort und Materialverfügbarkeit.
+      </p>
+    </div>
+  );
+}
+
+export function KalenderPlatzhalter() {
+  return (
+    <div className="rounded-2xl border border-dashed border-border/70 bg-background/40 p-5">
+      <p className="text-xs uppercase tracking-[0.2em] text-accent">Verfügbarkeiten prüfen</p>
+      <p className="mt-2 text-sm text-muted-foreground">
+        Hier können künftig freie und blockierte Zeiträume angezeigt werden. Aus Datenschutzgründen werden blockierte Termine nur als „belegt“ angezeigt –
+        ohne Kundennamen, Adressen oder Auftragsdetails.
+      </p>
+      <div className="mt-3 rounded-xl border border-border/60 bg-card/40 p-6 text-center text-xs text-muted-foreground">
+        Kalender wird eingebunden, sobald die Google-Kalender- oder TimeTree-Verknüpfung eingerichtet ist.
+      </div>
+    </div>
+  );
+}
+
 export function TrustChips() {
   return (
     <div className="grid gap-2 text-xs text-muted-foreground sm:grid-cols-2 lg:grid-cols-4">
       <span className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-card/40 px-3 py-2"><ShieldCheck className="h-4 w-4 text-accent" /> Kostenlose Ersteinschätzung</span>
       <span className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-card/40 px-3 py-2"><Clock className="h-4 w-4 text-accent" /> Schnelle Rückmeldung</span>
       <span className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-card/40 px-3 py-2"><Camera className="h-4 w-4 text-accent" /> Bilder per WhatsApp</span>
-      <span className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-card/40 px-3 py-2"><MapPin className="h-4 w-4 text-accent" /> Wilhelmshaven & Umgebung</span>
+      <span className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-card/40 px-3 py-2"><MapPin className="h-4 w-4 text-accent" /> Wilhelmshaven &amp; Umgebung</span>
     </div>
   );
 }
