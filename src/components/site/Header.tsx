@@ -51,6 +51,7 @@ export function Header() {
             className="h-10 w-auto shrink-0"
             width={120}
             height={48}
+            decoding="async"
           />
           <span className="hidden flex-col leading-tight md:flex">
             <span className="text-sm font-semibold tracking-tight text-foreground whitespace-nowrap">

@@ -16,6 +16,8 @@ export function Footer() {
                 className="h-12 w-auto"
                 width={140}
                 height={56}
+                loading="lazy"
+                decoding="async"
               />
             </div>
             <p className="mt-4 max-w-sm text-sm leading-relaxed text-muted-foreground">

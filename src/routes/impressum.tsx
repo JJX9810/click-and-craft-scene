@@ -65,7 +65,7 @@ function Page() {
             </p>
             <p className="flex items-center gap-2">
               <Globe className="h-3.5 w-3.5 text-accent" />
-              <a href="https://verlegt-verschraubt.de" className="hover:text-foreground" target="_blank" rel="noreferrer">verlegt-verschraubt.de</a>
+              <a href="https://verlegt-verschraubt.de" className="hover:text-foreground" target="_blank" rel="noopener noreferrer">verlegt-verschraubt.de</a>
             </p>
           </Card>
 
@@ -93,7 +93,7 @@ function Page() {
             <p>Wir sind nicht verpflichtet und nicht bereit, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.</p>
             <p className="pt-2 text-xs">
               Plattform der EU-Kommission zur Online-Streitbeilegung:{" "}
-              <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noreferrer" className="text-accent hover:underline">ec.europa.eu/consumers/odr</a>
+              <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">ec.europa.eu/consumers/odr</a>
             </p>
           </Card>
         </div>

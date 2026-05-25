@@ -448,7 +448,7 @@ export function Kostenrechner() {
             <a
               href={waUrl}
               target="_blank"
-              rel="noreferrer"
+              rel="noopener noreferrer"
               className="inline-flex h-14 items-center justify-center gap-2 rounded-full bg-[#25D366] px-6 text-base font-semibold text-white shadow-lg shadow-[#25D366]/30 transition-transform hover:-translate-y-0.5"
             >
               <MessageCircle className="h-5 w-5" /> Jetzt per WhatsApp anfragen
