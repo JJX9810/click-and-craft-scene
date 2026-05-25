@@ -8,6 +8,7 @@ import {
   breadcrumbNode, faqPageNode, jsonLdScript, serviceNode, webPageNode,
 } from "@/lib/schema";
 import { QuickAnswer, FactBox, LimitsBox, InternalLinks } from "@/components/site/InfoBlocks";
+import { PreisrechnerCTA } from "@/components/site/PreisrechnerCTA";
 
 const EN_URL = "https://verlegt-verschraubt.de/entruempelung-entsorgung-in-wilhelmshaven";
 
