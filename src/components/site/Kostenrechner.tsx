@@ -552,7 +552,7 @@ export function Kostenrechner() {
           <div className="rounded-2xl border border-accent/40 bg-gradient-to-br from-accent/15 via-background/60 to-background/40 p-6 sm:p-8">
             <p className="text-xs uppercase tracking-[0.25em] text-accent">Ihre unverbindliche Ersteinschätzung</p>
             {breakdown && breakdown.total > 0 ? (
-              <p className="mt-3 text-3xl font-semibold sm:text-4xl">Gesamtsumme: {eur(breakdown.total)}</p>
+              <p className="mt-3 text-3xl font-semibold sm:text-4xl">Geschätzte Gesamtkosten: ca. {eur(breakdown.total)}</p>
             ) : (
               <p className="mt-3 text-2xl font-semibold sm:text-3xl">Individuelles Angebot</p>
             )}
@@ -561,56 +561,22 @@ export function Kostenrechner() {
             </p>
           </div>
 
-          {breakdown && (
-            <div className="rounded-2xl border border-border/70 bg-background/40 p-5 sm:p-6">
-              <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Positionen</p>
-              <ul className="mt-3 space-y-2 text-sm">
-                {breakdown.items.map((it, i) => (
-                  <li key={i} className="flex flex-col gap-0.5 border-b border-border/40 pb-2 last:border-0 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4">
-                    <span>
-                      <span className="font-medium">{it.label}</span>
-                      {it.detail && <span className="ml-1 text-muted-foreground">– {it.detail}</span>}
-                    </span>
-                    <span className="shrink-0 text-right text-muted-foreground">
-                      {it.inklusive ? "inklusive" : it.amount === null ? "auf Anfrage" : eur(it.amount)}
-                    </span>
-                  </li>
-                ))}
-                {breakdown.anfahrt && (
-                  <li className="flex flex-col gap-0.5 border-b border-border/40 pb-2 last:border-0 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4">
-                    <span>
-                      <span className="font-medium">{breakdown.anfahrt.label}</span>
-                      {breakdown.anfahrt.detail && <span className="ml-1 text-muted-foreground">– {breakdown.anfahrt.detail}</span>}
-                    </span>
-                    <span className="shrink-0 text-right text-muted-foreground">
-                      {breakdown.anfahrt.inklusive ? "inklusive" : breakdown.anfahrt.amount === null ? "wird geprüft" : eur(breakdown.anfahrt.amount)}
-                    </span>
-                  </li>
-                )}
-                {breakdown.express && (
-                  <li className="flex flex-col gap-0.5 pb-2 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4">
-                    <span>
-                      <span className="font-medium">{breakdown.express.label}</span>
-                      {breakdown.express.detail && <span className="ml-1 text-muted-foreground">– {breakdown.express.detail}</span>}
-                    </span>
-                    <span className="shrink-0 text-right text-muted-foreground">
-                      {breakdown.express.inklusive ? "—" : breakdown.express.amount === null ? "auf Anfrage" : eur(breakdown.express.amount)}
-                    </span>
-                  </li>
-                )}
-              </ul>
-              {breakdown.total > 0 && (
-                <div className="mt-4 flex items-baseline justify-between border-t border-border/60 pt-3 text-base font-semibold">
-                  <span>Gesamtsumme berechenbarer Positionen</span>
-                  <span>{eur(breakdown.total)}</span>
-                </div>
-              )}
-              <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
-                Die Berechnung ist eine unverbindliche Ersteinschätzung. Der endgültige Preis kann je nach Untergrund, Zustand,
-                Zuschnitten, Raumaufteilung, Einsatzort, Terminwunsch und Zusatzarbeiten abweichen.
-              </p>
-            </div>
-          )}
+          <div className="rounded-2xl border border-border/70 bg-background/40 p-5 sm:p-6">
+            <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Ihre Angaben in der Zusammenfassung</p>
+            <ul className="mt-3 space-y-1.5 text-sm">
+              {summaryLines(s).map((line, i) => (
+                <li key={i} className="flex gap-2">
+                  <span className="text-muted-foreground">·</span>
+                  <span>{line}</span>
+                </li>
+              ))}
+            </ul>
+            <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
+              Diese Berechnung ist eine unverbindliche Ersteinschätzung. Der endgültige Preis hängt von Untergrund, Zuschnitten,
+              Raumaufteilung, Einsatzort, Terminwunsch und Zusatzarbeiten ab.
+            </p>
+          </div>
+
 
           <KalenderPlatzhalter />
 
