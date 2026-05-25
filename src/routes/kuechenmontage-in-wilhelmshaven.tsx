@@ -80,7 +80,19 @@ function Page() {
         breadcrumbs={[{ label: "Leistungen" }, { label: "Küchenmontage" }]}
       />
 
-      <Section eyebrow="Leistungsumfang" title="Was wir bei der Küchenmontage übernehmen">
+      <Section eyebrow="Kurzfassung" title="Küchenmontage in Wilhelmshaven">
+        <div className="grid gap-6 lg:grid-cols-2">
+          <QuickAnswer>
+            Verlegt &amp; Verschraubt übernimmt Küchenmontage in Wilhelmshaven
+            und Umgebung. Dazu gehören Aufbau nach Umzug, Restmontage,
+            Küchenmodule, Arbeitsplatten sowie Spüle und Armatur an vorhandenen
+            Anschlüssen.
+          </QuickAnswer>
+          <FactBox />
+        </div>
+      </Section>
+
+      <Section eyebrow="Leistungsumfang" title="Was wir bei der Küchenmontage übernehmen" bordered>
         <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
           {scope.map((s) => (
             <article key={s.t} className="rounded-2xl border border-border/70 bg-card/50 p-6 backdrop-blur">
