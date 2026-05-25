@@ -88,6 +88,8 @@ function Page() {
         </div>
       </Section>
 
+      <PreisrechnerCTA variant="entruempelung" />
+
       <Section eyebrow="Leistungen" title="Was wir räumen und entsorgen" bordered>
         <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
           {types.map((s) => (
