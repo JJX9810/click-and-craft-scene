@@ -179,6 +179,8 @@ export function OrtsSeite({
       </Section>
 
 
+      <PreisrechnerCTA variant="handwerkerservice" />
+
       <CtaBlock title={`Projekt in ${ort} anfragen`} text="Senden Sie Fotos und Maße – wir geben eine ehrliche Einschätzung." />
     </>
   );
