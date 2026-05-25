@@ -1,3 +1,4 @@
+import { breadcrumbNode, jsonLdScript, serviceNode, webPageNode } from "@/lib/schema";
 import { createFileRoute } from "@tanstack/react-router";
 import { OrtsSeite } from "@/components/site/OrtsSeite";
 
@@ -30,5 +31,21 @@ export const Route = createFileRoute("/handwerkerservice-wilhelmshaven")({
       { name: "twitter:image", content: "https://verlegt-verschraubt.de/hero-flooring.png" },
     ],
     links: [{ rel: "canonical", href: "https://verlegt-verschraubt.de/handwerkerservice-wilhelmshaven" }],
+    scripts: [
+      jsonLdScript([
+        webPageNode({ url: "https://verlegt-verschraubt.de/handwerkerservice-wilhelmshaven", name: 'Handwerkerservice in Wilhelmshaven', description: 'Bodenverlegung, Küchenmontage und Entrümpelung in Wilhelmshaven – Verlegt & Verschraubt aus Wilhelmshaven.' }),
+        serviceNode({
+          url: "https://verlegt-verschraubt.de/handwerkerservice-wilhelmshaven",
+          name: 'Handwerkerservice in Wilhelmshaven',
+          description: 'Bodenverlegung, Küchenmontage und Entrümpelung in Wilhelmshaven und Umgebung. Lokal, sauber und planbar.',
+          serviceType: "Handwerkerservice",
+          areaServed: ["Wilhelmshaven", "Schortens", "Sande", "Jever", "Varel", "Wangerland", "Umgebung"],
+        }),
+        breadcrumbNode([
+          { name: "Startseite", url: "https://verlegt-verschraubt.de/" },
+          { name: 'Handwerkerservice in Wilhelmshaven', url: "https://verlegt-verschraubt.de/handwerkerservice-wilhelmshaven" },
+        ]),
+      ]),
+    ],
   }),
 });

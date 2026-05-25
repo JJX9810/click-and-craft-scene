@@ -1,3 +1,4 @@
+import { breadcrumbNode, jsonLdScript, serviceNode, webPageNode } from "@/lib/schema";
 import { createFileRoute } from "@tanstack/react-router";
 import { OrtsSeite } from "@/components/site/OrtsSeite";
 
@@ -17,5 +18,21 @@ export const Route = createFileRoute("/handwerkerservice-jever")({
       { name: "twitter:image", content: "https://verlegt-verschraubt.de/hero-flooring.png" },
     ],
     links: [{ rel: "canonical", href: "https://verlegt-verschraubt.de/handwerkerservice-jever" }],
+    scripts: [
+      jsonLdScript([
+        webPageNode({ url: "https://verlegt-verschraubt.de/handwerkerservice-jever", name: 'Handwerkerservice in Jever', description: 'Bodenverlegung, Küchenmontage und Entrümpelung in Jever – Verlegt & Verschraubt aus Wilhelmshaven.' }),
+        serviceNode({
+          url: "https://verlegt-verschraubt.de/handwerkerservice-jever",
+          name: 'Handwerkerservice in Jever',
+          description: 'Bodenverlegung, Küchenmontage und Entrümpelung in Jever und Umgebung. Lokal, sauber und planbar.',
+          serviceType: "Handwerkerservice",
+          areaServed: ["Jever", "Wilhelmshaven", "Schortens", "Sande", "Wangerland", "Umgebung"],
+        }),
+        breadcrumbNode([
+          { name: "Startseite", url: "https://verlegt-verschraubt.de/" },
+          { name: 'Handwerkerservice in Jever', url: "https://verlegt-verschraubt.de/handwerkerservice-jever" },
+        ]),
+      ]),
+    ],
   }),
 });

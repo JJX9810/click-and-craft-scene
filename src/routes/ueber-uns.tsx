@@ -1,3 +1,4 @@
+import { breadcrumbNode, jsonLdScript, webPageNode } from "@/lib/schema";
 import { createFileRoute } from "@tanstack/react-router";
 import { PageHero, Section, Bullet, CtaBlock } from "@/components/site/PageShell";
 
@@ -17,6 +18,15 @@ export const Route = createFileRoute("/ueber-uns")({
       { name: "twitter:image", content: "https://verlegt-verschraubt.de/hero-flooring.png" },
     ],
     links: [{ rel: "canonical", href: "https://verlegt-verschraubt.de/ueber-uns" }],
+    scripts: [
+      jsonLdScript([
+        webPageNode({ url: "https://verlegt-verschraubt.de/ueber-uns", name: 'Über uns – Verlegt & Verschraubt', description: 'Über Verlegt & Verschraubt Handwerkerservice – Inhaber Justus Brosch aus Wilhelmshaven.' }),
+        breadcrumbNode([
+          { name: "Startseite", url: "https://verlegt-verschraubt.de/" },
+          { name: 'Über uns', url: "https://verlegt-verschraubt.de/ueber-uns" },
+        ]),
+      ]),
+    ],
   }),
 });
 

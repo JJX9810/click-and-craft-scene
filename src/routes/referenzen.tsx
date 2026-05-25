@@ -1,3 +1,4 @@
+import { breadcrumbNode, jsonLdScript, webPageNode } from "@/lib/schema";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { PageHero, Section, CtaBlock } from "@/components/site/PageShell";
@@ -19,6 +20,15 @@ export const Route = createFileRoute("/referenzen")({
       { name: "twitter:image", content: "https://verlegt-verschraubt.de/hero-flooring.png" },
     ],
     links: [{ rel: "canonical", href: "https://verlegt-verschraubt.de/referenzen" }],
+    scripts: [
+      jsonLdScript([
+        webPageNode({ url: "https://verlegt-verschraubt.de/referenzen", name: 'Referenzen – Verlegt & Verschraubt', description: 'Ausgewählte Projekte und Referenzen aus Wilhelmshaven und Umgebung.' }),
+        breadcrumbNode([
+          { name: "Startseite", url: "https://verlegt-verschraubt.de/" },
+          { name: 'Referenzen', url: "https://verlegt-verschraubt.de/referenzen" },
+        ]),
+      ]),
+    ],
   }),
 });
 

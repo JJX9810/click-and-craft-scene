@@ -5,6 +5,7 @@ import { ProjectCard } from "@/components/site/ProjectCard";
 import { projects, type ProjectCategory } from "@/data/projects";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Phone } from "lucide-react";
+import { breadcrumbNode, jsonLdScript, webPageNode } from "@/lib/schema";
 
 type Filter =
   | "Alle"
@@ -59,6 +60,19 @@ export const Route = createFileRoute("/showroom/")({
         { name: "twitter:image", content: ogImage },
       ],
       links: [{ rel: "canonical", href: "https://verlegt-verschraubt.de/showroom" }],
+      scripts: [
+        jsonLdScript([
+          webPageNode({
+            url: "https://verlegt-verschraubt.de/showroom",
+            name: ogTitle,
+            description: ogDesc,
+          }),
+          breadcrumbNode([
+            { name: "Startseite", url: "https://verlegt-verschraubt.de/" },
+            { name: "Showroom", url: "https://verlegt-verschraubt.de/showroom" },
+          ]),
+        ]),
+      ],
     };
   },
 });

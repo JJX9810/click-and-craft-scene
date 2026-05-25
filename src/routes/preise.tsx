@@ -1,3 +1,4 @@
+import { breadcrumbNode, jsonLdScript, webPageNode } from "@/lib/schema";
 import { createFileRoute } from "@tanstack/react-router";
 import { PageHero, Section, CtaBlock } from "@/components/site/PageShell";
 import { Kostenrechner } from "@/components/site/Kostenrechner";
@@ -18,6 +19,15 @@ export const Route = createFileRoute("/preise")({
       { name: "twitter:image", content: "https://verlegt-verschraubt.de/hero-flooring.png" },
     ],
     links: [{ rel: "canonical", href: "https://verlegt-verschraubt.de/preise" }],
+    scripts: [
+      jsonLdScript([
+        webPageNode({ url: "https://verlegt-verschraubt.de/preise", name: 'Kostenrechner – Verlegt & Verschraubt', description: 'Kostenloser Kostenrechner für Bodenverlegung, Küchenmontage und Entrümpelung in Wilhelmshaven – mit direkter WhatsApp-Anfrage.' }),
+        breadcrumbNode([
+          { name: "Startseite", url: "https://verlegt-verschraubt.de/" },
+          { name: 'Preise', url: "https://verlegt-verschraubt.de/preise" },
+        ]),
+      ]),
+    ],
   }),
 });
 

@@ -31,6 +31,16 @@ import { EinsatzgebietMap } from "@/components/site/EinsatzgebietMap";
 import { Kostenrechner } from "@/components/site/Kostenrechner";
 import { OnlinePresenceSection } from "@/components/site/OnlinePresenceSection";
 import { SawdustParticles } from "@/components/site/SawdustParticles";
+import {
+  HOME_WEBPAGE_ID,
+  breadcrumbNode,
+  faqPageNode,
+  jsonLdScript,
+  localBusinessNode,
+  organizationNode,
+  webPageNode,
+  websiteNode,
+} from "@/lib/schema";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -62,26 +72,22 @@ export const Route = createFileRoute("/")({
     ],
     links: [{ rel: "canonical", href: "https://verlegt-verschraubt.de/" }],
     scripts: [
-      {
-        type: "application/ld+json",
-        children: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "HomeAndConstructionBusiness",
-          name: "Verlegt & Verschraubt Handwerkerservice",
-          founder: "Justus Brosch",
-          telephone: "+49 163 4799286",
-          email: "justus.brosch@verlegt-verschraubt.de",
-          address: {
-            "@type": "PostalAddress",
-            streetAddress: "Weichselstraße 12",
-            postalCode: "26388",
-            addressLocality: "Wilhelmshaven",
-            addressCountry: "DE",
-          },
-          areaServed: ["Wilhelmshaven", "Schortens", "Sande", "Jever", "Varel", "Wangerland"],
-          slogan: "Z.O.Z. – Zuverlässig. Ordentlich. Zügig.",
+      jsonLdScript([
+        organizationNode,
+        localBusinessNode,
+        websiteNode,
+        webPageNode({
+          url: "https://verlegt-verschraubt.de/",
+          name: "Verlegt & Verschraubt – Handwerkerservice Wilhelmshaven",
+          description:
+            "Handwerkerservice Wilhelmshaven: Bodenverlegung, Küchenmontage und Entrümpelung. Z.O.Z. – zuverlässig, ordentlich, zügig.",
+          id: HOME_WEBPAGE_ID,
         }),
-      },
+        breadcrumbNode([
+          { name: "Startseite", url: "https://verlegt-verschraubt.de/" },
+        ]),
+        faqPageNode(faqs),
+      ]),
     ],
   }),
 });
