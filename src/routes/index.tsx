@@ -523,6 +523,24 @@ function Index() {
         </div>
       </section>
 
+      {/* INTERNE LINKS */}
+      <section className="border-t border-border/60 bg-background/40">
+        <div className="mx-auto max-w-7xl px-6 py-16">
+          <InternalLinks
+            title="Weiter im Überblick"
+            links={[
+              { to: "/bodenverlegung-wilhelmshaven", label: "Bodenverlegung in Wilhelmshaven ansehen" },
+              { to: "/kuechenmontage-in-wilhelmshaven", label: "Küchenmontage in Wilhelmshaven anfragen" },
+              { to: "/entruempelung-entsorgung-in-wilhelmshaven", label: "Kosten für Entrümpelung einschätzen" },
+              { to: "/preise", label: "Zum Kostenrechner" },
+              { to: "/referenzen", label: "Referenzen ansehen" },
+              { to: "/faq", label: "Antworten auf häufige Fragen" },
+              { to: "/kontakt", label: "Projekt mit Fotos anfragen" },
+            ]}
+          />
+        </div>
+      </section>
+
       {/* KONTAKT-CTA */}
       <section id="kontakt" className="relative border-t border-border/60">
         <div
