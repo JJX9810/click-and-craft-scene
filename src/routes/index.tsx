@@ -41,6 +41,7 @@ import {
   webPageNode,
   websiteNode,
 } from "@/lib/schema";
+import { QuickAnswer, FactBox, InternalLinks } from "@/components/site/InfoBlocks";
 
 export const Route = createFileRoute("/")({
   component: Index,
