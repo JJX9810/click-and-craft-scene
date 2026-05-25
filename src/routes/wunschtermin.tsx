@@ -43,6 +43,7 @@ export const Route = createFileRoute("/wunschtermin")({
 
 const PHONE_NUMBER = "491634799286";
 const PHONE_DISPLAY = "0163 4799286";
+const GOOGLE_CALENDAR_BOOKING_URL = "https://calendar.app.google/MbCnvoSqYjuLSAfY9";
 
 const input =
   "w-full rounded-md border border-border bg-background px-3 py-2.5 text-sm focus:border-accent focus:outline-none";
