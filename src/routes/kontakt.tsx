@@ -5,6 +5,7 @@ import { PageHero, Section } from "@/components/site/PageShell";
 import { Button } from "@/components/ui/button";
 import { Phone, Mail, MapPin, MessageCircle } from "lucide-react";
 import { EinsatzgebietMap } from "@/components/site/EinsatzgebietMap";
+import { QuickAnswer, FactBox, InternalLinks } from "@/components/site/InfoBlocks";
 
 export const Route = createFileRoute("/kontakt")({
   component: Page,
@@ -168,6 +169,17 @@ function Page() {
         intro="Je genauer Fotos, Maße und Beschreibung sind, desto besser die Einschätzung. Antwort an Werktagen in der Regel innerhalb von 24 Stunden."
         breadcrumbs={[{ label: "Kontakt" }]}
       />
+
+      <Section eyebrow="Kurzfassung" title="So erreichen Sie uns am besten">
+        <div className="grid gap-6 lg:grid-cols-2">
+          <QuickAnswer>
+            Anfragen können telefonisch, per E-Mail, Kontaktformular oder mit
+            Fotos gestellt werden. Für eine erste Einschätzung helfen Bilder,
+            Maße, Ort, Wunschzeitraum und eine kurze Beschreibung.
+          </QuickAnswer>
+          <FactBox />
+        </div>
+      </Section>
 
       <Section>
         <div className="grid gap-10 lg:grid-cols-[1.4fr_1fr]">
@@ -374,6 +386,19 @@ function Page() {
             </span>
           ))}
         </div>
+      </Section>
+
+      <Section eyebrow="Weiterlesen" title="Leistungen direkt ansehen">
+        <InternalLinks
+          links={[
+            { to: "/bodenverlegung-wilhelmshaven", label: "Bodenverlegung in Wilhelmshaven ansehen" },
+            { to: "/kuechenmontage-in-wilhelmshaven", label: "Küchenmontage in Wilhelmshaven anfragen" },
+            { to: "/entruempelung-entsorgung-in-wilhelmshaven", label: "Kosten für Entrümpelung einschätzen" },
+            { to: "/preise", label: "Zum Kostenrechner" },
+            { to: "/referenzen", label: "Referenzen ansehen" },
+            { to: "/faq", label: "Antworten auf häufige Fragen" },
+          ]}
+        />
       </Section>
     </>
   );

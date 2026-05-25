@@ -2,6 +2,7 @@ import { breadcrumbNode, jsonLdScript, webPageNode } from "@/lib/schema";
 import { createFileRoute } from "@tanstack/react-router";
 import { PageHero, Section, CtaBlock } from "@/components/site/PageShell";
 import { Kostenrechner } from "@/components/site/Kostenrechner";
+import { QuickAnswer, FactBox, InternalLinks } from "@/components/site/InfoBlocks";
 
 export const Route = createFileRoute("/preise")({
   component: Page,
@@ -41,7 +42,19 @@ function Page() {
         breadcrumbs={[{ label: "Kostenrechner" }]}
       />
 
-      <Section eyebrow="Hinweis" title="Unverbindliche Ersteinschätzung">
+      <Section eyebrow="Kurzfassung" title="Wie Preise zustande kommen">
+        <div className="grid gap-6 lg:grid-cols-2">
+          <QuickAnswer>
+            Der Preis hängt bei Verlegt &amp; Verschraubt vom Leistungsumfang,
+            Zustand vor Ort, Material, Fläche, Etage, Anfahrt und Dringlichkeit
+            ab. Der Kostenrechner liefert eine erste Orientierung und ersetzt
+            kein verbindliches Angebot.
+          </QuickAnswer>
+          <FactBox />
+        </div>
+      </Section>
+
+      <Section eyebrow="Hinweis" title="Unverbindliche Ersteinschätzung" bordered>
         <p className="max-w-3xl text-base leading-relaxed text-muted-foreground">
           Die Berechnung ist eine grobe Orientierung. Endgültige Preise hängen
           von Untergrund, Material, Zugang und Sonderfaktoren ab. Senden Sie
@@ -50,9 +63,23 @@ function Page() {
         </p>
       </Section>
 
+
       <Section eyebrow="Rechner" title="Projekt einschätzen lassen" bordered>
         <Kostenrechner />
       </Section>
+
+      <Section eyebrow="Weiterlesen" title="Passende Leistungen ansehen">
+        <InternalLinks
+          links={[
+            { to: "/bodenverlegung-wilhelmshaven", label: "Bodenverlegung in Wilhelmshaven ansehen" },
+            { to: "/kuechenmontage-in-wilhelmshaven", label: "Küchenmontage in Wilhelmshaven anfragen" },
+            { to: "/entruempelung-entsorgung-in-wilhelmshaven", label: "Kosten für Entrümpelung einschätzen" },
+            { to: "/kontakt", label: "Projekt mit Fotos anfragen" },
+          ]}
+        />
+      </Section>
+
+
 
       <CtaBlock
         title="Lieber direkt sprechen?"

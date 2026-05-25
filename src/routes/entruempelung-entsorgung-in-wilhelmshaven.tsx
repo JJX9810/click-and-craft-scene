@@ -7,6 +7,7 @@ import { ArrowRight } from "lucide-react";
 import {
   breadcrumbNode, faqPageNode, jsonLdScript, serviceNode, webPageNode,
 } from "@/lib/schema";
+import { QuickAnswer, FactBox, LimitsBox, InternalLinks } from "@/components/site/InfoBlocks";
 
 const EN_URL = "https://verlegt-verschraubt.de/entruempelung-entsorgung-in-wilhelmshaven";
 
@@ -75,7 +76,18 @@ function Page() {
         breadcrumbs={[{ label: "Leistungen" }, { label: "Entrümpelung & Entsorgung" }]}
       />
 
-      <Section eyebrow="Leistungen" title="Was wir räumen und entsorgen">
+      <Section eyebrow="Kurzfassung" title="Entrümpelung in Wilhelmshaven">
+        <div className="grid gap-6 lg:grid-cols-2">
+          <QuickAnswer>
+            Verlegt &amp; Verschraubt übernimmt Entrümpelung und Entsorgung in
+            Wilhelmshaven und Umgebung. Wohnungen, Keller, Dachböden, Möbel und
+            Sperrmüll werden planbar, diskret und besenrein geräumt.
+          </QuickAnswer>
+          <FactBox />
+        </div>
+      </Section>
+
+      <Section eyebrow="Leistungen" title="Was wir räumen und entsorgen" bordered>
         <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
           {types.map((s) => (
             <article key={s.t} className="rounded-2xl border border-border/70 bg-card/50 p-6 backdrop-blur">
@@ -124,6 +136,29 @@ function Page() {
           ))}
         </Accordion>
       </Section>
+
+      <Section eyebrow="Grenzen & nächste Schritte" title="Was vorab geklärt sein muss">
+        <div className="grid gap-6 lg:grid-cols-2">
+          <LimitsBox
+            title="Sonderfälle und Grenzen"
+            items={[
+              "Gefahrstoffe wie Asbest, Chemikalien oder Altöl müssen vorab geprüft werden.",
+              "Bei Sonderfällen (Brand- oder Wasserschäden, Schimmel) benötigen wir eine Einschätzung.",
+              "Keine gefährlichen Entsorgungen ohne fachliche Prüfung – wir binden bei Bedarf Fachbetriebe ein.",
+            ]}
+          />
+          <InternalLinks
+            links={[
+              { to: "/preise", label: "Kosten für Entrümpelung einschätzen" },
+              { to: "/referenzen", label: "Referenzen ansehen" },
+              { to: "/kontakt", label: "Räumung mit Fotos anfragen" },
+              { to: "/faq", label: "Antworten auf häufige Fragen" },
+            ]}
+          />
+        </div>
+      </Section>
+
+
 
       <CtaBlock
         title="Entrümpelung in Wilhelmshaven anfragen"

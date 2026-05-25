@@ -9,6 +9,7 @@ import { projects } from "@/data/projects";
 import {
   breadcrumbNode, faqPageNode, jsonLdScript, serviceNode, webPageNode,
 } from "@/lib/schema";
+import { QuickAnswer, FactBox, LimitsBox, InternalLinks } from "@/components/site/InfoBlocks";
 
 const KM_URL = "https://verlegt-verschraubt.de/kuechenmontage-in-wilhelmshaven";
 
@@ -79,7 +80,19 @@ function Page() {
         breadcrumbs={[{ label: "Leistungen" }, { label: "Küchenmontage" }]}
       />
 
-      <Section eyebrow="Leistungsumfang" title="Was wir bei der Küchenmontage übernehmen">
+      <Section eyebrow="Kurzfassung" title="Küchenmontage in Wilhelmshaven">
+        <div className="grid gap-6 lg:grid-cols-2">
+          <QuickAnswer>
+            Verlegt &amp; Verschraubt übernimmt Küchenmontage in Wilhelmshaven
+            und Umgebung. Dazu gehören Aufbau nach Umzug, Restmontage,
+            Küchenmodule, Arbeitsplatten sowie Spüle und Armatur an vorhandenen
+            Anschlüssen.
+          </QuickAnswer>
+          <FactBox />
+        </div>
+      </Section>
+
+      <Section eyebrow="Leistungsumfang" title="Was wir bei der Küchenmontage übernehmen" bordered>
         <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
           {scope.map((s) => (
             <article key={s.t} className="rounded-2xl border border-border/70 bg-card/50 p-6 backdrop-blur">
@@ -143,6 +156,31 @@ function Page() {
           </Link>
         </div>
       </Section>
+
+      <Section eyebrow="Grenzen & nächste Schritte" title="Klare Grenzen, klare Wege" bordered>
+        <div className="grid gap-6 lg:grid-cols-2">
+          <LimitsBox
+            title="Was wir bei der Küchenmontage nicht übernehmen"
+            items={[
+              "Keine Elektroinstallation.",
+              "Kein Starkstromanschluss.",
+              "Keine neuen Sanitärleitungen.",
+              "Spüle und Armatur nur an vorhandenen Anschlüssen und im Zusammenhang mit Küchenmontage.",
+            ]}
+            note="Für Elektro- und Sanitärarbeiten stimmen wir uns auf Wunsch mit Fachbetrieben ab."
+          />
+          <InternalLinks
+            links={[
+              { to: "/preise", label: "Kosten für Küchenmontage einschätzen" },
+              { to: "/referenzen", label: "Referenzen ansehen" },
+              { to: "/kontakt", label: "Küchenmontage mit Fotos anfragen" },
+              { to: "/faq", label: "Antworten auf häufige Fragen" },
+            ]}
+          />
+        </div>
+      </Section>
+
+
 
 
       <CtaBlock

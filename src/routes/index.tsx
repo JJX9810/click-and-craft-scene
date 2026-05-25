@@ -41,6 +41,7 @@ import {
   webPageNode,
   websiteNode,
 } from "@/lib/schema";
+import { QuickAnswer, FactBox, InternalLinks } from "@/components/site/InfoBlocks";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -259,6 +260,20 @@ function Index() {
               />
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* KURZANTWORT + FAKTEN */}
+      <section className="border-t border-border/60">
+        <div className="mx-auto grid max-w-7xl gap-6 px-6 py-16 lg:grid-cols-2">
+          <QuickAnswer>
+            Verlegt &amp; Verschraubt ist ein Handwerkerservice aus Wilhelmshaven
+            für Bodenverlegung, Küchenmontage sowie Entrümpelung und Entsorgung.
+            Das Unternehmen unterstützt Privatkunden in Wilhelmshaven und Umgebung
+            bei sauberen Innenarbeiten mit klarer Absprache, ordentlicher
+            Ausführung und zügiger Umsetzung.
+          </QuickAnswer>
+          <FactBox />
         </div>
       </section>
 
@@ -505,6 +520,24 @@ function Index() {
               Alle Fragen ansehen →
             </Link>
           </div>
+        </div>
+      </section>
+
+      {/* INTERNE LINKS */}
+      <section className="border-t border-border/60 bg-background/40">
+        <div className="mx-auto max-w-7xl px-6 py-16">
+          <InternalLinks
+            title="Weiter im Überblick"
+            links={[
+              { to: "/bodenverlegung-wilhelmshaven", label: "Bodenverlegung in Wilhelmshaven ansehen" },
+              { to: "/kuechenmontage-in-wilhelmshaven", label: "Küchenmontage in Wilhelmshaven anfragen" },
+              { to: "/entruempelung-entsorgung-in-wilhelmshaven", label: "Kosten für Entrümpelung einschätzen" },
+              { to: "/preise", label: "Zum Kostenrechner" },
+              { to: "/referenzen", label: "Referenzen ansehen" },
+              { to: "/faq", label: "Antworten auf häufige Fragen" },
+              { to: "/kontakt", label: "Projekt mit Fotos anfragen" },
+            ]}
+          />
         </div>
       </section>
 

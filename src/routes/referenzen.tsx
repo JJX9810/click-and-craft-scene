@@ -3,6 +3,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { PageHero, Section, CtaBlock } from "@/components/site/PageShell";
 import { Star, ArrowRight } from "lucide-react";
+import { InternalLinks } from "@/components/site/InfoBlocks";
 
 export const Route = createFileRoute("/referenzen")({
   component: Page,
@@ -118,6 +119,18 @@ function Page() {
         <p className="mt-6 text-xs text-muted-foreground">
           Hinweis: Bewertungen sind teilweise gekürzt und als Auszüge gekennzeichnet. Die jeweils volle Bewertung finden Sie auf der genannten Plattform.
         </p>
+      </Section>
+
+      <Section eyebrow="Weiterlesen" title="Passende Leistung anfragen">
+        <InternalLinks
+          links={[
+            { to: "/bodenverlegung-wilhelmshaven", label: "Bodenverlegung in Wilhelmshaven ansehen" },
+            { to: "/kuechenmontage-in-wilhelmshaven", label: "Küchenmontage in Wilhelmshaven anfragen" },
+            { to: "/entruempelung-entsorgung-in-wilhelmshaven", label: "Kosten für Entrümpelung einschätzen" },
+            { to: "/preise", label: "Zum Kostenrechner" },
+            { to: "/kontakt", label: "Projekt mit Fotos anfragen" },
+          ]}
+        />
       </Section>
 
       <CtaBlock

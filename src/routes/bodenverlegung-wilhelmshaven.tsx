@@ -9,6 +9,7 @@ import { projects } from "@/data/projects";
 import {
   breadcrumbNode, faqPageNode, jsonLdScript, serviceNode, webPageNode,
 } from "@/lib/schema";
+import { QuickAnswer, FactBox, LimitsBox, InternalLinks } from "@/components/site/InfoBlocks";
 
 const PAGE_URL = "https://verlegt-verschraubt.de/bodenverlegung-wilhelmshaven";
 
@@ -80,7 +81,19 @@ function Page() {
         breadcrumbs={[{ label: "Leistungen" }, { label: "Bodenverlegung" }]}
       />
 
-      <Section eyebrow="Kurzfassung" title="Was wir verlegen">
+      <Section eyebrow="Kurzfassung" title="Bodenverlegung in Wilhelmshaven">
+        <div className="grid gap-6 lg:grid-cols-2">
+          <QuickAnswer>
+            Verlegt &amp; Verschraubt übernimmt Bodenverlegung in Wilhelmshaven
+            und Umgebung. Dazu gehören Vinyl, Laminat, PVC, Teppich,
+            Untergrundprüfung, Zuschnitt, Verlegung und auf Wunsch
+            Sockelleisten.
+          </QuickAnswer>
+          <FactBox />
+        </div>
+      </Section>
+
+      <Section eyebrow="Kurzfassung" title="Was wir verlegen" bordered>
         <p className="max-w-3xl text-base leading-relaxed text-muted-foreground">
           Verlegt &amp; Verschraubt verlegt für Privatkunden in Wilhelmshaven und
           Umgebung verschiedene Bodenbeläge. Dazu gehören Untergrundprüfung,
@@ -171,6 +184,28 @@ function Page() {
             </AccordionItem>
           ))}
         </Accordion>
+      </Section>
+
+      <Section eyebrow="Grenzen & nächste Schritte" title="Was vorab zu klären ist">
+        <div className="grid gap-6 lg:grid-cols-2">
+          <LimitsBox
+            title="Voraussetzungen für ein gutes Ergebnis"
+            items={[
+              "Der Untergrund wird vorab geprüft (Ebenheit, Restfeuchte, Tragfähigkeit).",
+              "Bei starken Schäden oder Feuchtigkeit kann eine separate Vorbereitung nötig sein.",
+              "Wir machen keine unrealistischen Pauschalversprechen – die Einschätzung erfolgt nach Foto und Maßen.",
+            ]}
+            note="Sind Sie unsicher? Senden Sie Fotos vom Raum – wir geben eine ehrliche Einschätzung."
+          />
+          <InternalLinks
+            links={[
+              { to: "/preise", label: "Kosten für Bodenverlegung einschätzen" },
+              { to: "/referenzen", label: "Referenzen ansehen" },
+              { to: "/kontakt", label: "Projekt mit Fotos anfragen" },
+              { to: "/faq", label: "Antworten auf häufige Fragen" },
+            ]}
+          />
+        </div>
       </Section>
 
       <CtaBlock
