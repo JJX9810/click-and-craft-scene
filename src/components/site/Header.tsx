@@ -114,11 +114,15 @@ export function Header() {
           <Button
             asChild
             size="sm"
-            className="h-10 rounded-full bg-accent px-5 text-accent-foreground hover:bg-accent/90"
+            className="h-10 rounded-full bg-accent px-4 text-accent-foreground hover:bg-accent/90 sm:px-5"
           >
-            <a href="tel:+491634799286" className="gap-2">
+            <a
+              href="tel:+491634799286"
+              aria-label="Verlegt & Verschraubt anrufen: 0163 4799286"
+              className="gap-2"
+            >
               <Phone className="h-4 w-4" />
-              <span className="hidden sm:inline">Anrufen</span>
+              <span className="inline">Anrufen</span>
             </a>
           </Button>
           <button
