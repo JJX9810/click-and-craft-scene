@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as WunschterminRouteImport } from './routes/wunschtermin'
 import { Route as WirUnterstuetzenRouteImport } from './routes/wir-unterstuetzen'
 import { Route as WilhelmshavenRouteImport } from './routes/wilhelmshaven'
 import { Route as UeberUnsRouteImport } from './routes/ueber-uns'
@@ -36,6 +37,11 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ShowroomIndexRouteImport } from './routes/showroom.index'
 import { Route as ShowroomSlugRouteImport } from './routes/showroom.$slug'
 
+const WunschterminRoute = WunschterminRouteImport.update({
+  id: '/wunschtermin',
+  path: '/wunschtermin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const WirUnterstuetzenRoute = WirUnterstuetzenRouteImport.update({
   id: '/wir-unterstuetzen',
   path: '/wir-unterstuetzen',
@@ -201,6 +207,7 @@ export interface FileRoutesByFullPath {
   '/ueber-uns': typeof UeberUnsRoute
   '/wilhelmshaven': typeof WilhelmshavenRoute
   '/wir-unterstuetzen': typeof WirUnterstuetzenRoute
+  '/wunschtermin': typeof WunschterminRoute
   '/showroom/$slug': typeof ShowroomSlugRoute
   '/showroom/': typeof ShowroomIndexRoute
 }
@@ -229,6 +236,7 @@ export interface FileRoutesByTo {
   '/ueber-uns': typeof UeberUnsRoute
   '/wilhelmshaven': typeof WilhelmshavenRoute
   '/wir-unterstuetzen': typeof WirUnterstuetzenRoute
+  '/wunschtermin': typeof WunschterminRoute
   '/showroom/$slug': typeof ShowroomSlugRoute
   '/showroom': typeof ShowroomIndexRoute
 }
@@ -258,6 +266,7 @@ export interface FileRoutesById {
   '/ueber-uns': typeof UeberUnsRoute
   '/wilhelmshaven': typeof WilhelmshavenRoute
   '/wir-unterstuetzen': typeof WirUnterstuetzenRoute
+  '/wunschtermin': typeof WunschterminRoute
   '/showroom/$slug': typeof ShowroomSlugRoute
   '/showroom/': typeof ShowroomIndexRoute
 }
@@ -288,6 +297,7 @@ export interface FileRouteTypes {
     | '/ueber-uns'
     | '/wilhelmshaven'
     | '/wir-unterstuetzen'
+    | '/wunschtermin'
     | '/showroom/$slug'
     | '/showroom/'
   fileRoutesByTo: FileRoutesByTo
@@ -316,6 +326,7 @@ export interface FileRouteTypes {
     | '/ueber-uns'
     | '/wilhelmshaven'
     | '/wir-unterstuetzen'
+    | '/wunschtermin'
     | '/showroom/$slug'
     | '/showroom'
   id:
@@ -344,6 +355,7 @@ export interface FileRouteTypes {
     | '/ueber-uns'
     | '/wilhelmshaven'
     | '/wir-unterstuetzen'
+    | '/wunschtermin'
     | '/showroom/$slug'
     | '/showroom/'
   fileRoutesById: FileRoutesById
@@ -373,12 +385,20 @@ export interface RootRouteChildren {
   UeberUnsRoute: typeof UeberUnsRoute
   WilhelmshavenRoute: typeof WilhelmshavenRoute
   WirUnterstuetzenRoute: typeof WirUnterstuetzenRoute
+  WunschterminRoute: typeof WunschterminRoute
   ShowroomSlugRoute: typeof ShowroomSlugRoute
   ShowroomIndexRoute: typeof ShowroomIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/wunschtermin': {
+      id: '/wunschtermin'
+      path: '/wunschtermin'
+      fullPath: '/wunschtermin'
+      preLoaderRoute: typeof WunschterminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/wir-unterstuetzen': {
       id: '/wir-unterstuetzen'
       path: '/wir-unterstuetzen'
@@ -590,6 +610,7 @@ const rootRouteChildren: RootRouteChildren = {
   UeberUnsRoute: UeberUnsRoute,
   WilhelmshavenRoute: WilhelmshavenRoute,
   WirUnterstuetzenRoute: WirUnterstuetzenRoute,
+  WunschterminRoute: WunschterminRoute,
   ShowroomSlugRoute: ShowroomSlugRoute,
   ShowroomIndexRoute: ShowroomIndexRoute,
 }

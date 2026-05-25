@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { CalendarClock, MessageCircle, Calculator, Phone } from "lucide-react";
+import { CalendarClock, MessageCircle, Calculator } from "lucide-react";
 import { PageHero, Section, CtaBlock } from "@/components/site/PageShell";
 import { KalenderPlatzhalter } from "@/components/site/Kostenrechner";
 import { breadcrumbNode, jsonLdScript, webPageNode } from "@/lib/schema";
