@@ -4,10 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Phone, Mail, MapPin, MessageCircle, Camera, ArrowRight } from "lucide-react";
 import { EinsatzgebietMap } from "@/components/site/EinsatzgebietMap";
 
-const TEL = "+4916347992866";
+const TEL = "+491634799286";
 const TEL_DISPLAY = "0163 4799286";
 const MAIL = "justus.brosch@verlegt-verschraubt.de";
-const WA = "4916347992866";
+const WA = "491634799286";
 
 /**
  * Statisches Kontakt-Modul für den IONOS-Build.

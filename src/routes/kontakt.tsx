@@ -95,7 +95,7 @@ function Page() {
               <ul className="mt-5 space-y-4 text-sm">
                 <li className="flex items-center gap-3">
                   <Phone className="h-4 w-4 text-accent" />
-                  <a href="tel:+4916347992866" className="hover:text-accent">0163 4799286</a>
+                  <a href="tel:+491634799286" className="hover:text-accent">0163 4799286</a>
                 </li>
                 <li className="flex items-center gap-3">
                   <Mail className="h-4 w-4 text-accent" />
@@ -110,7 +110,7 @@ function Page() {
               </ul>
             </div>
             <a
-              href="https://wa.me/4916347992866"
+              href="https://wa.me/491634799286"
               target="_blank"
               rel="noreferrer"
               className="block rounded-2xl border border-border/70 bg-card/30 p-6 text-sm hover:border-accent/60"

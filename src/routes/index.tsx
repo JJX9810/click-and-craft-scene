@@ -206,7 +206,7 @@ function Index() {
                 variant="outline"
                 className="h-12 rounded-full border-border bg-transparent px-7 hover:bg-card"
               >
-                <a href="tel:+4916347992866">
+                <a href="tel:+491634799286">
                   <Phone className="mr-1 h-4 w-4" /> Direkt anrufen
                 </a>
               </Button>
@@ -526,7 +526,7 @@ function Index() {
                 variant="outline"
                 className="h-12 rounded-full border-border bg-transparent px-7 hover:bg-card"
               >
-                <a href="https://wa.me/4916347992866" target="_blank" rel="noreferrer">WhatsApp</a>
+                <a href="https://wa.me/491634799286" target="_blank" rel="noreferrer">WhatsApp</a>
               </Button>
             </div>
           </div>
@@ -539,7 +539,7 @@ function Index() {
                 <span className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background">
                   <Phone className="h-4 w-4 text-accent" />
                 </span>
-                <a href="tel:+4916347992866" className="hover:text-accent">0163 4799286</a>
+                <a href="tel:+491634799286" className="hover:text-accent">0163 4799286</a>
               </li>
               <li className="flex items-center gap-3">
                 <span className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background">

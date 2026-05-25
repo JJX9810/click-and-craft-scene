@@ -116,7 +116,7 @@ export function Header() {
             size="sm"
             className="h-10 rounded-full bg-accent px-5 text-accent-foreground hover:bg-accent/90"
           >
-            <a href="tel:+4916347992866" className="gap-2">
+            <a href="tel:+491634799286" className="gap-2">
               <Phone className="h-4 w-4" />
               <span className="hidden sm:inline">Anrufen</span>
             </a>
@@ -186,7 +186,7 @@ export function Header() {
                 asChild
                 className="h-11 rounded-full bg-accent text-accent-foreground hover:bg-accent/90"
               >
-                <a href="tel:+4916347992866">
+                <a href="tel:+491634799286">
                   <Phone className="mr-2 h-4 w-4" /> 0163 4799286
                 </a>
               </Button>
