@@ -6,6 +6,13 @@ import {
 import { ArrowRight } from "lucide-react";
 import { ProjectCard } from "@/components/site/ProjectCard";
 import { projects } from "@/data/projects";
+import {
+  breadcrumbNode, faqPageNode, jsonLdScript, serviceNode, webPageNode,
+} from "@/lib/schema";
+
+const KM_URL = "https://verlegt-verschraubt.de/kuechenmontage-in-wilhelmshaven";
+
+
 
 export const Route = createFileRoute("/kuechenmontage-in-wilhelmshaven")({
   component: Page,
