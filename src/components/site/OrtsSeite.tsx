@@ -3,6 +3,7 @@ import { PageHero, Section, Bullet, CtaBlock } from "@/components/site/PageShell
 import { Layers, Wrench, Trash2, ArrowRight } from "lucide-react";
 import { ProjectCard } from "@/components/site/ProjectCard";
 import { projects, type Project } from "@/data/projects";
+import { InternalLinks } from "@/components/site/InfoBlocks";
 
 export function OrtsSeite({
   ort,
@@ -41,7 +42,7 @@ export function OrtsSeite({
               <h3 className="mt-4 text-lg font-semibold">{s.title}</h3>
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{s.desc}</p>
               <Link to={s.to} className="mt-5 inline-flex items-center gap-1 text-xs font-medium uppercase tracking-[0.2em] text-accent hover:gap-2">
-                Details <ArrowRight className="h-3.5 w-3.5" />
+                {s.title} ansehen <ArrowRight className="h-3.5 w-3.5" />
               </Link>
             </article>
           ))}
@@ -90,6 +91,20 @@ export function OrtsSeite({
           ))}
         </ul>
       </Section>
+
+      <Section eyebrow="Weiterlesen" title="Passende Leistungen & nächste Schritte">
+        <InternalLinks
+          links={[
+            { to: "/bodenverlegung-wilhelmshaven", label: `Bodenverlegung in ${ort} ansehen` },
+            { to: "/kuechenmontage-in-wilhelmshaven", label: `Küchenmontage in ${ort} anfragen` },
+            { to: "/entruempelung-entsorgung-in-wilhelmshaven", label: `Kosten für Entrümpelung in ${ort} einschätzen` },
+            { to: "/preise", label: "Zum Kostenrechner" },
+            { to: "/referenzen", label: "Referenzen ansehen" },
+            { to: "/kontakt", label: "Projekt mit Fotos anfragen" },
+          ]}
+        />
+      </Section>
+
 
       <CtaBlock title={`Projekt in ${ort} anfragen`} text="Senden Sie Fotos und Maße – wir geben eine ehrliche Einschätzung." />
     </>
