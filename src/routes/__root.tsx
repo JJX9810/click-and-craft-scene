@@ -145,12 +145,24 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const isHome = pathname === "/";
 
   return (
     <QueryClientProvider client={queryClient}>
       <div className="bg-wood-grain relative flex min-h-screen flex-col overflow-x-hidden text-foreground">
+        {!isHome && (
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 z-0"
+            style={{
+              background:
+                "linear-gradient(to bottom, oklch(0.95 0.015 70 / 0.10), oklch(0.95 0.015 70 / 0.06) 60%, oklch(0.95 0.015 70 / 0.10))",
+            }}
+          />
+        )}
         <Header />
-        <main className="flex-1">
+        <main className="relative z-10 flex-1">
           <Outlet />
         </main>
         <Footer />
@@ -159,3 +171,4 @@ function RootComponent() {
     </QueryClientProvider>
   );
 }
+
