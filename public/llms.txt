@@ -25,5 +25,3 @@ Verlegt & Verschraubt ist ein lokaler Handwerkerservice aus Wilhelmshaven für P
 - [Handwerkerservice Varel](/handwerkerservice-varel): Handwerksleistungen in Varel und Umgebung.
 - [Handwerkerservice Wangerland](/handwerkerservice-wangerland): Handwerksleistungen in Wangerland und Umgebung.
 - [Handwerkerservice Wittmund](/handwerkerservice-wittmund): Handwerksleistungen in Wittmund und Umgebung.
-- [Impressum](/impressum): Rechtliche Angaben und Kontaktdaten.
-- [Datenschutz](/datenschutz): Datenschutzerklärung.
