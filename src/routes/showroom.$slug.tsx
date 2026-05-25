@@ -3,6 +3,7 @@ import { PageHero, Section, CtaBlock, Bullet } from "@/components/site/PageShell
 import { ProjectCard } from "@/components/site/ProjectCard";
 import { getProject, projects, type ProjectMedia } from "@/data/projects";
 import { ArrowRight, MapPin } from "lucide-react";
+import { breadcrumbNode, jsonLdScript, webPageNode } from "@/lib/schema";
 
 export const Route = createFileRoute("/showroom/$slug")({
   component: ProjectDetail,
@@ -14,18 +15,30 @@ export const Route = createFileRoute("/showroom/$slug")({
   head: ({ loaderData }) => {
     const p = loaderData?.project;
     if (!p) return {};
-    const imageObjects = p.media
-      .filter((m) => m.type === "image")
-      .map((m) => ({
-        "@type": "ImageObject",
-        contentUrl: m.src,
-        url: m.src,
-        name: m.alt,
-        caption: m.caption,
-        description: m.longDescription ?? m.caption ?? m.alt,
-      }));
     const url = `https://verlegt-verschraubt.de/showroom/${p.slug}`;
     const ogImage = "https://verlegt-verschraubt.de/hero-flooring.png";
+    const firstLocal = p.media.find(
+      (m) => m.type === "image" && typeof m.src === "string" && m.src.startsWith("/projects/"),
+    );
+    const nodes: unknown[] = [
+      webPageNode({ url, name: p.title, description: p.description }),
+      breadcrumbNode([
+        { name: "Startseite", url: "https://verlegt-verschraubt.de/" },
+        { name: "Showroom", url: "https://verlegt-verschraubt.de/showroom" },
+        { name: p.title, url },
+      ]),
+    ];
+    if (firstLocal) {
+      const absSrc = `https://verlegt-verschraubt.de${firstLocal.src}`;
+      nodes.push({
+        "@type": "ImageObject",
+        contentUrl: absSrc,
+        url: absSrc,
+        name: firstLocal.alt,
+        caption: firstLocal.caption,
+        description: firstLocal.longDescription ?? firstLocal.caption ?? firstLocal.alt,
+      });
+    }
     return {
       meta: [
         { title: `${p.title} – Showroom Verlegt & Verschraubt` },
@@ -40,20 +53,7 @@ export const Route = createFileRoute("/showroom/$slug")({
         { name: "twitter:image", content: ogImage },
       ],
       links: [{ rel: "canonical", href: url }],
-      scripts: [
-        {
-          type: "application/ld+json",
-          children: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "ImageGallery",
-            name: p.title,
-            description: p.description,
-            about: p.category,
-            contentLocation: { "@type": "Place", name: p.ort },
-            image: imageObjects,
-          }),
-        },
-      ],
+      scripts: [jsonLdScript(nodes)],
     };
   },
 });
