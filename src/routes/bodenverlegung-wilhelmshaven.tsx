@@ -9,6 +9,7 @@ import { projects } from "@/data/projects";
 import {
   breadcrumbNode, faqPageNode, jsonLdScript, serviceNode, webPageNode,
 } from "@/lib/schema";
+import { QuickAnswer, FactBox, LimitsBox, InternalLinks } from "@/components/site/InfoBlocks";
 
 const PAGE_URL = "https://verlegt-verschraubt.de/bodenverlegung-wilhelmshaven";
 
