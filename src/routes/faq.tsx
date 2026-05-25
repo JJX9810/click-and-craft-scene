@@ -6,6 +6,7 @@ import {
 import {
   breadcrumbNode, faqPageNode, jsonLdScript, webPageNode,
 } from "@/lib/schema";
+import { InternalLinks } from "@/components/site/InfoBlocks";
 
 const FAQ_URL = "https://verlegt-verschraubt.de/faq";
 
