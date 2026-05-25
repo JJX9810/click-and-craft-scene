@@ -1,112 +1,67 @@
-## Plan: Logo, Einsatzgebietskreis, erweiterter Kostenrechner mit WhatsApp-Lead
+## Sprint 2A – Plan
 
-### 1. Firmenlogo integrieren
-- Logo-URL: `https://verlegt-verschraubt.de/wp-content/uploads/2026/05/image003.png`
-- Lokal speichern unter `src/assets/logo.png` (für stabilen Build & Bundling).
-- `src/components/site/Header.tsx`: Wortmarke durch `<img src={logo}>` ersetzen, Höhe ~40–48px, daneben optional kompakter Schriftzug für SEO/Accessibility (`alt="Verlegt & Verschraubt Handwerkerservice"`).
-- `src/components/site/Footer.tsx`: Logo links oben einsetzen (heller Hintergrund-fähig, ggf. invertierte Variante via CSS-Filter falls nötig).
-- `src/routes/__root.tsx`: Favicon/og:image Verweis aktualisieren auf das Logo.
+Strikt nur zwei Themen: (1) Telefonnummer siteweit korrigieren, (2) Kontaktformular funktionsfähig machen. Keine SEO-/Meta-/Schema-/Routing-/Design-Änderungen. Keine neuen Seiten, keine Slug-Änderungen.
 
-### 2. Einsatzgebietskreis auf der Karte
-- Karte befindet sich aktuell vermutlich auf `kontakt.tsx` und/oder Ortsseiten als iframe (Google Maps embed). Da iframe-Embeds keine Overlays erlauben, Lösung:
-  - Auf der Kontakt-/Startseite die Karte um eine **visuelle Einsatzgebiets-Darstellung** ergänzen: Google Maps Static API ist nicht ohne Key, daher Alternative: Verwendung von **Leaflet + OpenStreetMap** (lib `react-leaflet` + `leaflet`) mit:
-    - Zentrum: Wilhelmshaven (53.5285° N, 8.1083° E)
-    - `<Circle>` Radius ~30 km in Markenfarbe (transparente Füllung, akzentuierter Rand)
-    - Marker auf Wilhelmshaven
-  - Unter der Karte Liste der Einsatzorte: Wilhelmshaven, Schortens, Sande, Jever, Varel, Wangerland, Hooksiel.
-- Komponente: `src/components/site/EinsatzgebietMap.tsx`, eingebunden in `kontakt.tsx`, `index.tsx` (Trust-Bereich) und Ortsseiten-Template.
+### 1. Telefonnummer korrigieren
 
-### 3. Bodenverlegung-Leistungen erweitern
-- `src/routes/bodenverlegung-wilhelmshaven.tsx`: Leistungs-Bullets ergänzen
-  - „Boden ausgleichen / Untergrundvorbereitung (Spachteln, Ausgleichsmasse)"
-  - „Verlegung von Designböden (Designvinyl, Klick-Vinyl, SPC, LVT)"
-- Auch in Header-Dropdown / interner Navigation und FAQ-Snippets entsprechend ergänzen.
+**Problem:** Die meisten `tel:`-Links nutzen `+4916347992866` (eine Ziffer zu viel). Korrekt ist `+491634799286`. Auch die JSON-LD-`telephone`-Felder und der WhatsApp-Link enthalten die falsche Nummer.
 
-### 4. Kostenrechner-Ausbau (`src/routes/preise.tsx`) → neuer Lead-Rechner
-Kompletter Rewrite des bestehenden Rechners zu einem **mehrstufigen, mobile-first Rechner mit WhatsApp-Lead**.
+**Konstanten zentral nicht erforderlich** – ich passe die Werte in-place an, ohne Refactor.
 
-#### Architektur
-- Neue Komponente: `src/components/site/Kostenrechner.tsx`
-- Eingebunden auf `/preise` und als Sektion auf `/` und `/kontakt`.
-- State-Management: lokaler `useState` mit Wizard-Schritten (1→2→3→4).
+Zu korrigierende Dateien (gefunden via ripgrep):
+- `src/components/site/Header.tsx` – 2× `tel:+4916347992866`
+- `src/components/site/Footer.tsx` – 1× `tel:`
+- `src/components/site/PageShell.tsx` – 2× `tel:`
+- `src/routes/index.tsx` – 2× `tel:`, 1× `wa.me/4916347992866`, 1× JSON-LD `telephone: "+49 163 4799286"` (Anzeige korrekt, Schema ggf. an `+491634799286` angleichen – nur Ziffernkorrektur, keine sonstige Schema-Änderung)
+- `src/routes/kontakt.tsx` – 1× `tel:`, 1× `wa.me/4916347992866`
+- `src/routes/impressum.tsx` – 1× `tel:`
+- `src/routes/showroom.index.tsx` – 1× `tel:`
+- `ionos-export/src/IonosKontakt.tsx` – `TEL = "+4916347992866"`, `WA = "4916347992866"`
+- `ionos-export/src/RootLayout.tsx` – `telephone: "+49 163 4799286"` (nur Ziffernkorrektur)
 
-#### Schritt 1 – Leistungsauswahl
-Große Karten-Buttons: Bodenverlegung · Küchenmontage · Entrümpelung · Sonstiges Projekt.
+**Nicht ändern:** `src/routes/partner.tsx` (`+4915757941442` ist eine andere, korrekte Partnernummer).
 
-#### Schritt 2 – Dynamische Felder
+**Mobile Sichtbarkeit:** Header-Anruf-Button zeigt aktuell auf Mobile nur das Icon. Ich ergänze sichtbaren Text/Nummer auf kleinen Viewports und ein `aria-label="Verlegt & Verschraubt anrufen"` am Icon-Button. Das Mobile-Menü zeigt die Nummer bereits sichtbar.
 
-**Bodenverlegung** (erweitert):
-- Bodenart (Vinyl, Laminat, Designboden, PVC, Teppich, Sonstiges)
-- Fläche m²
-- Altbelag entfernen (Ja/Nein)
-- Untergrundvorbereitung (Nein / Leicht ausgleichen / Vollflächig spachteln / Unsicher)
-- Sockelleisten (Keine / Mit Eckstücken / Auf Gehrung)
-- Türen kürzen (Ja/Nein/Unsicher)
-- Räume leer (Ja/Nein)
-- Ort / PLZ *
-- Wunschzeitraum
-- Zusatznachricht
+**Resultat überall:**
+- Sichtbar: `0163 4799286`
+- Link: `tel:+491634799286`
+- WhatsApp: `https://wa.me/491634799286`
 
-**Küchenmontage**:
-- Projektart (Neue / Gebrauchte / Umbau / Abbau)
-- Laufmeter
-- Arbeitsplatte zuschneiden, Geräte einbauen, Spüle montieren (Ja/Nein/Unsicher)
-- Demontage alte Küche (Ja/Nein)
-- Transport (Ja/Nein)
-- Ort/PLZ *, Wunschzeitraum, Zusatznachricht
+### 2. Kontaktformular funktionsfähig machen
 
-**Entrümpelung**:
-- Objektart, Menge (klein/mittel/groß/sehr groß), Etage, Aufzug, Entsorgung nötig, Ort/PLZ *, Wunschzeitraum, Zusatznachricht
+**Aktuell:** `src/routes/kontakt.tsx` macht nur `e.preventDefault(); setSent(true)` – keine echte Übertragung.
 
-**Sonstiges**: Freitextfeld + Ort/PLZ + Wunschzeitraum.
+**Backend-Check:** Es gibt kein konfiguriertes Lovable-Cloud-/Supabase-/Edge-Function-Setup für Mailversand. Ich erfinde keines. → **Priorität B: mailto-Fallback + WhatsApp + Anruf-Button.**
 
-#### Schritt 3 – Preisspanne
-Berechnungslogik (erweitert ggü. heute):
-- Boden: Basisrate × m² je Bodenart; Aufschläge für Altbelag, Untergrund (leicht/voll), Sockelleisten (Eckstücke günstiger als Gehrung), Türen kürzen.
-- Küche: bestehende Logik + Demontage- und Transportpauschalen.
-- Entrümpelung: Volumen-/Mengenklassen × Raumart, Etagenfaktor wenn kein Aufzug.
-- Sonstiges: keine Preisspanne, direkt Hinweis „individuelles Angebot".
-- Anzeige: „Ihre grobe Ersteinschätzung liegt bei ca. **X – Y €**" + Hinweis Unverbindlichkeit.
+**Umsetzung in `src/routes/kontakt.tsx`:**
 
-#### Schritt 4 – Lead-Box mit WhatsApp
-- Telefonnummer: `+49 163 4799286` → wa.me Link `491634799286`.
-- Nachricht via `encodeURIComponent`, leere Felder werden ausgelassen (Helper `appendIfSet`).
-- Buttons:
-  - Primär: „Jetzt per WhatsApp anfragen" (öffnet `wa.me/...?text=...` in neuem Tab → mobile = App, desktop = Web).
-  - Sekundär: „Angaben bearbeiten" (zurück zu Schritt 2).
-  - Tertiär: „Nachricht kopieren" (Clipboard API + Toast via vorhandenem `sonner`).
-  - Telefon-Button: `tel:+491634799286`.
-- DSGVO-Hinweis direkt unter den Buttons.
-- Trust-Chips: „Kostenlose Ersteinschätzung", „Schnelle Rückmeldung", „Bilder per WhatsApp ergänzbar", „Regional Wilhelmshaven & Umgebung".
+- State für alle Felder (Name, Telefon, E-Mail, Ort, Leistung, Zeitraum, Budget, Beschreibung, Datenschutz).
+- Validierung clientseitig:
+  - Name nicht leer (`trim`)
+  - Mindestens E-Mail ODER Telefon ausgefüllt
+  - E-Mail nur wenn vorhanden: enthält `@` und Punkt danach
+  - Telefon nur wenn vorhanden: nach Strip von Leerzeichen/`+`/`/`/`-`/`()` mindestens 5 Ziffern
+  - Datenschutz-Checkbox angehakt
+  - Fehler erscheinen direkt unter dem jeweiligen Feld (rotes Hint-Text), Submit blockiert
+- Leistung optional; wenn leer → im Body „Leistung: nicht ausgewählt / allgemeine Anfrage“
+- Nachrichten-Body-Funktion baut strukturierten Text laut Vorgabe (Name / Telefon / E-Mail / Ort / Leistung / Nachricht / Hinweis).
+- Hauptaktion: **zwei sichtbare Buttons** statt „Anfrage senden“:
+  - „Per E-Mail vorbereiten“ → öffnet `mailto:justus.brosch@verlegt-verschraubt.de?subject=<enc>&body=<enc>` via `window.location.href`. Subject + Body **getrennt** mit `encodeURIComponent` codiert.
+  - „Per WhatsApp vorbereiten“ → öffnet `https://wa.me/491634799286?text=<enc>` in neuem Tab.
+- Tertiär: „Direkt anrufen“ → `tel:+491634799286`.
+- Nach Klick wird je nach Aktion eine ehrliche Meldung gesetzt:
+  - mailto: „Ihr E-Mail-Programm wurde geöffnet. Bitte senden Sie die vorbereitete Anfrage ab.“
+  - WhatsApp: „Die WhatsApp-Nachricht wurde vorbereitet. Bitte senden Sie sie in WhatsApp ab.“
+  - Kein „Anfrage wurde gesendet“.
+- Datei-Upload-Feld bleibt visuell, aber mit Hinweistext „Fotos bitte per E-Mail/WhatsApp anhängen“ (mailto/WhatsApp können keine Dateien anhängen – ehrliche Kommunikation, keine Funktionsänderung der Seite).
+- Pflichtfeld-Sterne und `aria-invalid` setzen; Datenschutz-Hinweis bleibt sichtbar.
+- Keine Änderung an Meta/Hero/Map/Aside-Direktkontakt (außer Telefonnummer-Korrektur).
 
-#### Validierung
-- Pflichtfelder: Leistung, Ort/PLZ, Größe/Fläche/Menge.
-- Bei fehlendem Feld: freundliche Inline-Fehlermeldung, kein Schritt-Wechsel.
-- Eingaben mit `zod`-Schema validiert (max. Längen, PLZ Pattern `^\d{5}$` optional, Freitext ≤1000 Zeichen).
+**`ionos-export/src/IonosKontakt.tsx`:** Telefon-/WA-Konstanten korrigieren. Logik bleibt (ist bereits ein mailto/WA-Fallback).
 
-#### Design
-- Holz-/Beige-/Schwarz-Tokens aus `src/styles.css` wiederverwenden, Gold-Akzent über `--accent`.
-- Großzügige Touch-Targets (≥48px), klare Schritt-Indikator-Leiste oben.
-- Stepper: 1 Leistung · 2 Details · 3 Ergebnis.
+### Nicht im Scope
+Keine Änderungen an Schema-Typen, Canonicals, og:image, 404-Seite, OrtsSeiten, Slugs, Bildern oder Design. Keine neuen Routen. Keine neuen Pakete.
 
-### 5. Technische Details
-- Neue Dependencies: `leaflet`, `react-leaflet` (für Karte mit Radius). Alternativ ohne lib: SVG-Overlay über statisches OSM-Tile. → Plan: `react-leaflet` (bewährt, klein, edge-kompatibel).
-- Logo als `import logo from "@/assets/logo.png"` für Hash-basiertes Asset-Bundling.
-- Keine Server-Funktionen nötig (rein clientseitig, WhatsApp Deep-Link).
-
-### 6. Geänderte/neue Dateien
-- `src/assets/logo.png` (neu, von URL)
-- `src/components/site/Header.tsx` (Logo)
-- `src/components/site/Footer.tsx` (Logo)
-- `src/routes/__root.tsx` (Favicon/OG)
-- `src/components/site/EinsatzgebietMap.tsx` (neu)
-- `src/components/site/Kostenrechner.tsx` (neu, ersetzt alte Logik)
-- `src/routes/preise.tsx` (nutzt neuen Kostenrechner)
-- `src/routes/kontakt.tsx` (Karte + Rechner-Teaser)
-- `src/routes/index.tsx` (Karte + Rechner-Sektion)
-- `src/routes/bodenverlegung-wilhelmshaven.tsx` (Boden ausgleichen + Designböden)
-- `src/components/site/OrtsSeite.tsx` (optional: Karte)
-- `package.json` (leaflet, react-leaflet)
-
-### Offene Frage
-Soll die Karte (Einsatzgebietskreis) **nur** auf der Kontaktseite erscheinen oder zusätzlich auf der Startseite und allen Ortsseiten? Standardmäßig plane ich: Startseite (kompakt) + Kontaktseite (groß) + Ortsseiten (kompakt mit jeweiligem Ort als Marker).
+### Abschlussbericht
+Nach Implementierung liefere ich den geforderten 14-Punkte-Bericht.
