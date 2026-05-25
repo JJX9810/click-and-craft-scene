@@ -154,6 +154,10 @@ function Page() {
       return;
     }
     const body = buildMessage(form);
+    trackEvent("kontaktformular_submit", {
+      submit_mode: mode,
+      selected_service: form.leistung || "",
+    });
     if (mode === "mail") {
       const subject = encodeURIComponent("Projektanfrage über verlegt-verschraubt.de");
       const encBody = encodeURIComponent(body);
