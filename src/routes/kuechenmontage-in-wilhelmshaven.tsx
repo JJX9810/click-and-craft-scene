@@ -10,6 +10,7 @@ import {
   breadcrumbNode, faqPageNode, jsonLdScript, serviceNode, webPageNode,
 } from "@/lib/schema";
 import { QuickAnswer, FactBox, LimitsBox, InternalLinks } from "@/components/site/InfoBlocks";
+import { PreisrechnerCTA } from "@/components/site/PreisrechnerCTA";
 
 const KM_URL = "https://verlegt-verschraubt.de/kuechenmontage-in-wilhelmshaven";
 
