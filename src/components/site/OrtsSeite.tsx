@@ -92,6 +92,20 @@ export function OrtsSeite({
         </ul>
       </Section>
 
+      <Section eyebrow="Weiterlesen" title="Passende Leistungen & nächste Schritte">
+        <InternalLinks
+          links={[
+            { to: "/bodenverlegung-wilhelmshaven", label: `Bodenverlegung in ${ort} ansehen` },
+            { to: "/kuechenmontage-in-wilhelmshaven", label: `Küchenmontage in ${ort} anfragen` },
+            { to: "/entruempelung-entsorgung-in-wilhelmshaven", label: `Kosten für Entrümpelung in ${ort} einschätzen` },
+            { to: "/preise", label: "Zum Kostenrechner" },
+            { to: "/referenzen", label: "Referenzen ansehen" },
+            { to: "/kontakt", label: "Projekt mit Fotos anfragen" },
+          ]}
+        />
+      </Section>
+
+
       <CtaBlock title={`Projekt in ${ort} anfragen`} text="Senden Sie Fotos und Maße – wir geben eine ehrliche Einschätzung." />
     </>
   );
