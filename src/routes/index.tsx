@@ -31,6 +31,16 @@ import { EinsatzgebietMap } from "@/components/site/EinsatzgebietMap";
 import { Kostenrechner } from "@/components/site/Kostenrechner";
 import { OnlinePresenceSection } from "@/components/site/OnlinePresenceSection";
 import { SawdustParticles } from "@/components/site/SawdustParticles";
+import {
+  HOME_WEBPAGE_ID,
+  breadcrumbNode,
+  faqPageNode,
+  jsonLdScript,
+  localBusinessNode,
+  organizationNode,
+  webPageNode,
+  websiteNode,
+} from "@/lib/schema";
 
 export const Route = createFileRoute("/")({
   component: Index,
