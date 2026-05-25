@@ -25,6 +25,7 @@ export const Route = createFileRoute("/sitemap.xml")({
           { path: "/handwerkerservice-schortens", changefreq: "monthly", priority: "0.8" },
           { path: "/handwerkerservice-varel", changefreq: "monthly", priority: "0.8" },
           { path: "/handwerkerservice-wangerland", changefreq: "monthly", priority: "0.8" },
+          { path: "/handwerkerservice-wittmund", changefreq: "monthly", priority: "0.8" },
           { path: "/showroom", changefreq: "weekly", priority: "0.8" },
           { path: "/referenzen", changefreq: "monthly", priority: "0.7" },
           { path: "/preise", changefreq: "monthly", priority: "0.7" },

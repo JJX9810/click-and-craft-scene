@@ -131,7 +131,7 @@ const steps = [
   { icon: CheckCircle2, title: "Saubere Ausführung", desc: "Termin, Umsetzung, Übergabe – ordentlich und zügig." },
 ];
 
-const areas = ["Wilhelmshaven", "Schortens", "Sande", "Jever", "Varel", "Wangerland"];
+const areas = ["Wilhelmshaven", "Schortens", "Sande", "Jever", "Varel", "Wangerland", "Wittmund"];
 
 const reviews = [
   {

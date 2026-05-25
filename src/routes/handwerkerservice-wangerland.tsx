@@ -1,4 +1,4 @@
-import { breadcrumbNode, jsonLdScript, serviceNode, webPageNode } from "@/lib/schema";
+import { breadcrumbNode, faqPageNode, jsonLdScript, ortFaqItems, serviceNode, webPageNode } from "@/lib/schema";
 import { createFileRoute } from "@tanstack/react-router";
 import { OrtsSeite } from "@/components/site/OrtsSeite";
 
@@ -6,7 +6,7 @@ export const Route = createFileRoute("/handwerkerservice-wangerland")({
   component: () => (
     <OrtsSeite
       ort="Wangerland"
-      umgebung={["Hooksiel", "Wilhelmshaven", "Schortens", "Jever", "Varel"]}
+      umgebung={["Hooksiel", "Wilhelmshaven", "Schortens", "Jever", "Varel", "Wittmund"]}
       projectSlugs={["kuechenfolierung-hooksiel"]}
     />
   ),
@@ -32,12 +32,13 @@ export const Route = createFileRoute("/handwerkerservice-wangerland")({
           name: 'Handwerkerservice im Wangerland',
           description: 'Bodenverlegung, Küchenmontage und Entrümpelung im Wangerland und Umgebung. Lokal, sauber und planbar.',
           serviceType: "Handwerkerservice",
-          areaServed: ["Wangerland", "Hooksiel", "Wilhelmshaven", "Schortens", "Jever", "Varel", "Umgebung"],
+          areaServed: ["Wangerland", "Hooksiel", "Wilhelmshaven", "Schortens", "Jever", "Varel", "Wittmund", "Umgebung"],
         }),
         breadcrumbNode([
           { name: "Startseite", url: "https://verlegt-verschraubt.de/" },
           { name: 'Handwerkerservice im Wangerland', url: "https://verlegt-verschraubt.de/handwerkerservice-wangerland" },
         ]),
+        faqPageNode(ortFaqItems("Wangerland")),
       ]),
     ],
   }),

@@ -380,7 +380,7 @@ function Page() {
           <EinsatzgebietMap height="500px" zoom={9} />
         </div>
         <div className="mt-6 flex flex-wrap gap-2 text-sm text-muted-foreground">
-          {["Wilhelmshaven", "Schortens", "Sande", "Jever", "Varel", "Wangerland", "Hooksiel"].map((o) => (
+          {["Wilhelmshaven", "Schortens", "Sande", "Jever", "Varel", "Wangerland", "Wittmund", "Hooksiel"].map((o) => (
             <span key={o} className="inline-flex items-center gap-1.5 rounded-full border border-border/70 bg-card/40 px-3 py-1.5">
               <MapPin className="h-3.5 w-3.5 text-accent" /> {o}
             </span>

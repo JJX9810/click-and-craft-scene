@@ -1,9 +1,9 @@
-import { breadcrumbNode, jsonLdScript, serviceNode, webPageNode } from "@/lib/schema";
+import { breadcrumbNode, faqPageNode, jsonLdScript, ortFaqItems, serviceNode, webPageNode } from "@/lib/schema";
 import { createFileRoute } from "@tanstack/react-router";
 import { OrtsSeite } from "@/components/site/OrtsSeite";
 
 export const Route = createFileRoute("/handwerkerservice-jever")({
-  component: () => <OrtsSeite ort="Jever" umgebung={["Wilhelmshaven", "Schortens", "Sande", "Wangerland"]} />,
+  component: () => <OrtsSeite ort="Jever" umgebung={["Wilhelmshaven", "Schortens", "Sande", "Wangerland", "Wittmund"]} />,
   head: () => ({
     meta: [
       { title: "Handwerkerservice Jever – Boden, Küche, Entrümpelung" },
@@ -26,12 +26,13 @@ export const Route = createFileRoute("/handwerkerservice-jever")({
           name: 'Handwerkerservice in Jever',
           description: 'Bodenverlegung, Küchenmontage und Entrümpelung in Jever und Umgebung. Lokal, sauber und planbar.',
           serviceType: "Handwerkerservice",
-          areaServed: ["Jever", "Wilhelmshaven", "Schortens", "Sande", "Wangerland", "Umgebung"],
+          areaServed: ["Jever", "Wilhelmshaven", "Schortens", "Sande", "Wangerland", "Wittmund", "Umgebung"],
         }),
         breadcrumbNode([
           { name: "Startseite", url: "https://verlegt-verschraubt.de/" },
           { name: 'Handwerkerservice in Jever', url: "https://verlegt-verschraubt.de/handwerkerservice-jever" },
         ]),
+        faqPageNode(ortFaqItems("Jever")),
       ]),
     ],
   }),

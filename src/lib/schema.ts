@@ -139,6 +139,33 @@ export function faqPageNode(items: FaqItem[]) {
   };
 }
 
+// Standardisierte FAQ für Ortsseiten – wird sowohl sichtbar im DOM
+// als auch als FAQPage-Schema verwendet (Konsistenzpflicht).
+export function ortFaqItems(ort: string): FaqItem[] {
+  return [
+    {
+      q: `Bietet Verlegt & Verschraubt Handwerkerservice auch Arbeiten in ${ort} an?`,
+      a: `Ja. Wir sitzen in Wilhelmshaven und arbeiten regelmäßig in ${ort} und Umgebung – für Bodenverlegung, Küchenmontage sowie Entrümpelung und Entsorgung.`,
+    },
+    {
+      q: `Welche Leistungen sind in ${ort} möglich?`,
+      a: `Bodenverlegung (Vinyl, Laminat, PVC, Teppich), Küchenmontage (Aufbau nach Umzug, Restmontage, Arbeitsplatten) sowie Entrümpelung und Entsorgung von Wohnung, Keller oder Dachboden.`,
+    },
+    {
+      q: `Kann ich vorab Fotos für eine Einschätzung senden?`,
+      a: `Ja. Fotos und eine kurze Beschreibung per E-Mail oder über das Kontaktformular reichen für eine erste Einschätzung in den meisten Fällen aus.`,
+    },
+    {
+      q: `Ist eine Besichtigung vor Ort möglich?`,
+      a: `Ja, bei größeren Vorhaben in ${ort} stimmen wir gerne einen Vor-Ort-Termin ab, um Maße, Untergrund und Anschlüsse direkt zu prüfen.`,
+    },
+    {
+      q: `Wie frage ich ein Projekt in ${ort} am besten an?`,
+      a: `Senden Sie Ort, gewünschte Leistung, Maße bzw. Fläche, Fotos und einen Wunschzeitraum. Auf dieser Basis melden wir uns mit einer ehrlichen Einschätzung.`,
+    },
+  ];
+}
+
 export function graph(nodes: unknown[]) {
   return { "@context": "https://schema.org", "@graph": nodes };
 }

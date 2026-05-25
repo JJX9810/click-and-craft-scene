@@ -53,6 +53,7 @@ export function Footer() {
               <li><Link to="/handwerkerservice-jever" className="hover:text-foreground">Jever</Link></li>
               <li><Link to="/handwerkerservice-varel" className="hover:text-foreground">Varel</Link></li>
               <li><Link to="/handwerkerservice-wangerland" className="hover:text-foreground">Wangerland</Link></li>
+              <li><Link to="/handwerkerservice-wittmund" className="hover:text-foreground">Wittmund</Link></li>
             </ul>
           </div>
 
