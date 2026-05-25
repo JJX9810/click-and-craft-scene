@@ -15,6 +15,7 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ReferenzenRouteImport } from './routes/referenzen'
 import { Route as PreiseRouteImport } from './routes/preise'
 import { Route as PartnerRouteImport } from './routes/partner'
+import { Route as KuechenmontageWilhelmshavenRouteImport } from './routes/kuechenmontage-wilhelmshaven'
 import { Route as KuechenmontageInWilhelmshavenRouteImport } from './routes/kuechenmontage-in-wilhelmshaven'
 import { Route as KontaktRouteImport } from './routes/kontakt'
 import { Route as ImpressumRouteImport } from './routes/impressum'
@@ -62,6 +63,12 @@ const PartnerRoute = PartnerRouteImport.update({
   path: '/partner',
   getParentRoute: () => rootRouteImport,
 } as any)
+const KuechenmontageWilhelmshavenRoute =
+  KuechenmontageWilhelmshavenRouteImport.update({
+    id: '/kuechenmontage-wilhelmshaven',
+    path: '/kuechenmontage-wilhelmshaven',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const KuechenmontageInWilhelmshavenRoute =
   KuechenmontageInWilhelmshavenRouteImport.update({
     id: '/kuechenmontage-in-wilhelmshaven',
@@ -164,6 +171,7 @@ export interface FileRoutesByFullPath {
   '/impressum': typeof ImpressumRoute
   '/kontakt': typeof KontaktRoute
   '/kuechenmontage-in-wilhelmshaven': typeof KuechenmontageInWilhelmshavenRoute
+  '/kuechenmontage-wilhelmshaven': typeof KuechenmontageWilhelmshavenRoute
   '/partner': typeof PartnerRoute
   '/preise': typeof PreiseRoute
   '/referenzen': typeof ReferenzenRoute
@@ -188,6 +196,7 @@ export interface FileRoutesByTo {
   '/impressum': typeof ImpressumRoute
   '/kontakt': typeof KontaktRoute
   '/kuechenmontage-in-wilhelmshaven': typeof KuechenmontageInWilhelmshavenRoute
+  '/kuechenmontage-wilhelmshaven': typeof KuechenmontageWilhelmshavenRoute
   '/partner': typeof PartnerRoute
   '/preise': typeof PreiseRoute
   '/referenzen': typeof ReferenzenRoute
@@ -213,6 +222,7 @@ export interface FileRoutesById {
   '/impressum': typeof ImpressumRoute
   '/kontakt': typeof KontaktRoute
   '/kuechenmontage-in-wilhelmshaven': typeof KuechenmontageInWilhelmshavenRoute
+  '/kuechenmontage-wilhelmshaven': typeof KuechenmontageWilhelmshavenRoute
   '/partner': typeof PartnerRoute
   '/preise': typeof PreiseRoute
   '/referenzen': typeof ReferenzenRoute
@@ -239,6 +249,7 @@ export interface FileRouteTypes {
     | '/impressum'
     | '/kontakt'
     | '/kuechenmontage-in-wilhelmshaven'
+    | '/kuechenmontage-wilhelmshaven'
     | '/partner'
     | '/preise'
     | '/referenzen'
@@ -263,6 +274,7 @@ export interface FileRouteTypes {
     | '/impressum'
     | '/kontakt'
     | '/kuechenmontage-in-wilhelmshaven'
+    | '/kuechenmontage-wilhelmshaven'
     | '/partner'
     | '/preise'
     | '/referenzen'
@@ -287,6 +299,7 @@ export interface FileRouteTypes {
     | '/impressum'
     | '/kontakt'
     | '/kuechenmontage-in-wilhelmshaven'
+    | '/kuechenmontage-wilhelmshaven'
     | '/partner'
     | '/preise'
     | '/referenzen'
@@ -312,6 +325,7 @@ export interface RootRouteChildren {
   ImpressumRoute: typeof ImpressumRoute
   KontaktRoute: typeof KontaktRoute
   KuechenmontageInWilhelmshavenRoute: typeof KuechenmontageInWilhelmshavenRoute
+  KuechenmontageWilhelmshavenRoute: typeof KuechenmontageWilhelmshavenRoute
   PartnerRoute: typeof PartnerRoute
   PreiseRoute: typeof PreiseRoute
   ReferenzenRoute: typeof ReferenzenRoute
@@ -364,6 +378,13 @@ declare module '@tanstack/react-router' {
       path: '/partner'
       fullPath: '/partner'
       preLoaderRoute: typeof PartnerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/kuechenmontage-wilhelmshaven': {
+      id: '/kuechenmontage-wilhelmshaven'
+      path: '/kuechenmontage-wilhelmshaven'
+      fullPath: '/kuechenmontage-wilhelmshaven'
+      preLoaderRoute: typeof KuechenmontageWilhelmshavenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/kuechenmontage-in-wilhelmshaven': {
@@ -497,6 +518,7 @@ const rootRouteChildren: RootRouteChildren = {
   ImpressumRoute: ImpressumRoute,
   KontaktRoute: KontaktRoute,
   KuechenmontageInWilhelmshavenRoute: KuechenmontageInWilhelmshavenRoute,
+  KuechenmontageWilhelmshavenRoute: KuechenmontageWilhelmshavenRoute,
   PartnerRoute: PartnerRoute,
   PreiseRoute: PreiseRoute,
   ReferenzenRoute: ReferenzenRoute,
@@ -509,3 +531,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
