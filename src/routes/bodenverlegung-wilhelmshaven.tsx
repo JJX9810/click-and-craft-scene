@@ -94,6 +94,8 @@ function Page() {
         </div>
       </Section>
 
+      <PreisrechnerCTA variant="bodenverlegung" />
+
       <Section eyebrow="Kurzfassung" title="Was wir verlegen" bordered>
         <p className="max-w-3xl text-base leading-relaxed text-muted-foreground">
           Verlegt &amp; Verschraubt verlegt für Privatkunden in Wilhelmshaven und
