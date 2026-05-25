@@ -3,37 +3,11 @@ import { PageHero, Section, CtaBlock } from "@/components/site/PageShell";
 import {
   Accordion, AccordionContent, AccordionItem, AccordionTrigger,
 } from "@/components/ui/accordion";
+import {
+  breadcrumbNode, faqPageNode, jsonLdScript, webPageNode,
+} from "@/lib/schema";
 
-export const Route = createFileRoute("/faq")({
-  component: Page,
-  head: () => ({
-    meta: [
-      { title: "FAQ – Häufige Fragen | Verlegt & Verschraubt Wilhelmshaven" },
-      { name: "description", content: "Antworten zu Anfragen, Preisen, Bodenverlegung, Küchenmontage, Entrümpelung und Einsatzgebiet rund um Wilhelmshaven." },
-      { property: "og:title", content: "Häufige Fragen" },
-      { property: "og:description", content: "Antworten zu Leistungen, Preisen und Ablauf." },
-      { property: "og:url", content: "https://verlegt-verschraubt.de/faq" },
-      { property: "og:image", content: "https://verlegt-verschraubt.de/hero-flooring.png" },
-      { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Häufige Fragen" },
-      { name: "twitter:description", content: "Antworten zu Leistungen, Preisen und Ablauf." },
-      { name: "twitter:image", content: "https://verlegt-verschraubt.de/hero-flooring.png" },
-    ],
-    links: [{ rel: "canonical", href: "https://verlegt-verschraubt.de/faq" }],
-    scripts: [{
-      type: "application/ld+json",
-      children: JSON.stringify({
-        "@context": "https://schema.org",
-        "@type": "FAQPage",
-        mainEntity: faqGroups.flatMap(g => g.items).map(({ q, a }) => ({
-          "@type": "Question",
-          name: q,
-          acceptedAnswer: { "@type": "Answer", text: a },
-        })),
-      }),
-    }],
-  }),
-});
+const FAQ_URL = "https://verlegt-verschraubt.de/faq";
 
 const faqGroups = [
   {
@@ -72,6 +46,39 @@ const faqGroups = [
     ],
   },
 ];
+
+export const Route = createFileRoute("/faq")({
+  component: Page,
+  head: () => ({
+    meta: [
+      { title: "FAQ – Häufige Fragen | Verlegt & Verschraubt Wilhelmshaven" },
+      { name: "description", content: "Antworten zu Anfragen, Preisen, Bodenverlegung, Küchenmontage, Entrümpelung und Einsatzgebiet rund um Wilhelmshaven." },
+      { property: "og:title", content: "Häufige Fragen" },
+      { property: "og:description", content: "Antworten zu Leistungen, Preisen und Ablauf." },
+      { property: "og:url", content: FAQ_URL },
+      { property: "og:image", content: "https://verlegt-verschraubt.de/hero-flooring.png" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Häufige Fragen" },
+      { name: "twitter:description", content: "Antworten zu Leistungen, Preisen und Ablauf." },
+      { name: "twitter:image", content: "https://verlegt-verschraubt.de/hero-flooring.png" },
+    ],
+    links: [{ rel: "canonical", href: FAQ_URL }],
+    scripts: [
+      jsonLdScript([
+        webPageNode({
+          url: FAQ_URL,
+          name: "Häufige Fragen",
+          description: "Antworten zu Anfragen, Preisen, Bodenverlegung, Küchenmontage, Entrümpelung und Einsatzgebiet rund um Wilhelmshaven.",
+        }),
+        breadcrumbNode([
+          { name: "Startseite", url: "https://verlegt-verschraubt.de/" },
+          { name: "FAQ", url: FAQ_URL },
+        ]),
+        faqPageNode(faqGroups.flatMap(g => g.items)),
+      ]),
+    ],
+  }),
+});
 
 function Page() {
   return (
