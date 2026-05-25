@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WirUnterstuetzenRouteImport } from './routes/wir-unterstuetzen'
+import { Route as WilhelmshavenRouteImport } from './routes/wilhelmshaven'
 import { Route as UeberUnsRouteImport } from './routes/ueber-uns'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ReferenzenRouteImport } from './routes/referenzen'
@@ -37,6 +38,11 @@ import { Route as ShowroomSlugRouteImport } from './routes/showroom.$slug'
 const WirUnterstuetzenRoute = WirUnterstuetzenRouteImport.update({
   id: '/wir-unterstuetzen',
   path: '/wir-unterstuetzen',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WilhelmshavenRoute = WilhelmshavenRouteImport.update({
+  id: '/wilhelmshaven',
+  path: '/wilhelmshaven',
   getParentRoute: () => rootRouteImport,
 } as any)
 const UeberUnsRoute = UeberUnsRouteImport.update({
@@ -185,6 +191,7 @@ export interface FileRoutesByFullPath {
   '/referenzen': typeof ReferenzenRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/ueber-uns': typeof UeberUnsRoute
+  '/wilhelmshaven': typeof WilhelmshavenRoute
   '/wir-unterstuetzen': typeof WirUnterstuetzenRoute
   '/showroom/$slug': typeof ShowroomSlugRoute
   '/showroom/': typeof ShowroomIndexRoute
@@ -211,6 +218,7 @@ export interface FileRoutesByTo {
   '/referenzen': typeof ReferenzenRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/ueber-uns': typeof UeberUnsRoute
+  '/wilhelmshaven': typeof WilhelmshavenRoute
   '/wir-unterstuetzen': typeof WirUnterstuetzenRoute
   '/showroom/$slug': typeof ShowroomSlugRoute
   '/showroom': typeof ShowroomIndexRoute
@@ -238,6 +246,7 @@ export interface FileRoutesById {
   '/referenzen': typeof ReferenzenRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/ueber-uns': typeof UeberUnsRoute
+  '/wilhelmshaven': typeof WilhelmshavenRoute
   '/wir-unterstuetzen': typeof WirUnterstuetzenRoute
   '/showroom/$slug': typeof ShowroomSlugRoute
   '/showroom/': typeof ShowroomIndexRoute
@@ -266,6 +275,7 @@ export interface FileRouteTypes {
     | '/referenzen'
     | '/sitemap.xml'
     | '/ueber-uns'
+    | '/wilhelmshaven'
     | '/wir-unterstuetzen'
     | '/showroom/$slug'
     | '/showroom/'
@@ -292,6 +302,7 @@ export interface FileRouteTypes {
     | '/referenzen'
     | '/sitemap.xml'
     | '/ueber-uns'
+    | '/wilhelmshaven'
     | '/wir-unterstuetzen'
     | '/showroom/$slug'
     | '/showroom'
@@ -318,6 +329,7 @@ export interface FileRouteTypes {
     | '/referenzen'
     | '/sitemap.xml'
     | '/ueber-uns'
+    | '/wilhelmshaven'
     | '/wir-unterstuetzen'
     | '/showroom/$slug'
     | '/showroom/'
@@ -345,6 +357,7 @@ export interface RootRouteChildren {
   ReferenzenRoute: typeof ReferenzenRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   UeberUnsRoute: typeof UeberUnsRoute
+  WilhelmshavenRoute: typeof WilhelmshavenRoute
   WirUnterstuetzenRoute: typeof WirUnterstuetzenRoute
   ShowroomSlugRoute: typeof ShowroomSlugRoute
   ShowroomIndexRoute: typeof ShowroomIndexRoute
@@ -357,6 +370,13 @@ declare module '@tanstack/react-router' {
       path: '/wir-unterstuetzen'
       fullPath: '/wir-unterstuetzen'
       preLoaderRoute: typeof WirUnterstuetzenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/wilhelmshaven': {
+      id: '/wilhelmshaven'
+      path: '/wilhelmshaven'
+      fullPath: '/wilhelmshaven'
+      preLoaderRoute: typeof WilhelmshavenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/ueber-uns': {
@@ -546,6 +566,7 @@ const rootRouteChildren: RootRouteChildren = {
   ReferenzenRoute: ReferenzenRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   UeberUnsRoute: UeberUnsRoute,
+  WilhelmshavenRoute: WilhelmshavenRoute,
   WirUnterstuetzenRoute: WirUnterstuetzenRoute,
   ShowroomSlugRoute: ShowroomSlugRoute,
   ShowroomIndexRoute: ShowroomIndexRoute,
