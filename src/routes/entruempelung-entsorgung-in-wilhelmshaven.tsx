@@ -76,7 +76,18 @@ function Page() {
         breadcrumbs={[{ label: "Leistungen" }, { label: "Entrümpelung & Entsorgung" }]}
       />
 
-      <Section eyebrow="Leistungen" title="Was wir räumen und entsorgen">
+      <Section eyebrow="Kurzfassung" title="Entrümpelung in Wilhelmshaven">
+        <div className="grid gap-6 lg:grid-cols-2">
+          <QuickAnswer>
+            Verlegt &amp; Verschraubt übernimmt Entrümpelung und Entsorgung in
+            Wilhelmshaven und Umgebung. Wohnungen, Keller, Dachböden, Möbel und
+            Sperrmüll werden planbar, diskret und besenrein geräumt.
+          </QuickAnswer>
+          <FactBox />
+        </div>
+      </Section>
+
+      <Section eyebrow="Leistungen" title="Was wir räumen und entsorgen" bordered>
         <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
           {types.map((s) => (
             <article key={s.t} className="rounded-2xl border border-border/70 bg-card/50 p-6 backdrop-blur">
