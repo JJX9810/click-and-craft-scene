@@ -60,6 +60,19 @@ export const Route = createFileRoute("/showroom/")({
         { name: "twitter:image", content: ogImage },
       ],
       links: [{ rel: "canonical", href: "https://verlegt-verschraubt.de/showroom" }],
+      scripts: [
+        jsonLdScript([
+          webPageNode({
+            url: "https://verlegt-verschraubt.de/showroom",
+            name: ogTitle,
+            description: ogDesc,
+          }),
+          breadcrumbNode([
+            { name: "Startseite", url: "https://verlegt-verschraubt.de/" },
+            { name: "Showroom", url: "https://verlegt-verschraubt.de/showroom" },
+          ]),
+        ]),
+      ],
     };
   },
 });
