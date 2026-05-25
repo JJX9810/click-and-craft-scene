@@ -115,6 +115,7 @@ const initial: State = {
 
 const PHONE_NUMBER = "491634799286";
 const PHONE_DISPLAY = "0163 4799286";
+const GOOGLE_CALENDAR_BOOKING_URL = "https://calendar.app.google/MbCnvoSqYjuLSAfY9";
 
 const services: { key: Service; label: string; desc: string; icon: any }[] = [
   { key: "boden", label: "Bodenverlegung", desc: "Laminat, Vinyl, PVC, Teppich, Linoleum", icon: Layers },
