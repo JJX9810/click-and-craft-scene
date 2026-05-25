@@ -222,22 +222,33 @@ function Index() {
                   <Phone className="mr-1 h-4 w-4" /> Direkt anrufen
                 </a>
               </Button>
+              <Button
+                asChild
+                size="lg"
+                variant="outline"
+                className="h-12 rounded-full border-border bg-transparent px-7 hover:bg-card"
+              >
+                <Link to="/preise">Kosten einschätzen</Link>
+              </Button>
             </div>
 
-            <dl className="mt-12 grid max-w-md grid-cols-3 gap-6 border-t border-border/70 pt-8">
-              <div>
-                <dt className="text-2xl font-semibold">Lokal</dt>
-                <dd className="mt-1 text-[11px] uppercase tracking-[0.2em] text-muted-foreground">Wilhelmshaven</dd>
-              </div>
-              <div>
-                <dt className="text-2xl font-semibold">Direkt</dt>
-                <dd className="mt-1 text-[11px] uppercase tracking-[0.2em] text-muted-foreground">Inhaber-Kontakt</dd>
-              </div>
-              <div>
-                <dt className="text-2xl font-semibold">Sauber</dt>
-                <dd className="mt-1 text-[11px] uppercase tracking-[0.2em] text-muted-foreground">Übergabe</dd>
-              </div>
-            </dl>
+            <ul className="mt-10 flex flex-wrap gap-2 border-t border-border/70 pt-6">
+              {[
+                "Lokal aus Wilhelmshaven",
+                "Direkter Inhaber-Kontakt",
+                "Klare Absprachen",
+                "Saubere Übergabe",
+                "Z.O.Z. – zuverlässig, ordentlich, zügig",
+              ].map((t) => (
+                <li
+                  key={t}
+                  className="inline-flex items-center rounded-full border border-border/70 bg-card/50 px-3 py-1.5 text-xs text-muted-foreground backdrop-blur"
+                >
+                  <span className="mr-2 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
+                  {t}
+                </li>
+              ))}
+            </ul>
           </div>
 
           <div className="relative">
