@@ -433,6 +433,15 @@ function buildWaMessage(s: State, b: Breakdown | null): string {
 
   lines.push("");
   lines.push("Die Berechnung ist eine unverbindliche Ersteinschätzung. Der endgültige Preis wird nach Prüfung bestätigt.");
+
+  // Attribution / Quelle anhängen
+  const attrLines = buildAttributionLines();
+  if (attrLines.length > 0) {
+    lines.push("");
+    lines.push(...attrLines);
+  }
+
+  lines.push("");
   lines.push("Viele Grüße");
   return lines.join("\n");
 }
