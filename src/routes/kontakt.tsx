@@ -67,8 +67,8 @@ function validate(f: FormState): Errors {
   }
   if (hasPhone) {
     const digits = f.phone.replace(/[\s+/()\-]/g, "");
-    if (!/^\d+$/.test(digits) || digits.length < 5) {
-      e.phone = "Bitte eine gültige Telefonnummer angeben.";
+    if (!/^\d+$/.test(digits) || digits.length < 6) {
+      e.phone = "Bitte eine gültige Telefonnummer angeben (mindestens 6 Ziffern).";
     }
   }
   if (!f.datenschutz) e.datenschutz = "Bitte die Datenschutzerklärung bestätigen.";
@@ -245,9 +245,7 @@ function Page() {
                 />
               </Field>
               <div className="sm:col-span-2 rounded-md border border-border/60 bg-background/40 px-3 py-2 text-xs text-muted-foreground">
-                Fotos bitte direkt per E-Mail an{" "}
-                <a href={`mailto:${MAIL}`} className="text-accent hover:underline">{MAIL}</a>{" "}
-                oder per WhatsApp anhängen – das Formular kann keine Dateien mitsenden.
+                Fotos können Sie im nächsten Schritt per E-Mail oder WhatsApp anhängen.
               </div>
               {errors.kontakt && (
                 <p className="sm:col-span-2 text-xs text-destructive">{errors.kontakt}</p>
