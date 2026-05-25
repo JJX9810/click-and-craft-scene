@@ -15,14 +15,34 @@ export const Route = createFileRoute("/kuechenmontage-in-wilhelmshaven")({
       { name: "description", content: "Küchenmontage in Wilhelmshaven & Umgebung: Aufbau nach Umzug, Restmontage, Arbeitsplatten, Spüle und Armatur. Saubere Ausführung von Verlegt & Verschraubt." },
       { property: "og:title", content: "Küchenmontage in Wilhelmshaven & Umgebung" },
       { property: "og:description", content: "Aufbau, Restmontage und Anpassung Ihrer Küche – sauber und zuverlässig." },
-      { property: "og:url", content: "https://verlegt-verschraubt.de/kuechenmontage-in-wilhelmshaven" },
+      { property: "og:url", content: KM_URL },
       { property: "og:image", content: "https://verlegt-verschraubt.de/projects/kueche-wilhelmshaven-01.png" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Küchenmontage in Wilhelmshaven & Umgebung" },
       { name: "twitter:description", content: "Aufbau, Restmontage und Anpassung Ihrer Küche – sauber und zuverlässig." },
       { name: "twitter:image", content: "https://verlegt-verschraubt.de/projects/kueche-wilhelmshaven-01.png" },
     ],
-    links: [{ rel: "canonical", href: "https://verlegt-verschraubt.de/kuechenmontage-in-wilhelmshaven" }],
+    links: [{ rel: "canonical", href: KM_URL }],
+    scripts: [
+      jsonLdScript([
+        webPageNode({
+          url: KM_URL,
+          name: "Küchenmontage in Wilhelmshaven & Umgebung",
+          description: "Aufbau nach Umzug, Restmontage, neue Module, Arbeitsplatten, Spüle und Armatur sowie saubere Abschlüsse mit Sockel, Lichtleisten und Silikon.",
+        }),
+        serviceNode({
+          url: KM_URL,
+          name: "Küchenmontage in Wilhelmshaven",
+          description: "Küchenaufbau, Restmontage und Anpassung – von der Front über die Arbeitsplatte bis zur Spüle und Armatur. Wasseranschluss an bestehende Eckventile.",
+          serviceType: "Küchenmontage",
+        }),
+        breadcrumbNode([
+          { name: "Startseite", url: "https://verlegt-verschraubt.de/" },
+          { name: "Küchenmontage", url: KM_URL },
+        ]),
+        faqPageNode(faqs),
+      ]),
+    ],
   }),
 });
 
