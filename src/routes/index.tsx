@@ -372,10 +372,10 @@ function Index() {
                     to={s.to}
                     className="inline-flex items-center gap-1 text-xs font-medium uppercase tracking-[0.2em] text-accent hover:gap-2"
                   >
-                    Details <ArrowRight className="h-3.5 w-3.5" />
+                    {s.title} in Wilhelmshaven ansehen <ArrowRight className="h-3.5 w-3.5" />
                   </Link>
                   <Link to="/kontakt" className="text-xs uppercase tracking-[0.2em] text-muted-foreground hover:text-foreground">
-                    Anfragen
+                    Mit Fotos anfragen
                   </Link>
                 </div>
               </article>
