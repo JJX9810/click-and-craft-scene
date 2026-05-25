@@ -202,6 +202,12 @@ function Page() {
             noValidate
             className="rounded-2xl border border-border/70 bg-card/50 p-6 backdrop-blur sm:p-8"
           >
+            {/* Versteckte Attribution-Felder. Werden bei Formularabsendung
+                über buildMessage() automatisch in die Nachricht eingebettet
+                und stehen zusätzlich für serverseitige Formularsysteme bereit. */}
+            {Object.entries(getAttributionFields()).map(([name, value]) => (
+              <input key={name} type="hidden" name={name} value={value} readOnly />
+            ))}
             <div className="grid gap-5 sm:grid-cols-2">
               <Field label="Name" required error={errors.name}>
                 <input
