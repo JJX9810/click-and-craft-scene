@@ -765,7 +765,7 @@ function BodenForm({ s, upd }: { s: State; upd: <K extends keyof State>(k: K, v:
           onChange={(v) => upd("bodenartKey", v || "vinyl_schwimmend")}
           options={BODEN_VARIANTEN.map((b) => ({
             value: b.key,
-            label: b.price === null ? `${b.label} (auf Anfrage)` : `${b.label} · ${b.price.toFixed(2).replace(".", ",")} €/m²`,
+            label: b.price === null ? `${b.label} (auf Anfrage)` : b.label,
           }))}
         />
       </Field>
@@ -776,7 +776,7 @@ function BodenForm({ s, upd }: { s: State; upd: <K extends keyof State>(k: K, v:
         <Field label="Sockelleisten in lfm (laufende Meter)">
           <input type="number" min={0} value={s.sockelLfm} onChange={(e) => upd("sockelLfm", e.target.value)} className={input} placeholder="z. B. 40" />
           <p className="mt-1 text-xs text-muted-foreground">
-            Sockelleisten montieren ohne Acrylfuge: 5,00 € pro laufendem Meter. Acrylfuge / Versiegelung nicht enthalten – auf Wunsch separat kalkuliert.
+            Sockelleisten ohne Acrylfuge werden in der Einschätzung berücksichtigt. Acrylfuge / Versiegelung separat nach Aufwand.
           </p>
         </Field>
       </Grid2>
@@ -786,13 +786,13 @@ function BodenForm({ s, upd }: { s: State; upd: <K extends keyof State>(k: K, v:
           onChange={(v) => upd("altEntfernen", v as State["altEntfernen"])}
           options={[
             { value: "Nein", label: "Nein" },
-            { value: "schwimmend", label: "Schwimmend verlegt (4,00 €/m²)" },
-            { value: "verklebt", label: "Verklebt (auf Anfrage)" },
+            { value: "schwimmend", label: "Schwimmend verlegt" },
+            { value: "verklebt", label: "Verklebt (nach Besichtigung)" },
           ]}
         />
       </Field>
       <div className="rounded-md border border-border/60 bg-background/40 p-3 text-xs text-muted-foreground">
-        <p className="font-medium text-foreground">Inklusive im Preis:</p>
+        <p className="font-medium text-foreground">In der Einschätzung berücksichtigt:</p>
         <ul className="mt-1 list-disc pl-4">
           <li>Baustelleneinrichtung</li>
           <li>Alten Boden entsorgen</li>
