@@ -1,43 +1,81 @@
-## Prüfungsergebnisse
+## Plan: Google-Kalender-Verknüpfung aktivieren
 
-**1. Großbuchstaben-URLs (`/Kontakt`, `/Preise`, `/Referenzen`)**
-Grep über `src/`, `public/`, `ionos-export/` → **keine Treffer**. Alle Links sind bereits kleingeschrieben. Keine Korrektur nötig.
+### Ziel
+Den bereitgestellten Google-Kalender-Buchungslink (`https://calendar.app.google/MbCnvoSqYjuLSAfY9`) in den Kostenrechner und auf die /wunschtermin-Seite einbinden. Termin bleibt unverbindliche Anfrage. Keine Preisänderungen, keine öffentlichen Einzelpreise.
 
-**2. `prefers-reduced-motion`**
-Bereits in `src/styles.css` (Zeilen 214–221) korrekt implementiert:
-```css
-@media (prefers-reduced-motion: reduce) {
-  .animate-hero-float, .animate-marquee,
-  .animate-aurora-shift, .animate-shimmer,
-  .animate-fade-up { animation: none; }
-  .tile-shader::after { animation: none; }
-}
+---
+
+### Geänderte Dateien
+
+1. **`src/components/site/Kostenrechner.tsx`**
+2. **`src/routes/wunschtermin.tsx`**
+
+---
+
+### Änderung 1 — Zentrale Variable
+
+In `src/components/site/Kostenrechner.tsx` am Dateianfang ergänzen:
+```ts
+const GOOGLE_CALENDAR_BOOKING_URL = "https://calendar.app.google/MbCnvoSqYjuLSAfY9";
 ```
-Hero-Aurora wird automatisch deaktiviert. Keine Änderung nötig.
-
-**3. www → non-www (302)**
-Hosting-/Domain-Aufgabe (Cloudflare/Lovable-Custom-Domain). Im Code nicht lösbar. Bleibt offen.
 
 ---
 
-## Geplante Mini-Änderungen
+### Änderung 2 — `KalenderPlatzhalter` überarbeiten (Kostenrechner)
 
-### Änderung A — `public/llms.txt`
-Zwei Zeilen entfernen (rechtliche Pflichtseiten, keine AEO-Zielseiten):
-- `- [Impressum](/impressum): …`
-- `- [Datenschutz](/datenschutz): …`
+Die `KalenderPlatzhalter`-Komponente (exportiert, wird auch von /wunschtermin importiert) ersetzen durch einen funktionalen Block mit Button:
 
-Beide Seiten bleiben normal erreichbar; keine noindex-/Sitemap-Änderung.
+- **Button-Text:** „Verfügbarkeit prüfen“
+- **Link:** `GOOGLE_CALENDAR_BOOKING_URL`
+- **Öffnung:** `target="_blank" rel="noopener noreferrer"`
+- **Hinweis unter Button:** „Der Kalender dient zur unverbindlichen Terminanfrage. Der endgültige Termin wird nach Prüfung von Aufwand, Einsatzort, Materialverfügbarkeit und bestehender Planung bestätigt.“
+- **Datenschutz-Hinweis bleibt:** Keine Kundennamen, Adressen oder Auftragsdetails im Kalender sichtbar.
 
-### Änderung B — `src/routes/sitemap[.]xml.ts`
-Einheitliches `<lastmod>` pro URL ergänzen, basierend auf einem einzigen Build-Konstanten-Datum (kein künstlich rotierendes Datum). Vorgehen:
-- Konstante `const LAST_MOD = "2026-05-25";` (heutiges Build-Datum) am Dateianfang.
-- Im URL-Block direkt nach `<loc>` ein `<lastmod>${LAST_MOD}</lastmod>` einfügen.
-- Gleicher Wert für alle Einträge → ehrliche Aussage „Site zuletzt zum Build-Datum aktualisiert".
-
-Keine weiteren Änderungen an Prioritäten, Pfaden oder Struktur.
+Da `KalenderPlatzhalter` von `/wunschtermin.tsx` importiert wird, muss die Komponente dort ebenfalls korrekt rendern.
 
 ---
 
-## Bestätigung Out-of-Scope
-Keine Slug-Änderungen, keine Routen, keine Meta-/Canonical-/OG-/Schema-Änderungen, keine Header/Footer/Kontaktformular-Änderungen, keine Design-System-Änderung, keine neuen Libraries.
+### Änderung 3 — Kostenrechner Step 3 (Ergebnis)
+
+Die `<KalenderPlatzhalter />`-Einbindung in Step 3 (ca. Zeile 617) bleibt bestehen – die überarbeitete Komponente rendert dort automatisch den neuen Button.
+
+---
+
+### Änderung 4 — Kostenrechner `TerminBlock` (Step 2)
+
+Der bestehende `TerminBlock` mit Wunschdatum, Wunschzeitraum, Fertigstellung, Dringlichkeit und Hinweise bleibt unverändert. Keine Änderung.
+
+---
+
+### Änderung 5 — `/wunschtermin.tsx` anpassen
+
+**Section „Verfügbarkeit / Kalender“ überarbeiten:**
+
+- Titel bleibt oder wird auf „Kalender“ gesetzt.
+- Text: „Prüfen Sie verfügbare Zeiträume und senden Sie uns Ihren bevorzugten Termin. Der Termin wird erst nach Rückbestätigung verbindlich.“
+- Button: „Wunschtermin im Kalender auswählen“ → `GOOGLE_CALENDAR_BOOKING_URL`, `target="_blank" rel="noopener noreferrer"`
+- Hinweis darunter: Unverbindlichkeit + Datenschutz (keine Kundendaten sichtbar).
+- Import `Calendar` icon von lucide-react ergänzen falls nötig.
+
+Die WhatsApp-Anfrage (Formular, Button, Vorschau) bleibt vollständig erhalten.
+
+---
+
+### Was NICHT geändert wird
+
+- Keine Preislogik-Änderungen
+- Keine öffentlichen Einzelpreise sichtbar machen
+- Keine API-Schlüssel im Frontend
+- Keine verbindliche Online-Buchung
+- TerminBlock-Struktur, WhatsApp-Übergabe, Stepper, Formularfelder, Schema, Footer, Header, Routen
+
+---
+
+### Ergebnis-Check nach Umsetzung
+
+- `GOOGLE_CALENDAR_BOOKING_URL` als Konstante gesetzt
+- Button „Verfügbarkeit prüfen“ in überarbeitetem `KalenderPlatzhalter`
+- Button „Wunschtermin im Kalender auswählen“ auf /wunschtermin
+- Überall Unverbindlichkeit klargestellt
+- Keine Preise wieder öffentlich
+- Keine API-Zugangsdaten im Frontend
