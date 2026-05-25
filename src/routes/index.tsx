@@ -263,6 +263,20 @@ function Index() {
         </div>
       </section>
 
+      {/* KURZANTWORT + FAKTEN */}
+      <section className="border-t border-border/60">
+        <div className="mx-auto grid max-w-7xl gap-6 px-6 py-16 lg:grid-cols-2">
+          <QuickAnswer>
+            Verlegt &amp; Verschraubt ist ein Handwerkerservice aus Wilhelmshaven
+            für Bodenverlegung, Küchenmontage sowie Entrümpelung und Entsorgung.
+            Das Unternehmen unterstützt Privatkunden in Wilhelmshaven und Umgebung
+            bei sauberen Innenarbeiten mit klarer Absprache, ordentlicher
+            Ausführung und zügiger Umsetzung.
+          </QuickAnswer>
+          <FactBox />
+        </div>
+      </section>
+
       {/* TRUST / BEWERTUNGEN */}
       <section className="border-y border-border/60 bg-background/40">
         <div className="mx-auto max-w-7xl px-6 py-16">
