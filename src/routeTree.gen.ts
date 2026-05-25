@@ -10,11 +10,13 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WirUnterstuetzenRouteImport } from './routes/wir-unterstuetzen'
+import { Route as WilhelmshavenRouteImport } from './routes/wilhelmshaven'
 import { Route as UeberUnsRouteImport } from './routes/ueber-uns'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ReferenzenRouteImport } from './routes/referenzen'
 import { Route as PreiseRouteImport } from './routes/preise'
 import { Route as PartnerRouteImport } from './routes/partner'
+import { Route as KuechenmontageWilhelmshavenRouteImport } from './routes/kuechenmontage-wilhelmshaven'
 import { Route as KuechenmontageInWilhelmshavenRouteImport } from './routes/kuechenmontage-in-wilhelmshaven'
 import { Route as KontaktRouteImport } from './routes/kontakt'
 import { Route as ImpressumRouteImport } from './routes/impressum'
@@ -25,6 +27,7 @@ import { Route as HandwerkerserviceSchortensRouteImport } from './routes/handwer
 import { Route as HandwerkerserviceSandeRouteImport } from './routes/handwerkerservice-sande'
 import { Route as HandwerkerserviceJeverRouteImport } from './routes/handwerkerservice-jever'
 import { Route as FaqRouteImport } from './routes/faq'
+import { Route as EntruempelungWilhelmshavenRouteImport } from './routes/entruempelung-wilhelmshaven'
 import { Route as EntruempelungEntsorgungInWilhelmshavenRouteImport } from './routes/entruempelung-entsorgung-in-wilhelmshaven'
 import { Route as DatenschutzRouteImport } from './routes/datenschutz'
 import { Route as BodenverlegungWilhelmshavenRouteImport } from './routes/bodenverlegung-wilhelmshaven'
@@ -35,6 +38,11 @@ import { Route as ShowroomSlugRouteImport } from './routes/showroom.$slug'
 const WirUnterstuetzenRoute = WirUnterstuetzenRouteImport.update({
   id: '/wir-unterstuetzen',
   path: '/wir-unterstuetzen',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WilhelmshavenRoute = WilhelmshavenRouteImport.update({
+  id: '/wilhelmshaven',
+  path: '/wilhelmshaven',
   getParentRoute: () => rootRouteImport,
 } as any)
 const UeberUnsRoute = UeberUnsRouteImport.update({
@@ -62,6 +70,12 @@ const PartnerRoute = PartnerRouteImport.update({
   path: '/partner',
   getParentRoute: () => rootRouteImport,
 } as any)
+const KuechenmontageWilhelmshavenRoute =
+  KuechenmontageWilhelmshavenRouteImport.update({
+    id: '/kuechenmontage-wilhelmshaven',
+    path: '/kuechenmontage-wilhelmshaven',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const KuechenmontageInWilhelmshavenRoute =
   KuechenmontageInWilhelmshavenRouteImport.update({
     id: '/kuechenmontage-in-wilhelmshaven',
@@ -116,6 +130,12 @@ const FaqRoute = FaqRouteImport.update({
   path: '/faq',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EntruempelungWilhelmshavenRoute =
+  EntruempelungWilhelmshavenRouteImport.update({
+    id: '/entruempelung-wilhelmshaven',
+    path: '/entruempelung-wilhelmshaven',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const EntruempelungEntsorgungInWilhelmshavenRoute =
   EntruempelungEntsorgungInWilhelmshavenRouteImport.update({
     id: '/entruempelung-entsorgung-in-wilhelmshaven',
@@ -154,6 +174,7 @@ export interface FileRoutesByFullPath {
   '/bodenverlegung-wilhelmshaven': typeof BodenverlegungWilhelmshavenRoute
   '/datenschutz': typeof DatenschutzRoute
   '/entruempelung-entsorgung-in-wilhelmshaven': typeof EntruempelungEntsorgungInWilhelmshavenRoute
+  '/entruempelung-wilhelmshaven': typeof EntruempelungWilhelmshavenRoute
   '/faq': typeof FaqRoute
   '/handwerkerservice-jever': typeof HandwerkerserviceJeverRoute
   '/handwerkerservice-sande': typeof HandwerkerserviceSandeRoute
@@ -164,11 +185,13 @@ export interface FileRoutesByFullPath {
   '/impressum': typeof ImpressumRoute
   '/kontakt': typeof KontaktRoute
   '/kuechenmontage-in-wilhelmshaven': typeof KuechenmontageInWilhelmshavenRoute
+  '/kuechenmontage-wilhelmshaven': typeof KuechenmontageWilhelmshavenRoute
   '/partner': typeof PartnerRoute
   '/preise': typeof PreiseRoute
   '/referenzen': typeof ReferenzenRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/ueber-uns': typeof UeberUnsRoute
+  '/wilhelmshaven': typeof WilhelmshavenRoute
   '/wir-unterstuetzen': typeof WirUnterstuetzenRoute
   '/showroom/$slug': typeof ShowroomSlugRoute
   '/showroom/': typeof ShowroomIndexRoute
@@ -178,6 +201,7 @@ export interface FileRoutesByTo {
   '/bodenverlegung-wilhelmshaven': typeof BodenverlegungWilhelmshavenRoute
   '/datenschutz': typeof DatenschutzRoute
   '/entruempelung-entsorgung-in-wilhelmshaven': typeof EntruempelungEntsorgungInWilhelmshavenRoute
+  '/entruempelung-wilhelmshaven': typeof EntruempelungWilhelmshavenRoute
   '/faq': typeof FaqRoute
   '/handwerkerservice-jever': typeof HandwerkerserviceJeverRoute
   '/handwerkerservice-sande': typeof HandwerkerserviceSandeRoute
@@ -188,11 +212,13 @@ export interface FileRoutesByTo {
   '/impressum': typeof ImpressumRoute
   '/kontakt': typeof KontaktRoute
   '/kuechenmontage-in-wilhelmshaven': typeof KuechenmontageInWilhelmshavenRoute
+  '/kuechenmontage-wilhelmshaven': typeof KuechenmontageWilhelmshavenRoute
   '/partner': typeof PartnerRoute
   '/preise': typeof PreiseRoute
   '/referenzen': typeof ReferenzenRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/ueber-uns': typeof UeberUnsRoute
+  '/wilhelmshaven': typeof WilhelmshavenRoute
   '/wir-unterstuetzen': typeof WirUnterstuetzenRoute
   '/showroom/$slug': typeof ShowroomSlugRoute
   '/showroom': typeof ShowroomIndexRoute
@@ -203,6 +229,7 @@ export interface FileRoutesById {
   '/bodenverlegung-wilhelmshaven': typeof BodenverlegungWilhelmshavenRoute
   '/datenschutz': typeof DatenschutzRoute
   '/entruempelung-entsorgung-in-wilhelmshaven': typeof EntruempelungEntsorgungInWilhelmshavenRoute
+  '/entruempelung-wilhelmshaven': typeof EntruempelungWilhelmshavenRoute
   '/faq': typeof FaqRoute
   '/handwerkerservice-jever': typeof HandwerkerserviceJeverRoute
   '/handwerkerservice-sande': typeof HandwerkerserviceSandeRoute
@@ -213,11 +240,13 @@ export interface FileRoutesById {
   '/impressum': typeof ImpressumRoute
   '/kontakt': typeof KontaktRoute
   '/kuechenmontage-in-wilhelmshaven': typeof KuechenmontageInWilhelmshavenRoute
+  '/kuechenmontage-wilhelmshaven': typeof KuechenmontageWilhelmshavenRoute
   '/partner': typeof PartnerRoute
   '/preise': typeof PreiseRoute
   '/referenzen': typeof ReferenzenRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/ueber-uns': typeof UeberUnsRoute
+  '/wilhelmshaven': typeof WilhelmshavenRoute
   '/wir-unterstuetzen': typeof WirUnterstuetzenRoute
   '/showroom/$slug': typeof ShowroomSlugRoute
   '/showroom/': typeof ShowroomIndexRoute
@@ -229,6 +258,7 @@ export interface FileRouteTypes {
     | '/bodenverlegung-wilhelmshaven'
     | '/datenschutz'
     | '/entruempelung-entsorgung-in-wilhelmshaven'
+    | '/entruempelung-wilhelmshaven'
     | '/faq'
     | '/handwerkerservice-jever'
     | '/handwerkerservice-sande'
@@ -239,11 +269,13 @@ export interface FileRouteTypes {
     | '/impressum'
     | '/kontakt'
     | '/kuechenmontage-in-wilhelmshaven'
+    | '/kuechenmontage-wilhelmshaven'
     | '/partner'
     | '/preise'
     | '/referenzen'
     | '/sitemap.xml'
     | '/ueber-uns'
+    | '/wilhelmshaven'
     | '/wir-unterstuetzen'
     | '/showroom/$slug'
     | '/showroom/'
@@ -253,6 +285,7 @@ export interface FileRouteTypes {
     | '/bodenverlegung-wilhelmshaven'
     | '/datenschutz'
     | '/entruempelung-entsorgung-in-wilhelmshaven'
+    | '/entruempelung-wilhelmshaven'
     | '/faq'
     | '/handwerkerservice-jever'
     | '/handwerkerservice-sande'
@@ -263,11 +296,13 @@ export interface FileRouteTypes {
     | '/impressum'
     | '/kontakt'
     | '/kuechenmontage-in-wilhelmshaven'
+    | '/kuechenmontage-wilhelmshaven'
     | '/partner'
     | '/preise'
     | '/referenzen'
     | '/sitemap.xml'
     | '/ueber-uns'
+    | '/wilhelmshaven'
     | '/wir-unterstuetzen'
     | '/showroom/$slug'
     | '/showroom'
@@ -277,6 +312,7 @@ export interface FileRouteTypes {
     | '/bodenverlegung-wilhelmshaven'
     | '/datenschutz'
     | '/entruempelung-entsorgung-in-wilhelmshaven'
+    | '/entruempelung-wilhelmshaven'
     | '/faq'
     | '/handwerkerservice-jever'
     | '/handwerkerservice-sande'
@@ -287,11 +323,13 @@ export interface FileRouteTypes {
     | '/impressum'
     | '/kontakt'
     | '/kuechenmontage-in-wilhelmshaven'
+    | '/kuechenmontage-wilhelmshaven'
     | '/partner'
     | '/preise'
     | '/referenzen'
     | '/sitemap.xml'
     | '/ueber-uns'
+    | '/wilhelmshaven'
     | '/wir-unterstuetzen'
     | '/showroom/$slug'
     | '/showroom/'
@@ -302,6 +340,7 @@ export interface RootRouteChildren {
   BodenverlegungWilhelmshavenRoute: typeof BodenverlegungWilhelmshavenRoute
   DatenschutzRoute: typeof DatenschutzRoute
   EntruempelungEntsorgungInWilhelmshavenRoute: typeof EntruempelungEntsorgungInWilhelmshavenRoute
+  EntruempelungWilhelmshavenRoute: typeof EntruempelungWilhelmshavenRoute
   FaqRoute: typeof FaqRoute
   HandwerkerserviceJeverRoute: typeof HandwerkerserviceJeverRoute
   HandwerkerserviceSandeRoute: typeof HandwerkerserviceSandeRoute
@@ -312,11 +351,13 @@ export interface RootRouteChildren {
   ImpressumRoute: typeof ImpressumRoute
   KontaktRoute: typeof KontaktRoute
   KuechenmontageInWilhelmshavenRoute: typeof KuechenmontageInWilhelmshavenRoute
+  KuechenmontageWilhelmshavenRoute: typeof KuechenmontageWilhelmshavenRoute
   PartnerRoute: typeof PartnerRoute
   PreiseRoute: typeof PreiseRoute
   ReferenzenRoute: typeof ReferenzenRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   UeberUnsRoute: typeof UeberUnsRoute
+  WilhelmshavenRoute: typeof WilhelmshavenRoute
   WirUnterstuetzenRoute: typeof WirUnterstuetzenRoute
   ShowroomSlugRoute: typeof ShowroomSlugRoute
   ShowroomIndexRoute: typeof ShowroomIndexRoute
@@ -329,6 +370,13 @@ declare module '@tanstack/react-router' {
       path: '/wir-unterstuetzen'
       fullPath: '/wir-unterstuetzen'
       preLoaderRoute: typeof WirUnterstuetzenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/wilhelmshaven': {
+      id: '/wilhelmshaven'
+      path: '/wilhelmshaven'
+      fullPath: '/wilhelmshaven'
+      preLoaderRoute: typeof WilhelmshavenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/ueber-uns': {
@@ -364,6 +412,13 @@ declare module '@tanstack/react-router' {
       path: '/partner'
       fullPath: '/partner'
       preLoaderRoute: typeof PartnerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/kuechenmontage-wilhelmshaven': {
+      id: '/kuechenmontage-wilhelmshaven'
+      path: '/kuechenmontage-wilhelmshaven'
+      fullPath: '/kuechenmontage-wilhelmshaven'
+      preLoaderRoute: typeof KuechenmontageWilhelmshavenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/kuechenmontage-in-wilhelmshaven': {
@@ -436,6 +491,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FaqRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/entruempelung-wilhelmshaven': {
+      id: '/entruempelung-wilhelmshaven'
+      path: '/entruempelung-wilhelmshaven'
+      fullPath: '/entruempelung-wilhelmshaven'
+      preLoaderRoute: typeof EntruempelungWilhelmshavenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/entruempelung-entsorgung-in-wilhelmshaven': {
       id: '/entruempelung-entsorgung-in-wilhelmshaven'
       path: '/entruempelung-entsorgung-in-wilhelmshaven'
@@ -487,6 +549,7 @@ const rootRouteChildren: RootRouteChildren = {
   DatenschutzRoute: DatenschutzRoute,
   EntruempelungEntsorgungInWilhelmshavenRoute:
     EntruempelungEntsorgungInWilhelmshavenRoute,
+  EntruempelungWilhelmshavenRoute: EntruempelungWilhelmshavenRoute,
   FaqRoute: FaqRoute,
   HandwerkerserviceJeverRoute: HandwerkerserviceJeverRoute,
   HandwerkerserviceSandeRoute: HandwerkerserviceSandeRoute,
@@ -497,11 +560,13 @@ const rootRouteChildren: RootRouteChildren = {
   ImpressumRoute: ImpressumRoute,
   KontaktRoute: KontaktRoute,
   KuechenmontageInWilhelmshavenRoute: KuechenmontageInWilhelmshavenRoute,
+  KuechenmontageWilhelmshavenRoute: KuechenmontageWilhelmshavenRoute,
   PartnerRoute: PartnerRoute,
   PreiseRoute: PreiseRoute,
   ReferenzenRoute: ReferenzenRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   UeberUnsRoute: UeberUnsRoute,
+  WilhelmshavenRoute: WilhelmshavenRoute,
   WirUnterstuetzenRoute: WirUnterstuetzenRoute,
   ShowroomSlugRoute: ShowroomSlugRoute,
   ShowroomIndexRoute: ShowroomIndexRoute,

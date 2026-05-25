@@ -37,24 +37,30 @@ const categorySet: ProjectCategory[] = [
 
 export const Route = createFileRoute("/showroom/")({
   component: ShowroomPage,
-  head: () => ({
-    meta: [
-      { title: "Showroom – Projekte von Verlegt & Verschraubt Wilhelmshaven" },
-      {
-        name: "description",
-        content:
-          "Showroom: echte Projekte von Verlegt & Verschraubt aus Wilhelmshaven & Umgebung. Bodenverlegung, Küchenmontage, Küchenfolierung, Treppenbeläge und saubere Detailarbeiten.",
-      },
-      { property: "og:title", content: "Showroom – Projekte von Verlegt & Verschraubt" },
-      {
-        property: "og:description",
-        content: "Ausgewählte Projekte aus Wilhelmshaven, Coldewei, Schortens, Hooksiel und Umgebung.",
-      },
-      { property: "og:url", content: "/showroom" },
-      { property: "og:image", content: projects[0].cover },
-    ],
-    links: [{ rel: "canonical", href: "/showroom" }],
-  }),
+  head: () => {
+    const ogImage = "https://verlegt-verschraubt.de/projects/coldewei-03-vinyl-flur.jpeg";
+    const ogDesc = "Ausgewählte Projekte aus Wilhelmshaven, Coldewei, Schortens, Hooksiel und Umgebung.";
+    const ogTitle = "Showroom – Projekte von Verlegt & Verschraubt";
+    return {
+      meta: [
+        { title: "Showroom – Projekte von Verlegt & Verschraubt Wilhelmshaven" },
+        {
+          name: "description",
+          content:
+            "Showroom: echte Projekte von Verlegt & Verschraubt aus Wilhelmshaven & Umgebung. Bodenverlegung, Küchenmontage, Küchenfolierung, Treppenbeläge und saubere Detailarbeiten.",
+        },
+        { property: "og:title", content: ogTitle },
+        { property: "og:description", content: ogDesc },
+        { property: "og:url", content: "https://verlegt-verschraubt.de/showroom" },
+        { property: "og:image", content: ogImage },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: ogTitle },
+        { name: "twitter:description", content: ogDesc },
+        { name: "twitter:image", content: ogImage },
+      ],
+      links: [{ rel: "canonical", href: "https://verlegt-verschraubt.de/showroom" }],
+    };
+  },
 });
 
 function ShowroomPage() {
