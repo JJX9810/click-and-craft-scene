@@ -42,7 +42,19 @@ function Page() {
         breadcrumbs={[{ label: "Kostenrechner" }]}
       />
 
-      <Section eyebrow="Hinweis" title="Unverbindliche Ersteinschätzung">
+      <Section eyebrow="Kurzfassung" title="Wie Preise zustande kommen">
+        <div className="grid gap-6 lg:grid-cols-2">
+          <QuickAnswer>
+            Der Preis hängt bei Verlegt &amp; Verschraubt vom Leistungsumfang,
+            Zustand vor Ort, Material, Fläche, Etage, Anfahrt und Dringlichkeit
+            ab. Der Kostenrechner liefert eine erste Orientierung und ersetzt
+            kein verbindliches Angebot.
+          </QuickAnswer>
+          <FactBox />
+        </div>
+      </Section>
+
+      <Section eyebrow="Hinweis" title="Unverbindliche Ersteinschätzung" bordered>
         <p className="max-w-3xl text-base leading-relaxed text-muted-foreground">
           Die Berechnung ist eine grobe Orientierung. Endgültige Preise hängen
           von Untergrund, Material, Zugang und Sonderfaktoren ab. Senden Sie
@@ -50,6 +62,7 @@ function Page() {
           WhatsApp.
         </p>
       </Section>
+
 
       <Section eyebrow="Rechner" title="Projekt einschätzen lassen" bordered>
         <Kostenrechner />
