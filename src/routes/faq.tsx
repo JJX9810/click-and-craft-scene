@@ -104,6 +104,18 @@ function Page() {
         </Section>
       ))}
 
+      <Section eyebrow="Weiterlesen" title="Direkt zur passenden Leistung" bordered>
+        <InternalLinks
+          links={[
+            { to: "/bodenverlegung-wilhelmshaven", label: "Bodenverlegung in Wilhelmshaven ansehen" },
+            { to: "/kuechenmontage-in-wilhelmshaven", label: "Küchenmontage in Wilhelmshaven anfragen" },
+            { to: "/entruempelung-entsorgung-in-wilhelmshaven", label: "Kosten für Entrümpelung einschätzen" },
+            { to: "/preise", label: "Zum Kostenrechner" },
+            { to: "/kontakt", label: "Projekt mit Fotos anfragen" },
+          ]}
+        />
+      </Section>
+
       <CtaBlock />
     </>
   );
