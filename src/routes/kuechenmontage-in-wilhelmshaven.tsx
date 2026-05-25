@@ -157,6 +157,31 @@ function Page() {
         </div>
       </Section>
 
+      <Section eyebrow="Grenzen & nächste Schritte" title="Klare Grenzen, klare Wege" bordered>
+        <div className="grid gap-6 lg:grid-cols-2">
+          <LimitsBox
+            title="Was wir bei der Küchenmontage nicht übernehmen"
+            items={[
+              "Keine Elektroinstallation.",
+              "Kein Starkstromanschluss.",
+              "Keine neuen Sanitärleitungen.",
+              "Spüle und Armatur nur an vorhandenen Anschlüssen und im Zusammenhang mit Küchenmontage.",
+            ]}
+            note="Für Elektro- und Sanitärarbeiten stimmen wir uns auf Wunsch mit Fachbetrieben ab."
+          />
+          <InternalLinks
+            links={[
+              { to: "/preise", label: "Kosten für Küchenmontage einschätzen" },
+              { to: "/referenzen", label: "Referenzen ansehen" },
+              { to: "/kontakt", label: "Küchenmontage mit Fotos anfragen" },
+              { to: "/faq", label: "Antworten auf häufige Fragen" },
+            ]}
+          />
+        </div>
+      </Section>
+
+
+
 
       <CtaBlock
         title="Küchenprojekt anfragen"
