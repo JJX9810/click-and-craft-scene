@@ -1,3 +1,4 @@
+import { breadcrumbNode, jsonLdScript, webPageNode } from "@/lib/schema";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PageHero, Section, Bullet, CtaBlock } from "@/components/site/PageShell";
 import { BookOpen, PawPrint, Heart, ShieldCheck, Hammer, Info } from "lucide-react";
@@ -20,6 +21,15 @@ export const Route = createFileRoute("/wir-unterstuetzen")({
       { name: "twitter:image", content: "https://verlegt-verschraubt.de/hero-flooring.png" },
     ],
     links: [{ rel: "canonical", href: "https://verlegt-verschraubt.de/wir-unterstuetzen" }],
+    scripts: [
+      jsonLdScript([
+        webPageNode({ url: "https://verlegt-verschraubt.de/wir-unterstuetzen", name: 'Wir unterstützen – Verlegt & Verschraubt', description: 'Initiativen und Projekte, die wir unterstützen.' }),
+        breadcrumbNode([
+          { name: "Startseite", url: "https://verlegt-verschraubt.de/" },
+          { name: 'Wir unterstützen', url: "https://verlegt-verschraubt.de/wir-unterstuetzen" },
+        ]),
+      ]),
+    ],
   }),
 });
 

@@ -1,3 +1,4 @@
+import { breadcrumbNode, jsonLdScript, webPageNode } from "@/lib/schema";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { PageHero, Section } from "@/components/site/PageShell";
@@ -21,6 +22,15 @@ export const Route = createFileRoute("/kontakt")({
       { name: "twitter:image", content: "https://verlegt-verschraubt.de/hero-flooring.png" },
     ],
     links: [{ rel: "canonical", href: "https://verlegt-verschraubt.de/kontakt" }],
+    scripts: [
+      jsonLdScript([
+        webPageNode({ url: "https://verlegt-verschraubt.de/kontakt", name: 'Kontakt – Verlegt & Verschraubt Wilhelmshaven', description: 'Anfrage starten: Telefon, E-Mail oder Formular. Antwort in der Regel innerhalb von 24 Stunden.' }),
+        breadcrumbNode([
+          { name: "Startseite", url: "https://verlegt-verschraubt.de/" },
+          { name: 'Kontakt', url: "https://verlegt-verschraubt.de/kontakt" },
+        ]),
+      ]),
+    ],
   }),
 });
 

@@ -1,3 +1,4 @@
+import { breadcrumbNode, jsonLdScript, webPageNode } from "@/lib/schema";
 import { createFileRoute } from "@tanstack/react-router";
 import { PageHero, Section, Bullet, CtaBlock } from "@/components/site/PageShell";
 import { Star, Phone, Globe, MapPin } from "lucide-react";
@@ -19,6 +20,15 @@ export const Route = createFileRoute("/partner")({
       { name: "twitter:image", content: "https://verlegt-verschraubt.de/hero-flooring.png" },
     ],
     links: [{ rel: "canonical", href: "https://verlegt-verschraubt.de/partner" }],
+    scripts: [
+      jsonLdScript([
+        webPageNode({ url: "https://verlegt-verschraubt.de/partner", name: 'Partner – Verlegt & Verschraubt', description: 'Partner und Kooperationen von Verlegt & Verschraubt.' }),
+        breadcrumbNode([
+          { name: "Startseite", url: "https://verlegt-verschraubt.de/" },
+          { name: 'Partner', url: "https://verlegt-verschraubt.de/partner" },
+        ]),
+      ]),
+    ],
   }),
 });
 
