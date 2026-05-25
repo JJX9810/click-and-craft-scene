@@ -20,6 +20,7 @@ import { Route as KuechenmontageWilhelmshavenRouteImport } from './routes/kueche
 import { Route as KuechenmontageInWilhelmshavenRouteImport } from './routes/kuechenmontage-in-wilhelmshaven'
 import { Route as KontaktRouteImport } from './routes/kontakt'
 import { Route as ImpressumRouteImport } from './routes/impressum'
+import { Route as HandwerkerserviceWittmundRouteImport } from './routes/handwerkerservice-wittmund'
 import { Route as HandwerkerserviceWilhelmshavenRouteImport } from './routes/handwerkerservice-wilhelmshaven'
 import { Route as HandwerkerserviceWangerlandRouteImport } from './routes/handwerkerservice-wangerland'
 import { Route as HandwerkerserviceVarelRouteImport } from './routes/handwerkerservice-varel'
@@ -92,6 +93,12 @@ const ImpressumRoute = ImpressumRouteImport.update({
   path: '/impressum',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HandwerkerserviceWittmundRoute =
+  HandwerkerserviceWittmundRouteImport.update({
+    id: '/handwerkerservice-wittmund',
+    path: '/handwerkerservice-wittmund',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const HandwerkerserviceWilhelmshavenRoute =
   HandwerkerserviceWilhelmshavenRouteImport.update({
     id: '/handwerkerservice-wilhelmshaven',
@@ -182,6 +189,7 @@ export interface FileRoutesByFullPath {
   '/handwerkerservice-varel': typeof HandwerkerserviceVarelRoute
   '/handwerkerservice-wangerland': typeof HandwerkerserviceWangerlandRoute
   '/handwerkerservice-wilhelmshaven': typeof HandwerkerserviceWilhelmshavenRoute
+  '/handwerkerservice-wittmund': typeof HandwerkerserviceWittmundRoute
   '/impressum': typeof ImpressumRoute
   '/kontakt': typeof KontaktRoute
   '/kuechenmontage-in-wilhelmshaven': typeof KuechenmontageInWilhelmshavenRoute
@@ -209,6 +217,7 @@ export interface FileRoutesByTo {
   '/handwerkerservice-varel': typeof HandwerkerserviceVarelRoute
   '/handwerkerservice-wangerland': typeof HandwerkerserviceWangerlandRoute
   '/handwerkerservice-wilhelmshaven': typeof HandwerkerserviceWilhelmshavenRoute
+  '/handwerkerservice-wittmund': typeof HandwerkerserviceWittmundRoute
   '/impressum': typeof ImpressumRoute
   '/kontakt': typeof KontaktRoute
   '/kuechenmontage-in-wilhelmshaven': typeof KuechenmontageInWilhelmshavenRoute
@@ -237,6 +246,7 @@ export interface FileRoutesById {
   '/handwerkerservice-varel': typeof HandwerkerserviceVarelRoute
   '/handwerkerservice-wangerland': typeof HandwerkerserviceWangerlandRoute
   '/handwerkerservice-wilhelmshaven': typeof HandwerkerserviceWilhelmshavenRoute
+  '/handwerkerservice-wittmund': typeof HandwerkerserviceWittmundRoute
   '/impressum': typeof ImpressumRoute
   '/kontakt': typeof KontaktRoute
   '/kuechenmontage-in-wilhelmshaven': typeof KuechenmontageInWilhelmshavenRoute
@@ -266,6 +276,7 @@ export interface FileRouteTypes {
     | '/handwerkerservice-varel'
     | '/handwerkerservice-wangerland'
     | '/handwerkerservice-wilhelmshaven'
+    | '/handwerkerservice-wittmund'
     | '/impressum'
     | '/kontakt'
     | '/kuechenmontage-in-wilhelmshaven'
@@ -293,6 +304,7 @@ export interface FileRouteTypes {
     | '/handwerkerservice-varel'
     | '/handwerkerservice-wangerland'
     | '/handwerkerservice-wilhelmshaven'
+    | '/handwerkerservice-wittmund'
     | '/impressum'
     | '/kontakt'
     | '/kuechenmontage-in-wilhelmshaven'
@@ -320,6 +332,7 @@ export interface FileRouteTypes {
     | '/handwerkerservice-varel'
     | '/handwerkerservice-wangerland'
     | '/handwerkerservice-wilhelmshaven'
+    | '/handwerkerservice-wittmund'
     | '/impressum'
     | '/kontakt'
     | '/kuechenmontage-in-wilhelmshaven'
@@ -348,6 +361,7 @@ export interface RootRouteChildren {
   HandwerkerserviceVarelRoute: typeof HandwerkerserviceVarelRoute
   HandwerkerserviceWangerlandRoute: typeof HandwerkerserviceWangerlandRoute
   HandwerkerserviceWilhelmshavenRoute: typeof HandwerkerserviceWilhelmshavenRoute
+  HandwerkerserviceWittmundRoute: typeof HandwerkerserviceWittmundRoute
   ImpressumRoute: typeof ImpressumRoute
   KontaktRoute: typeof KontaktRoute
   KuechenmontageInWilhelmshavenRoute: typeof KuechenmontageInWilhelmshavenRoute
@@ -440,6 +454,13 @@ declare module '@tanstack/react-router' {
       path: '/impressum'
       fullPath: '/impressum'
       preLoaderRoute: typeof ImpressumRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/handwerkerservice-wittmund': {
+      id: '/handwerkerservice-wittmund'
+      path: '/handwerkerservice-wittmund'
+      fullPath: '/handwerkerservice-wittmund'
+      preLoaderRoute: typeof HandwerkerserviceWittmundRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/handwerkerservice-wilhelmshaven': {
@@ -557,6 +578,7 @@ const rootRouteChildren: RootRouteChildren = {
   HandwerkerserviceVarelRoute: HandwerkerserviceVarelRoute,
   HandwerkerserviceWangerlandRoute: HandwerkerserviceWangerlandRoute,
   HandwerkerserviceWilhelmshavenRoute: HandwerkerserviceWilhelmshavenRoute,
+  HandwerkerserviceWittmundRoute: HandwerkerserviceWittmundRoute,
   ImpressumRoute: ImpressumRoute,
   KontaktRoute: KontaktRoute,
   KuechenmontageInWilhelmshavenRoute: KuechenmontageInWilhelmshavenRoute,
@@ -574,3 +596,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
