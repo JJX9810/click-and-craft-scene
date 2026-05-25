@@ -708,12 +708,14 @@ export function Kostenrechner() {
               href={waUrl}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={handleWhatsAppClick}
               className="inline-flex h-14 items-center justify-center gap-2 rounded-full bg-[#25D366] px-6 text-base font-semibold text-white shadow-lg shadow-[#25D366]/30 transition-transform hover:-translate-y-0.5"
             >
               <MessageCircle className="h-5 w-5" /> Unverbindliche Terminanfrage per WhatsApp
             </a>
             <a
               href={`tel:+${PHONE_NUMBER}`}
+              onClick={handlePhoneClick}
               className="inline-flex h-14 items-center justify-center gap-2 rounded-full border border-accent/40 bg-accent/10 px-6 text-base font-semibold text-accent hover:bg-accent/20"
             >
               <Phone className="h-5 w-5" /> {PHONE_DISPLAY} anrufen
