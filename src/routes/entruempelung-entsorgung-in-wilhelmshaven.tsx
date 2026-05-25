@@ -137,6 +137,29 @@ function Page() {
         </Accordion>
       </Section>
 
+      <Section eyebrow="Grenzen & nächste Schritte" title="Was vorab geklärt sein muss">
+        <div className="grid gap-6 lg:grid-cols-2">
+          <LimitsBox
+            title="Sonderfälle und Grenzen"
+            items={[
+              "Gefahrstoffe wie Asbest, Chemikalien oder Altöl müssen vorab geprüft werden.",
+              "Bei Sonderfällen (Brand- oder Wasserschäden, Schimmel) benötigen wir eine Einschätzung.",
+              "Keine gefährlichen Entsorgungen ohne fachliche Prüfung – wir binden bei Bedarf Fachbetriebe ein.",
+            ]}
+          />
+          <InternalLinks
+            links={[
+              { to: "/preise", label: "Kosten für Entrümpelung einschätzen" },
+              { to: "/referenzen", label: "Referenzen ansehen" },
+              { to: "/kontakt", label: "Räumung mit Fotos anfragen" },
+              { to: "/faq", label: "Antworten auf häufige Fragen" },
+            ]}
+          />
+        </div>
+      </Section>
+
+
+
       <CtaBlock
         title="Entrümpelung in Wilhelmshaven anfragen"
         text="Schicken Sie Fotos der Räume und ein paar Eckdaten – wir geben eine ehrliche Einschätzung."
