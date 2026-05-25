@@ -186,6 +186,28 @@ function Page() {
         </Accordion>
       </Section>
 
+      <Section eyebrow="Grenzen & nächste Schritte" title="Was vorab zu klären ist">
+        <div className="grid gap-6 lg:grid-cols-2">
+          <LimitsBox
+            title="Voraussetzungen für ein gutes Ergebnis"
+            items={[
+              "Der Untergrund wird vorab geprüft (Ebenheit, Restfeuchte, Tragfähigkeit).",
+              "Bei starken Schäden oder Feuchtigkeit kann eine separate Vorbereitung nötig sein.",
+              "Wir machen keine unrealistischen Pauschalversprechen – die Einschätzung erfolgt nach Foto und Maßen.",
+            ]}
+            note="Sind Sie unsicher? Senden Sie Fotos vom Raum – wir geben eine ehrliche Einschätzung."
+          />
+          <InternalLinks
+            links={[
+              { to: "/preise", label: "Kosten für Bodenverlegung einschätzen" },
+              { to: "/referenzen", label: "Referenzen ansehen" },
+              { to: "/kontakt", label: "Projekt mit Fotos anfragen" },
+              { to: "/faq", label: "Antworten auf häufige Fragen" },
+            ]}
+          />
+        </div>
+      </Section>
+
       <CtaBlock
         title="Bodenprojekt in Wilhelmshaven anfragen"
         text="Senden Sie Fotos vom Raum und ein paar Maße – Sie erhalten eine ehrliche Einschätzung."
