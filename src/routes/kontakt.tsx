@@ -360,7 +360,7 @@ function Page() {
             <a
               href="https://wa.me/491634799286"
               target="_blank"
-              rel="noreferrer"
+              rel="noopener noreferrer"
               className="block rounded-2xl border border-border/70 bg-card/30 p-6 text-sm hover:border-accent/60"
             >
               <p className="text-xs uppercase tracking-[0.25em] text-accent">WhatsApp</p>

@@ -581,7 +581,7 @@ function Index() {
                 variant="outline"
                 className="h-12 rounded-full border-border bg-transparent px-7 hover:bg-card"
               >
-                <a href="https://wa.me/491634799286" target="_blank" rel="noreferrer">WhatsApp</a>
+                <a href="https://wa.me/491634799286" target="_blank" rel="noopener noreferrer">WhatsApp</a>
               </Button>
             </div>
           </div>
