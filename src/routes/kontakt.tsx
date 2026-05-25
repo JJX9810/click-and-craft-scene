@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Phone, Mail, MapPin, MessageCircle } from "lucide-react";
 import { EinsatzgebietMap } from "@/components/site/EinsatzgebietMap";
 import { QuickAnswer, FactBox, InternalLinks } from "@/components/site/InfoBlocks";
+import { buildAttributionLines, getAttributionFields } from "@/lib/attribution";
+import { trackEvent } from "@/lib/tracking";
 
 export const Route = createFileRoute("/kontakt")({
   component: Page,
