@@ -186,6 +186,8 @@ function Page() {
 
 
 
+      <PreisrechnerCTA variant="kuechenmontage" />
+
       <CtaBlock
         title="Küchenprojekt anfragen"
         text="Senden Sie Fotos der Küche und Anschlüsse – wir geben eine realistische Einschätzung."
