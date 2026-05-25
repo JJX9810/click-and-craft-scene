@@ -451,9 +451,53 @@ export function Kostenrechner() {
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [s, set] = useState<State>(initial);
   const [errors, setErrors] = useState<string[]>([]);
+  const viewTracked = useRef(false);
+  const stepTracked = useRef<Set<number>>(new Set());
 
   const upd = <K extends keyof State>(k: K, v: State[K]) => set((p) => ({ ...p, [k]: v }));
   const breakdown = useMemo(() => computeBreakdown(s), [s]);
+
+  // Leistung über URL-Parameter vorauswählen + view-Event
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (!viewTracked.current) {
+      viewTracked.current = true;
+      const params = new URLSearchParams(window.location.search);
+      const leistung = params.get("leistung");
+      if (leistung) {
+        const mapped = LEISTUNG_PARAM_MAP[leistung.toLowerCase()];
+        if (mapped) {
+          set((p) => (p.service ? p : { ...p, service: mapped }));
+        }
+      }
+      trackEvent("preisrechner_view", { leistung_param: leistung ?? "" });
+    }
+  }, []);
+
+  // Step-Tracking
+  useEffect(() => {
+    if (stepTracked.current.has(step)) return;
+    stepTracked.current.add(step);
+    const stepNames: Record<number, string> = { 1: "leistung", 2: "details", 3: "ergebnis" };
+    trackEvent("preisrechner_step", {
+      step_number: step,
+      step_name: stepNames[step] ?? String(step),
+      selected_service: s.service ?? "",
+    });
+    if (step === 3) {
+      trackEvent("preisrechner_result", {
+        selected_service: s.service ?? "",
+        total: breakdown?.total ?? 0,
+        has_on_request: breakdown?.hasOnRequest ?? false,
+      });
+    }
+  }, [step, s.service, breakdown]);
+
+  // Leistungs-Auswahl tracken
+  useEffect(() => {
+    if (!s.service) return;
+    trackEvent("preisrechner_leistung_selected", { selected_service: s.service });
+  }, [s.service]);
 
   const validate = (): string[] => {
     const e: string[] = [];
@@ -474,6 +518,20 @@ export function Kostenrechner() {
 
   const message = useMemo(() => buildWaMessage(s, breakdown), [s, breakdown]);
   const waUrl = `https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent(message)}`;
+
+  const handleWhatsAppClick = () => {
+    trackEvent("whatsapp_click_preisrechner", {
+      selected_service: s.service ?? "",
+      total: breakdown?.total ?? 0,
+    });
+  };
+
+  const handlePhoneClick = () => {
+    trackEvent("phone_click", {
+      origin: "preisrechner",
+      selected_service: s.service ?? "",
+    });
+  };
 
   const copyMsg = async () => {
     try {
