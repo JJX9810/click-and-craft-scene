@@ -295,12 +295,8 @@ function computeBreakdown(s: State): Breakdown | null {
   return { items, anfahrt, express, total, hasOnRequest };
 }
 
-function buildWaMessage(s: State, b: Breakdown | null): string {
+function summaryLines(s: State): string[] {
   const lines: string[] = [];
-  lines.push("Hallo Verlegt & Verschraubt,");
-  lines.push("");
-  lines.push("ich möchte eine unverbindliche Anfrage stellen.");
-  lines.push("");
   const serviceLabel =
     s.service === "boden"
       ? "Bodenverlegung"
@@ -308,18 +304,21 @@ function buildWaMessage(s: State, b: Breakdown | null): string {
         ? "Küchenmontage"
         : s.service === "ent"
           ? "Entrümpelung & Entsorgung"
-          : "Sonstiges Projekt";
-  if (s.name.trim()) lines.push(`Name: ${s.name.trim()}`);
-  if (s.telefon.trim()) lines.push(`Telefon: ${s.telefon.trim()}`);
-  if (s.ort.trim()) lines.push(`Ort / Einsatzadresse: ${s.ort.trim()}`);
-  lines.push(`Leistung: ${serviceLabel}`);
+          : s.service === "sonst"
+            ? "Sonstiges Projekt"
+            : "";
+  if (serviceLabel) lines.push(`Gewählte Leistung: ${serviceLabel}`);
 
   if (s.service === "boden") {
     const v = BODEN_VARIANTEN.find((x) => x.key === s.bodenartKey);
     if (v) lines.push(`Bodenart: ${v.label}`);
     if (s.qm) lines.push(`Fläche: ${s.qm} m²`);
-    if (s.altEntfernen) lines.push(`Alter Boden: ${s.altEntfernen}`);
-    if (s.sockelLfm) lines.push(`Sockelleisten: ${s.sockelLfm} lfm`);
+    if (s.sockelLfm && Number(s.sockelLfm) > 0) lines.push(`Sockelleisten: ${s.sockelLfm} lfm`);
+    if (s.altEntfernen && s.altEntfernen !== "Nein") {
+      lines.push(`Alten Boden entfernen: ${s.altEntfernen}`);
+    } else if (s.altEntfernen === "Nein") {
+      lines.push("Alten Boden entfernen: nein");
+    }
   } else if (s.service === "kueche") {
     if (s.kueArt) lines.push(`Projektart: ${s.kueArt}`);
     if (s.kueMeter) lines.push(`Küchenlänge: ${s.kueMeter} m`);
@@ -331,32 +330,63 @@ function buildWaMessage(s: State, b: Breakdown | null): string {
     if (s.sonstText.trim()) lines.push(`Beschreibung: ${s.sonstText.trim()}`);
   }
 
-  if (b) {
-    lines.push("");
-    lines.push("Positionen:");
-    for (const it of b.items) {
-      if (it.inklusive) lines.push(`- ${it.label}: inklusive`);
-      else if (it.amount === null) lines.push(`- ${it.label}: auf Anfrage${it.detail ? ` (${it.detail})` : ""}`);
-      else lines.push(`- ${it.detail ?? `${it.label}: ${eur(it.amount)}`}`);
-    }
-    if (b.anfahrt) {
-      if (b.anfahrt.inklusive) lines.push(`- Anfahrt: bis 35 km inklusive`);
-      else if (b.anfahrt.amount === null) lines.push(`- Anfahrt: wird nach Einsatzort geprüft`);
-      else lines.push(`- Anfahrt: ${b.anfahrt.detail} = ${eur(b.anfahrt.amount)}`);
-    }
-    if (b.express) {
-      if (b.express.amount === null) lines.push(`- ${b.express.label}: ${b.express.detail}`);
-      else if (b.express.inklusive) lines.push(`- ${b.express.label}: ${b.express.detail}`);
-      else lines.push(`- ${b.express.label}: ${b.express.detail} = ${eur(b.express.amount)}`);
-    }
-    if (b.total > 0) {
-      lines.push("");
-      lines.push(`Geschätzte Gesamtsumme: ${eur(b.total)}`);
-    }
-    if (b.hasOnRequest) {
-      lines.push("(Einzelne Positionen werden separat nach Besichtigung kalkuliert.)");
-    }
+  if (s.ort.trim()) lines.push(`Einsatzort: ${s.ort.trim()}`);
+  if (s.anfahrtKm.trim()) {
+    lines.push(`Anfahrt: wird je nach Einsatzort berücksichtigt (${s.anfahrtKm} km angegeben)`);
+  } else {
+    lines.push("Anfahrt: wird nach Einsatzort berücksichtigt");
   }
+
+  if (s.wunschDatum || s.wunschZeitraum) {
+    const t = [s.wunschDatum, s.wunschZeitraum].filter(Boolean).join(", ");
+    lines.push(`Terminwunsch: ${t}`);
+  }
+  if (s.fertigDatum) lines.push(`Fertigstellung gewünscht bis: ${s.fertigDatum}`);
+  if (s.dringlichkeit) {
+    const d = DRINGLICHKEIT_OPTIONS.find((o) => o.key === s.dringlichkeit);
+    if (d) lines.push(`Dringlichkeit: ${d.label}`);
+  }
+  return lines;
+}
+
+function buildWaMessage(s: State, b: Breakdown | null): string {
+  const lines: string[] = [];
+  lines.push("Hallo Verlegt & Verschraubt,");
+  lines.push("");
+  lines.push("ich möchte eine unverbindliche Anfrage stellen.");
+  lines.push("");
+  if (s.name.trim()) lines.push(`Name: ${s.name.trim()}`);
+  if (s.telefon.trim()) lines.push(`Telefon: ${s.telefon.trim()}`);
+  if (s.ort.trim()) lines.push(`Ort / Einsatzadresse: ${s.ort.trim()}`);
+
+  const serviceLabel =
+    s.service === "boden"
+      ? "Bodenverlegung"
+      : s.service === "kueche"
+        ? "Küchenmontage"
+        : s.service === "ent"
+          ? "Entrümpelung & Entsorgung"
+          : "Sonstiges Projekt";
+  lines.push(`Leistung: ${serviceLabel}`);
+
+  if (s.service === "boden") {
+    const v = BODEN_VARIANTEN.find((x) => x.key === s.bodenartKey);
+    if (v) lines.push(`Bodenart: ${v.label}`);
+    if (s.qm) lines.push(`Fläche: ${s.qm} m²`);
+    if (s.sockelLfm && Number(s.sockelLfm) > 0) lines.push(`Sockelleisten: ${s.sockelLfm} lfm`);
+    if (s.altEntfernen) lines.push(`Alten Boden entfernen: ${s.altEntfernen}`);
+  } else if (s.service === "kueche") {
+    if (s.kueArt) lines.push(`Projektart: ${s.kueArt}`);
+    if (s.kueMeter) lines.push(`Küchenlänge: ${s.kueMeter} m`);
+  } else if (s.service === "ent") {
+    if (s.entObjekt) lines.push(`Objekt: ${s.entObjekt}`);
+    if (s.entMenge) lines.push(`Menge: ${s.entMenge}`);
+    if (s.entEtage) lines.push(`Etage: ${s.entEtage}`);
+  } else if (s.service === "sonst") {
+    if (s.sonstText.trim()) lines.push(`Beschreibung: ${s.sonstText.trim()}`);
+  }
+
+  if (s.anfahrtKm.trim()) lines.push(`Entfernung: ${s.anfahrtKm} km`);
 
   lines.push("");
   lines.push("Wunschtermin:");
@@ -376,11 +406,17 @@ function buildWaMessage(s: State, b: Breakdown | null): string {
     lines.push(s.nachricht.trim());
   }
 
+  if (b && b.total > 0) {
+    lines.push("");
+    lines.push(`Geschätzte Gesamtkosten laut Rechner: ca. ${eur(b.total)}`);
+  }
+
   lines.push("");
-  lines.push("Bitte prüfen Sie, ob der Termin möglich ist.");
+  lines.push("Die Berechnung ist eine unverbindliche Ersteinschätzung. Der endgültige Preis wird nach Prüfung bestätigt.");
   lines.push("Viele Grüße");
   return lines.join("\n");
 }
+
 
 export function Kostenrechner() {
   const [step, setStep] = useState<1 | 2 | 3>(1);
@@ -499,7 +535,7 @@ export function Kostenrechner() {
                 className={input}
               />
               <p className="mt-1 text-xs text-muted-foreground">
-                Bis 35 km Entfernung ist die Anfahrt inklusive. Ab 35 km berechnen wir 0,70 € pro zusätzlichem Kilometer.
+                Die Anfahrt wird je nach Einsatzort in der Schätzung berücksichtigt.
               </p>
             </Field>
           </div>
@@ -552,7 +588,7 @@ export function Kostenrechner() {
           <div className="rounded-2xl border border-accent/40 bg-gradient-to-br from-accent/15 via-background/60 to-background/40 p-6 sm:p-8">
             <p className="text-xs uppercase tracking-[0.25em] text-accent">Ihre unverbindliche Ersteinschätzung</p>
             {breakdown && breakdown.total > 0 ? (
-              <p className="mt-3 text-3xl font-semibold sm:text-4xl">Gesamtsumme: {eur(breakdown.total)}</p>
+              <p className="mt-3 text-3xl font-semibold sm:text-4xl">Geschätzte Gesamtkosten: ca. {eur(breakdown.total)}</p>
             ) : (
               <p className="mt-3 text-2xl font-semibold sm:text-3xl">Individuelles Angebot</p>
             )}
@@ -561,56 +597,22 @@ export function Kostenrechner() {
             </p>
           </div>
 
-          {breakdown && (
-            <div className="rounded-2xl border border-border/70 bg-background/40 p-5 sm:p-6">
-              <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Positionen</p>
-              <ul className="mt-3 space-y-2 text-sm">
-                {breakdown.items.map((it, i) => (
-                  <li key={i} className="flex flex-col gap-0.5 border-b border-border/40 pb-2 last:border-0 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4">
-                    <span>
-                      <span className="font-medium">{it.label}</span>
-                      {it.detail && <span className="ml-1 text-muted-foreground">– {it.detail}</span>}
-                    </span>
-                    <span className="shrink-0 text-right text-muted-foreground">
-                      {it.inklusive ? "inklusive" : it.amount === null ? "auf Anfrage" : eur(it.amount)}
-                    </span>
-                  </li>
-                ))}
-                {breakdown.anfahrt && (
-                  <li className="flex flex-col gap-0.5 border-b border-border/40 pb-2 last:border-0 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4">
-                    <span>
-                      <span className="font-medium">{breakdown.anfahrt.label}</span>
-                      {breakdown.anfahrt.detail && <span className="ml-1 text-muted-foreground">– {breakdown.anfahrt.detail}</span>}
-                    </span>
-                    <span className="shrink-0 text-right text-muted-foreground">
-                      {breakdown.anfahrt.inklusive ? "inklusive" : breakdown.anfahrt.amount === null ? "wird geprüft" : eur(breakdown.anfahrt.amount)}
-                    </span>
-                  </li>
-                )}
-                {breakdown.express && (
-                  <li className="flex flex-col gap-0.5 pb-2 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4">
-                    <span>
-                      <span className="font-medium">{breakdown.express.label}</span>
-                      {breakdown.express.detail && <span className="ml-1 text-muted-foreground">– {breakdown.express.detail}</span>}
-                    </span>
-                    <span className="shrink-0 text-right text-muted-foreground">
-                      {breakdown.express.inklusive ? "—" : breakdown.express.amount === null ? "auf Anfrage" : eur(breakdown.express.amount)}
-                    </span>
-                  </li>
-                )}
-              </ul>
-              {breakdown.total > 0 && (
-                <div className="mt-4 flex items-baseline justify-between border-t border-border/60 pt-3 text-base font-semibold">
-                  <span>Gesamtsumme berechenbarer Positionen</span>
-                  <span>{eur(breakdown.total)}</span>
-                </div>
-              )}
-              <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
-                Die Berechnung ist eine unverbindliche Ersteinschätzung. Der endgültige Preis kann je nach Untergrund, Zustand,
-                Zuschnitten, Raumaufteilung, Einsatzort, Terminwunsch und Zusatzarbeiten abweichen.
-              </p>
-            </div>
-          )}
+          <div className="rounded-2xl border border-border/70 bg-background/40 p-5 sm:p-6">
+            <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Ihre Angaben in der Zusammenfassung</p>
+            <ul className="mt-3 space-y-1.5 text-sm">
+              {summaryLines(s).map((line, i) => (
+                <li key={i} className="flex gap-2">
+                  <span className="text-muted-foreground">·</span>
+                  <span>{line}</span>
+                </li>
+              ))}
+            </ul>
+            <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
+              Diese Berechnung ist eine unverbindliche Ersteinschätzung. Der endgültige Preis hängt von Untergrund, Zuschnitten,
+              Raumaufteilung, Einsatzort, Terminwunsch und Zusatzarbeiten ab.
+            </p>
+          </div>
+
 
           <KalenderPlatzhalter />
 
@@ -765,7 +767,7 @@ function BodenForm({ s, upd }: { s: State; upd: <K extends keyof State>(k: K, v:
           onChange={(v) => upd("bodenartKey", v || "vinyl_schwimmend")}
           options={BODEN_VARIANTEN.map((b) => ({
             value: b.key,
-            label: b.price === null ? `${b.label} (auf Anfrage)` : `${b.label} · ${b.price.toFixed(2).replace(".", ",")} €/m²`,
+            label: b.price === null ? `${b.label} (auf Anfrage)` : b.label,
           }))}
         />
       </Field>
@@ -776,7 +778,7 @@ function BodenForm({ s, upd }: { s: State; upd: <K extends keyof State>(k: K, v:
         <Field label="Sockelleisten in lfm (laufende Meter)">
           <input type="number" min={0} value={s.sockelLfm} onChange={(e) => upd("sockelLfm", e.target.value)} className={input} placeholder="z. B. 40" />
           <p className="mt-1 text-xs text-muted-foreground">
-            Sockelleisten montieren ohne Acrylfuge: 5,00 € pro laufendem Meter. Acrylfuge / Versiegelung nicht enthalten – auf Wunsch separat kalkuliert.
+            Sockelleisten ohne Acrylfuge werden in der Einschätzung berücksichtigt. Acrylfuge / Versiegelung separat nach Aufwand.
           </p>
         </Field>
       </Grid2>
@@ -786,13 +788,13 @@ function BodenForm({ s, upd }: { s: State; upd: <K extends keyof State>(k: K, v:
           onChange={(v) => upd("altEntfernen", v as State["altEntfernen"])}
           options={[
             { value: "Nein", label: "Nein" },
-            { value: "schwimmend", label: "Schwimmend verlegt (4,00 €/m²)" },
-            { value: "verklebt", label: "Verklebt (auf Anfrage)" },
+            { value: "schwimmend", label: "Schwimmend verlegt" },
+            { value: "verklebt", label: "Verklebt (nach Besichtigung)" },
           ]}
         />
       </Field>
       <div className="rounded-md border border-border/60 bg-background/40 p-3 text-xs text-muted-foreground">
-        <p className="font-medium text-foreground">Inklusive im Preis:</p>
+        <p className="font-medium text-foreground">In der Einschätzung berücksichtigt:</p>
         <ul className="mt-1 list-disc pl-4">
           <li>Baustelleneinrichtung</li>
           <li>Alten Boden entsorgen</li>
