@@ -75,9 +75,13 @@ export function Footer() {
               </li>
             </ul>
             <ul className="mt-6 flex flex-wrap gap-x-4 gap-y-2 text-xs text-muted-foreground">
+              <li><Link to="/kontakt" className="hover:text-foreground">Kontakt</Link></li>
+              <li><Link to="/ueber-uns" className="hover:text-foreground">Über uns</Link></li>
+              <li><Link to="/partner" className="hover:text-foreground">Partner</Link></li>
+              <li><Link to="/wir-unterstuetzen" className="hover:text-foreground">Wir unterstützen</Link></li>
+              <li><Link to="/faq" className="hover:text-foreground">FAQ</Link></li>
               <li><Link to="/impressum" className="hover:text-foreground">Impressum</Link></li>
               <li><Link to="/datenschutz" className="hover:text-foreground">Datenschutz</Link></li>
-              <li><Link to="/faq" className="hover:text-foreground">FAQ</Link></li>
             </ul>
           </div>
         </div>
