@@ -104,25 +104,6 @@ const PROFILE_URLS = [
   "https://www.golocal.de/wilhelmshaven/bodenbelaege/verlegtverschraubt-handwerkerservice-YVD9o/",
 ];
 
-const ORG_JSONLD = {
-  "@context": "https://schema.org",
-  "@type": "LocalBusiness",
-  name: "Verlegt & Verschraubt Handwerkerservice",
-  description:
-    "Bodenverlegung, Küchenmontage, Entrümpelung und kleine Reparaturen in Wilhelmshaven & Umgebung.",
-  url: "https://verlegt-verschraubt.de/",
-  image: "https://verlegt-verschraubt.de/logo.png",
-  logo: "https://verlegt-verschraubt.de/logo.png",
-  areaServed: "Wilhelmshaven und Umgebung",
-  address: {
-    "@type": "PostalAddress",
-    addressLocality: "Wilhelmshaven",
-    addressRegion: "Niedersachsen",
-    addressCountry: "DE",
-  },
-  sameAs: PROFILE_URLS,
-};
-
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   head: () => ({
     meta: [
@@ -147,12 +128,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         rel: "stylesheet",
         href: appCss,
-      },
-    ],
-    scripts: [
-      {
-        type: "application/ld+json",
-        children: JSON.stringify(ORG_JSONLD),
       },
     ],
   }),
