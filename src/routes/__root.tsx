@@ -168,6 +168,7 @@ function RootComponent() {
         </main>
         <Footer />
         <Toaster />
+        <AttributionTracker />
       </div>
     </QueryClientProvider>
   );
