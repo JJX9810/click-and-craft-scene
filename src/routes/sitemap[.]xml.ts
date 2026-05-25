@@ -3,6 +3,7 @@ import type {} from "@tanstack/react-start";
 import { projects } from "@/data/projects";
 
 const BASE_URL = "https://verlegt-verschraubt.de";
+const LAST_MOD = "2026-05-25";
 
 interface SitemapEntry {
   path: string;
@@ -49,6 +50,7 @@ export const Route = createFileRoute("/sitemap.xml")({
           [
             `  <url>`,
             `    <loc>${BASE_URL}${e.path}</loc>`,
+            `    <lastmod>${LAST_MOD}</lastmod>`,
             e.changefreq ? `    <changefreq>${e.changefreq}</changefreq>` : null,
             e.priority ? `    <priority>${e.priority}</priority>` : null,
             `  </url>`,
