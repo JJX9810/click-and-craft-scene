@@ -228,12 +228,28 @@ function Page() {
         </div>
       </Section>
 
-      <Section eyebrow="Verfügbarkeit" title="Kalender (in Vorbereitung)">
-        <KalenderPlatzhalter />
+      <Section eyebrow="Verfügbarkeit" title="Kalender">
+        <p className="max-w-3xl text-sm text-muted-foreground">
+          Prüfen Sie verfügbare Zeiträume und senden Sie uns Ihren bevorzugten Termin. Der Termin wird erst nach
+          Rückbestätigung verbindlich.
+        </p>
+        <div className="mt-4">
+          <a
+            href="https://calendar.app.google/MbCnvoSqYjuLSAfY9"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-accent px-6 text-sm font-semibold text-accent-foreground transition-colors hover:bg-accent/90"
+          >
+            <CalendarClock className="h-4 w-4" /> Wunschtermin im Kalender auswählen
+          </a>
+        </div>
+        <div className="mt-6">
+          <KalenderPlatzhalter />
+        </div>
         <p className="mt-3 max-w-3xl text-xs text-muted-foreground">
-          Bei Nutzung der Kalenderfunktion können externe Dienste wie Google Kalender oder TimeTree eingebunden werden. Es
-          gelten die Datenschutzbestimmungen des jeweiligen Anbieters. Es werden keine Kundennamen, Adressen oder
-          Auftragsdetails angezeigt – nur „frei“, „belegt“ oder „eingeschränkt verfügbar“.
+          Der ausgewählte Termin ist eine unverbindliche Terminanfrage und wird erst nach Rückbestätigung verbindlich.
+          Es werden keine Kundennamen, Adressen oder Auftragsdetails angezeigt – nur „frei“, „belegt“ oder
+          „eingeschränkt verfügbar“. Es gelten die Datenschutzbestimmungen des jeweiligen Anbieters.
         </p>
       </Section>
 
