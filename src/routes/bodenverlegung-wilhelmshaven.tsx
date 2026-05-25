@@ -211,6 +211,8 @@ function Page() {
         </div>
       </Section>
 
+      <PreisrechnerCTA variant="bodenverlegung" />
+
       <CtaBlock
         title="Bodenprojekt in Wilhelmshaven anfragen"
         text="Senden Sie Fotos vom Raum und ein paar Maße – Sie erhalten eine ehrliche Einschätzung."
