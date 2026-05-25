@@ -43,6 +43,7 @@ export const Route = createFileRoute("/wunschtermin")({
 
 const PHONE_NUMBER = "491634799286";
 const PHONE_DISPLAY = "0163 4799286";
+const GOOGLE_CALENDAR_BOOKING_URL = "https://calendar.app.google/MbCnvoSqYjuLSAfY9";
 
 const input =
   "w-full rounded-md border border-border bg-background px-3 py-2.5 text-sm focus:border-accent focus:outline-none";
@@ -235,7 +236,7 @@ function Page() {
         </p>
         <div className="mt-4">
           <a
-            href="https://calendar.app.google/MbCnvoSqYjuLSAfY9"
+            href={GOOGLE_CALENDAR_BOOKING_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-accent px-6 text-sm font-semibold text-accent-foreground transition-colors hover:bg-accent/90"
