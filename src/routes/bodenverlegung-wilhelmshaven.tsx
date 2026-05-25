@@ -15,9 +15,14 @@ export const Route = createFileRoute("/bodenverlegung-wilhelmshaven")({
       { name: "description", content: "Bodenverlegung in Wilhelmshaven & Umgebung: Vinyl, Laminat, PVC und Teppich. Sauber verlegt, mit Untergrundprüfung und Sockelleisten." },
       { property: "og:title", content: "Bodenverlegung in Wilhelmshaven & Umgebung" },
       { property: "og:description", content: "Vinyl, Laminat, PVC und Teppich – fachgerecht verlegt von Verlegt & Verschraubt." },
-      { property: "og:url", content: "/bodenverlegung-wilhelmshaven" },
+      { property: "og:url", content: "https://verlegt-verschraubt.de/bodenverlegung-wilhelmshaven" },
+      { property: "og:image", content: "https://verlegt-verschraubt.de/hero-flooring.png" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Bodenverlegung in Wilhelmshaven & Umgebung" },
+      { name: "twitter:description", content: "Vinyl, Laminat, PVC und Teppich – fachgerecht verlegt von Verlegt & Verschraubt." },
+      { name: "twitter:image", content: "https://verlegt-verschraubt.de/hero-flooring.png" },
     ],
-    links: [{ rel: "canonical", href: "/bodenverlegung-wilhelmshaven" }],
+    links: [{ rel: "canonical", href: "https://verlegt-verschraubt.de/bodenverlegung-wilhelmshaven" }],
   }),
 });
 

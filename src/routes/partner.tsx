@@ -11,9 +11,14 @@ export const Route = createFileRoute("/partner")({
       { name: "description", content: "Unsere Partner: J.S Küchen Duo Handwerk & Umbau. Für Elektro- und Sanitärarbeiten arbeiten wir mit Fachbetrieben zusammen." },
       { property: "og:title", content: "Partner & Netzwerk" },
       { property: "og:description", content: "Saubere Abgrenzung und Zusammenarbeit mit Fachbetrieben." },
-      { property: "og:url", content: "/partner" },
+      { property: "og:url", content: "https://verlegt-verschraubt.de/partner" },
+      { property: "og:image", content: "https://verlegt-verschraubt.de/hero-flooring.png" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Partner & Netzwerk" },
+      { name: "twitter:description", content: "Saubere Abgrenzung und Zusammenarbeit mit Fachbetrieben." },
+      { name: "twitter:image", content: "https://verlegt-verschraubt.de/hero-flooring.png" },
     ],
-    links: [{ rel: "canonical", href: "/partner" }],
+    links: [{ rel: "canonical", href: "https://verlegt-verschraubt.de/partner" }],
   }),
 });
 

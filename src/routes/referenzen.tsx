@@ -11,9 +11,14 @@ export const Route = createFileRoute("/referenzen")({
       { name: "description", content: "Echte Bewertungen von Kunden auf Google, MyHammer, Das Telefonbuch und Facebook – Auszüge zu Bodenverlegung, Küchenmontage und Zuverlässigkeit." },
       { property: "og:title", content: "Referenzen & Bewertungen" },
       { property: "og:description", content: "Bewertungen unserer Kunden zu Bodenverlegung, Küchenmontage und mehr." },
-      { property: "og:url", content: "/referenzen" },
+      { property: "og:url", content: "https://verlegt-verschraubt.de/referenzen" },
+      { property: "og:image", content: "https://verlegt-verschraubt.de/hero-flooring.png" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Referenzen & Bewertungen" },
+      { name: "twitter:description", content: "Bewertungen unserer Kunden zu Bodenverlegung, Küchenmontage und mehr." },
+      { name: "twitter:image", content: "https://verlegt-verschraubt.de/hero-flooring.png" },
     ],
-    links: [{ rel: "canonical", href: "/referenzen" }],
+    links: [{ rel: "canonical", href: "https://verlegt-verschraubt.de/referenzen" }],
   }),
 });
 

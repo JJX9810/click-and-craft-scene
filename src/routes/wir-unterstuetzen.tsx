@@ -12,9 +12,14 @@ export const Route = createFileRoute("/wir-unterstuetzen")({
       { name: "description", content: "Verlegt & Verschraubt aus Wilhelmshaven unterstützt Kinderbildung und Tierschutz durch Spenden und Lehrmaterialien." },
       { property: "og:title", content: "Wir unterstützen – Bildung & Tierschutz" },
       { property: "og:description", content: "Lokale Verantwortung: Lehrmaterial-Spenden für Kinder und Spenden an Tierschutzvereine." },
-      { property: "og:url", content: "/wir-unterstuetzen" },
+      { property: "og:url", content: "https://verlegt-verschraubt.de/wir-unterstuetzen" },
+      { property: "og:image", content: "https://verlegt-verschraubt.de/hero-flooring.png" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Wir unterstützen – Bildung & Tierschutz" },
+      { name: "twitter:description", content: "Lokale Verantwortung: Lehrmaterial-Spenden für Kinder und Spenden an Tierschutzvereine." },
+      { name: "twitter:image", content: "https://verlegt-verschraubt.de/hero-flooring.png" },
     ],
-    links: [{ rel: "canonical", href: "/wir-unterstuetzen" }],
+    links: [{ rel: "canonical", href: "https://verlegt-verschraubt.de/wir-unterstuetzen" }],
   }),
 });
 
