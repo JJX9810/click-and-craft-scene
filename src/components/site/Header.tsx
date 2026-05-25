@@ -28,6 +28,7 @@ const nav: NavItem[] = [
       { label: "Jever", to: "/handwerkerservice-jever" },
       { label: "Varel", to: "/handwerkerservice-varel" },
       { label: "Wangerland", to: "/handwerkerservice-wangerland" },
+      { label: "Wittmund", to: "/handwerkerservice-wittmund" },
       { label: "Wir unterstützen", to: "/wir-unterstuetzen" },
       { label: "Partner", to: "/partner" },
       { label: "Impressum", to: "/impressum" },
