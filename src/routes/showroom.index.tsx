@@ -5,6 +5,7 @@ import { ProjectCard } from "@/components/site/ProjectCard";
 import { projects, type ProjectCategory } from "@/data/projects";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Phone } from "lucide-react";
+import { breadcrumbNode, jsonLdScript, webPageNode } from "@/lib/schema";
 
 type Filter =
   | "Alle"
