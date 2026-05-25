@@ -41,7 +41,7 @@ export function OrtsSeite({
               <h3 className="mt-4 text-lg font-semibold">{s.title}</h3>
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{s.desc}</p>
               <Link to={s.to} className="mt-5 inline-flex items-center gap-1 text-xs font-medium uppercase tracking-[0.2em] text-accent hover:gap-2">
-                Details <ArrowRight className="h-3.5 w-3.5" />
+                {s.title} ansehen <ArrowRight className="h-3.5 w-3.5" />
               </Link>
             </article>
           ))}
