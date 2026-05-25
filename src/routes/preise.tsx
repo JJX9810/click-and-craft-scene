@@ -3,6 +3,12 @@ import { createFileRoute } from "@tanstack/react-router";
 import { PageHero, Section, CtaBlock } from "@/components/site/PageShell";
 import { Kostenrechner } from "@/components/site/Kostenrechner";
 import { QuickAnswer, FactBox, InternalLinks } from "@/components/site/InfoBlocks";
+import {
+  TrustBar,
+  ReviewsAside,
+  PostCalcTrust,
+  ValuedBySection,
+} from "@/components/site/TrustReviews";
 
 export const Route = createFileRoute("/preise")({
   component: Page,
@@ -63,9 +69,27 @@ function Page() {
         </p>
       </Section>
 
-
       <Section eyebrow="Rechner" title="Projekt einschätzen lassen" bordered>
-        <Kostenrechner />
+        <div className="mb-8">
+          <TrustBar />
+        </div>
+
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start">
+          <div className="min-w-0">
+            <Kostenrechner />
+          </div>
+          <div className="lg:sticky lg:top-24">
+            <ReviewsAside />
+          </div>
+        </div>
+
+        <div className="mt-10">
+          <PostCalcTrust />
+        </div>
+      </Section>
+
+      <Section eyebrow="Vertrauen" title="Was Kunden an Verlegt & Verschraubt schätzen">
+        <ValuedBySection />
       </Section>
 
       <Section eyebrow="Weiterlesen" title="Passende Leistungen ansehen">
@@ -78,8 +102,6 @@ function Page() {
           ]}
         />
       </Section>
-
-
 
       <CtaBlock
         title="Lieber direkt sprechen?"
