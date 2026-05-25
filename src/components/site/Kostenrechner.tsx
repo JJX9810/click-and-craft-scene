@@ -295,12 +295,8 @@ function computeBreakdown(s: State): Breakdown | null {
   return { items, anfahrt, express, total, hasOnRequest };
 }
 
-function buildWaMessage(s: State, b: Breakdown | null): string {
+function summaryLines(s: State): string[] {
   const lines: string[] = [];
-  lines.push("Hallo Verlegt & Verschraubt,");
-  lines.push("");
-  lines.push("ich möchte eine unverbindliche Anfrage stellen.");
-  lines.push("");
   const serviceLabel =
     s.service === "boden"
       ? "Bodenverlegung"
@@ -308,18 +304,21 @@ function buildWaMessage(s: State, b: Breakdown | null): string {
         ? "Küchenmontage"
         : s.service === "ent"
           ? "Entrümpelung & Entsorgung"
-          : "Sonstiges Projekt";
-  if (s.name.trim()) lines.push(`Name: ${s.name.trim()}`);
-  if (s.telefon.trim()) lines.push(`Telefon: ${s.telefon.trim()}`);
-  if (s.ort.trim()) lines.push(`Ort / Einsatzadresse: ${s.ort.trim()}`);
-  lines.push(`Leistung: ${serviceLabel}`);
+          : s.service === "sonst"
+            ? "Sonstiges Projekt"
+            : "";
+  if (serviceLabel) lines.push(`Gewählte Leistung: ${serviceLabel}`);
 
   if (s.service === "boden") {
     const v = BODEN_VARIANTEN.find((x) => x.key === s.bodenartKey);
     if (v) lines.push(`Bodenart: ${v.label}`);
     if (s.qm) lines.push(`Fläche: ${s.qm} m²`);
-    if (s.altEntfernen) lines.push(`Alter Boden: ${s.altEntfernen}`);
-    if (s.sockelLfm) lines.push(`Sockelleisten: ${s.sockelLfm} lfm`);
+    if (s.sockelLfm && Number(s.sockelLfm) > 0) lines.push(`Sockelleisten: ${s.sockelLfm} lfm`);
+    if (s.altEntfernen && s.altEntfernen !== "Nein") {
+      lines.push(`Alten Boden entfernen: ${s.altEntfernen}`);
+    } else if (s.altEntfernen === "Nein") {
+      lines.push("Alten Boden entfernen: nein");
+    }
   } else if (s.service === "kueche") {
     if (s.kueArt) lines.push(`Projektart: ${s.kueArt}`);
     if (s.kueMeter) lines.push(`Küchenlänge: ${s.kueMeter} m`);
@@ -331,32 +330,63 @@ function buildWaMessage(s: State, b: Breakdown | null): string {
     if (s.sonstText.trim()) lines.push(`Beschreibung: ${s.sonstText.trim()}`);
   }
 
-  if (b) {
-    lines.push("");
-    lines.push("Positionen:");
-    for (const it of b.items) {
-      if (it.inklusive) lines.push(`- ${it.label}: inklusive`);
-      else if (it.amount === null) lines.push(`- ${it.label}: auf Anfrage${it.detail ? ` (${it.detail})` : ""}`);
-      else lines.push(`- ${it.detail ?? `${it.label}: ${eur(it.amount)}`}`);
-    }
-    if (b.anfahrt) {
-      if (b.anfahrt.inklusive) lines.push(`- Anfahrt: bis 35 km inklusive`);
-      else if (b.anfahrt.amount === null) lines.push(`- Anfahrt: wird nach Einsatzort geprüft`);
-      else lines.push(`- Anfahrt: ${b.anfahrt.detail} = ${eur(b.anfahrt.amount)}`);
-    }
-    if (b.express) {
-      if (b.express.amount === null) lines.push(`- ${b.express.label}: ${b.express.detail}`);
-      else if (b.express.inklusive) lines.push(`- ${b.express.label}: ${b.express.detail}`);
-      else lines.push(`- ${b.express.label}: ${b.express.detail} = ${eur(b.express.amount)}`);
-    }
-    if (b.total > 0) {
-      lines.push("");
-      lines.push(`Geschätzte Gesamtsumme: ${eur(b.total)}`);
-    }
-    if (b.hasOnRequest) {
-      lines.push("(Einzelne Positionen werden separat nach Besichtigung kalkuliert.)");
-    }
+  if (s.ort.trim()) lines.push(`Einsatzort: ${s.ort.trim()}`);
+  if (s.anfahrtKm.trim()) {
+    lines.push(`Anfahrt: wird je nach Einsatzort berücksichtigt (${s.anfahrtKm} km angegeben)`);
+  } else {
+    lines.push("Anfahrt: wird nach Einsatzort berücksichtigt");
   }
+
+  if (s.wunschDatum || s.wunschZeitraum) {
+    const t = [s.wunschDatum, s.wunschZeitraum].filter(Boolean).join(", ");
+    lines.push(`Terminwunsch: ${t}`);
+  }
+  if (s.fertigDatum) lines.push(`Fertigstellung gewünscht bis: ${s.fertigDatum}`);
+  if (s.dringlichkeit) {
+    const d = DRINGLICHKEIT_OPTIONS.find((o) => o.key === s.dringlichkeit);
+    if (d) lines.push(`Dringlichkeit: ${d.label}`);
+  }
+  return lines;
+}
+
+function buildWaMessage(s: State, b: Breakdown | null): string {
+  const lines: string[] = [];
+  lines.push("Hallo Verlegt & Verschraubt,");
+  lines.push("");
+  lines.push("ich möchte eine unverbindliche Anfrage stellen.");
+  lines.push("");
+  if (s.name.trim()) lines.push(`Name: ${s.name.trim()}`);
+  if (s.telefon.trim()) lines.push(`Telefon: ${s.telefon.trim()}`);
+  if (s.ort.trim()) lines.push(`Ort / Einsatzadresse: ${s.ort.trim()}`);
+
+  const serviceLabel =
+    s.service === "boden"
+      ? "Bodenverlegung"
+      : s.service === "kueche"
+        ? "Küchenmontage"
+        : s.service === "ent"
+          ? "Entrümpelung & Entsorgung"
+          : "Sonstiges Projekt";
+  lines.push(`Leistung: ${serviceLabel}`);
+
+  if (s.service === "boden") {
+    const v = BODEN_VARIANTEN.find((x) => x.key === s.bodenartKey);
+    if (v) lines.push(`Bodenart: ${v.label}`);
+    if (s.qm) lines.push(`Fläche: ${s.qm} m²`);
+    if (s.sockelLfm && Number(s.sockelLfm) > 0) lines.push(`Sockelleisten: ${s.sockelLfm} lfm`);
+    if (s.altEntfernen) lines.push(`Alten Boden entfernen: ${s.altEntfernen}`);
+  } else if (s.service === "kueche") {
+    if (s.kueArt) lines.push(`Projektart: ${s.kueArt}`);
+    if (s.kueMeter) lines.push(`Küchenlänge: ${s.kueMeter} m`);
+  } else if (s.service === "ent") {
+    if (s.entObjekt) lines.push(`Objekt: ${s.entObjekt}`);
+    if (s.entMenge) lines.push(`Menge: ${s.entMenge}`);
+    if (s.entEtage) lines.push(`Etage: ${s.entEtage}`);
+  } else if (s.service === "sonst") {
+    if (s.sonstText.trim()) lines.push(`Beschreibung: ${s.sonstText.trim()}`);
+  }
+
+  if (s.anfahrtKm.trim()) lines.push(`Entfernung: ${s.anfahrtKm} km`);
 
   lines.push("");
   lines.push("Wunschtermin:");
@@ -376,11 +406,17 @@ function buildWaMessage(s: State, b: Breakdown | null): string {
     lines.push(s.nachricht.trim());
   }
 
+  if (b && b.total > 0) {
+    lines.push("");
+    lines.push(`Geschätzte Gesamtkosten laut Rechner: ca. ${eur(b.total)}`);
+  }
+
   lines.push("");
-  lines.push("Bitte prüfen Sie, ob der Termin möglich ist.");
+  lines.push("Die Berechnung ist eine unverbindliche Ersteinschätzung. Der endgültige Preis wird nach Prüfung bestätigt.");
   lines.push("Viele Grüße");
   return lines.join("\n");
 }
+
 
 export function Kostenrechner() {
   const [step, setStep] = useState<1 | 2 | 3>(1);
