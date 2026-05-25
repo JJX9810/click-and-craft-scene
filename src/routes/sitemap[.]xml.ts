@@ -19,8 +19,11 @@ export const Route = createFileRoute("/sitemap.xml")({
           { path: "/", changefreq: "weekly", priority: "1.0" },
           { path: "/bodenverlegung-wilhelmshaven", changefreq: "monthly", priority: "0.9" },
           { path: "/kuechenmontage-in-wilhelmshaven", changefreq: "monthly", priority: "0.9" },
+          { path: "/kuechenmontage-wilhelmshaven", changefreq: "monthly", priority: "1.0" },
           { path: "/entruempelung-entsorgung-in-wilhelmshaven", changefreq: "monthly", priority: "0.9" },
+          { path: "/entruempelung-wilhelmshaven", changefreq: "monthly", priority: "1.0" },
           { path: "/handwerkerservice-wilhelmshaven", changefreq: "monthly", priority: "0.8" },
+          { path: "/wilhelmshaven", changefreq: "monthly", priority: "1.0" },
           { path: "/handwerkerservice-jever", changefreq: "monthly", priority: "0.8" },
           { path: "/handwerkerservice-sande", changefreq: "monthly", priority: "0.8" },
           { path: "/handwerkerservice-schortens", changefreq: "monthly", priority: "0.8" },
@@ -36,7 +39,8 @@ export const Route = createFileRoute("/sitemap.xml")({
           { path: "/faq", changefreq: "monthly", priority: "0.6" },
           { path: "/kontakt", changefreq: "yearly", priority: "0.7" },
           { path: "/wunschtermin", changefreq: "monthly", priority: "0.7" },
-
+          { path: "/impressum", changefreq: "yearly", priority: "0.4" },
+          { path: "/datenschutz", changefreq: "yearly", priority: "0.4" },
         ];
 
         const projectEntries: SitemapEntry[] = projects.map((p) => ({
