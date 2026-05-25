@@ -94,7 +94,7 @@ function validate(f: FormState): Errors {
 }
 
 function buildMessage(f: FormState): string {
-  return [
+  const base = [
     "Neue Projektanfrage über verlegt-verschraubt.de",
     "",
     "Name:",
@@ -123,7 +123,12 @@ function buildMessage(f: FormState): string {
     "",
     "Hinweis:",
     "Diese Anfrage wurde über das Kontaktformular der Website vorbereitet.",
-  ].join("\n");
+  ];
+  const attr = buildAttributionLines();
+  if (attr.length > 0) {
+    base.push("", ...attr);
+  }
+  return base.join("\n");
 }
 
 function Page() {
