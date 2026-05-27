@@ -39,7 +39,7 @@ const categorySet: ProjectCategory[] = [
 export const Route = createFileRoute("/showroom/")({
   component: ShowroomPage,
   head: () => {
-    const ogImage = "https://verlegt-verschraubt.de/projects/coldewei-03-vinyl-flur.jpeg";
+    const ogImage = "https://www.verlegt-verschraubt.de/projects/coldewei-03-vinyl-flur.jpeg";
     const ogDesc = "Ausgewählte Projekte aus Wilhelmshaven, Coldewei, Schortens, Hooksiel und Umgebung.";
     const ogTitle = "Showroom – Projekte von Verlegt & Verschraubt";
     return {
@@ -52,24 +52,24 @@ export const Route = createFileRoute("/showroom/")({
         },
         { property: "og:title", content: ogTitle },
         { property: "og:description", content: ogDesc },
-        { property: "og:url", content: "https://verlegt-verschraubt.de/showroom" },
+        { property: "og:url", content: "https://www.verlegt-verschraubt.de/showroom" },
         { property: "og:image", content: ogImage },
         { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:title", content: ogTitle },
         { name: "twitter:description", content: ogDesc },
         { name: "twitter:image", content: ogImage },
       ],
-      links: [{ rel: "canonical", href: "https://verlegt-verschraubt.de/showroom" }],
+      links: [{ rel: "canonical", href: "https://www.verlegt-verschraubt.de/showroom" }],
       scripts: [
         jsonLdScript([
           webPageNode({
-            url: "https://verlegt-verschraubt.de/showroom",
+            url: "https://www.verlegt-verschraubt.de/showroom",
             name: ogTitle,
             description: ogDesc,
           }),
           breadcrumbNode([
-            { name: "Startseite", url: "https://verlegt-verschraubt.de/" },
-            { name: "Showroom", url: "https://verlegt-verschraubt.de/showroom" },
+            { name: "Startseite", url: "https://www.verlegt-verschraubt.de/" },
+            { name: "Showroom", url: "https://www.verlegt-verschraubt.de/showroom" },
           ]),
         ]),
       ],

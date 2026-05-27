@@ -8,7 +8,7 @@ import {
 } from "@/lib/schema";
 import { InternalLinks } from "@/components/site/InfoBlocks";
 
-const FAQ_URL = "https://verlegt-verschraubt.de/faq";
+const FAQ_URL = "https://www.verlegt-verschraubt.de/faq";
 
 const faqGroups = [
   {
@@ -57,11 +57,11 @@ export const Route = createFileRoute("/faq")({
       { property: "og:title", content: "Häufige Fragen" },
       { property: "og:description", content: "Antworten zu Leistungen, Preisen und Ablauf." },
       { property: "og:url", content: FAQ_URL },
-      { property: "og:image", content: "https://verlegt-verschraubt.de/hero-flooring.png" },
+      { property: "og:image", content: "https://www.verlegt-verschraubt.de/hero-flooring.png" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Häufige Fragen" },
       { name: "twitter:description", content: "Antworten zu Leistungen, Preisen und Ablauf." },
-      { name: "twitter:image", content: "https://verlegt-verschraubt.de/hero-flooring.png" },
+      { name: "twitter:image", content: "https://www.verlegt-verschraubt.de/hero-flooring.png" },
     ],
     links: [{ rel: "canonical", href: FAQ_URL }],
     scripts: [
@@ -72,7 +72,7 @@ export const Route = createFileRoute("/faq")({
           description: "Antworten zu Anfragen, Preisen, Bodenverlegung, Küchenmontage, Entrümpelung und Einsatzgebiet rund um Wilhelmshaven.",
         }),
         breadcrumbNode([
-          { name: "Startseite", url: "https://verlegt-verschraubt.de/" },
+          { name: "Startseite", url: "https://www.verlegt-verschraubt.de/" },
           { name: "FAQ", url: FAQ_URL },
         ]),
         faqPageNode(faqGroups.flatMap(g => g.items)),

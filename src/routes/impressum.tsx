@@ -10,15 +10,15 @@ export const Route = createFileRoute("/impressum")({
       { name: "description", content: "Impressum von Verlegt & Verschraubt Handwerkerservice, Inhaber Justus Brosch, Wilhelmshaven. Anbieterinformationen gemäß § 5 DDG." },
       { property: "og:title", content: "Impressum – Verlegt & Verschraubt Handwerkerservice" },
       { property: "og:description", content: "Anbieterinformationen gemäß § 5 DDG." },
-      { property: "og:url", content: "https://verlegt-verschraubt.de/impressum" },
-      { property: "og:image", content: "https://verlegt-verschraubt.de/hero-flooring.png" },
+      { property: "og:url", content: "https://www.verlegt-verschraubt.de/impressum" },
+      { property: "og:image", content: "https://www.verlegt-verschraubt.de/hero-flooring.png" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Impressum – Verlegt & Verschraubt Handwerkerservice" },
       { name: "twitter:description", content: "Anbieterinformationen gemäß § 5 DDG." },
-      { name: "twitter:image", content: "https://verlegt-verschraubt.de/hero-flooring.png" },
+      { name: "twitter:image", content: "https://www.verlegt-verschraubt.de/hero-flooring.png" },
       { name: "robots", content: "noindex" },
     ],
-    links: [{ rel: "canonical", href: "https://verlegt-verschraubt.de/impressum" }],
+    links: [{ rel: "canonical", href: "https://www.verlegt-verschraubt.de/impressum" }],
   }),
 });
 
@@ -65,7 +65,7 @@ function Page() {
             </p>
             <p className="flex items-center gap-2">
               <Globe className="h-3.5 w-3.5 text-accent" />
-              <a href="https://verlegt-verschraubt.de" className="hover:text-foreground" target="_blank" rel="noopener noreferrer">verlegt-verschraubt.de</a>
+              <a href="https://www.verlegt-verschraubt.de" className="hover:text-foreground" target="_blank" rel="noopener noreferrer">verlegt-verschraubt.de</a>
             </p>
           </Card>
 

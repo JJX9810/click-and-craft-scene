@@ -5,7 +5,7 @@
 // Update-Regel: Wenn ein neuer Kanal hinzukommt, hier ergänzen UND ggf. den
 // dazugehörigen Kurzlink in src/routes/go.$slug.tsx eintragen.
 
-export const SITE_BASE = "https://verlegt-verschraubt.de";
+export const SITE_BASE = "https://www.verlegt-verschraubt.de";
 
 export type MarketingLink = {
   key: string;

@@ -12,7 +12,7 @@ import {
 import { QuickAnswer, FactBox, LimitsBox, InternalLinks } from "@/components/site/InfoBlocks";
 import { PreisrechnerCTA } from "@/components/site/PreisrechnerCTA";
 
-const KM_URL = "https://verlegt-verschraubt.de/kuechenmontage-in-wilhelmshaven";
+const KM_URL = "https://www.verlegt-verschraubt.de/kuechenmontage-in-wilhelmshaven";
 
 
 
@@ -25,11 +25,11 @@ export const Route = createFileRoute("/kuechenmontage-in-wilhelmshaven")({
       { property: "og:title", content: "Küchenmontage in Wilhelmshaven & Umgebung" },
       { property: "og:description", content: "Aufbau, Restmontage und Anpassung Ihrer Küche – sauber und zuverlässig." },
       { property: "og:url", content: KM_URL },
-      { property: "og:image", content: "https://verlegt-verschraubt.de/projects/kueche-wilhelmshaven-01.png" },
+      { property: "og:image", content: "https://www.verlegt-verschraubt.de/projects/kueche-wilhelmshaven-01.png" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Küchenmontage in Wilhelmshaven & Umgebung" },
       { name: "twitter:description", content: "Aufbau, Restmontage und Anpassung Ihrer Küche – sauber und zuverlässig." },
-      { name: "twitter:image", content: "https://verlegt-verschraubt.de/projects/kueche-wilhelmshaven-01.png" },
+      { name: "twitter:image", content: "https://www.verlegt-verschraubt.de/projects/kueche-wilhelmshaven-01.png" },
     ],
     links: [{ rel: "canonical", href: KM_URL }],
     scripts: [
@@ -46,7 +46,7 @@ export const Route = createFileRoute("/kuechenmontage-in-wilhelmshaven")({
           serviceType: "Küchenmontage",
         }),
         breadcrumbNode([
-          { name: "Startseite", url: "https://verlegt-verschraubt.de/" },
+          { name: "Startseite", url: "https://www.verlegt-verschraubt.de/" },
           { name: "Küchenmontage", url: KM_URL },
         ]),
         faqPageNode(faqs),

@@ -10,7 +10,7 @@ import {
 import { QuickAnswer, FactBox, LimitsBox, InternalLinks } from "@/components/site/InfoBlocks";
 import { PreisrechnerCTA } from "@/components/site/PreisrechnerCTA";
 
-const EN_URL = "https://verlegt-verschraubt.de/entruempelung-entsorgung-in-wilhelmshaven";
+const EN_URL = "https://www.verlegt-verschraubt.de/entruempelung-entsorgung-in-wilhelmshaven";
 
 export const Route = createFileRoute("/entruempelung-entsorgung-in-wilhelmshaven")({
   component: Page,
@@ -21,11 +21,11 @@ export const Route = createFileRoute("/entruempelung-entsorgung-in-wilhelmshaven
       { property: "og:title", content: "Entrümpelung & Entsorgung in Wilhelmshaven" },
       { property: "og:description", content: "Wohnungs-, Keller- und Dachbodenräumung, Möbel- und Sperrmüllentsorgung in Wilhelmshaven & Umgebung." },
       { property: "og:url", content: EN_URL },
-      { property: "og:image", content: "https://verlegt-verschraubt.de/logo.png" },
+      { property: "og:image", content: "https://www.verlegt-verschraubt.de/logo.png" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Entrümpelung & Entsorgung in Wilhelmshaven" },
       { name: "twitter:description", content: "Wohnungs-, Keller- und Dachbodenräumung, Möbel- und Sperrmüllentsorgung in Wilhelmshaven & Umgebung." },
-      { name: "twitter:image", content: "https://verlegt-verschraubt.de/logo.png" },
+      { name: "twitter:image", content: "https://www.verlegt-verschraubt.de/logo.png" },
     ],
     links: [{ rel: "canonical", href: EN_URL }],
     scripts: [
@@ -42,7 +42,7 @@ export const Route = createFileRoute("/entruempelung-entsorgung-in-wilhelmshaven
           serviceType: "Entrümpelung und Entsorgung",
         }),
         breadcrumbNode([
-          { name: "Startseite", url: "https://verlegt-verschraubt.de/" },
+          { name: "Startseite", url: "https://www.verlegt-verschraubt.de/" },
           { name: "Entrümpelung & Entsorgung", url: EN_URL },
         ]),
         faqPageNode(faqs),
