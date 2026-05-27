@@ -14,6 +14,7 @@ export function ProjectCard({ project, eager = false }: { project: Project; eage
         <img
           src={project.cover}
           alt={project.coverAlt}
+          title={project.title}
           loading={eager ? "eager" : "lazy"}
           decoding="async"
           onError={(e) => {
