@@ -44,8 +44,8 @@ function Page() {
     <>
       <PageHero
         eyebrow="Kostenrechner"
-        title="In wenigen Schritten zur Ersteinschätzung."
-        intro="Wählen Sie Ihre Leistung, ergänzen Sie ein paar Angaben und senden Sie alles auf Wunsch direkt per WhatsApp – inklusive aller Daten aus dem Rechner."
+        title="Kostenrechner für Bodenverlegung, Küchenmontage & Entrümpelung in Wilhelmshaven"
+        intro="Wählen Sie Ihre Leistung, ergänzen Sie ein paar Angaben und erhalten Sie eine unverbindliche Ersteinschätzung – inklusive direkter Anfrage per WhatsApp."
         breadcrumbs={[{ label: "Kostenrechner" }]}
       />
 
