@@ -21,26 +21,26 @@ export const Route = createFileRoute("/wunschtermin")({
         content:
           "Unverbindliche Terminanfrage – wir prüfen Aufwand, Einsatzort und Verfügbarkeit und melden uns mit verbindlicher Rückbestätigung.",
       },
-      { property: "og:url", content: "https://verlegt-verschraubt.de/wunschtermin" },
-      { property: "og:image", content: "https://verlegt-verschraubt.de/hero-flooring.png" },
+      { property: "og:url", content: "https://www.verlegt-verschraubt.de/wunschtermin" },
+      { property: "og:image", content: "https://www.verlegt-verschraubt.de/hero-flooring.png" },
       { property: "og:image:alt", content: "Verlegt & Verschraubt – Wunschtermin anfragen" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Wunschtermin anfragen – Verlegt & Verschraubt" },
       { name: "twitter:description", content: "Unverbindliche Terminanfrage für Bodenverlegung, Küchenmontage und Entrümpelung in Wilhelmshaven und Umgebung." },
-      { name: "twitter:image", content: "https://verlegt-verschraubt.de/hero-flooring.png" },
+      { name: "twitter:image", content: "https://www.verlegt-verschraubt.de/hero-flooring.png" },
     ],
-    links: [{ rel: "canonical", href: "https://verlegt-verschraubt.de/wunschtermin" }],
+    links: [{ rel: "canonical", href: "https://www.verlegt-verschraubt.de/wunschtermin" }],
     scripts: [
       jsonLdScript([
         webPageNode({
-          url: "https://verlegt-verschraubt.de/wunschtermin",
+          url: "https://www.verlegt-verschraubt.de/wunschtermin",
           name: "Wunschtermin anfragen – Verlegt & Verschraubt",
           description:
             "Unverbindliche Terminanfrage für Bodenverlegung, Küchenmontage und Entrümpelung in Wilhelmshaven und Umgebung.",
         }),
         breadcrumbNode([
-          { name: "Startseite", url: "https://verlegt-verschraubt.de/" },
-          { name: "Wunschtermin", url: "https://verlegt-verschraubt.de/wunschtermin" },
+          { name: "Startseite", url: "https://www.verlegt-verschraubt.de/" },
+          { name: "Wunschtermin", url: "https://www.verlegt-verschraubt.de/wunschtermin" },
         ]),
       ]),
     ],

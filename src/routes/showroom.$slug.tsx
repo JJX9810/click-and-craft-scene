@@ -15,21 +15,21 @@ export const Route = createFileRoute("/showroom/$slug")({
   head: ({ loaderData }) => {
     const p = loaderData?.project;
     if (!p) return {};
-    const url = `https://verlegt-verschraubt.de/showroom/${p.slug}`;
-    const ogImage = "https://verlegt-verschraubt.de/hero-flooring.png";
+    const url = `https://www.verlegt-verschraubt.de/showroom/${p.slug}`;
+    const ogImage = "https://www.verlegt-verschraubt.de/hero-flooring.png";
     const firstLocal = p.media.find(
       (m) => m.type === "image" && typeof m.src === "string" && m.src.startsWith("/projects/"),
     );
     const nodes: unknown[] = [
       webPageNode({ url, name: p.title, description: p.description }),
       breadcrumbNode([
-        { name: "Startseite", url: "https://verlegt-verschraubt.de/" },
-        { name: "Showroom", url: "https://verlegt-verschraubt.de/showroom" },
+        { name: "Startseite", url: "https://www.verlegt-verschraubt.de/" },
+        { name: "Showroom", url: "https://www.verlegt-verschraubt.de/showroom" },
         { name: p.title, url },
       ]),
     ];
     if (firstLocal) {
-      const absSrc = `https://verlegt-verschraubt.de${firstLocal.src}`;
+      const absSrc = `https://www.verlegt-verschraubt.de${firstLocal.src}`;
       nodes.push({
         "@type": "ImageObject",
         contentUrl: absSrc,
@@ -47,10 +47,12 @@ export const Route = createFileRoute("/showroom/$slug")({
         { property: "og:description", content: p.description },
         { property: "og:url", content: url },
         { property: "og:image", content: ogImage },
+      { property: "og:image:alt", content: "Projektbeispiel von Verlegt & Verschraubt aus Wilhelmshaven und Umgebung" },
         { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:title", content: p.title },
         { name: "twitter:description", content: p.description },
         { name: "twitter:image", content: ogImage },
+      { name: "twitter:image:alt", content: "Projektbeispiel von Verlegt & Verschraubt aus Wilhelmshaven und Umgebung" },
       ],
       links: [{ rel: "canonical", href: url }],
       scripts: [jsonLdScript(nodes)],

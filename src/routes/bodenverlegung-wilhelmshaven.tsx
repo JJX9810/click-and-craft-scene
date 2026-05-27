@@ -12,7 +12,7 @@ import {
 import { QuickAnswer, FactBox, LimitsBox, InternalLinks } from "@/components/site/InfoBlocks";
 import { PreisrechnerCTA } from "@/components/site/PreisrechnerCTA";
 
-const PAGE_URL = "https://verlegt-verschraubt.de/bodenverlegung-wilhelmshaven";
+const PAGE_URL = "https://www.verlegt-verschraubt.de/bodenverlegung-wilhelmshaven";
 
 export const Route = createFileRoute("/bodenverlegung-wilhelmshaven")({
   component: Page,
@@ -23,11 +23,13 @@ export const Route = createFileRoute("/bodenverlegung-wilhelmshaven")({
       { property: "og:title", content: "Bodenverlegung in Wilhelmshaven & Umgebung" },
       { property: "og:description", content: "Vinyl, Laminat, PVC und Teppich – fachgerecht verlegt von Verlegt & Verschraubt." },
       { property: "og:url", content: PAGE_URL },
-      { property: "og:image", content: "https://verlegt-verschraubt.de/hero-flooring.png" },
+      { property: "og:image", content: "https://www.verlegt-verschraubt.de/hero-flooring.png" },
+      { property: "og:image:alt", content: "Bodenverlegung in Wilhelmshaven mit Vinyl, Laminat, Teppich und sauberen Abschlüssen" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Bodenverlegung in Wilhelmshaven & Umgebung" },
       { name: "twitter:description", content: "Vinyl, Laminat, PVC und Teppich – fachgerecht verlegt von Verlegt & Verschraubt." },
-      { name: "twitter:image", content: "https://verlegt-verschraubt.de/hero-flooring.png" },
+      { name: "twitter:image", content: "https://www.verlegt-verschraubt.de/hero-flooring.png" },
+      { name: "twitter:image:alt", content: "Bodenverlegung in Wilhelmshaven mit Vinyl, Laminat, Teppich und sauberen Abschlüssen" },
     ],
     links: [{ rel: "canonical", href: PAGE_URL }],
     scripts: [
@@ -44,7 +46,7 @@ export const Route = createFileRoute("/bodenverlegung-wilhelmshaven")({
           serviceType: "Bodenverlegung",
         }),
         breadcrumbNode([
-          { name: "Startseite", url: "https://verlegt-verschraubt.de/" },
+          { name: "Startseite", url: "https://www.verlegt-verschraubt.de/" },
           { name: "Bodenverlegung", url: PAGE_URL },
         ]),
         faqPageNode(faqs),
