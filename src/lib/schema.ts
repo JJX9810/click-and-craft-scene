@@ -1,7 +1,7 @@
 // Zentrale JSON-LD Bausteine für Verlegt & Verschraubt
 // Sprint 3 – konsolidierter Graph, keine erfundenen Daten.
 
-export const SITE_URL = "https://www.verlegt-verschraubt.de";
+export const SITE_URL = "https://verlegt-verschraubt.de";
 
 export const ORG_ID = `${SITE_URL}/#organization`;
 export const LB_ID = `${SITE_URL}/#localbusiness`;

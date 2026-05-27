@@ -1,6 +1,6 @@
 import { createFileRoute, Navigate } from "@tanstack/react-router";
 
-const TARGET = "https://www.verlegt-verschraubt.de/kuechenmontage-in-wilhelmshaven";
+const TARGET = "https://verlegt-verschraubt.de/kuechenmontage-in-wilhelmshaven";
 
 export const Route = createFileRoute("/kuechenmontage-wilhelmshaven")({
   server: {
