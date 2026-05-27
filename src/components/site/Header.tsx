@@ -47,7 +47,8 @@ export function Header() {
         <Link to="/" className="flex shrink-0 items-center gap-3 max-w-[280px]">
           <img
             src={logo}
-            alt="Verlegt & Verschraubt Handwerkerservice"
+            alt="Firmenlogo von Verlegt & Verschraubt Handwerkerservice"
+            title="Verlegt & Verschraubt Handwerkerservice"
             className="h-10 w-auto shrink-0"
             width={120}
             height={48}
