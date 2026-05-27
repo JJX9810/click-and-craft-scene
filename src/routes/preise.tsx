@@ -108,6 +108,8 @@ function Page() {
         title="Lieber direkt sprechen?"
         text="Anrufen oder WhatsApp – wir melden uns in der Regel innerhalb von 24 Stunden."
       />
+      <AttributionDebugPanel />
     </>
+
   );
 }
