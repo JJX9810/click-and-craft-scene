@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import type {} from "@tanstack/react-start";
 import { projects } from "@/data/projects";
 
-const BASE_URL = "https://www.verlegt-verschraubt.de";
+const BASE_URL = "https://verlegt-verschraubt.de";
 const LAST_MOD = "2026-05-25";
 
 interface SitemapEntry {

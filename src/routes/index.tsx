@@ -64,30 +64,30 @@ export const Route = createFileRoute("/")({
         content:
           "Z.O.Z. – Zuverlässig. Ordentlich. Zügig. Bodenverlegung, Küchenmontage und Entrümpelung in Wilhelmshaven & Umgebung.",
       },
-      { property: "og:url", content: "https://www.verlegt-verschraubt.de/" },
-      { property: "og:image", content: "https://www.verlegt-verschraubt.de/hero-flooring.png" },
+      { property: "og:url", content: "https://verlegt-verschraubt.de/" },
+      { property: "og:image", content: "https://verlegt-verschraubt.de/hero-flooring.png" },
       { property: "og:image:alt", content: "Bodenleger verlegt Laminat in Holzoptik – Verlegt & Verschraubt Wilhelmshaven" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Verlegt & Verschraubt – Handwerkerservice Wilhelmshaven" },
       { name: "twitter:description", content: "Z.O.Z. – Zuverlässig. Ordentlich. Zügig. Bodenverlegung, Küchenmontage und Entrümpelung in Wilhelmshaven & Umgebung." },
-      { name: "twitter:image", content: "https://www.verlegt-verschraubt.de/hero-flooring.png" },
+      { name: "twitter:image", content: "https://verlegt-verschraubt.de/hero-flooring.png" },
       { name: "twitter:image:alt", content: "Bodenleger verlegt Laminat in Holzoptik – Verlegt & Verschraubt Wilhelmshaven" },
     ],
-    links: [{ rel: "canonical", href: "https://www.verlegt-verschraubt.de/" }],
+    links: [{ rel: "canonical", href: "https://verlegt-verschraubt.de/" }],
     scripts: [
       jsonLdScript([
         organizationNode,
         localBusinessNode,
         websiteNode,
         webPageNode({
-          url: "https://www.verlegt-verschraubt.de/",
+          url: "https://verlegt-verschraubt.de/",
           name: "Verlegt & Verschraubt – Handwerkerservice Wilhelmshaven",
           description:
             "Handwerkerservice Wilhelmshaven: Bodenverlegung, Küchenmontage und Entrümpelung. Z.O.Z. – zuverlässig, ordentlich, zügig.",
           id: HOME_WEBPAGE_ID,
         }),
         breadcrumbNode([
-          { name: "Startseite", url: "https://www.verlegt-verschraubt.de/" },
+          { name: "Startseite", url: "https://verlegt-verschraubt.de/" },
         ]),
         faqPageNode(faqs),
       ]),

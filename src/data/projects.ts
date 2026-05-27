@@ -29,7 +29,7 @@ export type Project = {
   detail?: boolean;
 };
 
-const BASE = "https://www.verlegt-verschraubt.de/wp-content/uploads/2026/05";
+const BASE = "https://verlegt-verschraubt.de/wp-content/uploads/2026/05";
 
 export const projects: Project[] = [
   {
