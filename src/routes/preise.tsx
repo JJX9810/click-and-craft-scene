@@ -9,6 +9,7 @@ import {
   PostCalcTrust,
   ValuedBySection,
 } from "@/components/site/TrustReviews";
+import { AttributionDebugPanel } from "@/components/site/AttributionDebugPanel";
 
 export const Route = createFileRoute("/preise")({
   component: Page,
