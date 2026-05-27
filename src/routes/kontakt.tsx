@@ -19,10 +19,12 @@ export const Route = createFileRoute("/kontakt")({
       { property: "og:description", content: "Anfrage senden – inklusive Fotos und Maßen für eine schnelle Einschätzung." },
       { property: "og:url", content: "https://www.verlegt-verschraubt.de/kontakt" },
       { property: "og:image", content: "https://www.verlegt-verschraubt.de/hero-flooring.png" },
+      { property: "og:image:alt", content: "Kontakt zu Verlegt & Verschraubt Handwerkerservice in Wilhelmshaven" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Kontakt aufnehmen" },
       { name: "twitter:description", content: "Anfrage senden – inklusive Fotos und Maßen für eine schnelle Einschätzung." },
       { name: "twitter:image", content: "https://www.verlegt-verschraubt.de/hero-flooring.png" },
+      { name: "twitter:image:alt", content: "Kontakt zu Verlegt & Verschraubt Handwerkerservice in Wilhelmshaven" },
     ],
     links: [{ rel: "canonical", href: "https://www.verlegt-verschraubt.de/kontakt" }],
     scripts: [

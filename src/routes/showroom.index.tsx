@@ -54,10 +54,12 @@ export const Route = createFileRoute("/showroom/")({
         { property: "og:description", content: ogDesc },
         { property: "og:url", content: "https://www.verlegt-verschraubt.de/showroom" },
         { property: "og:image", content: ogImage },
+      { property: "og:image:alt", content: "Projektbeispiele von Verlegt & Verschraubt aus Wilhelmshaven und Umgebung" },
         { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:title", content: ogTitle },
         { name: "twitter:description", content: ogDesc },
         { name: "twitter:image", content: ogImage },
+      { name: "twitter:image:alt", content: "Projektbeispiele von Verlegt & Verschraubt aus Wilhelmshaven und Umgebung" },
       ],
       links: [{ rel: "canonical", href: "https://www.verlegt-verschraubt.de/showroom" }],
       scripts: [

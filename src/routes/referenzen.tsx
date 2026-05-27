@@ -15,10 +15,12 @@ export const Route = createFileRoute("/referenzen")({
       { property: "og:description", content: "Bewertungen unserer Kunden zu Bodenverlegung, Küchenmontage und mehr." },
       { property: "og:url", content: "https://www.verlegt-verschraubt.de/referenzen" },
       { property: "og:image", content: "https://www.verlegt-verschraubt.de/hero-flooring.png" },
+      { property: "og:image:alt", content: "Referenzen und Kundenstimmen von Verlegt & Verschraubt aus Wilhelmshaven" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Referenzen & Bewertungen" },
       { name: "twitter:description", content: "Bewertungen unserer Kunden zu Bodenverlegung, Küchenmontage und mehr." },
       { name: "twitter:image", content: "https://www.verlegt-verschraubt.de/hero-flooring.png" },
+      { name: "twitter:image:alt", content: "Referenzen und Kundenstimmen von Verlegt & Verschraubt aus Wilhelmshaven" },
     ],
     links: [{ rel: "canonical", href: "https://www.verlegt-verschraubt.de/referenzen" }],
     scripts: [

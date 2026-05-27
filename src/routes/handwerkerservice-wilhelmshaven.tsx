@@ -25,10 +25,12 @@ export const Route = createFileRoute("/handwerkerservice-wilhelmshaven")({
       { property: "og:description", content: "Boden, Küche, Entrümpelung in Wilhelmshaven – ehrliches Handwerk." },
       { property: "og:url", content: "https://www.verlegt-verschraubt.de/handwerkerservice-wilhelmshaven" },
       { property: "og:image", content: "https://www.verlegt-verschraubt.de/hero-flooring.png" },
+      { property: "og:image:alt", content: "Handwerkerservice in Wilhelmshaven für Bodenverlegung, Küchenmontage und Entrümpelung" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Handwerkerservice in Wilhelmshaven" },
       { name: "twitter:description", content: "Boden, Küche, Entrümpelung in Wilhelmshaven – ehrliches Handwerk." },
       { name: "twitter:image", content: "https://www.verlegt-verschraubt.de/hero-flooring.png" },
+      { name: "twitter:image:alt", content: "Handwerkerservice in Wilhelmshaven für Bodenverlegung, Küchenmontage und Entrümpelung" },
     ],
     links: [{ rel: "canonical", href: "https://www.verlegt-verschraubt.de/handwerkerservice-wilhelmshaven" }],
     scripts: [

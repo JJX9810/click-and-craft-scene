@@ -18,10 +18,12 @@ export const Route = createFileRoute("/handwerkerservice-wangerland")({
       { property: "og:description", content: "Boden, Küche, Entrümpelung im Wangerland." },
       { property: "og:url", content: "https://www.verlegt-verschraubt.de/handwerkerservice-wangerland" },
       { property: "og:image", content: "https://www.verlegt-verschraubt.de/hero-flooring.png" },
+      { property: "og:image:alt", content: "Handwerkerservice im Wangerland für Bodenverlegung, Küchenmontage und Entrümpelung" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Handwerkerservice im Wangerland" },
       { name: "twitter:description", content: "Boden, Küche, Entrümpelung im Wangerland." },
       { name: "twitter:image", content: "https://www.verlegt-verschraubt.de/hero-flooring.png" },
+      { name: "twitter:image:alt", content: "Handwerkerservice im Wangerland für Bodenverlegung, Küchenmontage und Entrümpelung" },
     ],
     links: [{ rel: "canonical", href: "https://www.verlegt-verschraubt.de/handwerkerservice-wangerland" }],
     scripts: [

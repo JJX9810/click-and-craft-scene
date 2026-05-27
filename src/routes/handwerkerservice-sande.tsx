@@ -12,10 +12,12 @@ export const Route = createFileRoute("/handwerkerservice-sande")({
       { property: "og:description", content: "Boden, Küche, Entrümpelung in Sande." },
       { property: "og:url", content: "https://www.verlegt-verschraubt.de/handwerkerservice-sande" },
       { property: "og:image", content: "https://www.verlegt-verschraubt.de/hero-flooring.png" },
+      { property: "og:image:alt", content: "Handwerkerservice in Sande für Bodenverlegung, Küchenmontage und Entrümpelung" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Handwerkerservice in Sande" },
       { name: "twitter:description", content: "Boden, Küche, Entrümpelung in Sande." },
       { name: "twitter:image", content: "https://www.verlegt-verschraubt.de/hero-flooring.png" },
+      { name: "twitter:image:alt", content: "Handwerkerservice in Sande für Bodenverlegung, Küchenmontage und Entrümpelung" },
     ],
     links: [{ rel: "canonical", href: "https://www.verlegt-verschraubt.de/handwerkerservice-sande" }],
     scripts: [

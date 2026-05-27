@@ -12,10 +12,12 @@ export const Route = createFileRoute("/ueber-uns")({
       { property: "og:description", content: "Wer hinter Verlegt & Verschraubt steht und wie wir arbeiten." },
       { property: "og:url", content: "https://www.verlegt-verschraubt.de/ueber-uns" },
       { property: "og:image", content: "https://www.verlegt-verschraubt.de/hero-flooring.png" },
+      { property: "og:image:alt", content: "Über Verlegt & Verschraubt – Handwerkerservice aus Wilhelmshaven" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Über uns – Verlegt & Verschraubt" },
       { name: "twitter:description", content: "Wer hinter Verlegt & Verschraubt steht und wie wir arbeiten." },
       { name: "twitter:image", content: "https://www.verlegt-verschraubt.de/hero-flooring.png" },
+      { name: "twitter:image:alt", content: "Über Verlegt & Verschraubt – Handwerkerservice aus Wilhelmshaven" },
     ],
     links: [{ rel: "canonical", href: "https://www.verlegt-verschraubt.de/ueber-uns" }],
     scripts: [

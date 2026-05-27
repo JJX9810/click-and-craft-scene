@@ -21,10 +21,12 @@ export const Route = createFileRoute("/preise")({
       { property: "og:description", content: "Erste Preisorientierung in Sekunden – Anfrage direkt per WhatsApp senden." },
       { property: "og:url", content: "https://www.verlegt-verschraubt.de/preise" },
       { property: "og:image", content: "https://www.verlegt-verschraubt.de/hero-flooring.png" },
+      { property: "og:image:alt", content: "Preisrechner von Verlegt & Verschraubt für Bodenverlegung, Küchenmontage und Entrümpelung in Wilhelmshaven" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Kostenrechner – Verlegt & Verschraubt" },
       { name: "twitter:description", content: "Erste Preisorientierung in Sekunden – Anfrage direkt per WhatsApp senden." },
       { name: "twitter:image", content: "https://www.verlegt-verschraubt.de/hero-flooring.png" },
+      { name: "twitter:image:alt", content: "Preisrechner von Verlegt & Verschraubt für Bodenverlegung, Küchenmontage und Entrümpelung in Wilhelmshaven" },
     ],
     links: [{ rel: "canonical", href: "https://www.verlegt-verschraubt.de/preise" }],
     scripts: [

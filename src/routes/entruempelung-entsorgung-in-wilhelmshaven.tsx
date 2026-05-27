@@ -22,10 +22,12 @@ export const Route = createFileRoute("/entruempelung-entsorgung-in-wilhelmshaven
       { property: "og:description", content: "Wohnungs-, Keller- und Dachbodenräumung, Möbel- und Sperrmüllentsorgung in Wilhelmshaven & Umgebung." },
       { property: "og:url", content: EN_URL },
       { property: "og:image", content: "https://www.verlegt-verschraubt.de/logo.png" },
+      { property: "og:image:alt", content: "Entrümpelung und Entsorgung in Wilhelmshaven und Umgebung" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Entrümpelung & Entsorgung in Wilhelmshaven" },
       { name: "twitter:description", content: "Wohnungs-, Keller- und Dachbodenräumung, Möbel- und Sperrmüllentsorgung in Wilhelmshaven & Umgebung." },
       { name: "twitter:image", content: "https://www.verlegt-verschraubt.de/logo.png" },
+      { name: "twitter:image:alt", content: "Entrümpelung und Entsorgung in Wilhelmshaven und Umgebung" },
     ],
     links: [{ rel: "canonical", href: EN_URL }],
     scripts: [

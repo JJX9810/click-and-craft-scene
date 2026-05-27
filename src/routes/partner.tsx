@@ -14,10 +14,12 @@ export const Route = createFileRoute("/partner")({
       { property: "og:description", content: "Saubere Abgrenzung und Zusammenarbeit mit Fachbetrieben." },
       { property: "og:url", content: "https://www.verlegt-verschraubt.de/partner" },
       { property: "og:image", content: "https://www.verlegt-verschraubt.de/hero-flooring.png" },
+      { property: "og:image:alt", content: "Partner und Kooperationen von Verlegt & Verschraubt aus Wilhelmshaven" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Partner & Netzwerk" },
       { name: "twitter:description", content: "Saubere Abgrenzung und Zusammenarbeit mit Fachbetrieben." },
       { name: "twitter:image", content: "https://www.verlegt-verschraubt.de/hero-flooring.png" },
+      { name: "twitter:image:alt", content: "Partner und Kooperationen von Verlegt & Verschraubt aus Wilhelmshaven" },
     ],
     links: [{ rel: "canonical", href: "https://www.verlegt-verschraubt.de/partner" }],
     scripts: [

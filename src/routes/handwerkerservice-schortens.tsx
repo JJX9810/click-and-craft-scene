@@ -18,10 +18,12 @@ export const Route = createFileRoute("/handwerkerservice-schortens")({
       { property: "og:description", content: "Boden, Küche, Entrümpelung in Schortens." },
       { property: "og:url", content: "https://www.verlegt-verschraubt.de/handwerkerservice-schortens" },
       { property: "og:image", content: "https://www.verlegt-verschraubt.de/hero-flooring.png" },
+      { property: "og:image:alt", content: "Handwerkerservice in Schortens für Bodenverlegung, Küchenmontage und Entrümpelung" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Handwerkerservice in Schortens" },
       { name: "twitter:description", content: "Boden, Küche, Entrümpelung in Schortens." },
       { name: "twitter:image", content: "https://www.verlegt-verschraubt.de/hero-flooring.png" },
+      { name: "twitter:image:alt", content: "Handwerkerservice in Schortens für Bodenverlegung, Küchenmontage und Entrümpelung" },
     ],
     links: [{ rel: "canonical", href: "https://www.verlegt-verschraubt.de/handwerkerservice-schortens" }],
     scripts: [

@@ -26,10 +26,12 @@ export const Route = createFileRoute("/kuechenmontage-in-wilhelmshaven")({
       { property: "og:description", content: "Aufbau, Restmontage und Anpassung Ihrer Küche – sauber und zuverlässig." },
       { property: "og:url", content: KM_URL },
       { property: "og:image", content: "https://www.verlegt-verschraubt.de/projects/kueche-wilhelmshaven-01.png" },
+      { property: "og:image:alt", content: "Küchenmontage in Wilhelmshaven und Umgebung durch Verlegt & Verschraubt" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Küchenmontage in Wilhelmshaven & Umgebung" },
       { name: "twitter:description", content: "Aufbau, Restmontage und Anpassung Ihrer Küche – sauber und zuverlässig." },
       { name: "twitter:image", content: "https://www.verlegt-verschraubt.de/projects/kueche-wilhelmshaven-01.png" },
+      { name: "twitter:image:alt", content: "Küchenmontage in Wilhelmshaven und Umgebung durch Verlegt & Verschraubt" },
     ],
     links: [{ rel: "canonical", href: KM_URL }],
     scripts: [

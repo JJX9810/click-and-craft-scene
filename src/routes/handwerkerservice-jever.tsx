@@ -12,10 +12,12 @@ export const Route = createFileRoute("/handwerkerservice-jever")({
       { property: "og:description", content: "Boden, Küche, Entrümpelung in Jever." },
       { property: "og:url", content: "https://www.verlegt-verschraubt.de/handwerkerservice-jever" },
       { property: "og:image", content: "https://www.verlegt-verschraubt.de/hero-flooring.png" },
+      { property: "og:image:alt", content: "Handwerkerservice in Jever für Bodenverlegung, Küchenmontage und Entrümpelung" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Handwerkerservice in Jever" },
       { name: "twitter:description", content: "Boden, Küche, Entrümpelung in Jever." },
       { name: "twitter:image", content: "https://www.verlegt-verschraubt.de/hero-flooring.png" },
+      { name: "twitter:image:alt", content: "Handwerkerservice in Jever für Bodenverlegung, Küchenmontage und Entrümpelung" },
     ],
     links: [{ rel: "canonical", href: "https://www.verlegt-verschraubt.de/handwerkerservice-jever" }],
     scripts: [

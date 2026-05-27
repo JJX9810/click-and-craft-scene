@@ -58,10 +58,12 @@ export const Route = createFileRoute("/faq")({
       { property: "og:description", content: "Antworten zu Leistungen, Preisen und Ablauf." },
       { property: "og:url", content: FAQ_URL },
       { property: "og:image", content: "https://www.verlegt-verschraubt.de/hero-flooring.png" },
+      { property: "og:image:alt", content: "Häufige Fragen zu Bodenverlegung, Küchenmontage und Entrümpelung bei Verlegt & Verschraubt" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Häufige Fragen" },
       { name: "twitter:description", content: "Antworten zu Leistungen, Preisen und Ablauf." },
       { name: "twitter:image", content: "https://www.verlegt-verschraubt.de/hero-flooring.png" },
+      { name: "twitter:image:alt", content: "Häufige Fragen zu Bodenverlegung, Küchenmontage und Entrümpelung bei Verlegt & Verschraubt" },
     ],
     links: [{ rel: "canonical", href: FAQ_URL }],
     scripts: [
