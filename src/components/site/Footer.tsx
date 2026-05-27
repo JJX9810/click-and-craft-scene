@@ -12,7 +12,8 @@ export function Footer() {
             <div className="flex items-center gap-3">
               <img
                 src={logo}
-                alt="Verlegt & Verschraubt Handwerkerservice"
+                alt="Firmenlogo von Verlegt & Verschraubt Handwerkerservice"
+                title="Verlegt & Verschraubt Handwerkerservice"
                 className="h-12 w-auto"
                 width={140}
                 height={56}

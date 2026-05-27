@@ -258,6 +258,7 @@ function Index() {
               <img
                 src={heroScene}
                 alt="Bodenleger verlegt Laminatplanke in Holzoptik auf dunklem Holzboden"
+                title="Bodenverlegung durch Verlegt & Verschraubt in Wilhelmshaven"
                 className="animate-hero-float h-full w-full object-cover"
                 width={1024}
                 height={704}

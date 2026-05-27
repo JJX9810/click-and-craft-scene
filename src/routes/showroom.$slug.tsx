@@ -68,6 +68,7 @@ function MediaItem({ m, eager }: { m: ProjectMedia; eager?: boolean }) {
           <img
             src={m.src}
             alt={m.alt}
+            title={m.caption ?? m.alt}
             loading={eager ? "eager" : "lazy"}
             decoding="async"
             onError={(e) => {
