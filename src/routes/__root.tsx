@@ -103,6 +103,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { name: "google-site-verification", content: "TDh9EUozWlH9ooXcek1xTUxdzAmmLgSj9dY6jk3OVng" },
+      { name: "robots", content: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" },
+      { name: "publisher", content: "Verlegt & Verschraubt Handwerkerservice" },
       { title: "Verlegt & Verschraubt Handwerkerservice – Wilhelmshaven" },
       {
         name: "description",
@@ -114,8 +116,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:site_name", content: "Verlegt & Verschraubt Handwerkerservice" },
       { property: "og:locale", content: "de_DE" },
       { property: "og:title", content: "Verlegt & Verschraubt Handwerkerservice – Wilhelmshaven" },
+      {
+        property: "og:description",
+        content:
+          "Bodenverlegung, Küchenmontage und Entrümpelung in Wilhelmshaven & Umgebung. Z.O.Z. – Zuverlässig. Ordentlich. Zügig.",
+      },
+      { property: "og:url", content: "https://verlegt-verschraubt.de/" },
+      { property: "og:image:alt", content: "Verlegt & Verschraubt – Bodenverlegung, Küchenmontage und Entrümpelung in Wilhelmshaven" },
       { name: "twitter:title", content: "Verlegt & Verschraubt Handwerkerservice – Wilhelmshaven" },
+      { name: "twitter:description", content: "Z.O.Z. – Zuverlässig. Ordentlich. Zügig. Bodenverlegung, Küchenmontage und Entrümpelung in Wilhelmshaven & Umgebung." },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:image:alt", content: "Verlegt & Verschraubt – Handwerkerservice Wilhelmshaven" },
     ],
     links: [
       {
