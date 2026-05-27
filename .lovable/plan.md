@@ -1,81 +1,48 @@
-## Plan: Google-Kalender-Verknüpfung aktivieren
 
-### Ziel
-Den bereitgestellten Google-Kalender-Buchungslink (`https://calendar.app.google/MbCnvoSqYjuLSAfY9`) in den Kostenrechner und auf die /wunschtermin-Seite einbinden. Termin bleibt unverbindliche Anfrage. Keine Preisänderungen, keine öffentlichen Einzelpreise.
+## Ziel
 
----
+Attribution-System verifizieren, ohne externe Analytics/Consent/GA4 anzufassen. Zusätzlich ein internes Debug-Panel auf `/preise?debug=1` einbauen, damit QR-Codes und Kurzlinks vor Ort schnell überprüfbar sind.
 
-### Geänderte Dateien
+## Umsetzung
 
-1. **`src/components/site/Kostenrechner.tsx`**
-2. **`src/routes/wunschtermin.tsx`**
+### 1. Neue Komponente: `src/components/site/AttributionDebugPanel.tsx`
+- Liest `?debug=1` aus der URL (über `useSearch` / `window.location.search`).
+- Rendert `null`, wenn `debug` nicht gesetzt → normale Besucher sehen nichts.
+- Zeigt sonst eine schlichte, gerahmte Box (Tailwind, Design-Tokens, kein Eingriff ins bestehende Layout) mit:
+  - first_touch_* (source, medium, campaign, content, landing_page, timestamp)
+  - last_touch_* (source, medium, campaign, content, landing_page, timestamp)
+  - current_page
+  - menschenlesbare Quelle (`formatSource(last.source)`) + Kampagne (`formatCampaign`)
+  - Ablaufdatum: `stored_at + 90 Tage` (aus `localStorage`, da `getAttribution()` heute kein `stored_at` zurückgibt → wird mit ausgelesen)
+- Buttons:
+  - „Attribution zurücksetzen" → `localStorage.removeItem("vv_attribution_v1")` + Reload
+  - „Aktualisieren" → forciert Re-Render
+- Aktualisiert sich bei Mount und bei Klick auf Reset.
 
----
+### 2. Einbindung auf der Preisseite
+- In `src/routes/preise.tsx` ganz unten (nach `CtaBlock`) `<AttributionDebugPanel />` einfügen.
+- Komponente entscheidet selbst, ob sie sichtbar ist → keine Änderung am normalen Design.
 
-### Änderung 1 — Zentrale Variable
+### 3. Live-Test (browser tool)
+Nach Build prüfe ich in der Vorschau:
+- `/go/kleinanzeigen`, `/go/facebook`, `/go/flyer`, `/go/visitenkarte`, `/go/google`, `/go/myhammer` → muss auf `/preise?...` weiterleiten.
+- Direkte UTM-URLs (`/preise?utm_source=...`) → Debug-Panel zeigt korrekte Werte.
+- Interne Navigation (z. B. zu `/kontakt` und zurück zu `/preise?debug=1`) → first_touch bleibt, last_touch unverändert.
+- Neuer UTM-Link → last_touch aktualisiert, first_touch unverändert.
+- Direktaufruf ohne UTM nach Reset → Quelle „Direkter Websitebesuch".
+- Preisrechner → WhatsApp-Klick: Nachricht enthält „Anfrage über: …", „Kampagne: Preisrechner", „Einstiegsseite: /preise…". (Test ohne Versand: WhatsApp-Link-URL lesen, `text`-Parameter dekodieren.)
 
-In `src/components/site/Kostenrechner.tsx` am Dateianfang ergänzen:
-```ts
-const GOOGLE_CALENDAR_BOOKING_URL = "https://calendar.app.google/MbCnvoSqYjuLSAfY9";
-```
+### 4. Keine Eingriffe
+- Kein GA4/GTM/Plausible.
+- Kein Consent-Banner.
+- Keine Änderungen an `attribution.ts`, `tracking.ts`, `Kostenrechner.tsx`, `kontakt.tsx`, `go.$slug.tsx` außer falls beim Test ein konkreter Bug auftritt.
 
----
+### 5. Abschlussbericht
+Strukturierter Report mit den 11 Punkten aus der Aufgabe inkl. konkreter Beobachtungen aus dem Live-Test und Stichproben aus dem Debug-Panel.
 
-### Änderung 2 — `KalenderPlatzhalter` überarbeiten (Kostenrechner)
+## Technische Details
 
-Die `KalenderPlatzhalter`-Komponente (exportiert, wird auch von /wunschtermin importiert) ersetzen durch einen funktionalen Block mit Button:
-
-- **Button-Text:** „Verfügbarkeit prüfen“
-- **Link:** `GOOGLE_CALENDAR_BOOKING_URL`
-- **Öffnung:** `target="_blank" rel="noopener noreferrer"`
-- **Hinweis unter Button:** „Der Kalender dient zur unverbindlichen Terminanfrage. Der endgültige Termin wird nach Prüfung von Aufwand, Einsatzort, Materialverfügbarkeit und bestehender Planung bestätigt.“
-- **Datenschutz-Hinweis bleibt:** Keine Kundennamen, Adressen oder Auftragsdetails im Kalender sichtbar.
-
-Da `KalenderPlatzhalter` von `/wunschtermin.tsx` importiert wird, muss die Komponente dort ebenfalls korrekt rendern.
-
----
-
-### Änderung 3 — Kostenrechner Step 3 (Ergebnis)
-
-Die `<KalenderPlatzhalter />`-Einbindung in Step 3 (ca. Zeile 617) bleibt bestehen – die überarbeitete Komponente rendert dort automatisch den neuen Button.
-
----
-
-### Änderung 4 — Kostenrechner `TerminBlock` (Step 2)
-
-Der bestehende `TerminBlock` mit Wunschdatum, Wunschzeitraum, Fertigstellung, Dringlichkeit und Hinweise bleibt unverändert. Keine Änderung.
-
----
-
-### Änderung 5 — `/wunschtermin.tsx` anpassen
-
-**Section „Verfügbarkeit / Kalender“ überarbeiten:**
-
-- Titel bleibt oder wird auf „Kalender“ gesetzt.
-- Text: „Prüfen Sie verfügbare Zeiträume und senden Sie uns Ihren bevorzugten Termin. Der Termin wird erst nach Rückbestätigung verbindlich.“
-- Button: „Wunschtermin im Kalender auswählen“ → `GOOGLE_CALENDAR_BOOKING_URL`, `target="_blank" rel="noopener noreferrer"`
-- Hinweis darunter: Unverbindlichkeit + Datenschutz (keine Kundendaten sichtbar).
-- Import `Calendar` icon von lucide-react ergänzen falls nötig.
-
-Die WhatsApp-Anfrage (Formular, Button, Vorschau) bleibt vollständig erhalten.
-
----
-
-### Was NICHT geändert wird
-
-- Keine Preislogik-Änderungen
-- Keine öffentlichen Einzelpreise sichtbar machen
-- Keine API-Schlüssel im Frontend
-- Keine verbindliche Online-Buchung
-- TerminBlock-Struktur, WhatsApp-Übergabe, Stepper, Formularfelder, Schema, Footer, Header, Routen
-
----
-
-### Ergebnis-Check nach Umsetzung
-
-- `GOOGLE_CALENDAR_BOOKING_URL` als Konstante gesetzt
-- Button „Verfügbarkeit prüfen“ in überarbeitetem `KalenderPlatzhalter`
-- Button „Wunschtermin im Kalender auswählen“ auf /wunschtermin
-- Überall Unverbindlichkeit klargestellt
-- Keine Preise wieder öffentlich
-- Keine API-Zugangsdaten im Frontend
+- `useSearch({ strict: false })` aus TanStack Router, fallback `window.location.search`, damit die Komponente unabhängig von Route-Search-Schema funktioniert.
+- Werte werden über `getAttributionFields()` gelesen → keine Duplizierung der Logik.
+- Für TTL: Rohzugriff `JSON.parse(localStorage.getItem("vv_attribution_v1"))?.stored_at`, +90 Tage, als ISO-Datum anzeigen.
+- Styling: `border border-border bg-muted/50 text-xs font-mono p-4 rounded-md` o. ä., in `Section`-Container eingebettet. Kein Einfluss auf das Hero/Layout.
