@@ -39,13 +39,14 @@ export const realReviews = [
 
 function Stars({ size = "h-3.5 w-3.5" }: { size?: string }) {
   return (
-    <div className="flex items-center gap-0.5 text-accent" aria-label="5 von 5 Sternen">
+    <div className="flex items-center gap-0.5 text-accent" role="img" aria-label="5 von 5 Sternen">
       {Array.from({ length: 5 }).map((_, i) => (
-        <Star key={i} className={`${size} fill-current`} />
+        <Star key={i} aria-hidden="true" className={`${size} fill-current`} />
       ))}
     </div>
   );
 }
+
 
 /** Schmale Trust-Leiste oberhalb / am Rechner. Keine erfundenen Zahlen. */
 export function TrustBar() {
