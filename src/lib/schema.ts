@@ -4,9 +4,17 @@
 export const SITE_URL = "https://verlegt-verschraubt.de";
 
 export const ORG_ID = `${SITE_URL}/#organization`;
-export const LB_ID = `${SITE_URL}/#localbusiness`;
+// LB_ID kept as alias for backwards-compat; points to the same single
+// Organization/LocalBusiness/HomeAndConstructionBusiness entity.
+export const LB_ID = ORG_ID;
 export const WEBSITE_ID = `${SITE_URL}/#website`;
 export const HOME_WEBPAGE_ID = `${SITE_URL}/#webpage`;
+
+export const SERVICE_IDS = {
+  bodenverlegung: `${SITE_URL}/#service-bodenverlegung`,
+  kuechenmontage: `${SITE_URL}/#service-kuechenmontage`,
+  entruempelung: `${SITE_URL}/#service-entruempelung`,
+} as const;
 
 export const PROFILE_URLS = [
   "https://share.google/47AcEDNTSDkltR1un",
@@ -39,7 +47,6 @@ const AREA_SERVED = [
   "Wilhelmshaven und Umgebung",
 ];
 
-// OfferCatalog ohne Preise / Offers – nur Leistungsspektrum
 const OFFER_CATALOG = {
   "@type": "OfferCatalog",
   name: "Leistungen Verlegt & Verschraubt",
@@ -50,37 +57,43 @@ const OFFER_CATALOG = {
   ],
 };
 
+// Eine konsolidierte Entität mit mehreren Typen – wird sowohl als
+// Organization als auch als LocalBusiness / HomeAndConstructionBusiness
+// erkannt und über ORG_ID von allen WebPages referenziert.
 export const organizationNode = {
-  "@type": "Organization",
+  "@type": ["Organization", "LocalBusiness", "HomeAndConstructionBusiness"],
   "@id": ORG_ID,
   name: "Verlegt & Verschraubt Handwerkerservice",
+  alternateName: "Verlegt & Verschraubt",
+  description:
+    "Verlegt & Verschraubt Handwerkerservice unterstützt Privatkunden bei Bodenverlegung, Küchenmontage sowie Entrümpelung & Entsorgung in Wilhelmshaven und Umgebung.",
   url: `${SITE_URL}/`,
   logo: `${SITE_URL}/logo.png`,
   image: `${SITE_URL}/hero-flooring.png`,
   email: "justus.brosch@verlegt-verschraubt.de",
   telephone: "+491634799286",
+  priceRange: "€€",
   founder: { "@type": "Person", name: "Justus Brosch" },
-  address: POSTAL_ADDRESS,
-  sameAs: PROFILE_URLS,
-};
-
-export const localBusinessNode = {
-  "@type": "HomeAndConstructionBusiness",
-  "@id": LB_ID,
-  name: "Verlegt & Verschraubt Handwerkerservice",
-  url: `${SITE_URL}/`,
-  logo: `${SITE_URL}/logo.png`,
-  image: `${SITE_URL}/hero-flooring.png`,
-  email: "justus.brosch@verlegt-verschraubt.de",
-  telephone: "+491634799286",
-  founder: { "@type": "Person", name: "Justus Brosch" },
-  parentOrganization: { "@id": ORG_ID },
   address: POSTAL_ADDRESS,
   areaServed: AREA_SERVED,
   sameAs: PROFILE_URLS,
   slogan: "Z.O.Z. – Zuverlässig. Ordentlich. Zügig.",
+  knowsAbout: [
+    "Bodenverlegung",
+    "Küchenmontage",
+    "Entrümpelung",
+    "Vinylboden",
+    "Laminat",
+    "PVC-Boden",
+    "Teppichboden",
+    "Sockelleisten",
+    "Küchenaufbau",
+  ],
   hasOfferCatalog: OFFER_CATALOG,
 };
+
+// Backwards-compat-Alias – verweist auf dieselbe Entität.
+export const localBusinessNode = organizationNode;
 
 export const websiteNode = {
   "@type": "WebSite",
@@ -91,15 +104,62 @@ export const websiteNode = {
   publisher: { "@id": ORG_ID },
 };
 
-export interface WebPageInput { url: string; name: string; description: string; id?: string; }
-export function webPageNode({ url, name, description, id }: WebPageInput) {
+// Eigenständige Service-Entities mit stabilen @ids, die von Leistungs-
+// und Ortsseiten als WebPage.about referenziert werden können.
+export const serviceEntities = [
+  {
+    "@type": "Service",
+    "@id": SERVICE_IDS.bodenverlegung,
+    name: "Bodenverlegung in Wilhelmshaven & Umgebung",
+    description:
+      "Verlegung von Vinyl, Designboden, Laminat, PVC und Teppich inklusive Untergrundprüfung, Treppenverkleidung sowie Sockelleisten und Übergängen.",
+    serviceType: "Bodenverlegung",
+    url: `${SITE_URL}/bodenverlegung-wilhelmshaven`,
+    provider: { "@id": ORG_ID },
+    areaServed: AREA_SERVED,
+  },
+  {
+    "@type": "Service",
+    "@id": SERVICE_IDS.kuechenmontage,
+    name: "Küchenmontage in Wilhelmshaven & Umgebung",
+    description:
+      "Küchenaufbau nach Umzug, Restmontage und Anpassung – Arbeitsplatten, Spüle, Armatur sowie Sockel und Lichtleisten.",
+    serviceType: "Küchenmontage",
+    url: `${SITE_URL}/kuechenmontage-in-wilhelmshaven`,
+    provider: { "@id": ORG_ID },
+    areaServed: AREA_SERVED,
+  },
+  {
+    "@type": "Service",
+    "@id": SERVICE_IDS.entruempelung,
+    name: "Entrümpelung & Entsorgung in Wilhelmshaven",
+    description:
+      "Wohnungs-, Keller- und Dachbodenentrümpelung, Möbel- und Sperrmüllentsorgung sowie Räumung vor Renovierung.",
+    serviceType: "Entrümpelung und Entsorgung",
+    url: `${SITE_URL}/entruempelung-entsorgung-in-wilhelmshaven`,
+    provider: { "@id": ORG_ID },
+    areaServed: AREA_SERVED,
+  },
+];
+
+export interface WebPageInput {
+  url: string;
+  name: string;
+  description: string;
+  id?: string;
+  about?: { "@id": string } | { "@id": string }[];
+  primaryImageOfPage?: string;
+}
+export function webPageNode({ url, name, description, id, about, primaryImageOfPage }: WebPageInput) {
   return {
     "@type": "WebPage",
     "@id": id ?? `${url}#webpage`,
     url, name, description,
     inLanguage: "de-DE",
     isPartOf: { "@id": WEBSITE_ID },
-    about: { "@id": LB_ID },
+    publisher: { "@id": ORG_ID },
+    about: about ?? { "@id": ORG_ID },
+    ...(primaryImageOfPage ? { primaryImageOfPage } : {}),
   };
 }
 
@@ -116,13 +176,14 @@ export function breadcrumbNode(items: BreadcrumbItem[]) {
 export interface ServiceInput {
   url: string; name: string; description: string; serviceType: string;
   areaServed?: string | string[];
+  id?: string;
 }
-export function serviceNode({ url, name, description, serviceType, areaServed }: ServiceInput) {
+export function serviceNode({ url, name, description, serviceType, areaServed, id }: ServiceInput) {
   return {
     "@type": "Service",
-    "@id": `${url}#service`,
+    "@id": id ?? `${url}#service`,
     name, description, serviceType, url,
-    provider: { "@id": LB_ID },
+    provider: { "@id": ORG_ID },
     areaServed: areaServed ?? AREA_SERVED,
   };
 }

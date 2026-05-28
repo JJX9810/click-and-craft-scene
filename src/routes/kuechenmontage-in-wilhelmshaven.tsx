@@ -7,7 +7,7 @@ import { ArrowRight } from "lucide-react";
 import { ProjectCard } from "@/components/site/ProjectCard";
 import { projects } from "@/data/projects";
 import {
-  breadcrumbNode, faqPageNode, jsonLdScript, serviceNode, webPageNode,
+  breadcrumbNode, faqPageNode, jsonLdScript, serviceNode, webPageNode, SERVICE_IDS,
 } from "@/lib/schema";
 import { QuickAnswer, FactBox, LimitsBox, InternalLinks } from "@/components/site/InfoBlocks";
 import { PreisrechnerCTA } from "@/components/site/PreisrechnerCTA";
@@ -40,9 +40,11 @@ export const Route = createFileRoute("/kuechenmontage-in-wilhelmshaven")({
           url: KM_URL,
           name: "Küchenmontage in Wilhelmshaven & Umgebung",
           description: "Aufbau nach Umzug, Restmontage, neue Module, Arbeitsplatten, Spüle und Armatur sowie saubere Abschlüsse mit Sockel, Lichtleisten und Silikon.",
+          about: { "@id": SERVICE_IDS.kuechenmontage },
         }),
         serviceNode({
           url: KM_URL,
+          id: SERVICE_IDS.kuechenmontage,
           name: "Küchenmontage in Wilhelmshaven",
           description: "Küchenaufbau, Restmontage und Anpassung – von der Front über die Arbeitsplatte bis zur Spüle und Armatur. Wasseranschluss an bestehende Eckventile.",
           serviceType: "Küchenmontage",

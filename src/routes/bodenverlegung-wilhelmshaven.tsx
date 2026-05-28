@@ -7,7 +7,7 @@ import { ArrowRight } from "lucide-react";
 import { ProjectCard } from "@/components/site/ProjectCard";
 import { projects } from "@/data/projects";
 import {
-  breadcrumbNode, faqPageNode, jsonLdScript, serviceNode, webPageNode,
+  breadcrumbNode, faqPageNode, jsonLdScript, serviceNode, webPageNode, SERVICE_IDS,
 } from "@/lib/schema";
 import { QuickAnswer, FactBox, LimitsBox, InternalLinks } from "@/components/site/InfoBlocks";
 import { PreisrechnerCTA } from "@/components/site/PreisrechnerCTA";
@@ -38,9 +38,11 @@ export const Route = createFileRoute("/bodenverlegung-wilhelmshaven")({
           url: PAGE_URL,
           name: "Bodenverlegung in Wilhelmshaven & Umgebung",
           description: "Vinyl, Laminat, PVC, Teppich, Treppen und Sockelleisten – sauber verlegt, mit ordentlichen Kanten und stimmigem Verlegebild. Für Privatkunden in Wilhelmshaven, Schortens, Sande, Jever, Varel und Wangerland.",
+          about: { "@id": SERVICE_IDS.bodenverlegung },
         }),
         serviceNode({
           url: PAGE_URL,
+          id: SERVICE_IDS.bodenverlegung,
           name: "Bodenverlegung in Wilhelmshaven",
           description: "Verlegung von Vinyl, Designboden, Laminat, PVC und Teppich inklusive Untergrundprüfung, Altbelag entfernen, Treppenverkleidung sowie Sockelleisten und Übergängen.",
           serviceType: "Bodenverlegung",

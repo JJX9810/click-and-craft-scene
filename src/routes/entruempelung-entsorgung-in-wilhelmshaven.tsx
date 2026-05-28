@@ -5,7 +5,7 @@ import {
 } from "@/components/ui/accordion";
 import { ArrowRight } from "lucide-react";
 import {
-  breadcrumbNode, faqPageNode, jsonLdScript, serviceNode, webPageNode,
+  breadcrumbNode, faqPageNode, jsonLdScript, serviceNode, webPageNode, SERVICE_IDS,
 } from "@/lib/schema";
 import { QuickAnswer, FactBox, LimitsBox, InternalLinks } from "@/components/site/InfoBlocks";
 import { PreisrechnerCTA } from "@/components/site/PreisrechnerCTA";
@@ -36,9 +36,11 @@ export const Route = createFileRoute("/entruempelung-entsorgung-in-wilhelmshaven
           url: EN_URL,
           name: "Entrümpelung & Entsorgung in Wilhelmshaven",
           description: "Wohnungen, Keller, Dachböden und ganze Häuser räumen wir zuverlässig und besenrein – inklusive fachgerechter Entsorgung von Möbeln und Sperrmüll. Auch als Räumung vor Renovierung möglich.",
+          about: { "@id": SERVICE_IDS.entruempelung },
         }),
         serviceNode({
           url: EN_URL,
+          id: SERVICE_IDS.entruempelung,
           name: "Entrümpelung & Entsorgung in Wilhelmshaven",
           description: "Wohnungs-, Keller- und Dachbodenentrümpelung, Möbel- und Sperrmüllentsorgung sowie Räumung vor Renovierung in Wilhelmshaven und Umgebung.",
           serviceType: "Entrümpelung und Entsorgung",
