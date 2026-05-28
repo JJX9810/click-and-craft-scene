@@ -202,7 +202,7 @@ function Index() {
         <SawdustParticles density={28} />
 
         <div className="relative mx-auto grid max-w-7xl grid-cols-1 items-center gap-12 px-6 pb-24 pt-12 lg:grid-cols-2 lg:gap-10 lg:pt-20">
-          <div className="relative z-10 max-w-xl animate-fade-up">
+          <div className="relative z-10 max-w-xl">
             <span className="inline-block rounded-full border border-accent/30 bg-accent/10 px-4 py-1.5 text-[11px] uppercase tracking-[0.28em] text-accent">
               Z.O.Z. · Zuverlässig · Ordentlich · Zügig
             </span>
@@ -273,14 +273,15 @@ function Index() {
                   sizes="(max-width: 768px) 100vw, 50vw"
                 />
                 <img
-                  src={heroScene}
+                  src="/hero-flooring.webp"
                   alt="Bodenleger verlegt Laminatplanke in Holzoptik auf dunklem Holzboden"
                   title="Bodenverlegung durch Verlegt & Verschraubt in Wilhelmshaven"
-                  className="animate-hero-float h-full w-full object-cover"
+                  className="h-full w-full object-cover"
                   width={1024}
                   height={704}
                   fetchPriority="high"
                   decoding="async"
+                  loading="eager"
                 />
               </picture>
               <div
@@ -293,6 +294,8 @@ function Index() {
             </div>
           </div>
         </div>
+      </section>
+
       </section>
 
       {/* KURZANTWORT + FAKTEN */}
