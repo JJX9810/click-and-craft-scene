@@ -296,7 +296,6 @@ function Index() {
         </div>
       </section>
 
-      </section>
 
       {/* KURZANTWORT + FAKTEN */}
       <section className="border-t border-border/60">
