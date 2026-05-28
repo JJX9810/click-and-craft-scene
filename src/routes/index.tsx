@@ -365,7 +365,7 @@ function Index() {
           </div>
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {featuredProjects.slice(0, 3).map((p, i) => (
-              <ProjectCard key={p.slug} project={p} eager={i === 0} />
+              <ProjectCard key={p.slug} project={p} eager={false} />
             ))}
           </div>
         </div>
