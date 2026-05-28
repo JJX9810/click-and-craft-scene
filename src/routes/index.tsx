@@ -266,16 +266,23 @@ function Index() {
 
           <div className="relative">
             <div className="relative aspect-[16/11] w-full overflow-hidden rounded-3xl border border-border/60 shadow-2xl">
-              <img
-                src={heroScene}
-                alt="Bodenleger verlegt Laminatplanke in Holzoptik auf dunklem Holzboden"
-                title="Bodenverlegung durch Verlegt & Verschraubt in Wilhelmshaven"
-                className="animate-hero-float h-full w-full object-cover"
-                width={1024}
-                height={704}
-                fetchPriority="high"
-                decoding="async"
-              />
+              <picture>
+                <source
+                  type="image/webp"
+                  srcSet="/hero-flooring-mobile.webp 800w, /hero-flooring.webp 1600w"
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                />
+                <img
+                  src={heroScene}
+                  alt="Bodenleger verlegt Laminatplanke in Holzoptik auf dunklem Holzboden"
+                  title="Bodenverlegung durch Verlegt & Verschraubt in Wilhelmshaven"
+                  className="animate-hero-float h-full w-full object-cover"
+                  width={1024}
+                  height={704}
+                  fetchPriority="high"
+                  decoding="async"
+                />
+              </picture>
               <div
                 className="pointer-events-none absolute inset-0"
                 style={{
