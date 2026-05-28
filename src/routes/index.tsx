@@ -24,7 +24,6 @@ import {
   CheckCircle2,
   Star,
 } from "lucide-react";
-import heroScene from "@/assets/hero-flooring.png";
 import { ProjectCard } from "@/components/site/ProjectCard";
 import { featuredProjects } from "@/data/projects";
 import { EinsatzgebietMap } from "@/components/site/EinsatzgebietMap";
