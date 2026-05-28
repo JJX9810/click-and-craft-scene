@@ -21,7 +21,7 @@ export function ProjectCard({ project, eager = false }: { project: Project; eage
             const img = e.currentTarget;
             if (img.dataset.fallback !== "1") {
               img.dataset.fallback = "1";
-              img.src = "/wood-bg.png";
+              img.src = "/wood-bg.webp";
             }
           }}
           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
