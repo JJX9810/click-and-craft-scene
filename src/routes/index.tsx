@@ -24,7 +24,6 @@ import {
   CheckCircle2,
   Star,
 } from "lucide-react";
-import heroScene from "@/assets/hero-flooring.png";
 import { ProjectCard } from "@/components/site/ProjectCard";
 import { featuredProjects } from "@/data/projects";
 import { EinsatzgebietMap } from "@/components/site/EinsatzgebietMap";
@@ -202,7 +201,7 @@ function Index() {
         <SawdustParticles density={28} />
 
         <div className="relative mx-auto grid max-w-7xl grid-cols-1 items-center gap-12 px-6 pb-24 pt-12 lg:grid-cols-2 lg:gap-10 lg:pt-20">
-          <div className="relative z-10 max-w-xl animate-fade-up">
+          <div className="relative z-10 max-w-xl">
             <span className="inline-block rounded-full border border-accent/30 bg-accent/10 px-4 py-1.5 text-[11px] uppercase tracking-[0.28em] text-accent">
               Z.O.Z. · Zuverlässig · Ordentlich · Zügig
             </span>
@@ -273,14 +272,15 @@ function Index() {
                   sizes="(max-width: 768px) 100vw, 50vw"
                 />
                 <img
-                  src={heroScene}
+                  src="/hero-flooring.webp"
                   alt="Bodenleger verlegt Laminatplanke in Holzoptik auf dunklem Holzboden"
                   title="Bodenverlegung durch Verlegt & Verschraubt in Wilhelmshaven"
-                  className="animate-hero-float h-full w-full object-cover"
+                  className="h-full w-full object-cover"
                   width={1024}
                   height={704}
                   fetchPriority="high"
                   decoding="async"
+                  loading="eager"
                 />
               </picture>
               <div
@@ -294,6 +294,7 @@ function Index() {
           </div>
         </div>
       </section>
+
 
       {/* KURZANTWORT + FAKTEN */}
       <section className="border-t border-border/60">
@@ -326,11 +327,12 @@ function Index() {
           <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {reviews.map((r) => (
               <article key={r.name} className="tile-shader rounded-2xl border border-border/70 bg-card/50 p-5 backdrop-blur">
-                <div className="flex items-center gap-1 text-accent">
+                <div className="flex items-center gap-1 text-accent" role="img" aria-label="5 von 5 Sternen">
                   {Array.from({ length: 5 }).map((_, i) => (
-                    <Star key={i} className="h-3.5 w-3.5 fill-current" />
+                    <Star key={i} aria-hidden="true" className="h-3.5 w-3.5 fill-current" />
                   ))}
                 </div>
+
                 <p className="mt-3 text-sm leading-relaxed text-foreground/90">„{r.text}"</p>
                 <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground">
                   <span className="font-medium text-foreground">{r.name}</span>

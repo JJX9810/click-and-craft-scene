@@ -50,7 +50,8 @@ function PartnerCard() {
           </p>
         </div>
         <div className="flex items-center gap-2 rounded-full border border-accent/40 bg-accent/10 px-3 py-1.5 text-xs">
-          <Star className="h-3.5 w-3.5 fill-accent text-accent" />
+          <Star aria-hidden="true" className="h-3.5 w-3.5 fill-accent text-accent" />
+
           <span className="font-medium text-foreground">5,0</span>
           <span className="text-muted-foreground">· 14 Google-Rezensionen</span>
         </div>
