@@ -33,7 +33,7 @@ export function FactBox() {
       aria-label="Verlegt & Verschraubt – Fakten"
     >
       <p className="text-[11px] uppercase tracking-[0.28em] text-accent">Auf einen Blick</p>
-      <h3 className="mt-2 text-lg font-semibold">Verlegt &amp; Verschraubt Handwerkerservice</h3>
+      <p className="mt-2 text-lg font-semibold">Verlegt &amp; Verschraubt Handwerkerservice</p>
       <dl className="mt-5 grid gap-3 text-sm sm:grid-cols-2">
         <div className="flex items-start gap-2">
           <User className="mt-0.5 h-4 w-4 shrink-0 text-accent" />

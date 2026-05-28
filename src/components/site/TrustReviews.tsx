@@ -132,10 +132,10 @@ export function PostCalcTrust() {
       <div className="grid gap-6 lg:grid-cols-[1fr_auto] lg:items-center">
         <div>
           <p className="text-xs uppercase tracking-[0.24em] text-accent">Noch unsicher?</p>
-          <h3 className="mt-2 text-xl font-semibold tracking-tight text-foreground sm:text-2xl">
+          <p className="mt-2 text-xl font-semibold tracking-tight text-foreground sm:text-2xl">
             Unsere Kunden schätzen besonders die saubere Ausführung,
             klare Kommunikation und zuverlässige Termine.
-          </h3>
+          </p>
           <figure className="mt-5 border-l-2 border-accent/60 pl-4">
             <Stars />
             <blockquote className="mt-2 text-sm leading-relaxed text-foreground/90">
