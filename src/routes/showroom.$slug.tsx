@@ -75,7 +75,7 @@ function MediaItem({ m, eager }: { m: ProjectMedia; eager?: boolean }) {
               const img = e.currentTarget;
               if (img.dataset.fallback !== "1") {
                 img.dataset.fallback = "1";
-                img.src = "/wood-bg.png";
+                img.src = "/wood-bg.webp";
               }
             }}
             className="h-full w-full object-cover"
@@ -83,7 +83,7 @@ function MediaItem({ m, eager }: { m: ProjectMedia; eager?: boolean }) {
         ) : (
           <video
             src={m.src}
-            poster="/wood-bg.png"
+            poster="/wood-bg.webp"
             controls
             preload="metadata"
             playsInline
