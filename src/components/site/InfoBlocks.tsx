@@ -35,55 +35,55 @@ export function FactBox() {
       <p className="text-[11px] uppercase tracking-[0.28em] text-accent">Auf einen Blick</p>
       <p className="mt-2 text-lg font-semibold">Verlegt &amp; Verschraubt Handwerkerservice</p>
       <dl className="mt-5 grid gap-3 text-sm sm:grid-cols-2">
-        <div className="flex items-start gap-2">
-          <User className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
-          <div>
-            <dt className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Inhaber</dt>
-            <dd className="mt-0.5">Justus Brosch</dd>
-          </div>
+        <div>
+          <dt className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-muted-foreground">
+            <User className="h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
+            Inhaber
+          </dt>
+          <dd className="mt-0.5 pl-6">Justus Brosch</dd>
         </div>
-        <div className="flex items-start gap-2">
-          <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
-          <div>
-            <dt className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Standort</dt>
-            <dd className="mt-0.5">Weichselstraße 12, 26388 Wilhelmshaven</dd>
-          </div>
+        <div>
+          <dt className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-muted-foreground">
+            <MapPin className="h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
+            Standort
+          </dt>
+          <dd className="mt-0.5 pl-6">Weichselstraße 12, 26388 Wilhelmshaven</dd>
         </div>
-        <div className="flex items-start gap-2 sm:col-span-2">
-          <Wrench className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
-          <div>
-            <dt className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Leistungen</dt>
-            <dd className="mt-0.5">Bodenverlegung, Küchenmontage, Entrümpelung &amp; Entsorgung</dd>
-          </div>
+        <div className="sm:col-span-2">
+          <dt className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-muted-foreground">
+            <Wrench className="h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
+            Leistungen
+          </dt>
+          <dd className="mt-0.5 pl-6">Bodenverlegung, Küchenmontage, Entrümpelung &amp; Entsorgung</dd>
         </div>
-        <div className="flex items-start gap-2 sm:col-span-2">
-          <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
-          <div>
-            <dt className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Einsatzgebiet</dt>
-            <dd className="mt-0.5">
-              Wilhelmshaven, Sande, Schortens, Jever, Varel, Wangerland, Wittmund und Umgebung
-            </dd>
-          </div>
+        <div className="sm:col-span-2">
+          <dt className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-muted-foreground">
+            <MapPin className="h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
+            Einsatzgebiet
+          </dt>
+          <dd className="mt-0.5 pl-6">
+            Wilhelmshaven, Sande, Schortens, Jever, Varel, Wangerland, Wittmund und Umgebung
+          </dd>
         </div>
-        <div className="flex items-start gap-2">
-          <Phone className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
-          <div>
-            <dt className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Telefon</dt>
-            <dd className="mt-0.5">
-              <a href="tel:+491634799286" className="hover:text-accent">0163 4799286</a>
-            </dd>
-          </div>
+        <div>
+          <dt className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-muted-foreground">
+            <Phone className="h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
+            Telefon
+          </dt>
+          <dd className="mt-0.5 pl-6">
+            <a href="tel:+491634799286" className="hover:text-accent">0163 4799286</a>
+          </dd>
         </div>
-        <div className="flex items-start gap-2">
-          <Mail className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
-          <div>
-            <dt className="text-xs uppercase tracking-[0.18em] text-muted-foreground">E-Mail</dt>
-            <dd className="mt-0.5 break-all">
-              <a href="mailto:justus.brosch@verlegt-verschraubt.de" className="hover:text-accent">
-                justus.brosch@verlegt-verschraubt.de
-              </a>
-            </dd>
-          </div>
+        <div>
+          <dt className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-muted-foreground">
+            <Mail className="h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
+            E-Mail
+          </dt>
+          <dd className="mt-0.5 break-all pl-6">
+            <a href="mailto:justus.brosch@verlegt-verschraubt.de" className="hover:text-accent">
+              justus.brosch@verlegt-verschraubt.de
+            </a>
+          </dd>
         </div>
       </dl>
     </aside>

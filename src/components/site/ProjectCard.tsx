@@ -50,12 +50,14 @@ export function ProjectCard({ project, eager = false }: { project: Project; eage
           <Link
             to="/showroom/$slug"
             params={{ slug: project.slug }}
+            aria-label={`Projekt „${project.title}" im Showroom ansehen`}
             className="inline-flex items-center gap-1 text-xs font-medium uppercase tracking-[0.2em] text-accent hover:gap-2"
           >
             Projekt ansehen <ArrowRight className="h-3.5 w-3.5" />
           </Link>
           <Link
             to="/kontakt"
+            aria-label={`Ähnliches Projekt wie „${project.title}" anfragen`}
             className="text-xs uppercase tracking-[0.2em] text-muted-foreground hover:text-foreground"
           >
             Anfragen

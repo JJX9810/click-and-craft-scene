@@ -73,7 +73,17 @@ export const Route = createFileRoute("/")({
       { name: "twitter:image", content: "https://verlegt-verschraubt.de/hero-flooring.png" },
       { name: "twitter:image:alt", content: "Bodenleger verlegt Laminat in Holzoptik – Verlegt & Verschraubt Wilhelmshaven" },
     ],
-    links: [{ rel: "canonical", href: "https://verlegt-verschraubt.de/" }],
+    links: [
+      { rel: "canonical", href: "https://verlegt-verschraubt.de/" },
+      {
+        rel: "preload",
+        as: "image",
+        href: "/hero-flooring.webp",
+        imagesrcset: "/hero-flooring-mobile.webp 800w, /hero-flooring.webp 1600w",
+        imagesizes: "(max-width: 768px) 100vw, 50vw",
+        fetchpriority: "high",
+      },
+    ],
     scripts: [
       jsonLdScript([
         organizationNode,
@@ -256,16 +266,23 @@ function Index() {
 
           <div className="relative">
             <div className="relative aspect-[16/11] w-full overflow-hidden rounded-3xl border border-border/60 shadow-2xl">
-              <img
-                src={heroScene}
-                alt="Bodenleger verlegt Laminatplanke in Holzoptik auf dunklem Holzboden"
-                title="Bodenverlegung durch Verlegt & Verschraubt in Wilhelmshaven"
-                className="animate-hero-float h-full w-full object-cover"
-                width={1024}
-                height={704}
-                fetchPriority="high"
-                decoding="async"
-              />
+              <picture>
+                <source
+                  type="image/webp"
+                  srcSet="/hero-flooring-mobile.webp 800w, /hero-flooring.webp 1600w"
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                />
+                <img
+                  src={heroScene}
+                  alt="Bodenleger verlegt Laminatplanke in Holzoptik auf dunklem Holzboden"
+                  title="Bodenverlegung durch Verlegt & Verschraubt in Wilhelmshaven"
+                  className="animate-hero-float h-full w-full object-cover"
+                  width={1024}
+                  height={704}
+                  fetchPriority="high"
+                  decoding="async"
+                />
+              </picture>
               <div
                 className="pointer-events-none absolute inset-0"
                 style={{
@@ -348,7 +365,7 @@ function Index() {
           </div>
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {featuredProjects.slice(0, 3).map((p, i) => (
-              <ProjectCard key={p.slug} project={p} eager={i === 0} />
+              <ProjectCard key={p.slug} project={p} eager={false} />
             ))}
           </div>
         </div>
