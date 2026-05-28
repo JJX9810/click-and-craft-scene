@@ -36,8 +36,8 @@ import {
   breadcrumbNode,
   faqPageNode,
   jsonLdScript,
-  localBusinessNode,
   organizationNode,
+  serviceEntities,
   webPageNode,
   websiteNode,
 } from "@/lib/schema";
@@ -77,14 +77,15 @@ export const Route = createFileRoute("/")({
     scripts: [
       jsonLdScript([
         organizationNode,
-        localBusinessNode,
         websiteNode,
+        ...serviceEntities,
         webPageNode({
           url: "https://verlegt-verschraubt.de/",
           name: "Verlegt & Verschraubt – Handwerkerservice Wilhelmshaven",
           description:
             "Handwerkerservice Wilhelmshaven: Bodenverlegung, Küchenmontage und Entrümpelung. Z.O.Z. – zuverlässig, ordentlich, zügig.",
           id: HOME_WEBPAGE_ID,
+          primaryImageOfPage: "https://verlegt-verschraubt.de/hero-flooring.png",
         }),
         breadcrumbNode([
           { name: "Startseite", url: "https://verlegt-verschraubt.de/" },
