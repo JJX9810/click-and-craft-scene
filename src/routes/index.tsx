@@ -73,7 +73,17 @@ export const Route = createFileRoute("/")({
       { name: "twitter:image", content: "https://verlegt-verschraubt.de/hero-flooring.png" },
       { name: "twitter:image:alt", content: "Bodenleger verlegt Laminat in Holzoptik – Verlegt & Verschraubt Wilhelmshaven" },
     ],
-    links: [{ rel: "canonical", href: "https://verlegt-verschraubt.de/" }],
+    links: [
+      { rel: "canonical", href: "https://verlegt-verschraubt.de/" },
+      {
+        rel: "preload",
+        as: "image",
+        href: "/hero-flooring.webp",
+        imagesrcset: "/hero-flooring-mobile.webp 800w, /hero-flooring.webp 1600w",
+        imagesizes: "(max-width: 768px) 100vw, 50vw",
+        fetchpriority: "high",
+      },
+    ],
     scripts: [
       jsonLdScript([
         organizationNode,
