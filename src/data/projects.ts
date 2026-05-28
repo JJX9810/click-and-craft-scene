@@ -206,13 +206,13 @@ export const projects: Project[] = [
     category: "Küchenmontage",
     description:
       "In Schortens wurde eine helle Küchenzeile montiert und sauber ausgerichtet. Arbeitsplatte, Spüle, Kochfeld und Fronten wurden ordentlich eingebaut.",
-    cover: "/projects/kuechen-schortens-01.png",
+    cover: "/projects/kuechen-schortens-01.webp",
     coverAlt: "Weiße Küchenmontage in Schortens mit dunkler Arbeitsplatte und schwarzer Spüle",
     featured: true,
     media: [
       {
         type: "image",
-        src: "/projects/kuechen-schortens-01.png",
+        src: "/projects/kuechen-schortens-01.webp",
         alt: "Weiße L-förmige Küche nach der Montage in Schortens",
         caption: "Fertig montierte Küchenzeile in Schortens mit dunkler Arbeitsplatte und schwarzer Spüle.",
         longDescription:
@@ -228,13 +228,13 @@ export const projects: Project[] = [
     category: "Küchenmontage",
     description:
       "Moderne weiße Einbauküche in Schortens montiert und sauber ausgerichtet. Arbeitsplatte, Spüle, Kochfeld, Dunstabzug, Hochschrank und integrierte Geräte stimmig eingebaut.",
-    cover: "/projects/kueche-schortens-modern-02.png",
+    cover: "/projects/kueche-schortens-modern-02.webp",
     coverAlt: "Weiße Einbauküche in Schortens mit grifflosen Fronten und integrierten Geräten",
     featured: false,
     media: [
       {
         type: "image",
-        src: "/projects/kueche-schortens-modern-02.png",
+        src: "/projects/kueche-schortens-modern-02.webp",
         alt: "Moderne weiße Einbauküche mit schwarzem Geräteblock in Schortens",
         caption: "Moderne Einbauküche in Schortens mit klaren Fronten, Gerätehochschrank und Holzoptikboden.",
         longDescription:
@@ -243,7 +243,7 @@ export const projects: Project[] = [
       },
       {
         type: "image",
-        src: "/projects/kueche-schortens-modern-01.png",
+        src: "/projects/kueche-schortens-modern-01.webp",
         alt: "Weiße L-Küche mit grauer Arbeitsplatte in Schortens",
         caption: "Zweite Perspektive der weißen Einbauküche mit langer Zeile und Hochschrank.",
         longDescription:
@@ -280,12 +280,12 @@ export const projects: Project[] = [
     category: "Küchenmontage",
     description:
       "Küche mit weißen Fronten und Holzoptik-Arbeitsplatte in Wilhelmshaven montiert. Spüle, Kochfeld, Hochschrank und Arbeitsbereich sauber eingebaut.",
-    cover: "/projects/kueche-wilhelmshaven-01.png",
+    cover: "/projects/kueche-wilhelmshaven-01.webp",
     coverAlt: "Küchenmontage mit Holzarbeitsplatte in Wilhelmshaven",
     media: [
       {
         type: "image",
-        src: "/projects/kueche-wilhelmshaven-01.png",
+        src: "/projects/kueche-wilhelmshaven-01.webp",
         alt: "Weiße Küche mit Holzarbeitsplatte nach der Montage in Wilhelmshaven",
         caption: "Fertig montierte U-Küche in Wilhelmshaven mit weißen Fronten und heller Holzarbeitsplatte.",
         longDescription:
@@ -310,12 +310,12 @@ export const projects: Project[] = [
     category: "Detailarbeiten",
     description:
       "Sauber gezogene Silikonfuge zwischen Küchenarbeitsplatte und Fliesenspiegel. Schützt die Anschlusskante und rundet die Küchenmontage optisch ab.",
-    cover: "/projects/silikonfuge-wilhelmshaven-01.png",
+    cover: "/projects/silikonfuge-wilhelmshaven-01.webp",
     coverAlt: "Silikonfuge an Küchenarbeitsplatte in Wilhelmshaven",
     media: [
       {
         type: "image",
-        src: "/projects/silikonfuge-wilhelmshaven-01.png",
+        src: "/projects/silikonfuge-wilhelmshaven-01.webp",
         alt: "Sauber gezogene weiße Silikonfuge zwischen Arbeitsplatte und Fliesenspiegel in Wilhelmshaven",
         caption: "Detailbild einer gleichmäßig gezogenen Silikonfuge an der Küchenarbeitsplatte.",
         longDescription:
@@ -331,13 +331,13 @@ export const projects: Project[] = [
     category: "Treppenbelag",
     description:
       "Erneuerung eines Treppenbelags in Wilhelmshaven. Der Vergleich zeigt, wie stark sich ein Treppenbereich durch einen neuen Belag optisch und funktional verändert.",
-    cover: "/projects/treppenbelag-wilhelmshaven-02-vorher-nachher.png",
+    cover: "/projects/treppenbelag-wilhelmshaven-02-vorher-nachher.webp",
     coverAlt: "Treppenbelag vorher und nachher in Wilhelmshaven",
     featured: true,
     media: [
       {
         type: "image",
-        src: "/projects/treppenbelag-wilhelmshaven-01-vorher.png",
+        src: "/projects/treppenbelag-wilhelmshaven-01-vorher.webp",
         alt: "Vorherbild einer mit Teppich belegten Holztreppe in Wilhelmshaven",
         caption: "Vorher: bestehender Treppenbelag im Altzustand vor der Erneuerung.",
         longDescription:
@@ -346,7 +346,7 @@ export const projects: Project[] = [
       },
       {
         type: "image",
-        src: "/projects/treppenbelag-wilhelmshaven-02-vorher-nachher.png",
+        src: "/projects/treppenbelag-wilhelmshaven-02-vorher-nachher.webp",
         alt: "Vorher-Nachher-Vergleich einer Treppe mit neuem Belag in Wilhelmshaven",
         caption: "Vorher-Nachher-Vergleich der Treppenverlegung in Wilhelmshaven.",
         longDescription:
@@ -362,12 +362,12 @@ export const projects: Project[] = [
     category: "Detailarbeiten",
     description:
       "Sauber ausgeführter Übergang zwischen zwei Bereichen. Die Übergangsschiene sorgt für einen ordentlichen Abschluss und ein stimmiges Gesamtbild.",
-    cover: "/projects/vinyl-uebergang-wilhelmshaven-01.png",
+    cover: "/projects/vinyl-uebergang-wilhelmshaven-01.webp",
     coverAlt: "Vinylboden mit Übergangsschiene in Wilhelmshaven",
     media: [
       {
         type: "image",
-        src: "/projects/vinyl-uebergang-wilhelmshaven-01.png",
+        src: "/projects/vinyl-uebergang-wilhelmshaven-01.webp",
         alt: "Dunkler Vinylboden mit sauber gesetzter Übergangsschiene in Wilhelmshaven",
         caption: "Detailbild eines dunklen Vinylbodens mit sauber ausgeführtem Raumübergang.",
         longDescription:
@@ -404,12 +404,12 @@ export const projects: Project[] = [
     category: "Bodenverlegung",
     description:
       "Vinylboden im Wohnraum verlegt. Saubere Bodenverlegung im Innenbereich – als Referenz für Wohnräume, Mietwohnungen oder teilmöblierte Bereiche.",
-    cover: "/projects/vinyl-wohnraum-wilhelmshaven-01.png",
+    cover: "/projects/vinyl-wohnraum-wilhelmshaven-01.webp",
     coverAlt: "Vinylboden im Wohnraum in Wilhelmshaven",
     media: [
       {
         type: "image",
-        src: "/projects/vinyl-wohnraum-wilhelmshaven-01.png",
+        src: "/projects/vinyl-wohnraum-wilhelmshaven-01.webp",
         alt: "Heller Wohnraum mit neu verlegtem Boden in Wilhelmshaven",
         caption: "Neu verlegter Boden im Wohnraum – großformatig, ruhig und gleichmäßig verlegt.",
         longDescription:
@@ -418,7 +418,7 @@ export const projects: Project[] = [
       },
       {
         type: "image",
-        src: "/projects/vinyl-wohnraum-wilhelmshaven-02.png",
+        src: "/projects/vinyl-wohnraum-wilhelmshaven-02.webp",
         alt: "Großer Wohnraum mit fertig verlegtem Vinylboden in Wilhelmshaven",
         caption: "Weitere Referenzansicht des verlegten Vinylbodens im Wohnraum in Wilhelmshaven.",
         longDescription:
