@@ -328,11 +328,12 @@ function Index() {
           <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {reviews.map((r) => (
               <article key={r.name} className="tile-shader rounded-2xl border border-border/70 bg-card/50 p-5 backdrop-blur">
-                <div className="flex items-center gap-1 text-accent">
+                <div className="flex items-center gap-1 text-accent" role="img" aria-label="5 von 5 Sternen">
                   {Array.from({ length: 5 }).map((_, i) => (
-                    <Star key={i} className="h-3.5 w-3.5 fill-current" />
+                    <Star key={i} aria-hidden="true" className="h-3.5 w-3.5 fill-current" />
                   ))}
                 </div>
+
                 <p className="mt-3 text-sm leading-relaxed text-foreground/90">„{r.text}"</p>
                 <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground">
                   <span className="font-medium text-foreground">{r.name}</span>
