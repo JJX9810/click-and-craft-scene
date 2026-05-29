@@ -53,6 +53,7 @@ const BODEN_VARIANTEN: { key: string; label: string; price: number | null }[] = 
 
 const ALT_PRICE_SCHWIMMEND = 4; // €/m²
 const SOCKEL_PRICE = 5; // €/lfm
+const DAEMMUNG_PRICE = 1.5; // €/m²
 const ANFAHRT_FREI_KM = 35;
 const ANFAHRT_PRO_KM = 0.7;
 
@@ -60,7 +61,7 @@ const DRINGLICHKEIT_OPTIONS = [
   { key: "flexibel", label: "Flexibel / normal planbar", surcharge: 0 },
   { key: "14tage", label: "Innerhalb von 14 Tagen", surcharge: 0.1 },
   { key: "7tage", label: "Innerhalb von 7 Tagen", surcharge: 0.2 },
-  { key: "3tage", label: "Innerhalb von 3 Tagen / sehr kurzfristig", surcharge: null as null | number },
+  { key: "3tage", label: "Innerhalb von 3 Tagen / sehr kurzfristig", surcharge: 0.2 },
 ];
 
 type State = {
