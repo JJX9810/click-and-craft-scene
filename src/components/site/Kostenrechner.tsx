@@ -353,6 +353,7 @@ function summaryLines(s: State): string[] {
     } else if (s.altEntfernen === "Nein") {
       lines.push("Alten Boden entfernen: nein");
     }
+    if (s.daemmung === "Ja") lines.push("Dämmung verlegen: ja");
   } else if (s.service === "kueche") {
     if (s.kueArt) lines.push(`Projektart: ${s.kueArt}`);
     if (s.kueMeter) lines.push(`Küchenlänge: ${s.kueMeter} m`);
