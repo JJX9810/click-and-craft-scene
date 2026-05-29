@@ -119,6 +119,7 @@ const initial: State = {
   qm: "",
   altEntfernen: "",
   sockelLfm: "",
+  daemmung: "",
   kueArt: "Neue Küche",
   kueMeter: "",
   kueArbeit: "",
