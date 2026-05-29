@@ -84,6 +84,7 @@ type State = {
   qm: string;
   altEntfernen: "" | "Nein" | "schwimmend" | "verklebt";
   sockelLfm: string;
+  daemmung: "Ja" | "Nein" | "";
   // küche
   kueArt: string;
   kueMeter: string;
