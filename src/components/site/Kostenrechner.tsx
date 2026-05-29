@@ -231,6 +231,17 @@ function computeBreakdown(s: State): Breakdown | null {
     items.push({ label: "Alten Boden entsorgen", amount: 0, inklusive: true });
     items.push({ label: "Trittschalldämmung verlegen", amount: 0, inklusive: true });
 
+    if (s.daemmung === "Ja") {
+      const a = +(qm * DAEMMUNG_PRICE).toFixed(2);
+      items.push({
+        label: "Dämmung verlegen",
+        detail: `${qm} m² × ${eur(DAEMMUNG_PRICE)} = ${eur(a)}`,
+        amount: a,
+        arbeitsleistung: true,
+      });
+      arbeitssumme += a;
+    }
+
     const lfm = Number(s.sockelLfm);
     if (lfm > 0) {
       const a = +(lfm * SOCKEL_PRICE).toFixed(2);
