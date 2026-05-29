@@ -53,6 +53,7 @@ const BODEN_VARIANTEN: { key: string; label: string; price: number | null }[] = 
 
 const ALT_PRICE_SCHWIMMEND = 4; // €/m²
 const SOCKEL_PRICE = 5; // €/lfm
+const DAEMMUNG_PRICE = 1.5; // €/m²
 const ANFAHRT_FREI_KM = 35;
 const ANFAHRT_PRO_KM = 0.7;
 
@@ -60,7 +61,7 @@ const DRINGLICHKEIT_OPTIONS = [
   { key: "flexibel", label: "Flexibel / normal planbar", surcharge: 0 },
   { key: "14tage", label: "Innerhalb von 14 Tagen", surcharge: 0.1 },
   { key: "7tage", label: "Innerhalb von 7 Tagen", surcharge: 0.2 },
-  { key: "3tage", label: "Innerhalb von 3 Tagen / sehr kurzfristig", surcharge: null as null | number },
+  { key: "3tage", label: "Innerhalb von 3 Tagen / sehr kurzfristig", surcharge: 0.2 },
 ];
 
 type State = {
@@ -83,6 +84,7 @@ type State = {
   qm: string;
   altEntfernen: "" | "Nein" | "schwimmend" | "verklebt";
   sockelLfm: string;
+  daemmung: "Ja" | "Nein" | "";
   // küche
   kueArt: string;
   kueMeter: string;
@@ -117,6 +119,7 @@ const initial: State = {
   qm: "",
   altEntfernen: "",
   sockelLfm: "",
+  daemmung: "",
   kueArt: "Neue Küche",
   kueMeter: "",
   kueArbeit: "",
@@ -227,6 +230,17 @@ function computeBreakdown(s: State): Breakdown | null {
 
     items.push({ label: "Alten Boden entsorgen", amount: 0, inklusive: true });
     items.push({ label: "Trittschalldämmung verlegen", amount: 0, inklusive: true });
+
+    if (s.daemmung === "Ja") {
+      const a = +(qm * DAEMMUNG_PRICE).toFixed(2);
+      items.push({
+        label: "Dämmung verlegen",
+        detail: `${qm} m² × ${eur(DAEMMUNG_PRICE)} = ${eur(a)}`,
+        amount: a,
+        arbeitsleistung: true,
+      });
+      arbeitssumme += a;
+    }
 
     const lfm = Number(s.sockelLfm);
     if (lfm > 0) {
@@ -339,6 +353,7 @@ function summaryLines(s: State): string[] {
     } else if (s.altEntfernen === "Nein") {
       lines.push("Alten Boden entfernen: nein");
     }
+    if (s.daemmung === "Ja") lines.push("Dämmung verlegen: ja");
   } else if (s.service === "kueche") {
     if (s.kueArt) lines.push(`Projektart: ${s.kueArt}`);
     if (s.kueMeter) lines.push(`Küchenlänge: ${s.kueMeter} m`);
@@ -395,6 +410,7 @@ function buildWaMessage(s: State, b: Breakdown | null): string {
     if (s.qm) lines.push(`Fläche: ${s.qm} m²`);
     if (s.sockelLfm && Number(s.sockelLfm) > 0) lines.push(`Sockelleisten: ${s.sockelLfm} lfm`);
     if (s.altEntfernen) lines.push(`Alten Boden entfernen: ${s.altEntfernen}`);
+    if (s.daemmung === "Ja") lines.push(`Dämmung verlegen: ja`);
   } else if (s.service === "kueche") {
     if (s.kueArt) lines.push(`Projektart: ${s.kueArt}`);
     if (s.kueMeter) lines.push(`Küchenlänge: ${s.kueMeter} m`);
@@ -880,6 +896,13 @@ function BodenForm({ s, upd }: { s: State; upd: <K extends keyof State>(k: K, v:
             { value: "schwimmend", label: "Schwimmend verlegt" },
             { value: "verklebt", label: "Verklebt (nach Besichtigung)" },
           ]}
+        />
+      </Field>
+      <Field label="Dämmung verlegen">
+        <Choice
+          value={s.daemmung}
+          onChange={(v) => upd("daemmung", v as State["daemmung"])}
+          options={["Ja", "Nein"]}
         />
       </Field>
       <div className="rounded-md border border-border/60 bg-background/40 p-3 text-xs text-muted-foreground">
