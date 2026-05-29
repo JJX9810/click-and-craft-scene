@@ -898,6 +898,13 @@ function BodenForm({ s, upd }: { s: State; upd: <K extends keyof State>(k: K, v:
           ]}
         />
       </Field>
+      <Field label="Dämmung verlegen">
+        <Choice
+          value={s.daemmung}
+          onChange={(v) => upd("daemmung", v as State["daemmung"])}
+          options={["Ja", "Nein"]}
+        />
+      </Field>
       <div className="rounded-md border border-border/60 bg-background/40 p-3 text-xs text-muted-foreground">
         <p className="font-medium text-foreground">In der Einschätzung berücksichtigt:</p>
         <ul className="mt-1 list-disc pl-4">
