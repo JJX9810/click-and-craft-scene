@@ -410,6 +410,7 @@ function buildWaMessage(s: State, b: Breakdown | null): string {
     if (s.qm) lines.push(`Fläche: ${s.qm} m²`);
     if (s.sockelLfm && Number(s.sockelLfm) > 0) lines.push(`Sockelleisten: ${s.sockelLfm} lfm`);
     if (s.altEntfernen) lines.push(`Alten Boden entfernen: ${s.altEntfernen}`);
+    if (s.daemmung === "Ja") lines.push(`Dämmung verlegen: ja`);
   } else if (s.service === "kueche") {
     if (s.kueArt) lines.push(`Projektart: ${s.kueArt}`);
     if (s.kueMeter) lines.push(`Küchenlänge: ${s.kueMeter} m`);
