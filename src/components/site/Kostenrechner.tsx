@@ -140,7 +140,7 @@ const initial: State = {
   sockelLfm: "",
   sockelArt: "",
   daemmung: "",
-  teppichVerkleben: "",
+  
   materialService: "",
   materialWert: "",
   kueArt: "Neue Küche",
