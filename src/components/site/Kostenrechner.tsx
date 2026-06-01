@@ -203,13 +203,13 @@ type Breakdown = {
 
 function computeAnfahrt(km: number): LineItem {
   if (km <= ANFAHRT_FREI_KM) {
-    return { label: "Anfahrt", detail: `${km} km – bis 35 km inklusive`, amount: 0, inklusive: true };
+    return { label: "Anfahrt", detail: `${km} km – im Einsatzgebiet inklusive`, amount: 0, inklusive: true };
   }
   const extra = km - ANFAHRT_FREI_KM;
   const amount = +(extra * ANFAHRT_PRO_KM).toFixed(2);
   return {
     label: "Anfahrt",
-    detail: `${km} km Entfernung, davon ${extra} Mehrkilometer × 0,70 €`,
+    detail: `${km} km Entfernung – Mehrkilometer werden anteilig berücksichtigt`,
     amount,
   };
 }
@@ -236,7 +236,7 @@ function computeBreakdown(s: State): Breakdown | null {
       const a = +(qm * variante.price).toFixed(2);
       items.push({
         label: `${variante.label} verlegen`,
-        detail: `${qm} m² × ${eur(variante.price)} = ${eur(a)}`,
+        detail: `${qm} m²`,
         amount: a,
         arbeitsleistung: true,
       });
@@ -249,25 +249,26 @@ function computeBreakdown(s: State): Breakdown | null {
       const a = +(qm * ALT_PRICE_SCHWIMMEND).toFixed(2);
       items.push({
         label: "Alten schwimmend verlegten Boden entfernen",
-        detail: `${qm} m² × ${eur(ALT_PRICE_SCHWIMMEND)} = ${eur(a)}`,
+        detail: `${qm} m²`,
         amount: a,
         arbeitsleistung: true,
       });
       arbeitssumme += a;
     } else if (s.altEntfernen === "verklebt") {
+      const a = +(qm * ALT_PRICE_VERKLEBT).toFixed(2);
       items.push({
-        label: "Entfernung verklebter Böden",
-        detail: "nach Besichtigung / auf Anfrage",
-        amount: null,
+        label: "Verklebten Altbelag entfernen",
+        detail: `${qm} m²`,
+        amount: a,
+        arbeitsleistung: true,
       });
-      hasOnRequest = true;
+      arbeitssumme += a;
     } else if (s.altEntfernen === "teppich_lose") {
       const raw = +(qm * ALT_TEPPICH_LOSE_PRICE).toFixed(2);
       const a = Math.max(raw, ALT_TEPPICH_LOSE_MIN);
-      const minHinweis = a > raw ? ` – Mindestpauschale ${eur(ALT_TEPPICH_LOSE_MIN)}` : "";
       items.push({
         label: "Altbelag entfernen & entsorgen – Teppich lose / nicht verklebt",
-        detail: `${qm} m² × ${eur(ALT_TEPPICH_LOSE_PRICE)} = ${eur(raw)}${minHinweis}. Inklusive Aufnahme, Tragen, Laden, Transport und Entsorgung.`,
+        detail: `${qm} m² – inklusive Aufnahme, Tragen, Laden, Transport und Entsorgung`,
         amount: a,
         arbeitsleistung: true,
       });
@@ -275,10 +276,9 @@ function computeBreakdown(s: State): Breakdown | null {
     } else if (s.altEntfernen === "teppich_verklebt") {
       const raw = +(qm * ALT_TEPPICH_VERKLEBT_PRICE).toFixed(2);
       const a = Math.max(raw, ALT_TEPPICH_VERKLEBT_MIN);
-      const minHinweis = a > raw ? ` – Mindestpauschale ${eur(ALT_TEPPICH_VERKLEBT_MIN)}` : "";
       items.push({
         label: "Altbelag entfernen & entsorgen – Teppich verklebt",
-        detail: `${qm} m² × ${eur(ALT_TEPPICH_VERKLEBT_PRICE)} = ${eur(raw)}${minHinweis}. Inklusive Aufnahme, Tragen, Laden, Transport und Entsorgung. Zusätzliche Untergrundarbeiten sind nicht enthalten.`,
+        detail: `${qm} m² – inklusive Aufnahme, Tragen, Laden, Transport und Entsorgung. Zusätzliche Untergrundarbeiten sind nicht enthalten.`,
         amount: a,
         arbeitsleistung: true,
       });
@@ -299,15 +299,12 @@ function computeBreakdown(s: State): Breakdown | null {
       const a = +(qm * DAEMMUNG_PRICE).toFixed(2);
       items.push({
         label: "Dämmung verlegen",
-        detail: `${qm} m² × ${eur(DAEMMUNG_PRICE)} = ${eur(a)}`,
+        detail: `${qm} m²`,
         amount: a,
         arbeitsleistung: true,
       });
       arbeitssumme += a;
     }
-
-
-
 
     const lfm = Number(s.sockelLfm);
     if (lfm > 0 && s.sockelArt && s.sockelArt !== "keine") {
@@ -315,7 +312,7 @@ function computeBreakdown(s: State): Breakdown | null {
         const a = +(lfm * SOCKEL_GEHRUNG_PRICE).toFixed(2);
         items.push({
           label: "Sockelleisten auf Gehrung montieren",
-          detail: `${lfm} lfm × ${eur(SOCKEL_GEHRUNG_PRICE)} = ${eur(a)}`,
+          detail: `${lfm} lfm`,
           amount: a,
           arbeitsleistung: true,
         });
@@ -324,7 +321,7 @@ function computeBreakdown(s: State): Breakdown | null {
         const a = +(lfm * SOCKEL_PRICE).toFixed(2);
         items.push({
           label: "Sockelleisten montieren (ohne Acrylfuge)",
-          detail: `${lfm} lfm × ${eur(SOCKEL_PRICE)} = ${eur(a)}`,
+          detail: `${lfm} lfm`,
           amount: a,
           arbeitsleistung: true,
         });
@@ -337,17 +334,15 @@ function computeBreakdown(s: State): Breakdown | null {
       if (!isNaN(wert) && wert > 0) {
         const raw = +(wert * MATERIALSERVICE_RATE).toFixed(2);
         const a = Math.max(raw, MATERIALSERVICE_MIN);
-        const minHinweis = a > raw ? ` – Mindestpauschale ${eur(MATERIALSERVICE_MIN)}` : "";
         items.push({
           label: "Materialservice – Auswahl, Beschaffung und Anlieferung",
-          detail: `15 % von ${eur(wert)} Materialwert = ${eur(raw)}${minHinweis}. Berechnet mit 15 % des Materialwertes, mindestens ${eur(MATERIALSERVICE_MIN)}.`,
           amount: a,
         });
         sonstSumme += a;
       } else {
         items.push({
           label: "Materialservice – Auswahl, Beschaffung und Anlieferung",
-          detail: "Bitte Materialwert eintragen, damit der Materialservice berechnet werden kann.",
+          detail: "Bitte Materialwert eintragen, damit der Materialservice berücksichtigt werden kann.",
           amount: null,
         });
         hasOnRequest = true;
@@ -356,12 +351,41 @@ function computeBreakdown(s: State): Breakdown | null {
   } else if (s.service === "kueche") {
     const m = Number(s.kueMeter);
     if (!m || m <= 0) return null;
-    items.push({
-      label: "Küchenmontage / -arbeiten",
-      detail: `Geschätzter Aufwand für ca. ${m} m Küchenlänge – exakte Berechnung nach Besichtigung`,
-      amount: null,
-    });
-    hasOnRequest = true;
+
+    // Hauptleistung anhand Projektart
+    if (s.kueArt === "Küchenabbau") {
+      const a = +(m * KUECHE_DEMONTAGE_PRICE).toFixed(2);
+      items.push({ label: "Küchen-Demontage", detail: `${m} lfm`, amount: a, arbeitsleistung: true });
+      arbeitssumme += a;
+    } else {
+      // Neue Küche, Gebrauchte Küche, Küchenumbau → Montage
+      const a = +(m * KUECHE_MONTAGE_PRICE).toFixed(2);
+      items.push({ label: "Küchenmontage", detail: `${m} lfm`, amount: a, arbeitsleistung: true });
+      arbeitssumme += a;
+    }
+
+    // Zusätzliche Demontage einer alten Küche
+    if (s.kueDemontage === "Ja" && s.kueArt !== "Küchenabbau") {
+      const a = +(m * KUECHE_DEMONTAGE_PRICE).toFixed(2);
+      items.push({ label: "Demontage alter Küche", detail: `${m} lfm`, amount: a, arbeitsleistung: true });
+      arbeitssumme += a;
+    }
+
+    // Alte Küche entsorgen (wenn Transport "Ja" → Pauschale für Entsorgung)
+    if (s.kueTransport === "Ja") {
+      items.push({ label: "Alte Küche entsorgen", amount: KUECHE_ENTSORGUNG_PAUSCHAL });
+      sonstSumme += KUECHE_ENTSORGUNG_PAUSCHAL;
+    }
+
+    // Geräte / Spüle / Arbeitsplatte – falls "Unsicher" → Hinweis auf Besichtigung
+    if (s.kueArbeit === "Unsicher" || s.kueGeraete === "Unsicher" || s.kueSpuele === "Unsicher") {
+      items.push({
+        label: "Zusatzleistungen (Geräte, Spüle, Arbeitsplatte)",
+        detail: "Genauer Umfang wird nach Besichtigung festgelegt.",
+        amount: null,
+      });
+      hasOnRequest = true;
+    }
   } else if (s.service === "ent") {
     if (!s.entMenge) return null;
     items.push({
@@ -395,22 +419,16 @@ function computeBreakdown(s: State): Breakdown | null {
     anfahrt = { label: "Anfahrt", detail: "wird nach Einsatzort geprüft", amount: null };
   }
 
-  // Express-Zuschlag
+  // Express-Zuschlag (auf Arbeitsleistung)
   let express: LineItem | null = null;
   if (s.dringlichkeit) {
     const d = DRINGLICHKEIT_OPTIONS.find((o) => o.key === s.dringlichkeit);
     if (d) {
-      if (d.surcharge === null) {
-        express = {
-          label: "Sehr kurzfristiger Termin (≤ 3 Tage)",
-          detail: "nur nach Rücksprache möglich – Expresszuschlag individuell",
-          amount: null,
-        };
-      } else if (d.surcharge > 0 && arbeitssumme > 0) {
+      if (d.surcharge > 0 && arbeitssumme > 0) {
         const a = +(arbeitssumme * d.surcharge).toFixed(2);
         express = {
-          label: `Expresszuschlag (${Math.round(d.surcharge * 100)} %)`,
-          detail: `${d.label} – ${Math.round(d.surcharge * 100)} % auf Arbeitsleistungen (${eur(arbeitssumme)})`,
+          label: "Expresszuschlag",
+          detail: `${d.label} – wird auf die Arbeitsleistung angewendet`,
           amount: a,
         };
         sonstSumme += a;
