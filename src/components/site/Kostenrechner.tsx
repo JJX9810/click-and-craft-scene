@@ -51,7 +51,9 @@ const BODEN_VARIANTEN: { key: string; label: string; price: number | null }[] = 
   { key: "teppich_vollflaechig", label: "Teppich vollflächig verklebt", price: 12 },
 ];
 
+// === Interne Berechnungswerte – NICHT im Frontend sichtbar rendern ===
 const ALT_PRICE_SCHWIMMEND = 4; // €/m²
+const ALT_PRICE_VERKLEBT = 7; // €/m² – verklebter Altbelag (Boden, nicht Teppich)
 const SOCKEL_PRICE = 5; // €/lfm – normale Montage
 const SOCKEL_GEHRUNG_PRICE = 7; // €/lfm – auf Gehrung gesägt
 const DAEMMUNG_PRICE = 1.5; // €/m²
@@ -62,8 +64,18 @@ const ALT_TEPPICH_VERKLEBT_PRICE = 12; // €/m²
 const ALT_TEPPICH_VERKLEBT_MIN = 180; // €
 const MATERIALSERVICE_RATE = 0.15;
 const MATERIALSERVICE_MIN = 150; // €
-const ANFAHRT_FREI_KM = 35;
+const ANFAHRT_FREI_KM = 30;
 const ANFAHRT_PRO_KM = 0.7;
+
+// Küchenmontage (interne Preise)
+const KUECHE_MONTAGE_PRICE = 189; // €/lfm
+const KUECHE_DEMONTAGE_PRICE = 100; // €/lfm
+const KUECHE_ARBEITSPLATTE_PRICE = 119; // €/lfm
+const KUECHE_ENTSORGUNG_PAUSCHAL = 350; // €
+
+// Preisspanne (für Kundenausgabe als Orientierungswert)
+const RANGE_LOW = 0.9;
+const RANGE_HIGH = 1.1;
 
 const DRINGLICHKEIT_OPTIONS = [
   { key: "flexibel", label: "Flexibel / normal planbar", surcharge: 0 },
@@ -191,13 +203,13 @@ type Breakdown = {
 
 function computeAnfahrt(km: number): LineItem {
   if (km <= ANFAHRT_FREI_KM) {
-    return { label: "Anfahrt", detail: `${km} km – bis 35 km inklusive`, amount: 0, inklusive: true };
+    return { label: "Anfahrt", detail: `${km} km – im Einsatzgebiet inklusive`, amount: 0, inklusive: true };
   }
   const extra = km - ANFAHRT_FREI_KM;
   const amount = +(extra * ANFAHRT_PRO_KM).toFixed(2);
   return {
     label: "Anfahrt",
-    detail: `${km} km Entfernung, davon ${extra} Mehrkilometer × 0,70 €`,
+    detail: `${km} km Entfernung – Mehrkilometer werden anteilig berücksichtigt`,
     amount,
   };
 }
@@ -224,7 +236,7 @@ function computeBreakdown(s: State): Breakdown | null {
       const a = +(qm * variante.price).toFixed(2);
       items.push({
         label: `${variante.label} verlegen`,
-        detail: `${qm} m² × ${eur(variante.price)} = ${eur(a)}`,
+        detail: `${qm} m²`,
         amount: a,
         arbeitsleistung: true,
       });
@@ -237,25 +249,26 @@ function computeBreakdown(s: State): Breakdown | null {
       const a = +(qm * ALT_PRICE_SCHWIMMEND).toFixed(2);
       items.push({
         label: "Alten schwimmend verlegten Boden entfernen",
-        detail: `${qm} m² × ${eur(ALT_PRICE_SCHWIMMEND)} = ${eur(a)}`,
+        detail: `${qm} m²`,
         amount: a,
         arbeitsleistung: true,
       });
       arbeitssumme += a;
     } else if (s.altEntfernen === "verklebt") {
+      const a = +(qm * ALT_PRICE_VERKLEBT).toFixed(2);
       items.push({
-        label: "Entfernung verklebter Böden",
-        detail: "nach Besichtigung / auf Anfrage",
-        amount: null,
+        label: "Verklebten Altbelag entfernen",
+        detail: `${qm} m²`,
+        amount: a,
+        arbeitsleistung: true,
       });
-      hasOnRequest = true;
+      arbeitssumme += a;
     } else if (s.altEntfernen === "teppich_lose") {
       const raw = +(qm * ALT_TEPPICH_LOSE_PRICE).toFixed(2);
       const a = Math.max(raw, ALT_TEPPICH_LOSE_MIN);
-      const minHinweis = a > raw ? ` – Mindestpauschale ${eur(ALT_TEPPICH_LOSE_MIN)}` : "";
       items.push({
         label: "Altbelag entfernen & entsorgen – Teppich lose / nicht verklebt",
-        detail: `${qm} m² × ${eur(ALT_TEPPICH_LOSE_PRICE)} = ${eur(raw)}${minHinweis}. Inklusive Aufnahme, Tragen, Laden, Transport und Entsorgung.`,
+        detail: `${qm} m² – inklusive Aufnahme, Tragen, Laden, Transport und Entsorgung`,
         amount: a,
         arbeitsleistung: true,
       });
@@ -263,10 +276,9 @@ function computeBreakdown(s: State): Breakdown | null {
     } else if (s.altEntfernen === "teppich_verklebt") {
       const raw = +(qm * ALT_TEPPICH_VERKLEBT_PRICE).toFixed(2);
       const a = Math.max(raw, ALT_TEPPICH_VERKLEBT_MIN);
-      const minHinweis = a > raw ? ` – Mindestpauschale ${eur(ALT_TEPPICH_VERKLEBT_MIN)}` : "";
       items.push({
         label: "Altbelag entfernen & entsorgen – Teppich verklebt",
-        detail: `${qm} m² × ${eur(ALT_TEPPICH_VERKLEBT_PRICE)} = ${eur(raw)}${minHinweis}. Inklusive Aufnahme, Tragen, Laden, Transport und Entsorgung. Zusätzliche Untergrundarbeiten sind nicht enthalten.`,
+        detail: `${qm} m² – inklusive Aufnahme, Tragen, Laden, Transport und Entsorgung. Zusätzliche Untergrundarbeiten sind nicht enthalten.`,
         amount: a,
         arbeitsleistung: true,
       });
@@ -287,15 +299,12 @@ function computeBreakdown(s: State): Breakdown | null {
       const a = +(qm * DAEMMUNG_PRICE).toFixed(2);
       items.push({
         label: "Dämmung verlegen",
-        detail: `${qm} m² × ${eur(DAEMMUNG_PRICE)} = ${eur(a)}`,
+        detail: `${qm} m²`,
         amount: a,
         arbeitsleistung: true,
       });
       arbeitssumme += a;
     }
-
-
-
 
     const lfm = Number(s.sockelLfm);
     if (lfm > 0 && s.sockelArt && s.sockelArt !== "keine") {
@@ -303,7 +312,7 @@ function computeBreakdown(s: State): Breakdown | null {
         const a = +(lfm * SOCKEL_GEHRUNG_PRICE).toFixed(2);
         items.push({
           label: "Sockelleisten auf Gehrung montieren",
-          detail: `${lfm} lfm × ${eur(SOCKEL_GEHRUNG_PRICE)} = ${eur(a)}`,
+          detail: `${lfm} lfm`,
           amount: a,
           arbeitsleistung: true,
         });
@@ -312,7 +321,7 @@ function computeBreakdown(s: State): Breakdown | null {
         const a = +(lfm * SOCKEL_PRICE).toFixed(2);
         items.push({
           label: "Sockelleisten montieren (ohne Acrylfuge)",
-          detail: `${lfm} lfm × ${eur(SOCKEL_PRICE)} = ${eur(a)}`,
+          detail: `${lfm} lfm`,
           amount: a,
           arbeitsleistung: true,
         });
@@ -325,17 +334,15 @@ function computeBreakdown(s: State): Breakdown | null {
       if (!isNaN(wert) && wert > 0) {
         const raw = +(wert * MATERIALSERVICE_RATE).toFixed(2);
         const a = Math.max(raw, MATERIALSERVICE_MIN);
-        const minHinweis = a > raw ? ` – Mindestpauschale ${eur(MATERIALSERVICE_MIN)}` : "";
         items.push({
           label: "Materialservice – Auswahl, Beschaffung und Anlieferung",
-          detail: `15 % von ${eur(wert)} Materialwert = ${eur(raw)}${minHinweis}. Berechnet mit 15 % des Materialwertes, mindestens ${eur(MATERIALSERVICE_MIN)}.`,
           amount: a,
         });
         sonstSumme += a;
       } else {
         items.push({
           label: "Materialservice – Auswahl, Beschaffung und Anlieferung",
-          detail: "Bitte Materialwert eintragen, damit der Materialservice berechnet werden kann.",
+          detail: "Bitte Materialwert eintragen, damit der Materialservice berücksichtigt werden kann.",
           amount: null,
         });
         hasOnRequest = true;
@@ -344,12 +351,41 @@ function computeBreakdown(s: State): Breakdown | null {
   } else if (s.service === "kueche") {
     const m = Number(s.kueMeter);
     if (!m || m <= 0) return null;
-    items.push({
-      label: "Küchenmontage / -arbeiten",
-      detail: `Geschätzter Aufwand für ca. ${m} m Küchenlänge – exakte Berechnung nach Besichtigung`,
-      amount: null,
-    });
-    hasOnRequest = true;
+
+    // Hauptleistung anhand Projektart
+    if (s.kueArt === "Küchenabbau") {
+      const a = +(m * KUECHE_DEMONTAGE_PRICE).toFixed(2);
+      items.push({ label: "Küchen-Demontage", detail: `${m} lfm`, amount: a, arbeitsleistung: true });
+      arbeitssumme += a;
+    } else {
+      // Neue Küche, Gebrauchte Küche, Küchenumbau → Montage
+      const a = +(m * KUECHE_MONTAGE_PRICE).toFixed(2);
+      items.push({ label: "Küchenmontage", detail: `${m} lfm`, amount: a, arbeitsleistung: true });
+      arbeitssumme += a;
+    }
+
+    // Zusätzliche Demontage einer alten Küche
+    if (s.kueDemontage === "Ja" && s.kueArt !== "Küchenabbau") {
+      const a = +(m * KUECHE_DEMONTAGE_PRICE).toFixed(2);
+      items.push({ label: "Demontage alter Küche", detail: `${m} lfm`, amount: a, arbeitsleistung: true });
+      arbeitssumme += a;
+    }
+
+    // Alte Küche entsorgen (wenn Transport "Ja" → Pauschale für Entsorgung)
+    if (s.kueTransport === "Ja") {
+      items.push({ label: "Alte Küche entsorgen", amount: KUECHE_ENTSORGUNG_PAUSCHAL });
+      sonstSumme += KUECHE_ENTSORGUNG_PAUSCHAL;
+    }
+
+    // Geräte / Spüle / Arbeitsplatte – falls "Unsicher" → Hinweis auf Besichtigung
+    if (s.kueArbeit === "Unsicher" || s.kueGeraete === "Unsicher" || s.kueSpuele === "Unsicher") {
+      items.push({
+        label: "Zusatzleistungen (Geräte, Spüle, Arbeitsplatte)",
+        detail: "Genauer Umfang wird nach Besichtigung festgelegt.",
+        amount: null,
+      });
+      hasOnRequest = true;
+    }
   } else if (s.service === "ent") {
     if (!s.entMenge) return null;
     items.push({
@@ -383,22 +419,16 @@ function computeBreakdown(s: State): Breakdown | null {
     anfahrt = { label: "Anfahrt", detail: "wird nach Einsatzort geprüft", amount: null };
   }
 
-  // Express-Zuschlag
+  // Express-Zuschlag (auf Arbeitsleistung)
   let express: LineItem | null = null;
   if (s.dringlichkeit) {
     const d = DRINGLICHKEIT_OPTIONS.find((o) => o.key === s.dringlichkeit);
     if (d) {
-      if (d.surcharge === null) {
-        express = {
-          label: "Sehr kurzfristiger Termin (≤ 3 Tage)",
-          detail: "nur nach Rücksprache möglich – Expresszuschlag individuell",
-          amount: null,
-        };
-      } else if (d.surcharge > 0 && arbeitssumme > 0) {
+      if (d.surcharge > 0 && arbeitssumme > 0) {
         const a = +(arbeitssumme * d.surcharge).toFixed(2);
         express = {
-          label: `Expresszuschlag (${Math.round(d.surcharge * 100)} %)`,
-          detail: `${d.label} – ${Math.round(d.surcharge * 100)} % auf Arbeitsleistungen (${eur(arbeitssumme)})`,
+          label: "Expresszuschlag",
+          detail: `${d.label} – wird auf die Arbeitsleistung angewendet`,
           amount: a,
         };
         sonstSumme += a;
@@ -746,7 +776,7 @@ export function Kostenrechner() {
                 type="number"
                 min={0}
                 value={s.anfahrtKm}
-                onChange={(e) => upd("anfahrtKm", e.target.value)}
+                onChange={(e) => upd("anfahrtKm", e.target.value.replace(/^-/, ""))}
                 placeholder="z. B. 25"
                 className={input}
               />
@@ -804,9 +834,18 @@ export function Kostenrechner() {
           <div className="rounded-2xl border border-accent/40 bg-gradient-to-br from-accent/15 via-background/60 to-background/40 p-6 sm:p-8">
             <p className="text-xs uppercase tracking-[0.25em] text-accent">Ihre unverbindliche Ersteinschätzung</p>
             {breakdown && breakdown.total > 0 ? (
-              <p className="mt-3 text-3xl font-semibold sm:text-4xl">Geschätzte Gesamtkosten: ca. {eur(breakdown.total)}</p>
+              <>
+                <p className="mt-3 text-3xl font-semibold sm:text-4xl">
+                  Ihre unverbindliche Preisorientierung: ca. {eur(+(breakdown.total * RANGE_LOW).toFixed(0))} – {eur(+(breakdown.total * RANGE_HIGH).toFixed(0))}
+                </p>
+                {breakdown.hasOnRequest && (
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    Einzelne Positionen werden erst nach Besichtigung kalkuliert und sind in dieser Spanne noch nicht enthalten.
+                  </p>
+                )}
+              </>
             ) : (
-              <p className="mt-3 text-2xl font-semibold sm:text-3xl">Individuelles Angebot</p>
+              <p className="mt-3 text-2xl font-semibold sm:text-3xl">Individuelles Angebot nach Besichtigung</p>
             )}
             <p className="mt-2 text-xs text-muted-foreground">
               Endkundenpreise · keine Umsatzsteuer (§ 19 UStG / Kleinunternehmer)
@@ -991,10 +1030,10 @@ function BodenForm({ s, upd }: { s: State; upd: <K extends keyof State>(k: K, v:
       </Field>
       <Grid2>
         <Field label="Fläche in m² *">
-          <input type="number" min={1} value={s.qm} onChange={(e) => upd("qm", e.target.value)} className={input} placeholder="z. B. 28" />
+          <input type="number" min={1} value={s.qm} onChange={(e) => upd("qm", e.target.value.replace(/^-/, ""))} className={input} placeholder="z. B. 28" />
         </Field>
         <Field label="Sockelleisten in lfm (laufende Meter)">
-          <input type="number" min={0} value={s.sockelLfm} onChange={(e) => upd("sockelLfm", e.target.value)} className={input} placeholder="z. B. 40" />
+          <input type="number" min={0} value={s.sockelLfm} onChange={(e) => upd("sockelLfm", e.target.value.replace(/^-/, ""))} className={input} placeholder="z. B. 40" />
           <p className="mt-1 text-xs text-muted-foreground">
             Ausführung bitte unten auswählen. Acrylfuge / Versiegelung separat nach Aufwand.
           </p>
@@ -1006,12 +1045,12 @@ function BodenForm({ s, upd }: { s: State; upd: <K extends keyof State>(k: K, v:
           onChange={(v) => upd("sockelArt", v as State["sockelArt"])}
           options={[
             { value: "keine", label: "Keine Sockelleisten" },
-            { value: "normal", label: "Normale Montage (5,00 €/lfm)" },
-            { value: "gehrung", label: "Auf Gehrung gesägt (7,00 €/lfm)" },
+            { value: "normal", label: "Normale Montage" },
+            { value: "gehrung", label: "Auf Gehrung gesägt" },
           ]}
         />
         <p className="mt-1 text-xs text-muted-foreground">
-          Es wird entweder normale Montage oder Gehrung berechnet – nicht beides.
+          Es wird entweder normale Montage oder Gehrung berücksichtigt – nicht beides.
         </p>
       </Field>
       <Field label="Altbelag entfernen & entsorgen">
@@ -1021,9 +1060,9 @@ function BodenForm({ s, upd }: { s: State; upd: <K extends keyof State>(k: K, v:
           options={[
             { value: "Nein", label: "Nein" },
             { value: "schwimmend", label: "Schwimmend verlegt" },
-            { value: "verklebt", label: "Verklebt (nach Besichtigung)" },
-            { value: "teppich_lose", label: "Teppich lose / nicht verklebt (7,00 €/m², min. 120 €)" },
-            { value: "teppich_verklebt", label: "Teppich verklebt (12,00 €/m², min. 180 €)" },
+            { value: "verklebt", label: "Verklebter Boden" },
+            { value: "teppich_lose", label: "Teppich lose / nicht verklebt" },
+            { value: "teppich_verklebt", label: "Teppich verklebt" },
             { value: "teppich_stark", label: "Stark verklebt / Schaumrücken / Klebereste (nur nach Besichtigung)" },
           ]}
         />
@@ -1058,7 +1097,7 @@ function BodenForm({ s, upd }: { s: State; upd: <K extends keyof State>(k: K, v:
               placeholder="z. B. 1200"
             />
             <p className="mt-1 text-xs text-muted-foreground">
-              Berechnung: 15 % des Materialwertes, mindestens 150,00 €. Der Materialwert selbst dient nur als Berechnungsgrundlage.
+              Materialauswahl, Beschaffung und Anlieferung. Der Materialwert dient ausschließlich als Berechnungsgrundlage.
             </p>
             {(!s.materialWert || Number(s.materialWert) <= 0) && (
               <p className="mt-1 text-xs text-destructive">
@@ -1088,7 +1127,7 @@ function KuecheForm({ s, upd }: { s: State; upd: <K extends keyof State>(k: K, v
           <Choice value={s.kueArt} onChange={(v) => upd("kueArt", v || "Neue Küche")} options={["Neue Küche", "Gebrauchte Küche", "Küchenumbau", "Küchenabbau"]} />
         </Field>
         <Field label="Küchenlänge in m *">
-          <input type="number" step={0.5} min={1} value={s.kueMeter} onChange={(e) => upd("kueMeter", e.target.value)} className={input} placeholder="z. B. 3" />
+          <input type="number" step={0.5} min={1} value={s.kueMeter} onChange={(e) => upd("kueMeter", e.target.value.replace(/^-/, ""))} className={input} placeholder="z. B. 3" />
         </Field>
       </Grid2>
       <Grid2>
@@ -1130,7 +1169,7 @@ function EntForm({ s, upd }: { s: State; upd: <K extends keyof State>(k: K, v: S
       </Field>
       <Grid2>
         <Field label="Etage">
-          <input type="number" min={0} value={s.entEtage} onChange={(e) => upd("entEtage", e.target.value)} className={input} placeholder="z. B. 2" />
+          <input type="number" min={0} value={s.entEtage} onChange={(e) => upd("entEtage", e.target.value.replace(/^-/, ""))} className={input} placeholder="z. B. 2" />
         </Field>
         <Field label="Aufzug vorhanden">
           <Choice value={s.entAufzug} onChange={(v) => upd("entAufzug", v as State["entAufzug"])} options={["Ja", "Nein"]} />
