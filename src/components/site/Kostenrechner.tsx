@@ -980,11 +980,25 @@ function BodenForm({ s, upd }: { s: State; upd: <K extends keyof State>(k: K, v:
         <Field label="Sockelleisten in lfm (laufende Meter)">
           <input type="number" min={0} value={s.sockelLfm} onChange={(e) => upd("sockelLfm", e.target.value)} className={input} placeholder="z. B. 40" />
           <p className="mt-1 text-xs text-muted-foreground">
-            Sockelleisten ohne Acrylfuge werden in der Einschätzung berücksichtigt. Acrylfuge / Versiegelung separat nach Aufwand.
+            Ausführung bitte unten auswählen. Acrylfuge / Versiegelung separat nach Aufwand.
           </p>
         </Field>
       </Grid2>
-      <Field label="Alten Boden entfernen">
+      <Field label="Sockelleisten-Ausführung">
+        <Choice
+          value={s.sockelArt}
+          onChange={(v) => upd("sockelArt", v as State["sockelArt"])}
+          options={[
+            { value: "keine", label: "Keine Sockelleisten" },
+            { value: "normal", label: "Normale Montage (5,00 €/lfm)" },
+            { value: "gehrung", label: "Auf Gehrung gesägt (7,00 €/lfm)" },
+          ]}
+        />
+        <p className="mt-1 text-xs text-muted-foreground">
+          Es wird entweder normale Montage oder Gehrung berechnet – nicht beides.
+        </p>
+      </Field>
+      <Field label="Altbelag entfernen & entsorgen">
         <Choice
           value={s.altEntfernen}
           onChange={(v) => upd("altEntfernen", v as State["altEntfernen"])}
@@ -992,6 +1006,9 @@ function BodenForm({ s, upd }: { s: State; upd: <K extends keyof State>(k: K, v:
             { value: "Nein", label: "Nein" },
             { value: "schwimmend", label: "Schwimmend verlegt" },
             { value: "verklebt", label: "Verklebt (nach Besichtigung)" },
+            { value: "teppich_lose", label: "Teppich lose / nicht verklebt (7,00 €/m², min. 120 €)" },
+            { value: "teppich_verklebt", label: "Teppich verklebt (12,00 €/m², min. 180 €)" },
+            { value: "teppich_stark", label: "Stark verklebt / Schaumrücken / Klebereste (nur nach Besichtigung)" },
           ]}
         />
       </Field>
@@ -1002,6 +1019,51 @@ function BodenForm({ s, upd }: { s: State; upd: <K extends keyof State>(k: K, v:
           options={["Ja", "Nein"]}
         />
       </Field>
+      {s.bodenartKey.startsWith("teppich") && (
+        <Field label="Teppichboden verkleben / fixieren">
+          <Choice
+            value={s.teppichVerkleben}
+            onChange={(v) => upd("teppichVerkleben", v as State["teppichVerkleben"])}
+            options={["Ja", "Nein"]}
+          />
+          <p className="mt-1 text-xs text-muted-foreground">
+            Vollflächiges Verkleben / Fixieren eines neuen Teppichbodens – 7,00 €/m² zusätzlich zur Verlegung.
+          </p>
+        </Field>
+      )}
+      <div className="space-y-3 rounded-md border border-border/60 bg-background/40 p-4">
+        <Field label="Materialservice gewünscht">
+          <Choice
+            value={s.materialService}
+            onChange={(v) => upd("materialService", v as State["materialService"])}
+            options={["Ja", "Nein"]}
+          />
+          <p className="mt-1 text-xs text-muted-foreground">
+            Wir unterstützen bei der Materialauswahl, Beschaffung und Anlieferung des passenden Materials.
+          </p>
+        </Field>
+        {s.materialService === "Ja" && (
+          <Field label="Geschätzter Materialwert in €">
+            <input
+              type="number"
+              min={0}
+              step={1}
+              value={s.materialWert}
+              onChange={(e) => upd("materialWert", e.target.value.replace(/^-/, ""))}
+              className={input}
+              placeholder="z. B. 1200"
+            />
+            <p className="mt-1 text-xs text-muted-foreground">
+              Berechnung: 15 % des Materialwertes, mindestens 150,00 €. Der Materialwert selbst dient nur als Berechnungsgrundlage.
+            </p>
+            {(!s.materialWert || Number(s.materialWert) <= 0) && (
+              <p className="mt-1 text-xs text-destructive">
+                Bitte Materialwert eintragen, damit der Materialservice berechnet werden kann.
+              </p>
+            )}
+          </Field>
+        )}
+      </div>
       <div className="rounded-md border border-border/60 bg-background/40 p-3 text-xs text-muted-foreground">
         <p className="font-medium text-foreground">In der Einschätzung berücksichtigt:</p>
         <ul className="mt-1 list-disc pl-4">
