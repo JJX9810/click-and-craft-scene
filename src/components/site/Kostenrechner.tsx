@@ -55,7 +55,7 @@ const ALT_PRICE_SCHWIMMEND = 4; // €/m²
 const SOCKEL_PRICE = 5; // €/lfm – normale Montage
 const SOCKEL_GEHRUNG_PRICE = 7; // €/lfm – auf Gehrung gesägt
 const DAEMMUNG_PRICE = 1.5; // €/m²
-const TEPPICH_VERKLEBEN_PRICE = 7; // €/m²
+
 const ALT_TEPPICH_LOSE_PRICE = 7; // €/m²
 const ALT_TEPPICH_LOSE_MIN = 120; // €
 const ALT_TEPPICH_VERKLEBT_PRICE = 12; // €/m²
