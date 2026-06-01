@@ -294,17 +294,8 @@ function computeBreakdown(s: State): Breakdown | null {
       arbeitssumme += a;
     }
 
-    const istTeppich = s.bodenartKey.startsWith("teppich");
-    if (istTeppich && s.teppichVerkleben === "Ja") {
-      const a = +(qm * TEPPICH_VERKLEBEN_PRICE).toFixed(2);
-      items.push({
-        label: "Teppichboden verkleben / fixieren",
-        detail: `${qm} m² × ${eur(TEPPICH_VERKLEBEN_PRICE)} = ${eur(a)}`,
-        amount: a,
-        arbeitsleistung: true,
-      });
-      arbeitssumme += a;
-    }
+
+
 
     const lfm = Number(s.sockelLfm);
     if (lfm > 0 && s.sockelArt && s.sockelArt !== "keine") {
