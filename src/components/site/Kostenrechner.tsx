@@ -52,8 +52,16 @@ const BODEN_VARIANTEN: { key: string; label: string; price: number | null }[] = 
 ];
 
 const ALT_PRICE_SCHWIMMEND = 4; // €/m²
-const SOCKEL_PRICE = 5; // €/lfm
+const SOCKEL_PRICE = 5; // €/lfm – normale Montage
+const SOCKEL_GEHRUNG_PRICE = 7; // €/lfm – auf Gehrung gesägt
 const DAEMMUNG_PRICE = 1.5; // €/m²
+const TEPPICH_VERKLEBEN_PRICE = 7; // €/m²
+const ALT_TEPPICH_LOSE_PRICE = 7; // €/m²
+const ALT_TEPPICH_LOSE_MIN = 120; // €
+const ALT_TEPPICH_VERKLEBT_PRICE = 12; // €/m²
+const ALT_TEPPICH_VERKLEBT_MIN = 180; // €
+const MATERIALSERVICE_RATE = 0.15;
+const MATERIALSERVICE_MIN = 150; // €
 const ANFAHRT_FREI_KM = 35;
 const ANFAHRT_PRO_KM = 0.7;
 
