@@ -1035,18 +1035,6 @@ function BodenForm({ s, upd }: { s: State; upd: <K extends keyof State>(k: K, v:
           options={["Ja", "Nein"]}
         />
       </Field>
-      {s.bodenartKey.startsWith("teppich") && (
-        <Field label="Teppichboden verkleben / fixieren">
-          <Choice
-            value={s.teppichVerkleben}
-            onChange={(v) => upd("teppichVerkleben", v as State["teppichVerkleben"])}
-            options={["Ja", "Nein"]}
-          />
-          <p className="mt-1 text-xs text-muted-foreground">
-            Vollflächiges Verkleben / Fixieren eines neuen Teppichbodens – 7,00 €/m² zusätzlich zur Verlegung.
-          </p>
-        </Field>
-      )}
       <div className="space-y-3 rounded-md border border-border/60 bg-background/40 p-4">
         <Field label="Materialservice gewünscht">
           <Choice
