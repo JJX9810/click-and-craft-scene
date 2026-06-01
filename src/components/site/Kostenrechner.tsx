@@ -90,9 +90,20 @@ type State = {
   // boden
   bodenartKey: string;
   qm: string;
-  altEntfernen: "" | "Nein" | "schwimmend" | "verklebt";
+  altEntfernen:
+    | ""
+    | "Nein"
+    | "schwimmend"
+    | "verklebt"
+    | "teppich_lose"
+    | "teppich_verklebt"
+    | "teppich_stark";
   sockelLfm: string;
+  sockelArt: "" | "keine" | "normal" | "gehrung";
   daemmung: "Ja" | "Nein" | "";
+  teppichVerkleben: "Ja" | "Nein" | "";
+  materialService: "Ja" | "Nein" | "";
+  materialWert: string;
   // küche
   kueArt: string;
   kueMeter: string;
