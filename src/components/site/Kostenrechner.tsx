@@ -530,8 +530,15 @@ function buildWaMessage(s: State, b: Breakdown | null): string {
     if (v) lines.push(`Bodenart: ${v.label}`);
     if (s.qm) lines.push(`Fläche: ${s.qm} m²`);
     if (s.sockelLfm && Number(s.sockelLfm) > 0) lines.push(`Sockelleisten: ${s.sockelLfm} lfm`);
-    if (s.altEntfernen) lines.push(`Alten Boden entfernen: ${s.altEntfernen}`);
+    if (s.sockelArt) lines.push(`Sockelleisten-Ausführung: ${altSockelLabel(s.sockelArt)}`);
+    if (s.altEntfernen) lines.push(`Altbelag entfernen & entsorgen: ${altEntfernenLabel(s.altEntfernen)}`);
     if (s.daemmung === "Ja") lines.push(`Dämmung verlegen: ja`);
+    if (s.bodenartKey.startsWith("teppich") && s.teppichVerkleben === "Ja") {
+      lines.push("Teppichboden verkleben / fixieren: ja");
+    }
+    if (s.materialService === "Ja") {
+      lines.push(`Materialservice: ja${s.materialWert ? ` (Materialwert ca. ${s.materialWert} €)` : ""}`);
+    }
   } else if (s.service === "kueche") {
     if (s.kueArt) lines.push(`Projektart: ${s.kueArt}`);
     if (s.kueMeter) lines.push(`Küchenlänge: ${s.kueMeter} m`);
