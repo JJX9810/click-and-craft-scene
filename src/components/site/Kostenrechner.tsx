@@ -52,8 +52,16 @@ const BODEN_VARIANTEN: { key: string; label: string; price: number | null }[] = 
 ];
 
 const ALT_PRICE_SCHWIMMEND = 4; // €/m²
-const SOCKEL_PRICE = 5; // €/lfm
+const SOCKEL_PRICE = 5; // €/lfm – normale Montage
+const SOCKEL_GEHRUNG_PRICE = 7; // €/lfm – auf Gehrung gesägt
 const DAEMMUNG_PRICE = 1.5; // €/m²
+const TEPPICH_VERKLEBEN_PRICE = 7; // €/m²
+const ALT_TEPPICH_LOSE_PRICE = 7; // €/m²
+const ALT_TEPPICH_LOSE_MIN = 120; // €
+const ALT_TEPPICH_VERKLEBT_PRICE = 12; // €/m²
+const ALT_TEPPICH_VERKLEBT_MIN = 180; // €
+const MATERIALSERVICE_RATE = 0.15;
+const MATERIALSERVICE_MIN = 150; // €
 const ANFAHRT_FREI_KM = 35;
 const ANFAHRT_PRO_KM = 0.7;
 
@@ -82,9 +90,20 @@ type State = {
   // boden
   bodenartKey: string;
   qm: string;
-  altEntfernen: "" | "Nein" | "schwimmend" | "verklebt";
+  altEntfernen:
+    | ""
+    | "Nein"
+    | "schwimmend"
+    | "verklebt"
+    | "teppich_lose"
+    | "teppich_verklebt"
+    | "teppich_stark";
   sockelLfm: string;
+  sockelArt: "" | "keine" | "normal" | "gehrung";
   daemmung: "Ja" | "Nein" | "";
+  teppichVerkleben: "Ja" | "Nein" | "";
+  materialService: "Ja" | "Nein" | "";
+  materialWert: string;
   // küche
   kueArt: string;
   kueMeter: string;
@@ -119,7 +138,11 @@ const initial: State = {
   qm: "",
   altEntfernen: "",
   sockelLfm: "",
+  sockelArt: "",
   daemmung: "",
+  teppichVerkleben: "",
+  materialService: "",
+  materialWert: "",
   kueArt: "Neue Küche",
   kueMeter: "",
   kueArbeit: "",
@@ -226,6 +249,35 @@ function computeBreakdown(s: State): Breakdown | null {
         amount: null,
       });
       hasOnRequest = true;
+    } else if (s.altEntfernen === "teppich_lose") {
+      const raw = +(qm * ALT_TEPPICH_LOSE_PRICE).toFixed(2);
+      const a = Math.max(raw, ALT_TEPPICH_LOSE_MIN);
+      const minHinweis = a > raw ? ` – Mindestpauschale ${eur(ALT_TEPPICH_LOSE_MIN)}` : "";
+      items.push({
+        label: "Altbelag entfernen & entsorgen – Teppich lose / nicht verklebt",
+        detail: `${qm} m² × ${eur(ALT_TEPPICH_LOSE_PRICE)} = ${eur(raw)}${minHinweis}. Inklusive Aufnahme, Tragen, Laden, Transport und Entsorgung.`,
+        amount: a,
+        arbeitsleistung: true,
+      });
+      arbeitssumme += a;
+    } else if (s.altEntfernen === "teppich_verklebt") {
+      const raw = +(qm * ALT_TEPPICH_VERKLEBT_PRICE).toFixed(2);
+      const a = Math.max(raw, ALT_TEPPICH_VERKLEBT_MIN);
+      const minHinweis = a > raw ? ` – Mindestpauschale ${eur(ALT_TEPPICH_VERKLEBT_MIN)}` : "";
+      items.push({
+        label: "Altbelag entfernen & entsorgen – Teppich verklebt",
+        detail: `${qm} m² × ${eur(ALT_TEPPICH_VERKLEBT_PRICE)} = ${eur(raw)}${minHinweis}. Inklusive Aufnahme, Tragen, Laden, Transport und Entsorgung. Zusätzliche Untergrundarbeiten sind nicht enthalten.`,
+        amount: a,
+        arbeitsleistung: true,
+      });
+      arbeitssumme += a;
+    } else if (s.altEntfernen === "teppich_stark") {
+      items.push({
+        label: "Stark verklebter Altbelag / Schaumrücken / Klebereste – nur nach Besichtigung",
+        detail: "Bei stark verklebtem Teppich, Schaumrückenresten oder Kleberückständen können zusätzliche Schleif-, Spachtel- oder Untergrundarbeiten erforderlich sein. Diese werden erst nach Sichtprüfung kalkuliert.",
+        amount: null,
+      });
+      hasOnRequest = true;
     }
 
     items.push({ label: "Alten Boden entsorgen", amount: 0, inklusive: true });
@@ -242,16 +294,61 @@ function computeBreakdown(s: State): Breakdown | null {
       arbeitssumme += a;
     }
 
-    const lfm = Number(s.sockelLfm);
-    if (lfm > 0) {
-      const a = +(lfm * SOCKEL_PRICE).toFixed(2);
+    const istTeppich = s.bodenartKey.startsWith("teppich");
+    if (istTeppich && s.teppichVerkleben === "Ja") {
+      const a = +(qm * TEPPICH_VERKLEBEN_PRICE).toFixed(2);
       items.push({
-        label: "Sockelleisten montieren (ohne Acrylfuge)",
-        detail: `${lfm} lfm × ${eur(SOCKEL_PRICE)} = ${eur(a)}`,
+        label: "Teppichboden verkleben / fixieren",
+        detail: `${qm} m² × ${eur(TEPPICH_VERKLEBEN_PRICE)} = ${eur(a)}`,
         amount: a,
         arbeitsleistung: true,
       });
       arbeitssumme += a;
+    }
+
+    const lfm = Number(s.sockelLfm);
+    if (lfm > 0 && s.sockelArt && s.sockelArt !== "keine") {
+      if (s.sockelArt === "gehrung") {
+        const a = +(lfm * SOCKEL_GEHRUNG_PRICE).toFixed(2);
+        items.push({
+          label: "Sockelleisten auf Gehrung montieren",
+          detail: `${lfm} lfm × ${eur(SOCKEL_GEHRUNG_PRICE)} = ${eur(a)}`,
+          amount: a,
+          arbeitsleistung: true,
+        });
+        arbeitssumme += a;
+      } else if (s.sockelArt === "normal") {
+        const a = +(lfm * SOCKEL_PRICE).toFixed(2);
+        items.push({
+          label: "Sockelleisten montieren (ohne Acrylfuge)",
+          detail: `${lfm} lfm × ${eur(SOCKEL_PRICE)} = ${eur(a)}`,
+          amount: a,
+          arbeitsleistung: true,
+        });
+        arbeitssumme += a;
+      }
+    }
+
+    if (s.materialService === "Ja") {
+      const wert = Number(s.materialWert);
+      if (!isNaN(wert) && wert > 0) {
+        const raw = +(wert * MATERIALSERVICE_RATE).toFixed(2);
+        const a = Math.max(raw, MATERIALSERVICE_MIN);
+        const minHinweis = a > raw ? ` – Mindestpauschale ${eur(MATERIALSERVICE_MIN)}` : "";
+        items.push({
+          label: "Materialservice – Auswahl, Beschaffung und Anlieferung",
+          detail: `15 % von ${eur(wert)} Materialwert = ${eur(raw)}${minHinweis}. Berechnet mit 15 % des Materialwertes, mindestens ${eur(MATERIALSERVICE_MIN)}.`,
+          amount: a,
+        });
+        sonstSumme += a;
+      } else {
+        items.push({
+          label: "Materialservice – Auswahl, Beschaffung und Anlieferung",
+          detail: "Bitte Materialwert eintragen, damit der Materialservice berechnet werden kann.",
+          amount: null,
+        });
+        hasOnRequest = true;
+      }
     }
   } else if (s.service === "kueche") {
     const m = Number(s.kueMeter);
@@ -329,6 +426,27 @@ function computeBreakdown(s: State): Breakdown | null {
   return { items, anfahrt, express, total, hasOnRequest };
 }
 
+function altSockelLabel(v: State["sockelArt"]): string {
+  switch (v) {
+    case "keine": return "keine Sockelleisten";
+    case "normal": return "normale Montage";
+    case "gehrung": return "auf Gehrung gesägt";
+    default: return "";
+  }
+}
+
+function altEntfernenLabel(v: State["altEntfernen"]): string {
+  switch (v) {
+    case "Nein": return "nein";
+    case "schwimmend": return "schwimmend verlegter Boden";
+    case "verklebt": return "verklebter Boden (nach Besichtigung)";
+    case "teppich_lose": return "Teppich lose / nicht verklebt";
+    case "teppich_verklebt": return "Teppich verklebt";
+    case "teppich_stark": return "stark verklebt / Schaumrücken / Klebereste (nur nach Besichtigung)";
+    default: return "";
+  }
+}
+
 function summaryLines(s: State): string[] {
   const lines: string[] = [];
   const serviceLabel =
@@ -348,12 +466,15 @@ function summaryLines(s: State): string[] {
     if (v) lines.push(`Bodenart: ${v.label}`);
     if (s.qm) lines.push(`Fläche: ${s.qm} m²`);
     if (s.sockelLfm && Number(s.sockelLfm) > 0) lines.push(`Sockelleisten: ${s.sockelLfm} lfm`);
-    if (s.altEntfernen && s.altEntfernen !== "Nein") {
-      lines.push(`Alten Boden entfernen: ${s.altEntfernen}`);
-    } else if (s.altEntfernen === "Nein") {
-      lines.push("Alten Boden entfernen: nein");
-    }
+    if (s.sockelArt) lines.push(`Sockelleisten-Ausführung: ${altSockelLabel(s.sockelArt)}`);
+    if (s.altEntfernen) lines.push(`Altbelag entfernen & entsorgen: ${altEntfernenLabel(s.altEntfernen)}`);
     if (s.daemmung === "Ja") lines.push("Dämmung verlegen: ja");
+    if (s.bodenartKey.startsWith("teppich") && s.teppichVerkleben === "Ja") {
+      lines.push("Teppichboden verkleben / fixieren: ja");
+    }
+    if (s.materialService === "Ja") {
+      lines.push(`Materialservice: ja${s.materialWert ? ` (Materialwert ca. ${s.materialWert} €)` : ""}`);
+    }
   } else if (s.service === "kueche") {
     if (s.kueArt) lines.push(`Projektart: ${s.kueArt}`);
     if (s.kueMeter) lines.push(`Küchenlänge: ${s.kueMeter} m`);
@@ -409,8 +530,15 @@ function buildWaMessage(s: State, b: Breakdown | null): string {
     if (v) lines.push(`Bodenart: ${v.label}`);
     if (s.qm) lines.push(`Fläche: ${s.qm} m²`);
     if (s.sockelLfm && Number(s.sockelLfm) > 0) lines.push(`Sockelleisten: ${s.sockelLfm} lfm`);
-    if (s.altEntfernen) lines.push(`Alten Boden entfernen: ${s.altEntfernen}`);
+    if (s.sockelArt) lines.push(`Sockelleisten-Ausführung: ${altSockelLabel(s.sockelArt)}`);
+    if (s.altEntfernen) lines.push(`Altbelag entfernen & entsorgen: ${altEntfernenLabel(s.altEntfernen)}`);
     if (s.daemmung === "Ja") lines.push(`Dämmung verlegen: ja`);
+    if (s.bodenartKey.startsWith("teppich") && s.teppichVerkleben === "Ja") {
+      lines.push("Teppichboden verkleben / fixieren: ja");
+    }
+    if (s.materialService === "Ja") {
+      lines.push(`Materialservice: ja${s.materialWert ? ` (Materialwert ca. ${s.materialWert} €)` : ""}`);
+    }
   } else if (s.service === "kueche") {
     if (s.kueArt) lines.push(`Projektart: ${s.kueArt}`);
     if (s.kueMeter) lines.push(`Küchenlänge: ${s.kueMeter} m`);
@@ -883,11 +1011,25 @@ function BodenForm({ s, upd }: { s: State; upd: <K extends keyof State>(k: K, v:
         <Field label="Sockelleisten in lfm (laufende Meter)">
           <input type="number" min={0} value={s.sockelLfm} onChange={(e) => upd("sockelLfm", e.target.value)} className={input} placeholder="z. B. 40" />
           <p className="mt-1 text-xs text-muted-foreground">
-            Sockelleisten ohne Acrylfuge werden in der Einschätzung berücksichtigt. Acrylfuge / Versiegelung separat nach Aufwand.
+            Ausführung bitte unten auswählen. Acrylfuge / Versiegelung separat nach Aufwand.
           </p>
         </Field>
       </Grid2>
-      <Field label="Alten Boden entfernen">
+      <Field label="Sockelleisten-Ausführung">
+        <Choice
+          value={s.sockelArt}
+          onChange={(v) => upd("sockelArt", v as State["sockelArt"])}
+          options={[
+            { value: "keine", label: "Keine Sockelleisten" },
+            { value: "normal", label: "Normale Montage (5,00 €/lfm)" },
+            { value: "gehrung", label: "Auf Gehrung gesägt (7,00 €/lfm)" },
+          ]}
+        />
+        <p className="mt-1 text-xs text-muted-foreground">
+          Es wird entweder normale Montage oder Gehrung berechnet – nicht beides.
+        </p>
+      </Field>
+      <Field label="Altbelag entfernen & entsorgen">
         <Choice
           value={s.altEntfernen}
           onChange={(v) => upd("altEntfernen", v as State["altEntfernen"])}
@@ -895,6 +1037,9 @@ function BodenForm({ s, upd }: { s: State; upd: <K extends keyof State>(k: K, v:
             { value: "Nein", label: "Nein" },
             { value: "schwimmend", label: "Schwimmend verlegt" },
             { value: "verklebt", label: "Verklebt (nach Besichtigung)" },
+            { value: "teppich_lose", label: "Teppich lose / nicht verklebt (7,00 €/m², min. 120 €)" },
+            { value: "teppich_verklebt", label: "Teppich verklebt (12,00 €/m², min. 180 €)" },
+            { value: "teppich_stark", label: "Stark verklebt / Schaumrücken / Klebereste (nur nach Besichtigung)" },
           ]}
         />
       </Field>
@@ -905,6 +1050,51 @@ function BodenForm({ s, upd }: { s: State; upd: <K extends keyof State>(k: K, v:
           options={["Ja", "Nein"]}
         />
       </Field>
+      {s.bodenartKey.startsWith("teppich") && (
+        <Field label="Teppichboden verkleben / fixieren">
+          <Choice
+            value={s.teppichVerkleben}
+            onChange={(v) => upd("teppichVerkleben", v as State["teppichVerkleben"])}
+            options={["Ja", "Nein"]}
+          />
+          <p className="mt-1 text-xs text-muted-foreground">
+            Vollflächiges Verkleben / Fixieren eines neuen Teppichbodens – 7,00 €/m² zusätzlich zur Verlegung.
+          </p>
+        </Field>
+      )}
+      <div className="space-y-3 rounded-md border border-border/60 bg-background/40 p-4">
+        <Field label="Materialservice gewünscht">
+          <Choice
+            value={s.materialService}
+            onChange={(v) => upd("materialService", v as State["materialService"])}
+            options={["Ja", "Nein"]}
+          />
+          <p className="mt-1 text-xs text-muted-foreground">
+            Wir unterstützen bei der Materialauswahl, Beschaffung und Anlieferung des passenden Materials.
+          </p>
+        </Field>
+        {s.materialService === "Ja" && (
+          <Field label="Geschätzter Materialwert in €">
+            <input
+              type="number"
+              min={0}
+              step={1}
+              value={s.materialWert}
+              onChange={(e) => upd("materialWert", e.target.value.replace(/^-/, ""))}
+              className={input}
+              placeholder="z. B. 1200"
+            />
+            <p className="mt-1 text-xs text-muted-foreground">
+              Berechnung: 15 % des Materialwertes, mindestens 150,00 €. Der Materialwert selbst dient nur als Berechnungsgrundlage.
+            </p>
+            {(!s.materialWert || Number(s.materialWert) <= 0) && (
+              <p className="mt-1 text-xs text-destructive">
+                Bitte Materialwert eintragen, damit der Materialservice berechnet werden kann.
+              </p>
+            )}
+          </Field>
+        )}
+      </div>
       <div className="rounded-md border border-border/60 bg-background/40 p-3 text-xs text-muted-foreground">
         <p className="font-medium text-foreground">In der Einschätzung berücksichtigt:</p>
         <ul className="mt-1 list-disc pl-4">
