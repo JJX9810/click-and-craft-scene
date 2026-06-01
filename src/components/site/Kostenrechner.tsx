@@ -55,7 +55,7 @@ const ALT_PRICE_SCHWIMMEND = 4; // €/m²
 const SOCKEL_PRICE = 5; // €/lfm – normale Montage
 const SOCKEL_GEHRUNG_PRICE = 7; // €/lfm – auf Gehrung gesägt
 const DAEMMUNG_PRICE = 1.5; // €/m²
-const TEPPICH_VERKLEBEN_PRICE = 7; // €/m²
+
 const ALT_TEPPICH_LOSE_PRICE = 7; // €/m²
 const ALT_TEPPICH_LOSE_MIN = 120; // €
 const ALT_TEPPICH_VERKLEBT_PRICE = 12; // €/m²
@@ -101,7 +101,7 @@ type State = {
   sockelLfm: string;
   sockelArt: "" | "keine" | "normal" | "gehrung";
   daemmung: "Ja" | "Nein" | "";
-  teppichVerkleben: "Ja" | "Nein" | "";
+  
   materialService: "Ja" | "Nein" | "";
   materialWert: string;
   // küche
@@ -140,7 +140,7 @@ const initial: State = {
   sockelLfm: "",
   sockelArt: "",
   daemmung: "",
-  teppichVerkleben: "",
+  
   materialService: "",
   materialWert: "",
   kueArt: "Neue Küche",
@@ -294,17 +294,8 @@ function computeBreakdown(s: State): Breakdown | null {
       arbeitssumme += a;
     }
 
-    const istTeppich = s.bodenartKey.startsWith("teppich");
-    if (istTeppich && s.teppichVerkleben === "Ja") {
-      const a = +(qm * TEPPICH_VERKLEBEN_PRICE).toFixed(2);
-      items.push({
-        label: "Teppichboden verkleben / fixieren",
-        detail: `${qm} m² × ${eur(TEPPICH_VERKLEBEN_PRICE)} = ${eur(a)}`,
-        amount: a,
-        arbeitsleistung: true,
-      });
-      arbeitssumme += a;
-    }
+
+
 
     const lfm = Number(s.sockelLfm);
     if (lfm > 0 && s.sockelArt && s.sockelArt !== "keine") {
@@ -469,9 +460,6 @@ function summaryLines(s: State): string[] {
     if (s.sockelArt) lines.push(`Sockelleisten-Ausführung: ${altSockelLabel(s.sockelArt)}`);
     if (s.altEntfernen) lines.push(`Altbelag entfernen & entsorgen: ${altEntfernenLabel(s.altEntfernen)}`);
     if (s.daemmung === "Ja") lines.push("Dämmung verlegen: ja");
-    if (s.bodenartKey.startsWith("teppich") && s.teppichVerkleben === "Ja") {
-      lines.push("Teppichboden verkleben / fixieren: ja");
-    }
     if (s.materialService === "Ja") {
       lines.push(`Materialservice: ja${s.materialWert ? ` (Materialwert ca. ${s.materialWert} €)` : ""}`);
     }
@@ -533,9 +521,6 @@ function buildWaMessage(s: State, b: Breakdown | null): string {
     if (s.sockelArt) lines.push(`Sockelleisten-Ausführung: ${altSockelLabel(s.sockelArt)}`);
     if (s.altEntfernen) lines.push(`Altbelag entfernen & entsorgen: ${altEntfernenLabel(s.altEntfernen)}`);
     if (s.daemmung === "Ja") lines.push(`Dämmung verlegen: ja`);
-    if (s.bodenartKey.startsWith("teppich") && s.teppichVerkleben === "Ja") {
-      lines.push("Teppichboden verkleben / fixieren: ja");
-    }
     if (s.materialService === "Ja") {
       lines.push(`Materialservice: ja${s.materialWert ? ` (Materialwert ca. ${s.materialWert} €)` : ""}`);
     }
@@ -1050,18 +1035,6 @@ function BodenForm({ s, upd }: { s: State; upd: <K extends keyof State>(k: K, v:
           options={["Ja", "Nein"]}
         />
       </Field>
-      {s.bodenartKey.startsWith("teppich") && (
-        <Field label="Teppichboden verkleben / fixieren">
-          <Choice
-            value={s.teppichVerkleben}
-            onChange={(v) => upd("teppichVerkleben", v as State["teppichVerkleben"])}
-            options={["Ja", "Nein"]}
-          />
-          <p className="mt-1 text-xs text-muted-foreground">
-            Vollflächiges Verkleben / Fixieren eines neuen Teppichbodens – 7,00 €/m² zusätzlich zur Verlegung.
-          </p>
-        </Field>
-      )}
       <div className="space-y-3 rounded-md border border-border/60 bg-background/40 p-4">
         <Field label="Materialservice gewünscht">
           <Choice
