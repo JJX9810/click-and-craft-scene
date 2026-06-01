@@ -51,7 +51,9 @@ const BODEN_VARIANTEN: { key: string; label: string; price: number | null }[] = 
   { key: "teppich_vollflaechig", label: "Teppich vollflächig verklebt", price: 12 },
 ];
 
+// === Interne Berechnungswerte – NICHT im Frontend sichtbar rendern ===
 const ALT_PRICE_SCHWIMMEND = 4; // €/m²
+const ALT_PRICE_VERKLEBT = 7; // €/m² – verklebter Altbelag (Boden, nicht Teppich)
 const SOCKEL_PRICE = 5; // €/lfm – normale Montage
 const SOCKEL_GEHRUNG_PRICE = 7; // €/lfm – auf Gehrung gesägt
 const DAEMMUNG_PRICE = 1.5; // €/m²
@@ -62,8 +64,18 @@ const ALT_TEPPICH_VERKLEBT_PRICE = 12; // €/m²
 const ALT_TEPPICH_VERKLEBT_MIN = 180; // €
 const MATERIALSERVICE_RATE = 0.15;
 const MATERIALSERVICE_MIN = 150; // €
-const ANFAHRT_FREI_KM = 35;
+const ANFAHRT_FREI_KM = 30;
 const ANFAHRT_PRO_KM = 0.7;
+
+// Küchenmontage (interne Preise)
+const KUECHE_MONTAGE_PRICE = 189; // €/lfm
+const KUECHE_DEMONTAGE_PRICE = 100; // €/lfm
+const KUECHE_ARBEITSPLATTE_PRICE = 119; // €/lfm
+const KUECHE_ENTSORGUNG_PAUSCHAL = 350; // €
+
+// Preisspanne (für Kundenausgabe als Orientierungswert)
+const RANGE_LOW = 0.9;
+const RANGE_HIGH = 1.1;
 
 const DRINGLICHKEIT_OPTIONS = [
   { key: "flexibel", label: "Flexibel / normal planbar", surcharge: 0 },
