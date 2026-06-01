@@ -249,6 +249,35 @@ function computeBreakdown(s: State): Breakdown | null {
         amount: null,
       });
       hasOnRequest = true;
+    } else if (s.altEntfernen === "teppich_lose") {
+      const raw = +(qm * ALT_TEPPICH_LOSE_PRICE).toFixed(2);
+      const a = Math.max(raw, ALT_TEPPICH_LOSE_MIN);
+      const minHinweis = a > raw ? ` – Mindestpauschale ${eur(ALT_TEPPICH_LOSE_MIN)}` : "";
+      items.push({
+        label: "Altbelag entfernen & entsorgen – Teppich lose / nicht verklebt",
+        detail: `${qm} m² × ${eur(ALT_TEPPICH_LOSE_PRICE)} = ${eur(raw)}${minHinweis}. Inklusive Aufnahme, Tragen, Laden, Transport und Entsorgung.`,
+        amount: a,
+        arbeitsleistung: true,
+      });
+      arbeitssumme += a;
+    } else if (s.altEntfernen === "teppich_verklebt") {
+      const raw = +(qm * ALT_TEPPICH_VERKLEBT_PRICE).toFixed(2);
+      const a = Math.max(raw, ALT_TEPPICH_VERKLEBT_MIN);
+      const minHinweis = a > raw ? ` – Mindestpauschale ${eur(ALT_TEPPICH_VERKLEBT_MIN)}` : "";
+      items.push({
+        label: "Altbelag entfernen & entsorgen – Teppich verklebt",
+        detail: `${qm} m² × ${eur(ALT_TEPPICH_VERKLEBT_PRICE)} = ${eur(raw)}${minHinweis}. Inklusive Aufnahme, Tragen, Laden, Transport und Entsorgung. Zusätzliche Untergrundarbeiten sind nicht enthalten.`,
+        amount: a,
+        arbeitsleistung: true,
+      });
+      arbeitssumme += a;
+    } else if (s.altEntfernen === "teppich_stark") {
+      items.push({
+        label: "Stark verklebter Altbelag / Schaumrücken / Klebereste – nur nach Besichtigung",
+        detail: "Bei stark verklebtem Teppich, Schaumrückenresten oder Kleberückständen können zusätzliche Schleif-, Spachtel- oder Untergrundarbeiten erforderlich sein. Diese werden erst nach Sichtprüfung kalkuliert.",
+        amount: null,
+      });
+      hasOnRequest = true;
     }
 
     items.push({ label: "Alten Boden entsorgen", amount: 0, inklusive: true });
@@ -265,16 +294,61 @@ function computeBreakdown(s: State): Breakdown | null {
       arbeitssumme += a;
     }
 
-    const lfm = Number(s.sockelLfm);
-    if (lfm > 0) {
-      const a = +(lfm * SOCKEL_PRICE).toFixed(2);
+    const istTeppich = s.bodenartKey.startsWith("teppich");
+    if (istTeppich && s.teppichVerkleben === "Ja") {
+      const a = +(qm * TEPPICH_VERKLEBEN_PRICE).toFixed(2);
       items.push({
-        label: "Sockelleisten montieren (ohne Acrylfuge)",
-        detail: `${lfm} lfm × ${eur(SOCKEL_PRICE)} = ${eur(a)}`,
+        label: "Teppichboden verkleben / fixieren",
+        detail: `${qm} m² × ${eur(TEPPICH_VERKLEBEN_PRICE)} = ${eur(a)}`,
         amount: a,
         arbeitsleistung: true,
       });
       arbeitssumme += a;
+    }
+
+    const lfm = Number(s.sockelLfm);
+    if (lfm > 0 && s.sockelArt && s.sockelArt !== "keine") {
+      if (s.sockelArt === "gehrung") {
+        const a = +(lfm * SOCKEL_GEHRUNG_PRICE).toFixed(2);
+        items.push({
+          label: "Sockelleisten auf Gehrung montieren",
+          detail: `${lfm} lfm × ${eur(SOCKEL_GEHRUNG_PRICE)} = ${eur(a)}`,
+          amount: a,
+          arbeitsleistung: true,
+        });
+        arbeitssumme += a;
+      } else if (s.sockelArt === "normal") {
+        const a = +(lfm * SOCKEL_PRICE).toFixed(2);
+        items.push({
+          label: "Sockelleisten montieren (ohne Acrylfuge)",
+          detail: `${lfm} lfm × ${eur(SOCKEL_PRICE)} = ${eur(a)}`,
+          amount: a,
+          arbeitsleistung: true,
+        });
+        arbeitssumme += a;
+      }
+    }
+
+    if (s.materialService === "Ja") {
+      const wert = Number(s.materialWert);
+      if (!isNaN(wert) && wert > 0) {
+        const raw = +(wert * MATERIALSERVICE_RATE).toFixed(2);
+        const a = Math.max(raw, MATERIALSERVICE_MIN);
+        const minHinweis = a > raw ? ` – Mindestpauschale ${eur(MATERIALSERVICE_MIN)}` : "";
+        items.push({
+          label: "Materialservice – Auswahl, Beschaffung und Anlieferung",
+          detail: `15 % von ${eur(wert)} Materialwert = ${eur(raw)}${minHinweis}. Berechnet mit 15 % des Materialwertes, mindestens ${eur(MATERIALSERVICE_MIN)}.`,
+          amount: a,
+        });
+        sonstSumme += a;
+      } else {
+        items.push({
+          label: "Materialservice – Auswahl, Beschaffung und Anlieferung",
+          detail: "Bitte Materialwert eintragen, damit der Materialservice berechnet werden kann.",
+          amount: null,
+        });
+        hasOnRequest = true;
+      }
     }
   } else if (s.service === "kueche") {
     const m = Number(s.kueMeter);
