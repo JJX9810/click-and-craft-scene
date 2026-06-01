@@ -101,7 +101,7 @@ type State = {
   sockelLfm: string;
   sockelArt: "" | "keine" | "normal" | "gehrung";
   daemmung: "Ja" | "Nein" | "";
-  teppichVerkleben: "Ja" | "Nein" | "";
+  
   materialService: "Ja" | "Nein" | "";
   materialWert: string;
   // küche
