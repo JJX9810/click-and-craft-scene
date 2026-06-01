@@ -426,6 +426,27 @@ function computeBreakdown(s: State): Breakdown | null {
   return { items, anfahrt, express, total, hasOnRequest };
 }
 
+function altSockelLabel(v: State["sockelArt"]): string {
+  switch (v) {
+    case "keine": return "keine Sockelleisten";
+    case "normal": return "normale Montage";
+    case "gehrung": return "auf Gehrung gesägt";
+    default: return "";
+  }
+}
+
+function altEntfernenLabel(v: State["altEntfernen"]): string {
+  switch (v) {
+    case "Nein": return "nein";
+    case "schwimmend": return "schwimmend verlegter Boden";
+    case "verklebt": return "verklebter Boden (nach Besichtigung)";
+    case "teppich_lose": return "Teppich lose / nicht verklebt";
+    case "teppich_verklebt": return "Teppich verklebt";
+    case "teppich_stark": return "stark verklebt / Schaumrücken / Klebereste (nur nach Besichtigung)";
+    default: return "";
+  }
+}
+
 function summaryLines(s: State): string[] {
   const lines: string[] = [];
   const serviceLabel =
