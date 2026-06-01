@@ -836,7 +836,7 @@ export function Kostenrechner() {
             {breakdown && breakdown.total > 0 ? (
               <>
                 <p className="mt-3 text-3xl font-semibold sm:text-4xl">
-                  Ihre unverbindliche Preisorientierung: ca. {eur(+(breakdown.total * RANGE_LOW).toFixed(0))} – {eur(+(breakdown.total * RANGE_HIGH).toFixed(0))}
+                  Ihr unverbindlicher Orientierungspreis: ca. {eur(breakdown.total)}
                 </p>
                 {breakdown.hasOnRequest && (
                   <p className="mt-2 text-sm text-muted-foreground">
