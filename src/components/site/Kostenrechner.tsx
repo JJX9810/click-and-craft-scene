@@ -1036,12 +1036,12 @@ function BodenForm({ s, upd }: { s: State; upd: <K extends keyof State>(k: K, v:
           onChange={(v) => upd("sockelArt", v as State["sockelArt"])}
           options={[
             { value: "keine", label: "Keine Sockelleisten" },
-            { value: "normal", label: "Normale Montage (5,00 €/lfm)" },
-            { value: "gehrung", label: "Auf Gehrung gesägt (7,00 €/lfm)" },
+            { value: "normal", label: "Normale Montage" },
+            { value: "gehrung", label: "Auf Gehrung gesägt" },
           ]}
         />
         <p className="mt-1 text-xs text-muted-foreground">
-          Es wird entweder normale Montage oder Gehrung berechnet – nicht beides.
+          Es wird entweder normale Montage oder Gehrung berücksichtigt – nicht beides.
         </p>
       </Field>
       <Field label="Altbelag entfernen & entsorgen">
@@ -1051,9 +1051,9 @@ function BodenForm({ s, upd }: { s: State; upd: <K extends keyof State>(k: K, v:
           options={[
             { value: "Nein", label: "Nein" },
             { value: "schwimmend", label: "Schwimmend verlegt" },
-            { value: "verklebt", label: "Verklebt (nach Besichtigung)" },
-            { value: "teppich_lose", label: "Teppich lose / nicht verklebt (7,00 €/m², min. 120 €)" },
-            { value: "teppich_verklebt", label: "Teppich verklebt (12,00 €/m², min. 180 €)" },
+            { value: "verklebt", label: "Verklebter Boden" },
+            { value: "teppich_lose", label: "Teppich lose / nicht verklebt" },
+            { value: "teppich_verklebt", label: "Teppich verklebt" },
             { value: "teppich_stark", label: "Stark verklebt / Schaumrücken / Klebereste (nur nach Besichtigung)" },
           ]}
         />
