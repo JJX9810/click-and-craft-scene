@@ -834,9 +834,18 @@ export function Kostenrechner() {
           <div className="rounded-2xl border border-accent/40 bg-gradient-to-br from-accent/15 via-background/60 to-background/40 p-6 sm:p-8">
             <p className="text-xs uppercase tracking-[0.25em] text-accent">Ihre unverbindliche Ersteinschätzung</p>
             {breakdown && breakdown.total > 0 ? (
-              <p className="mt-3 text-3xl font-semibold sm:text-4xl">Geschätzte Gesamtkosten: ca. {eur(breakdown.total)}</p>
+              <>
+                <p className="mt-3 text-3xl font-semibold sm:text-4xl">
+                  Ihre unverbindliche Preisorientierung: ca. {eur(+(breakdown.total * RANGE_LOW).toFixed(0))} – {eur(+(breakdown.total * RANGE_HIGH).toFixed(0))}
+                </p>
+                {breakdown.hasOnRequest && (
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    Einzelne Positionen werden erst nach Besichtigung kalkuliert und sind in dieser Spanne noch nicht enthalten.
+                  </p>
+                )}
+              </>
             ) : (
-              <p className="mt-3 text-2xl font-semibold sm:text-3xl">Individuelles Angebot</p>
+              <p className="mt-3 text-2xl font-semibold sm:text-3xl">Individuelles Angebot nach Besichtigung</p>
             )}
             <p className="mt-2 text-xs text-muted-foreground">
               Endkundenpreise · keine Umsatzsteuer (§ 19 UStG / Kleinunternehmer)
