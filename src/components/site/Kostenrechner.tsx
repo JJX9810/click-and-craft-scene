@@ -1088,7 +1088,7 @@ function BodenForm({ s, upd }: { s: State; upd: <K extends keyof State>(k: K, v:
               placeholder="z. B. 1200"
             />
             <p className="mt-1 text-xs text-muted-foreground">
-              Berechnung: 15 % des Materialwertes, mindestens 150,00 €. Der Materialwert selbst dient nur als Berechnungsgrundlage.
+              Materialauswahl, Beschaffung und Anlieferung. Der Materialwert dient ausschließlich als Berechnungsgrundlage.
             </p>
             {(!s.materialWert || Number(s.materialWert) <= 0) && (
               <p className="mt-1 text-xs text-destructive">
