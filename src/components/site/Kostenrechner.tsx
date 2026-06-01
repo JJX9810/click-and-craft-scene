@@ -73,9 +73,6 @@ const KUECHE_DEMONTAGE_PRICE = 100; // €/lfm
 const KUECHE_ARBEITSPLATTE_PRICE = 119; // €/lfm
 const KUECHE_ENTSORGUNG_PAUSCHAL = 350; // €
 
-// Preisspanne (für Kundenausgabe als Orientierungswert)
-const RANGE_LOW = 0.9;
-const RANGE_HIGH = 1.1;
 
 const DRINGLICHKEIT_OPTIONS = [
   { key: "flexibel", label: "Flexibel / normal planbar", surcharge: 0 },
