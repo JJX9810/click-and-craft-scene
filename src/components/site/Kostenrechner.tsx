@@ -776,7 +776,7 @@ export function Kostenrechner() {
                 type="number"
                 min={0}
                 value={s.anfahrtKm}
-                onChange={(e) => upd("anfahrtKm", e.target.value)}
+                onChange={(e) => upd("anfahrtKm", e.target.value.replace(/^-/, ""))}
                 placeholder="z. B. 25"
                 className={input}
               />
@@ -1030,10 +1030,10 @@ function BodenForm({ s, upd }: { s: State; upd: <K extends keyof State>(k: K, v:
       </Field>
       <Grid2>
         <Field label="Fläche in m² *">
-          <input type="number" min={1} value={s.qm} onChange={(e) => upd("qm", e.target.value)} className={input} placeholder="z. B. 28" />
+          <input type="number" min={1} value={s.qm} onChange={(e) => upd("qm", e.target.value.replace(/^-/, ""))} className={input} placeholder="z. B. 28" />
         </Field>
         <Field label="Sockelleisten in lfm (laufende Meter)">
-          <input type="number" min={0} value={s.sockelLfm} onChange={(e) => upd("sockelLfm", e.target.value)} className={input} placeholder="z. B. 40" />
+          <input type="number" min={0} value={s.sockelLfm} onChange={(e) => upd("sockelLfm", e.target.value.replace(/^-/, ""))} className={input} placeholder="z. B. 40" />
           <p className="mt-1 text-xs text-muted-foreground">
             Ausführung bitte unten auswählen. Acrylfuge / Versiegelung separat nach Aufwand.
           </p>
@@ -1127,7 +1127,7 @@ function KuecheForm({ s, upd }: { s: State; upd: <K extends keyof State>(k: K, v
           <Choice value={s.kueArt} onChange={(v) => upd("kueArt", v || "Neue Küche")} options={["Neue Küche", "Gebrauchte Küche", "Küchenumbau", "Küchenabbau"]} />
         </Field>
         <Field label="Küchenlänge in m *">
-          <input type="number" step={0.5} min={1} value={s.kueMeter} onChange={(e) => upd("kueMeter", e.target.value)} className={input} placeholder="z. B. 3" />
+          <input type="number" step={0.5} min={1} value={s.kueMeter} onChange={(e) => upd("kueMeter", e.target.value.replace(/^-/, ""))} className={input} placeholder="z. B. 3" />
         </Field>
       </Grid2>
       <Grid2>
@@ -1169,7 +1169,7 @@ function EntForm({ s, upd }: { s: State; upd: <K extends keyof State>(k: K, v: S
       </Field>
       <Grid2>
         <Field label="Etage">
-          <input type="number" min={0} value={s.entEtage} onChange={(e) => upd("entEtage", e.target.value)} className={input} placeholder="z. B. 2" />
+          <input type="number" min={0} value={s.entEtage} onChange={(e) => upd("entEtage", e.target.value.replace(/^-/, ""))} className={input} placeholder="z. B. 2" />
         </Field>
         <Field label="Aufzug vorhanden">
           <Choice value={s.entAufzug} onChange={(v) => upd("entAufzug", v as State["entAufzug"])} options={["Ja", "Nein"]} />
