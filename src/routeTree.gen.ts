@@ -17,6 +17,7 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ReferenzenRouteImport } from './routes/referenzen'
 import { Route as PreiseRouteImport } from './routes/preise'
 import { Route as PartnerRouteImport } from './routes/partner'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as KuechenmontageWilhelmshavenRouteImport } from './routes/kuechenmontage-wilhelmshaven'
 import { Route as KuechenmontageInWilhelmshavenRouteImport } from './routes/kuechenmontage-in-wilhelmshaven'
 import { Route as KontaktRouteImport } from './routes/kontakt'
@@ -33,10 +34,15 @@ import { Route as EntruempelungWilhelmshavenRouteImport } from './routes/entruem
 import { Route as EntruempelungEntsorgungInWilhelmshavenRouteImport } from './routes/entruempelung-entsorgung-in-wilhelmshaven'
 import { Route as DatenschutzRouteImport } from './routes/datenschutz'
 import { Route as BodenverlegungWilhelmshavenRouteImport } from './routes/bodenverlegung-wilhelmshaven'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ShowroomIndexRouteImport } from './routes/showroom.index'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as ShowroomSlugRouteImport } from './routes/showroom.$slug'
 import { Route as GoSlugRouteImport } from './routes/go.$slug'
+import { Route as AdminStatistikenRouteImport } from './routes/admin.statistiken'
+import { Route as AdminLiveRouteImport } from './routes/admin.live'
+import { Route as AdminBerechnungenRouteImport } from './routes/admin.berechnungen'
 
 const WunschterminRoute = WunschterminRouteImport.update({
   id: '/wunschtermin',
@@ -76,6 +82,11 @@ const PreiseRoute = PreiseRouteImport.update({
 const PartnerRoute = PartnerRouteImport.update({
   id: '/partner',
   path: '/partner',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const KuechenmontageWilhelmshavenRoute =
@@ -167,6 +178,11 @@ const BodenverlegungWilhelmshavenRoute =
     path: '/bodenverlegung-wilhelmshaven',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -176,6 +192,11 @@ const ShowroomIndexRoute = ShowroomIndexRouteImport.update({
   id: '/showroom/',
   path: '/showroom/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
 } as any)
 const ShowroomSlugRoute = ShowroomSlugRouteImport.update({
   id: '/showroom/$slug',
@@ -187,9 +208,25 @@ const GoSlugRoute = GoSlugRouteImport.update({
   path: '/go/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminStatistikenRoute = AdminStatistikenRouteImport.update({
+  id: '/statistiken',
+  path: '/statistiken',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminLiveRoute = AdminLiveRouteImport.update({
+  id: '/live',
+  path: '/live',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminBerechnungenRoute = AdminBerechnungenRouteImport.update({
+  id: '/berechnungen',
+  path: '/berechnungen',
+  getParentRoute: () => AdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
   '/bodenverlegung-wilhelmshaven': typeof BodenverlegungWilhelmshavenRoute
   '/datenschutz': typeof DatenschutzRoute
   '/entruempelung-entsorgung-in-wilhelmshaven': typeof EntruempelungEntsorgungInWilhelmshavenRoute
@@ -206,6 +243,7 @@ export interface FileRoutesByFullPath {
   '/kontakt': typeof KontaktRoute
   '/kuechenmontage-in-wilhelmshaven': typeof KuechenmontageInWilhelmshavenRoute
   '/kuechenmontage-wilhelmshaven': typeof KuechenmontageWilhelmshavenRoute
+  '/login': typeof LoginRoute
   '/partner': typeof PartnerRoute
   '/preise': typeof PreiseRoute
   '/referenzen': typeof ReferenzenRoute
@@ -214,8 +252,12 @@ export interface FileRoutesByFullPath {
   '/wilhelmshaven': typeof WilhelmshavenRoute
   '/wir-unterstuetzen': typeof WirUnterstuetzenRoute
   '/wunschtermin': typeof WunschterminRoute
+  '/admin/berechnungen': typeof AdminBerechnungenRoute
+  '/admin/live': typeof AdminLiveRoute
+  '/admin/statistiken': typeof AdminStatistikenRoute
   '/go/$slug': typeof GoSlugRoute
   '/showroom/$slug': typeof ShowroomSlugRoute
+  '/admin/': typeof AdminIndexRoute
   '/showroom/': typeof ShowroomIndexRoute
 }
 export interface FileRoutesByTo {
@@ -236,6 +278,7 @@ export interface FileRoutesByTo {
   '/kontakt': typeof KontaktRoute
   '/kuechenmontage-in-wilhelmshaven': typeof KuechenmontageInWilhelmshavenRoute
   '/kuechenmontage-wilhelmshaven': typeof KuechenmontageWilhelmshavenRoute
+  '/login': typeof LoginRoute
   '/partner': typeof PartnerRoute
   '/preise': typeof PreiseRoute
   '/referenzen': typeof ReferenzenRoute
@@ -244,13 +287,18 @@ export interface FileRoutesByTo {
   '/wilhelmshaven': typeof WilhelmshavenRoute
   '/wir-unterstuetzen': typeof WirUnterstuetzenRoute
   '/wunschtermin': typeof WunschterminRoute
+  '/admin/berechnungen': typeof AdminBerechnungenRoute
+  '/admin/live': typeof AdminLiveRoute
+  '/admin/statistiken': typeof AdminStatistikenRoute
   '/go/$slug': typeof GoSlugRoute
   '/showroom/$slug': typeof ShowroomSlugRoute
+  '/admin': typeof AdminIndexRoute
   '/showroom': typeof ShowroomIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
   '/bodenverlegung-wilhelmshaven': typeof BodenverlegungWilhelmshavenRoute
   '/datenschutz': typeof DatenschutzRoute
   '/entruempelung-entsorgung-in-wilhelmshaven': typeof EntruempelungEntsorgungInWilhelmshavenRoute
@@ -267,6 +315,7 @@ export interface FileRoutesById {
   '/kontakt': typeof KontaktRoute
   '/kuechenmontage-in-wilhelmshaven': typeof KuechenmontageInWilhelmshavenRoute
   '/kuechenmontage-wilhelmshaven': typeof KuechenmontageWilhelmshavenRoute
+  '/login': typeof LoginRoute
   '/partner': typeof PartnerRoute
   '/preise': typeof PreiseRoute
   '/referenzen': typeof ReferenzenRoute
@@ -275,14 +324,19 @@ export interface FileRoutesById {
   '/wilhelmshaven': typeof WilhelmshavenRoute
   '/wir-unterstuetzen': typeof WirUnterstuetzenRoute
   '/wunschtermin': typeof WunschterminRoute
+  '/admin/berechnungen': typeof AdminBerechnungenRoute
+  '/admin/live': typeof AdminLiveRoute
+  '/admin/statistiken': typeof AdminStatistikenRoute
   '/go/$slug': typeof GoSlugRoute
   '/showroom/$slug': typeof ShowroomSlugRoute
+  '/admin/': typeof AdminIndexRoute
   '/showroom/': typeof ShowroomIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/bodenverlegung-wilhelmshaven'
     | '/datenschutz'
     | '/entruempelung-entsorgung-in-wilhelmshaven'
@@ -299,6 +353,7 @@ export interface FileRouteTypes {
     | '/kontakt'
     | '/kuechenmontage-in-wilhelmshaven'
     | '/kuechenmontage-wilhelmshaven'
+    | '/login'
     | '/partner'
     | '/preise'
     | '/referenzen'
@@ -307,8 +362,12 @@ export interface FileRouteTypes {
     | '/wilhelmshaven'
     | '/wir-unterstuetzen'
     | '/wunschtermin'
+    | '/admin/berechnungen'
+    | '/admin/live'
+    | '/admin/statistiken'
     | '/go/$slug'
     | '/showroom/$slug'
+    | '/admin/'
     | '/showroom/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -329,6 +388,7 @@ export interface FileRouteTypes {
     | '/kontakt'
     | '/kuechenmontage-in-wilhelmshaven'
     | '/kuechenmontage-wilhelmshaven'
+    | '/login'
     | '/partner'
     | '/preise'
     | '/referenzen'
@@ -337,12 +397,17 @@ export interface FileRouteTypes {
     | '/wilhelmshaven'
     | '/wir-unterstuetzen'
     | '/wunschtermin'
+    | '/admin/berechnungen'
+    | '/admin/live'
+    | '/admin/statistiken'
     | '/go/$slug'
     | '/showroom/$slug'
+    | '/admin'
     | '/showroom'
   id:
     | '__root__'
     | '/'
+    | '/admin'
     | '/bodenverlegung-wilhelmshaven'
     | '/datenschutz'
     | '/entruempelung-entsorgung-in-wilhelmshaven'
@@ -359,6 +424,7 @@ export interface FileRouteTypes {
     | '/kontakt'
     | '/kuechenmontage-in-wilhelmshaven'
     | '/kuechenmontage-wilhelmshaven'
+    | '/login'
     | '/partner'
     | '/preise'
     | '/referenzen'
@@ -367,13 +433,18 @@ export interface FileRouteTypes {
     | '/wilhelmshaven'
     | '/wir-unterstuetzen'
     | '/wunschtermin'
+    | '/admin/berechnungen'
+    | '/admin/live'
+    | '/admin/statistiken'
     | '/go/$slug'
     | '/showroom/$slug'
+    | '/admin/'
     | '/showroom/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRouteWithChildren
   BodenverlegungWilhelmshavenRoute: typeof BodenverlegungWilhelmshavenRoute
   DatenschutzRoute: typeof DatenschutzRoute
   EntruempelungEntsorgungInWilhelmshavenRoute: typeof EntruempelungEntsorgungInWilhelmshavenRoute
@@ -390,6 +461,7 @@ export interface RootRouteChildren {
   KontaktRoute: typeof KontaktRoute
   KuechenmontageInWilhelmshavenRoute: typeof KuechenmontageInWilhelmshavenRoute
   KuechenmontageWilhelmshavenRoute: typeof KuechenmontageWilhelmshavenRoute
+  LoginRoute: typeof LoginRoute
   PartnerRoute: typeof PartnerRoute
   PreiseRoute: typeof PreiseRoute
   ReferenzenRoute: typeof ReferenzenRoute
@@ -459,6 +531,13 @@ declare module '@tanstack/react-router' {
       path: '/partner'
       fullPath: '/partner'
       preLoaderRoute: typeof PartnerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/kuechenmontage-wilhelmshaven': {
@@ -573,6 +652,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BodenverlegungWilhelmshavenRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -586,6 +672,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/showroom/'
       preLoaderRoute: typeof ShowroomIndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/showroom/$slug': {
       id: '/showroom/$slug'
@@ -601,11 +694,49 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GoSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/statistiken': {
+      id: '/admin/statistiken'
+      path: '/statistiken'
+      fullPath: '/admin/statistiken'
+      preLoaderRoute: typeof AdminStatistikenRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/live': {
+      id: '/admin/live'
+      path: '/live'
+      fullPath: '/admin/live'
+      preLoaderRoute: typeof AdminLiveRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/berechnungen': {
+      id: '/admin/berechnungen'
+      path: '/berechnungen'
+      fullPath: '/admin/berechnungen'
+      preLoaderRoute: typeof AdminBerechnungenRouteImport
+      parentRoute: typeof AdminRoute
+    }
   }
 }
 
+interface AdminRouteChildren {
+  AdminBerechnungenRoute: typeof AdminBerechnungenRoute
+  AdminLiveRoute: typeof AdminLiveRoute
+  AdminStatistikenRoute: typeof AdminStatistikenRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminBerechnungenRoute: AdminBerechnungenRoute,
+  AdminLiveRoute: AdminLiveRoute,
+  AdminStatistikenRoute: AdminStatistikenRoute,
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRouteWithChildren,
   BodenverlegungWilhelmshavenRoute: BodenverlegungWilhelmshavenRoute,
   DatenschutzRoute: DatenschutzRoute,
   EntruempelungEntsorgungInWilhelmshavenRoute:
@@ -623,6 +754,7 @@ const rootRouteChildren: RootRouteChildren = {
   KontaktRoute: KontaktRoute,
   KuechenmontageInWilhelmshavenRoute: KuechenmontageInWilhelmshavenRoute,
   KuechenmontageWilhelmshavenRoute: KuechenmontageWilhelmshavenRoute,
+  LoginRoute: LoginRoute,
   PartnerRoute: PartnerRoute,
   PreiseRoute: PreiseRoute,
   ReferenzenRoute: ReferenzenRoute,
@@ -638,13 +770,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

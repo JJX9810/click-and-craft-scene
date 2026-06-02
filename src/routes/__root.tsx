@@ -14,6 +14,7 @@ import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { Toaster } from "@/components/ui/sonner";
 import { AttributionTracker } from "@/components/AttributionTracker";
+import { AnalyticsTracker } from "@/components/AnalyticsTracker";
 
 
 function NotFoundComponent() {
@@ -159,6 +160,16 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isHome = pathname === "/";
+  const isAdminArea = pathname.startsWith("/admin") || pathname.startsWith("/login");
+
+  if (isAdminArea) {
+    return (
+      <QueryClientProvider client={queryClient}>
+        <Outlet />
+        <Toaster />
+      </QueryClientProvider>
+    );
+  }
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -180,8 +191,10 @@ function RootComponent() {
         <Footer />
         <Toaster />
         <AttributionTracker />
+        <AnalyticsTracker />
       </div>
     </QueryClientProvider>
   );
 }
+
 

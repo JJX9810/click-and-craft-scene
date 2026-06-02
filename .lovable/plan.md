@@ -1,48 +1,52 @@
 
+# Admin-Bereich mit Live-Tracking
+
 ## Ziel
+Geschützter Admin-Bereich (nur du), erreichbar über `/admin`, mit Login per E-Mail+Passwort. Dort: aktive Besucher live, Kostenrechner-Eingaben live, Historie aller Berechnungen mit Export & Löschen, Seitenaufruf-Statistiken.
 
-Attribution-System verifizieren, ohne externe Analytics/Consent/GA4 anzufassen. Zusätzlich ein internes Debug-Panel auf `/preise?debug=1` einbauen, damit QR-Codes und Kurzlinks vor Ort schnell überprüfbar sind.
+## Voraussetzung
+Lovable Cloud aktivieren (PostgreSQL + Auth + Realtime). Nur dein einziger Admin-Account wird angelegt; Public-Signup bleibt deaktiviert.
 
-## Umsetzung
+## Datenmodell (neue Tabellen)
+- `admin_users` – Whitelist deiner User-ID (RLS: nur eigene Zeile lesbar). Bestimmt, wer Admin ist.
+- `page_views` – id, path, referrer, user_agent, country (optional), session_id, created_at. Anonym, keine IP.
+- `active_sessions` – session_id, path, last_seen_at. TTL 60 s → „aktive Besucher".
+- `calculator_sessions` – session_id, aktueller Snapshot (Fläche, Optionen, Zwischensumme), updated_at. Live-Eingaben.
+- `calculator_submissions` – komplette Berechnung beim Klick auf „Anfrage senden" oder beim Verlassen, mit Endpreis, Optionen JSON, created_at.
 
-### 1. Neue Komponente: `src/components/site/AttributionDebugPanel.tsx`
-- Liest `?debug=1` aus der URL (über `useSearch` / `window.location.search`).
-- Rendert `null`, wenn `debug` nicht gesetzt → normale Besucher sehen nichts.
-- Zeigt sonst eine schlichte, gerahmte Box (Tailwind, Design-Tokens, kein Eingriff ins bestehende Layout) mit:
-  - first_touch_* (source, medium, campaign, content, landing_page, timestamp)
-  - last_touch_* (source, medium, campaign, content, landing_page, timestamp)
-  - current_page
-  - menschenlesbare Quelle (`formatSource(last.source)`) + Kampagne (`formatCampaign`)
-  - Ablaufdatum: `stored_at + 90 Tage` (aus `localStorage`, da `getAttribution()` heute kein `stored_at` zurückgibt → wird mit ausgelesen)
-- Buttons:
-  - „Attribution zurücksetzen" → `localStorage.removeItem("vv_attribution_v1")` + Reload
-  - „Aktualisieren" → forciert Re-Render
-- Aktualisiert sich bei Mount und bei Klick auf Reset.
+RLS:
+- Public/anon: nur INSERT/UPDATE eigener Session-Zeile (key = session_id).
+- Admin (über `has_role`-Funktion + `admin_users`): SELECT/DELETE auf allen Tabellen.
 
-### 2. Einbindung auf der Preisseite
-- In `src/routes/preise.tsx` ganz unten (nach `CtaBlock`) `<AttributionDebugPanel />` einfügen.
-- Komponente entscheidet selbst, ob sie sichtbar ist → keine Änderung am normalen Design.
+## Tracking (Frontend)
+- Anonyme `session_id` in `sessionStorage` (UUID).
+- Globaler Tracker im Root: bei jedem Routenwechsel `page_views` + `active_sessions` upsert; Heartbeat alle 20 s.
+- Kostenrechner: bei jeder Änderung debounced (500 ms) Upsert in `calculator_sessions`; bei Reset/Absenden Insert in `calculator_submissions`.
+- Keine IP-Adressen, keine personenbezogenen Daten – DSGVO-konform.
 
-### 3. Live-Test (browser tool)
-Nach Build prüfe ich in der Vorschau:
-- `/go/kleinanzeigen`, `/go/facebook`, `/go/flyer`, `/go/visitenkarte`, `/go/google`, `/go/myhammer` → muss auf `/preise?...` weiterleiten.
-- Direkte UTM-URLs (`/preise?utm_source=...`) → Debug-Panel zeigt korrekte Werte.
-- Interne Navigation (z. B. zu `/kontakt` und zurück zu `/preise?debug=1`) → first_touch bleibt, last_touch unverändert.
-- Neuer UTM-Link → last_touch aktualisiert, first_touch unverändert.
-- Direktaufruf ohne UTM nach Reset → Quelle „Direkter Websitebesuch".
-- Preisrechner → WhatsApp-Klick: Nachricht enthält „Anfrage über: …", „Kampagne: Preisrechner", „Einstiegsseite: /preise…". (Test ohne Versand: WhatsApp-Link-URL lesen, `text`-Parameter dekodieren.)
+## Admin-Bereich (Routen)
+- `/login` – Login-Formular (E-Mail+Passwort). Bei Erfolg → `/admin`.
+- `/_authenticated/admin` – Layout-Route, prüft Admin-Status via `has_role`. Nicht-Admins → 404.
+- `/_authenticated/admin/index` – Dashboard (aktive Besucher zählen, neueste Berechnungen, Stats-Karten).
+- `/_authenticated/admin/live` – Live-Kostenrechner-Sessions (Realtime-Subscription auf `calculator_sessions`).
+- `/_authenticated/admin/berechnungen` – Tabelle aller Submissions mit Filter, **CSV-Export**, **Löschen** (einzeln + alle).
+- `/_authenticated/admin/statistiken` – Top-Seiten, Aufrufe pro Tag (Chart).
 
-### 4. Keine Eingriffe
-- Kein GA4/GTM/Plausible.
-- Kein Consent-Banner.
-- Keine Änderungen an `attribution.ts`, `tracking.ts`, `Kostenrechner.tsx`, `kontakt.tsx`, `go.$slug.tsx` außer falls beim Test ein konkreter Bug auftritt.
+Realtime: Supabase Realtime-Channels für `active_sessions` und `calculator_sessions` → Updates ohne Reload.
 
-### 5. Abschlussbericht
-Strukturierter Report mit den 11 Punkten aus der Aufgabe inkl. konkreter Beobachtungen aus dem Live-Test und Stichproben aus dem Debug-Panel.
+## Sicherheit
+- Login nur via Supabase Auth.
+- Public-Signup in Cloud-Settings deaktiviert (nur dein Account existiert).
+- Admin-Check serverseitig über Security-Definer-Funktion `has_role`.
+- Admin-Routen über `_authenticated` Layout + Child-Gate mit `has_role`-Check.
+- `/admin` taucht nicht in Navigation/Footer/Sitemap auf.
+
+## Bestehende Seite
+Keine Änderungen am Design, an Texten, am Kostenrechner-UI oder an bestehenden Routen. Nur ein unsichtbarer Tracking-Hook wird im Root ergänzt und der Kostenrechner bekommt einen Tracking-Hook für Eingaben.
 
 ## Technische Details
-
-- `useSearch({ strict: false })` aus TanStack Router, fallback `window.location.search`, damit die Komponente unabhängig von Route-Search-Schema funktioniert.
-- Werte werden über `getAttributionFields()` gelesen → keine Duplizierung der Logik.
-- Für TTL: Rohzugriff `JSON.parse(localStorage.getItem("vv_attribution_v1"))?.stored_at`, +90 Tage, als ISO-Datum anzeigen.
-- Styling: `border border-border bg-muted/50 text-xs font-mono p-4 rounded-md` o. ä., in `Section`-Container eingebettet. Kein Einfluss auf das Hero/Layout.
+- Stack: TanStack Start + Lovable Cloud (Supabase).
+- Server-Functions mit `requireSupabaseAuth` + Admin-Check für alle Admin-Datenabrufe.
+- Realtime via `supabase.channel(...).on('postgres_changes', ...)` im Client.
+- CSV-Export client-seitig aus geladenen Daten.
+- Aktive-Besucher-Cleanup via TanStack Query Refetch alle 30 s (kein Cron nötig).
