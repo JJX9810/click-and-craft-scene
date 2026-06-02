@@ -40,6 +40,7 @@ import { Route as ShowroomIndexRouteImport } from './routes/showroom.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as ShowroomSlugRouteImport } from './routes/showroom.$slug'
 import { Route as GoSlugRouteImport } from './routes/go.$slug'
+import { Route as AdminStatistikenRouteImport } from './routes/admin.statistiken'
 import { Route as AdminLiveRouteImport } from './routes/admin.live'
 import { Route as AdminBerechnungenRouteImport } from './routes/admin.berechnungen'
 
@@ -207,6 +208,11 @@ const GoSlugRoute = GoSlugRouteImport.update({
   path: '/go/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminStatistikenRoute = AdminStatistikenRouteImport.update({
+  id: '/statistiken',
+  path: '/statistiken',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminLiveRoute = AdminLiveRouteImport.update({
   id: '/live',
   path: '/live',
@@ -248,6 +254,7 @@ export interface FileRoutesByFullPath {
   '/wunschtermin': typeof WunschterminRoute
   '/admin/berechnungen': typeof AdminBerechnungenRoute
   '/admin/live': typeof AdminLiveRoute
+  '/admin/statistiken': typeof AdminStatistikenRoute
   '/go/$slug': typeof GoSlugRoute
   '/showroom/$slug': typeof ShowroomSlugRoute
   '/admin/': typeof AdminIndexRoute
@@ -282,6 +289,7 @@ export interface FileRoutesByTo {
   '/wunschtermin': typeof WunschterminRoute
   '/admin/berechnungen': typeof AdminBerechnungenRoute
   '/admin/live': typeof AdminLiveRoute
+  '/admin/statistiken': typeof AdminStatistikenRoute
   '/go/$slug': typeof GoSlugRoute
   '/showroom/$slug': typeof ShowroomSlugRoute
   '/admin': typeof AdminIndexRoute
@@ -318,6 +326,7 @@ export interface FileRoutesById {
   '/wunschtermin': typeof WunschterminRoute
   '/admin/berechnungen': typeof AdminBerechnungenRoute
   '/admin/live': typeof AdminLiveRoute
+  '/admin/statistiken': typeof AdminStatistikenRoute
   '/go/$slug': typeof GoSlugRoute
   '/showroom/$slug': typeof ShowroomSlugRoute
   '/admin/': typeof AdminIndexRoute
@@ -355,6 +364,7 @@ export interface FileRouteTypes {
     | '/wunschtermin'
     | '/admin/berechnungen'
     | '/admin/live'
+    | '/admin/statistiken'
     | '/go/$slug'
     | '/showroom/$slug'
     | '/admin/'
@@ -389,6 +399,7 @@ export interface FileRouteTypes {
     | '/wunschtermin'
     | '/admin/berechnungen'
     | '/admin/live'
+    | '/admin/statistiken'
     | '/go/$slug'
     | '/showroom/$slug'
     | '/admin'
@@ -424,6 +435,7 @@ export interface FileRouteTypes {
     | '/wunschtermin'
     | '/admin/berechnungen'
     | '/admin/live'
+    | '/admin/statistiken'
     | '/go/$slug'
     | '/showroom/$slug'
     | '/admin/'
@@ -682,6 +694,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GoSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/statistiken': {
+      id: '/admin/statistiken'
+      path: '/statistiken'
+      fullPath: '/admin/statistiken'
+      preLoaderRoute: typeof AdminStatistikenRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/live': {
       id: '/admin/live'
       path: '/live'
@@ -702,12 +721,14 @@ declare module '@tanstack/react-router' {
 interface AdminRouteChildren {
   AdminBerechnungenRoute: typeof AdminBerechnungenRoute
   AdminLiveRoute: typeof AdminLiveRoute
+  AdminStatistikenRoute: typeof AdminStatistikenRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminBerechnungenRoute: AdminBerechnungenRoute,
   AdminLiveRoute: AdminLiveRoute,
+  AdminStatistikenRoute: AdminStatistikenRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
 
