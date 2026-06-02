@@ -152,6 +152,7 @@ const initial: State = {
   sockelLfm: "",
   sockelArt: "",
   daemmung: "",
+  spachteln: "",
   
   materialService: "",
   materialWert: "",
