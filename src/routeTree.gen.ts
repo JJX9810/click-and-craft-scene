@@ -40,6 +40,7 @@ import { Route as ShowroomIndexRouteImport } from './routes/showroom.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as ShowroomSlugRouteImport } from './routes/showroom.$slug'
 import { Route as GoSlugRouteImport } from './routes/go.$slug'
+import { Route as AdminLiveRouteImport } from './routes/admin.live'
 
 const WunschterminRoute = WunschterminRouteImport.update({
   id: '/wunschtermin',
@@ -205,6 +206,11 @@ const GoSlugRoute = GoSlugRouteImport.update({
   path: '/go/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminLiveRoute = AdminLiveRouteImport.update({
+  id: '/live',
+  path: '/live',
+  getParentRoute: () => AdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -234,6 +240,7 @@ export interface FileRoutesByFullPath {
   '/wilhelmshaven': typeof WilhelmshavenRoute
   '/wir-unterstuetzen': typeof WirUnterstuetzenRoute
   '/wunschtermin': typeof WunschterminRoute
+  '/admin/live': typeof AdminLiveRoute
   '/go/$slug': typeof GoSlugRoute
   '/showroom/$slug': typeof ShowroomSlugRoute
   '/admin/': typeof AdminIndexRoute
@@ -266,6 +273,7 @@ export interface FileRoutesByTo {
   '/wilhelmshaven': typeof WilhelmshavenRoute
   '/wir-unterstuetzen': typeof WirUnterstuetzenRoute
   '/wunschtermin': typeof WunschterminRoute
+  '/admin/live': typeof AdminLiveRoute
   '/go/$slug': typeof GoSlugRoute
   '/showroom/$slug': typeof ShowroomSlugRoute
   '/admin': typeof AdminIndexRoute
@@ -300,6 +308,7 @@ export interface FileRoutesById {
   '/wilhelmshaven': typeof WilhelmshavenRoute
   '/wir-unterstuetzen': typeof WirUnterstuetzenRoute
   '/wunschtermin': typeof WunschterminRoute
+  '/admin/live': typeof AdminLiveRoute
   '/go/$slug': typeof GoSlugRoute
   '/showroom/$slug': typeof ShowroomSlugRoute
   '/admin/': typeof AdminIndexRoute
@@ -335,6 +344,7 @@ export interface FileRouteTypes {
     | '/wilhelmshaven'
     | '/wir-unterstuetzen'
     | '/wunschtermin'
+    | '/admin/live'
     | '/go/$slug'
     | '/showroom/$slug'
     | '/admin/'
@@ -367,6 +377,7 @@ export interface FileRouteTypes {
     | '/wilhelmshaven'
     | '/wir-unterstuetzen'
     | '/wunschtermin'
+    | '/admin/live'
     | '/go/$slug'
     | '/showroom/$slug'
     | '/admin'
@@ -400,6 +411,7 @@ export interface FileRouteTypes {
     | '/wilhelmshaven'
     | '/wir-unterstuetzen'
     | '/wunschtermin'
+    | '/admin/live'
     | '/go/$slug'
     | '/showroom/$slug'
     | '/admin/'
@@ -658,14 +670,23 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GoSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/live': {
+      id: '/admin/live'
+      path: '/live'
+      fullPath: '/admin/live'
+      preLoaderRoute: typeof AdminLiveRouteImport
+      parentRoute: typeof AdminRoute
+    }
   }
 }
 
 interface AdminRouteChildren {
+  AdminLiveRoute: typeof AdminLiveRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminLiveRoute: AdminLiveRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
 
