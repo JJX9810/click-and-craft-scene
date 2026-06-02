@@ -58,6 +58,7 @@ const ALT_PRICE_VERKLEBT = 7; // €/m² – verklebter Altbelag (Boden, nicht T
 const SOCKEL_PRICE = 5; // €/lfm – normale Montage
 const SOCKEL_GEHRUNG_PRICE = 7; // €/lfm – auf Gehrung gesägt
 const DAEMMUNG_PRICE = 1.5; // €/m²
+const SPACHTELN_PRICE = 19; // €/m² – inkl. Grundierung
 
 const ALT_TEPPICH_LOSE_PRICE = 7; // €/m²
 const ALT_TEPPICH_LOSE_MIN = 120; // €
@@ -111,6 +112,7 @@ type State = {
   sockelLfm: string;
   sockelArt: "" | "keine" | "normal" | "gehrung";
   daemmung: "Ja" | "Nein" | "";
+  spachteln: "Ja" | "Nein" | "";
   
   materialService: "Ja" | "Nein" | "";
   materialWert: string;
@@ -150,6 +152,7 @@ const initial: State = {
   sockelLfm: "",
   sockelArt: "",
   daemmung: "",
+  spachteln: "",
   
   materialService: "",
   materialWert: "",
@@ -303,6 +306,18 @@ function computeBreakdown(s: State): Breakdown | null {
       });
       arbeitssumme += a;
     }
+
+    if (s.spachteln === "Ja") {
+      const a = +(qm * SPACHTELN_PRICE).toFixed(2);
+      items.push({
+        label: "Spachteln inkl. Grundierung",
+        detail: `${qm} m²`,
+        amount: a,
+        arbeitsleistung: true,
+      });
+      arbeitssumme += a;
+    }
+
 
     const lfm = Number(s.sockelLfm);
     if (lfm > 0 && s.sockelArt && s.sockelArt !== "keine") {
@@ -488,6 +503,7 @@ function summaryLines(s: State): string[] {
     if (s.sockelArt) lines.push(`Sockelleisten-Ausführung: ${altSockelLabel(s.sockelArt)}`);
     if (s.altEntfernen) lines.push(`Altbelag entfernen & entsorgen: ${altEntfernenLabel(s.altEntfernen)}`);
     if (s.daemmung === "Ja") lines.push("Dämmung verlegen: ja");
+    if (s.spachteln === "Ja") lines.push("Spachteln inkl. Grundierung: ja");
     if (s.materialService === "Ja") {
       lines.push(`Materialservice: ja${s.materialWert ? ` (Materialwert ca. ${s.materialWert} €)` : ""}`);
     }
@@ -549,6 +565,7 @@ function buildWaMessage(s: State, b: Breakdown | null): string {
     if (s.sockelArt) lines.push(`Sockelleisten-Ausführung: ${altSockelLabel(s.sockelArt)}`);
     if (s.altEntfernen) lines.push(`Altbelag entfernen & entsorgen: ${altEntfernenLabel(s.altEntfernen)}`);
     if (s.daemmung === "Ja") lines.push(`Dämmung verlegen: ja`);
+    if (s.spachteln === "Ja") lines.push(`Spachteln inkl. Grundierung: ja`);
     if (s.materialService === "Ja") {
       lines.push(`Materialservice: ja${s.materialWert ? ` (Materialwert ca. ${s.materialWert} €)` : ""}`);
     }
@@ -1091,6 +1108,16 @@ function BodenForm({ s, upd }: { s: State; upd: <K extends keyof State>(k: K, v:
           onChange={(v) => upd("daemmung", v as State["daemmung"])}
           options={["Ja", "Nein"]}
         />
+      </Field>
+      <Field label="Spachteln inkl. Grundierung">
+        <Choice
+          value={s.spachteln}
+          onChange={(v) => upd("spachteln", v as State["spachteln"])}
+          options={["Ja", "Nein"]}
+        />
+        <p className="mt-1 text-xs text-muted-foreground">
+          Untergrund vorbereiten: spachteln inklusive Grundierung (19 €/m²).
+        </p>
       </Field>
       <div className="space-y-3 rounded-md border border-border/60 bg-background/40 p-4">
         <Field label="Materialservice gewünscht">
