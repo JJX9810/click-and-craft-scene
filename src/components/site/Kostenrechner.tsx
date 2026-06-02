@@ -565,6 +565,7 @@ function buildWaMessage(s: State, b: Breakdown | null): string {
     if (s.sockelArt) lines.push(`Sockelleisten-Ausführung: ${altSockelLabel(s.sockelArt)}`);
     if (s.altEntfernen) lines.push(`Altbelag entfernen & entsorgen: ${altEntfernenLabel(s.altEntfernen)}`);
     if (s.daemmung === "Ja") lines.push(`Dämmung verlegen: ja`);
+    if (s.spachteln === "Ja") lines.push(`Spachteln inkl. Grundierung: ja`);
     if (s.materialService === "Ja") {
       lines.push(`Materialservice: ja${s.materialWert ? ` (Materialwert ca. ${s.materialWert} €)` : ""}`);
     }
