@@ -37,6 +37,7 @@ import { Route as BodenverlegungWilhelmshavenRouteImport } from './routes/bodenv
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ShowroomIndexRouteImport } from './routes/showroom.index'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as ShowroomSlugRouteImport } from './routes/showroom.$slug'
 import { Route as GoSlugRouteImport } from './routes/go.$slug'
 
@@ -189,6 +190,11 @@ const ShowroomIndexRoute = ShowroomIndexRouteImport.update({
   path: '/showroom/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
+} as any)
 const ShowroomSlugRoute = ShowroomSlugRouteImport.update({
   id: '/showroom/$slug',
   path: '/showroom/$slug',
@@ -202,7 +208,7 @@ const GoSlugRoute = GoSlugRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
+  '/admin': typeof AdminRouteWithChildren
   '/bodenverlegung-wilhelmshaven': typeof BodenverlegungWilhelmshavenRoute
   '/datenschutz': typeof DatenschutzRoute
   '/entruempelung-entsorgung-in-wilhelmshaven': typeof EntruempelungEntsorgungInWilhelmshavenRoute
@@ -230,11 +236,11 @@ export interface FileRoutesByFullPath {
   '/wunschtermin': typeof WunschterminRoute
   '/go/$slug': typeof GoSlugRoute
   '/showroom/$slug': typeof ShowroomSlugRoute
+  '/admin/': typeof AdminIndexRoute
   '/showroom/': typeof ShowroomIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
   '/bodenverlegung-wilhelmshaven': typeof BodenverlegungWilhelmshavenRoute
   '/datenschutz': typeof DatenschutzRoute
   '/entruempelung-entsorgung-in-wilhelmshaven': typeof EntruempelungEntsorgungInWilhelmshavenRoute
@@ -262,12 +268,13 @@ export interface FileRoutesByTo {
   '/wunschtermin': typeof WunschterminRoute
   '/go/$slug': typeof GoSlugRoute
   '/showroom/$slug': typeof ShowroomSlugRoute
+  '/admin': typeof AdminIndexRoute
   '/showroom': typeof ShowroomIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
+  '/admin': typeof AdminRouteWithChildren
   '/bodenverlegung-wilhelmshaven': typeof BodenverlegungWilhelmshavenRoute
   '/datenschutz': typeof DatenschutzRoute
   '/entruempelung-entsorgung-in-wilhelmshaven': typeof EntruempelungEntsorgungInWilhelmshavenRoute
@@ -295,6 +302,7 @@ export interface FileRoutesById {
   '/wunschtermin': typeof WunschterminRoute
   '/go/$slug': typeof GoSlugRoute
   '/showroom/$slug': typeof ShowroomSlugRoute
+  '/admin/': typeof AdminIndexRoute
   '/showroom/': typeof ShowroomIndexRoute
 }
 export interface FileRouteTypes {
@@ -329,11 +337,11 @@ export interface FileRouteTypes {
     | '/wunschtermin'
     | '/go/$slug'
     | '/showroom/$slug'
+    | '/admin/'
     | '/showroom/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/admin'
     | '/bodenverlegung-wilhelmshaven'
     | '/datenschutz'
     | '/entruempelung-entsorgung-in-wilhelmshaven'
@@ -361,6 +369,7 @@ export interface FileRouteTypes {
     | '/wunschtermin'
     | '/go/$slug'
     | '/showroom/$slug'
+    | '/admin'
     | '/showroom'
   id:
     | '__root__'
@@ -393,12 +402,13 @@ export interface FileRouteTypes {
     | '/wunschtermin'
     | '/go/$slug'
     | '/showroom/$slug'
+    | '/admin/'
     | '/showroom/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AdminRoute: typeof AdminRoute
+  AdminRoute: typeof AdminRouteWithChildren
   BodenverlegungWilhelmshavenRoute: typeof BodenverlegungWilhelmshavenRoute
   DatenschutzRoute: typeof DatenschutzRoute
   EntruempelungEntsorgungInWilhelmshavenRoute: typeof EntruempelungEntsorgungInWilhelmshavenRoute
@@ -627,6 +637,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShowroomIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/showroom/$slug': {
       id: '/showroom/$slug'
       path: '/showroom/$slug'
@@ -644,9 +661,19 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AdminRouteChildren {
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AdminRoute: AdminRoute,
+  AdminRoute: AdminRouteWithChildren,
   BodenverlegungWilhelmshavenRoute: BodenverlegungWilhelmshavenRoute,
   DatenschutzRoute: DatenschutzRoute,
   EntruempelungEntsorgungInWilhelmshavenRoute:
