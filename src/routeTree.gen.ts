@@ -41,6 +41,7 @@ import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as ShowroomSlugRouteImport } from './routes/showroom.$slug'
 import { Route as GoSlugRouteImport } from './routes/go.$slug'
 import { Route as AdminLiveRouteImport } from './routes/admin.live'
+import { Route as AdminBerechnungenRouteImport } from './routes/admin.berechnungen'
 
 const WunschterminRoute = WunschterminRouteImport.update({
   id: '/wunschtermin',
@@ -211,6 +212,11 @@ const AdminLiveRoute = AdminLiveRouteImport.update({
   path: '/live',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminBerechnungenRoute = AdminBerechnungenRouteImport.update({
+  id: '/berechnungen',
+  path: '/berechnungen',
+  getParentRoute: () => AdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -240,6 +246,7 @@ export interface FileRoutesByFullPath {
   '/wilhelmshaven': typeof WilhelmshavenRoute
   '/wir-unterstuetzen': typeof WirUnterstuetzenRoute
   '/wunschtermin': typeof WunschterminRoute
+  '/admin/berechnungen': typeof AdminBerechnungenRoute
   '/admin/live': typeof AdminLiveRoute
   '/go/$slug': typeof GoSlugRoute
   '/showroom/$slug': typeof ShowroomSlugRoute
@@ -273,6 +280,7 @@ export interface FileRoutesByTo {
   '/wilhelmshaven': typeof WilhelmshavenRoute
   '/wir-unterstuetzen': typeof WirUnterstuetzenRoute
   '/wunschtermin': typeof WunschterminRoute
+  '/admin/berechnungen': typeof AdminBerechnungenRoute
   '/admin/live': typeof AdminLiveRoute
   '/go/$slug': typeof GoSlugRoute
   '/showroom/$slug': typeof ShowroomSlugRoute
@@ -308,6 +316,7 @@ export interface FileRoutesById {
   '/wilhelmshaven': typeof WilhelmshavenRoute
   '/wir-unterstuetzen': typeof WirUnterstuetzenRoute
   '/wunschtermin': typeof WunschterminRoute
+  '/admin/berechnungen': typeof AdminBerechnungenRoute
   '/admin/live': typeof AdminLiveRoute
   '/go/$slug': typeof GoSlugRoute
   '/showroom/$slug': typeof ShowroomSlugRoute
@@ -344,6 +353,7 @@ export interface FileRouteTypes {
     | '/wilhelmshaven'
     | '/wir-unterstuetzen'
     | '/wunschtermin'
+    | '/admin/berechnungen'
     | '/admin/live'
     | '/go/$slug'
     | '/showroom/$slug'
@@ -377,6 +387,7 @@ export interface FileRouteTypes {
     | '/wilhelmshaven'
     | '/wir-unterstuetzen'
     | '/wunschtermin'
+    | '/admin/berechnungen'
     | '/admin/live'
     | '/go/$slug'
     | '/showroom/$slug'
@@ -411,6 +422,7 @@ export interface FileRouteTypes {
     | '/wilhelmshaven'
     | '/wir-unterstuetzen'
     | '/wunschtermin'
+    | '/admin/berechnungen'
     | '/admin/live'
     | '/go/$slug'
     | '/showroom/$slug'
@@ -677,15 +689,24 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminLiveRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/berechnungen': {
+      id: '/admin/berechnungen'
+      path: '/berechnungen'
+      fullPath: '/admin/berechnungen'
+      preLoaderRoute: typeof AdminBerechnungenRouteImport
+      parentRoute: typeof AdminRoute
+    }
   }
 }
 
 interface AdminRouteChildren {
+  AdminBerechnungenRoute: typeof AdminBerechnungenRoute
   AdminLiveRoute: typeof AdminLiveRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminBerechnungenRoute: AdminBerechnungenRoute,
   AdminLiveRoute: AdminLiveRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
