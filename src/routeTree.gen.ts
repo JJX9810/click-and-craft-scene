@@ -17,6 +17,7 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ReferenzenRouteImport } from './routes/referenzen'
 import { Route as PreiseRouteImport } from './routes/preise'
 import { Route as PartnerRouteImport } from './routes/partner'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as KuechenmontageWilhelmshavenRouteImport } from './routes/kuechenmontage-wilhelmshaven'
 import { Route as KuechenmontageInWilhelmshavenRouteImport } from './routes/kuechenmontage-in-wilhelmshaven'
 import { Route as KontaktRouteImport } from './routes/kontakt'
@@ -33,6 +34,7 @@ import { Route as EntruempelungWilhelmshavenRouteImport } from './routes/entruem
 import { Route as EntruempelungEntsorgungInWilhelmshavenRouteImport } from './routes/entruempelung-entsorgung-in-wilhelmshaven'
 import { Route as DatenschutzRouteImport } from './routes/datenschutz'
 import { Route as BodenverlegungWilhelmshavenRouteImport } from './routes/bodenverlegung-wilhelmshaven'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ShowroomIndexRouteImport } from './routes/showroom.index'
 import { Route as ShowroomSlugRouteImport } from './routes/showroom.$slug'
@@ -76,6 +78,11 @@ const PreiseRoute = PreiseRouteImport.update({
 const PartnerRoute = PartnerRouteImport.update({
   id: '/partner',
   path: '/partner',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const KuechenmontageWilhelmshavenRoute =
@@ -167,6 +174,11 @@ const BodenverlegungWilhelmshavenRoute =
     path: '/bodenverlegung-wilhelmshaven',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -190,6 +202,7 @@ const GoSlugRoute = GoSlugRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/bodenverlegung-wilhelmshaven': typeof BodenverlegungWilhelmshavenRoute
   '/datenschutz': typeof DatenschutzRoute
   '/entruempelung-entsorgung-in-wilhelmshaven': typeof EntruempelungEntsorgungInWilhelmshavenRoute
@@ -206,6 +219,7 @@ export interface FileRoutesByFullPath {
   '/kontakt': typeof KontaktRoute
   '/kuechenmontage-in-wilhelmshaven': typeof KuechenmontageInWilhelmshavenRoute
   '/kuechenmontage-wilhelmshaven': typeof KuechenmontageWilhelmshavenRoute
+  '/login': typeof LoginRoute
   '/partner': typeof PartnerRoute
   '/preise': typeof PreiseRoute
   '/referenzen': typeof ReferenzenRoute
@@ -220,6 +234,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/bodenverlegung-wilhelmshaven': typeof BodenverlegungWilhelmshavenRoute
   '/datenschutz': typeof DatenschutzRoute
   '/entruempelung-entsorgung-in-wilhelmshaven': typeof EntruempelungEntsorgungInWilhelmshavenRoute
@@ -236,6 +251,7 @@ export interface FileRoutesByTo {
   '/kontakt': typeof KontaktRoute
   '/kuechenmontage-in-wilhelmshaven': typeof KuechenmontageInWilhelmshavenRoute
   '/kuechenmontage-wilhelmshaven': typeof KuechenmontageWilhelmshavenRoute
+  '/login': typeof LoginRoute
   '/partner': typeof PartnerRoute
   '/preise': typeof PreiseRoute
   '/referenzen': typeof ReferenzenRoute
@@ -251,6 +267,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/bodenverlegung-wilhelmshaven': typeof BodenverlegungWilhelmshavenRoute
   '/datenschutz': typeof DatenschutzRoute
   '/entruempelung-entsorgung-in-wilhelmshaven': typeof EntruempelungEntsorgungInWilhelmshavenRoute
@@ -267,6 +284,7 @@ export interface FileRoutesById {
   '/kontakt': typeof KontaktRoute
   '/kuechenmontage-in-wilhelmshaven': typeof KuechenmontageInWilhelmshavenRoute
   '/kuechenmontage-wilhelmshaven': typeof KuechenmontageWilhelmshavenRoute
+  '/login': typeof LoginRoute
   '/partner': typeof PartnerRoute
   '/preise': typeof PreiseRoute
   '/referenzen': typeof ReferenzenRoute
@@ -283,6 +301,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/bodenverlegung-wilhelmshaven'
     | '/datenschutz'
     | '/entruempelung-entsorgung-in-wilhelmshaven'
@@ -299,6 +318,7 @@ export interface FileRouteTypes {
     | '/kontakt'
     | '/kuechenmontage-in-wilhelmshaven'
     | '/kuechenmontage-wilhelmshaven'
+    | '/login'
     | '/partner'
     | '/preise'
     | '/referenzen'
@@ -313,6 +333,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/admin'
     | '/bodenverlegung-wilhelmshaven'
     | '/datenschutz'
     | '/entruempelung-entsorgung-in-wilhelmshaven'
@@ -329,6 +350,7 @@ export interface FileRouteTypes {
     | '/kontakt'
     | '/kuechenmontage-in-wilhelmshaven'
     | '/kuechenmontage-wilhelmshaven'
+    | '/login'
     | '/partner'
     | '/preise'
     | '/referenzen'
@@ -343,6 +365,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/admin'
     | '/bodenverlegung-wilhelmshaven'
     | '/datenschutz'
     | '/entruempelung-entsorgung-in-wilhelmshaven'
@@ -359,6 +382,7 @@ export interface FileRouteTypes {
     | '/kontakt'
     | '/kuechenmontage-in-wilhelmshaven'
     | '/kuechenmontage-wilhelmshaven'
+    | '/login'
     | '/partner'
     | '/preise'
     | '/referenzen'
@@ -374,6 +398,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRoute
   BodenverlegungWilhelmshavenRoute: typeof BodenverlegungWilhelmshavenRoute
   DatenschutzRoute: typeof DatenschutzRoute
   EntruempelungEntsorgungInWilhelmshavenRoute: typeof EntruempelungEntsorgungInWilhelmshavenRoute
@@ -390,6 +415,7 @@ export interface RootRouteChildren {
   KontaktRoute: typeof KontaktRoute
   KuechenmontageInWilhelmshavenRoute: typeof KuechenmontageInWilhelmshavenRoute
   KuechenmontageWilhelmshavenRoute: typeof KuechenmontageWilhelmshavenRoute
+  LoginRoute: typeof LoginRoute
   PartnerRoute: typeof PartnerRoute
   PreiseRoute: typeof PreiseRoute
   ReferenzenRoute: typeof ReferenzenRoute
@@ -459,6 +485,13 @@ declare module '@tanstack/react-router' {
       path: '/partner'
       fullPath: '/partner'
       preLoaderRoute: typeof PartnerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/kuechenmontage-wilhelmshaven': {
@@ -573,6 +606,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BodenverlegungWilhelmshavenRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -606,6 +646,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRoute,
   BodenverlegungWilhelmshavenRoute: BodenverlegungWilhelmshavenRoute,
   DatenschutzRoute: DatenschutzRoute,
   EntruempelungEntsorgungInWilhelmshavenRoute:
@@ -623,6 +664,7 @@ const rootRouteChildren: RootRouteChildren = {
   KontaktRoute: KontaktRoute,
   KuechenmontageInWilhelmshavenRoute: KuechenmontageInWilhelmshavenRoute,
   KuechenmontageWilhelmshavenRoute: KuechenmontageWilhelmshavenRoute,
+  LoginRoute: LoginRoute,
   PartnerRoute: PartnerRoute,
   PreiseRoute: PreiseRoute,
   ReferenzenRoute: ReferenzenRoute,
@@ -638,3 +680,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
