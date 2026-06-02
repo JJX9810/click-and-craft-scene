@@ -58,6 +58,7 @@ const ALT_PRICE_VERKLEBT = 7; // €/m² – verklebter Altbelag (Boden, nicht T
 const SOCKEL_PRICE = 5; // €/lfm – normale Montage
 const SOCKEL_GEHRUNG_PRICE = 7; // €/lfm – auf Gehrung gesägt
 const DAEMMUNG_PRICE = 1.5; // €/m²
+const SPACHTELN_PRICE = 19; // €/m² – inkl. Grundierung
 
 const ALT_TEPPICH_LOSE_PRICE = 7; // €/m²
 const ALT_TEPPICH_LOSE_MIN = 120; // €
