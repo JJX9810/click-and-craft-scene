@@ -112,6 +112,7 @@ type State = {
   sockelLfm: string;
   sockelArt: "" | "keine" | "normal" | "gehrung";
   daemmung: "Ja" | "Nein" | "";
+  spachteln: "Ja" | "Nein" | "";
   
   materialService: "Ja" | "Nein" | "";
   materialWert: string;
