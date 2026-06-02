@@ -650,6 +650,26 @@ export function Kostenrechner() {
     }
   }, [step, s.service, breakdown]);
 
+  // Live-Tracking für Admin-Bereich: debounced Upsert bei jeder Änderung
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (!s.service) return;
+    const t = window.setTimeout(() => {
+      void upsertCalcSession(s as any, breakdown?.total ?? null);
+    }, 600);
+    return () => window.clearTimeout(t);
+  }, [s, breakdown]);
+
+  // Abschluss-Erfassung bei Erreichen von Schritt 3 (Ergebnis)
+  const submittedRef = useRef(false);
+  useEffect(() => {
+    if (step === 3 && !submittedRef.current && s.service) {
+      submittedRef.current = true;
+      void submitCalculation(s as any, breakdown?.total ?? null);
+    }
+  }, [step, s, breakdown]);
+
+
   // Leistungs-Auswahl tracken
   useEffect(() => {
     if (!s.service) return;
