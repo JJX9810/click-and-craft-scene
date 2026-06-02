@@ -52,7 +52,7 @@ export async function upsertCalcSession(snapshot: any, totalEstimate: number | n
   }
 }
 
-export async function submitCalculation(snapshot: Record<string, unknown>, totalEstimate: number | null) {
+export async function submitCalculation(snapshot: any, totalEstimate: number | null) {
   if (!isBrowser()) return;
   const session_id = getVisitorSessionId();
   try {
