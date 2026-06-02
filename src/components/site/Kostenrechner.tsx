@@ -307,6 +307,18 @@ function computeBreakdown(s: State): Breakdown | null {
       arbeitssumme += a;
     }
 
+    if (s.spachteln === "Ja") {
+      const a = +(qm * SPACHTELN_PRICE).toFixed(2);
+      items.push({
+        label: "Spachteln inkl. Grundierung",
+        detail: `${qm} m²`,
+        amount: a,
+        arbeitsleistung: true,
+      });
+      arbeitssumme += a;
+    }
+
+
     const lfm = Number(s.sockelLfm);
     if (lfm > 0 && s.sockelArt && s.sockelArt !== "keine") {
       if (s.sockelArt === "gehrung") {
