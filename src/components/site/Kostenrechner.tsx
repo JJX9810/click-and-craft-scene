@@ -786,9 +786,6 @@ export function Kostenrechner() {
         <div className="mt-8 space-y-6">
           <div>
             <h3 className="text-lg font-semibold sm:text-xl">Details zu Ihrem Projekt</h3>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Alle Preise sind Endkundenpreise. Verlegt &amp; Verschraubt arbeitet als Kleinunternehmer nach § 19 UStG – es wird keine Umsatzsteuer ausgewiesen.
-            </p>
           </div>
 
           {s.service === "boden" && <BodenForm s={s} upd={upd} />}
