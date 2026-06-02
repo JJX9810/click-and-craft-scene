@@ -1109,6 +1109,16 @@ function BodenForm({ s, upd }: { s: State; upd: <K extends keyof State>(k: K, v:
           options={["Ja", "Nein"]}
         />
       </Field>
+      <Field label="Spachteln inkl. Grundierung">
+        <Choice
+          value={s.spachteln}
+          onChange={(v) => upd("spachteln", v as State["spachteln"])}
+          options={["Ja", "Nein"]}
+        />
+        <p className="mt-1 text-xs text-muted-foreground">
+          Untergrund vorbereiten: spachteln inklusive Grundierung (19 €/m²).
+        </p>
+      </Field>
       <div className="space-y-3 rounded-md border border-border/60 bg-background/40 p-4">
         <Field label="Materialservice gewünscht">
           <Choice
