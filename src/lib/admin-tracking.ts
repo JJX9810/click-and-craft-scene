@@ -34,7 +34,7 @@ export async function heartbeat(path: string) {
   }
 }
 
-export async function upsertCalcSession(snapshot: Record<string, unknown>, totalEstimate: number | null) {
+export async function upsertCalcSession(snapshot: any, totalEstimate: number | null) {
   if (!isBrowser()) return;
   const session_id = getVisitorSessionId();
   try {
