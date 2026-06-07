@@ -1,0 +1,2393 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Verlegt &amp; Verschraubt – Cockpit 2026</title>
+<style>
+/* ============================================================
+   V&V COCKPIT 2026 – 4-Bereich-Sidebar
+   Speicher: localStorage. Kein Server, kein Internet nötig.
+   ============================================================ */
+:root{
+  --bg:#0c0907; --panel:#15100d; --panel2:#1d1511; --panel3:#0f0b08;
+  --line:#4c3728; --line2:rgba(202,160,106,.25);
+  --text:#f4ede4; --muted:#b89d83; --muted2:#7a6050;
+  --gold:#d4a15a; --gold2:#edc48b; --gold3:#9a7247;
+  --red:#8f2d22; --red2:#d67b70; --green:#5e9c72; --green2:#a0c890;
+  --blue:#b07a45; --orange:#c98747;
+  --shadow:0 14px 34px rgba(0,0,0,.5);
+  --r:16px; --r2:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  background:radial-gradient(circle at top left,rgba(162,100,42,.14),transparent 26%),
+            radial-gradient(circle at 80% 30%,rgba(212,161,90,.08),transparent 22%),
+            linear-gradient(180deg,#120d09 0%,#090705 100%);
+  color:var(--text);font-family:Arial,Helvetica,sans-serif;min-height:100vh;
+  font-size:14px;
+}
+button,input,select,textarea{font-family:inherit}
+a{color:var(--gold);text-decoration:none}
+
+/* ── TOPBAR ── */
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;gap:14px;
+  padding:14px 20px;
+  background:linear-gradient(135deg,rgba(101,63,31,.65) 0%,rgba(34,24,17,.97) 42%,rgba(12,9,7,1) 100%);
+  border-bottom:1px solid var(--line2);position:sticky;top:0;z-index:30;
+  backdrop-filter:blur(12px);
+}
+.brand{display:flex;align-items:center;gap:12px}
+.brand-mark{width:46px;height:46px;border-radius:12px;background:rgba(212,161,90,.12);
+  border:1px solid var(--line2);display:grid;place-items:center;
+  font-size:13px;font-weight:900;color:var(--gold);letter-spacing:.5px;line-height:1.1;text-align:center}
+.brand-text h1{font-size:20px;font-weight:900;color:#f8efe3;letter-spacing:.2px}
+.brand-text p{font-size:11.5px;color:var(--muted);margin-top:1px}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.top-save-info{font-size:11px;color:var(--muted2)}
+
+/* ── LAYOUT ── */
+.shell{display:grid;grid-template-columns:252px 1fr;min-height:calc(100vh - 74px)}
+
+/* ── SIDEBAR ── */
+.sidebar{
+  background:rgba(12,9,7,.96);border-right:1px solid var(--line);
+  padding:12px 10px 24px;position:sticky;top:74px;height:calc(100vh - 74px);
+  overflow-y:auto;
+}
+.sidebar::-webkit-scrollbar{width:4px}
+.sidebar::-webkit-scrollbar-thumb{background:var(--line);border-radius:2px}
+
+.nav-group{margin-bottom:6px;border-radius:var(--r2);overflow:hidden;border:1px solid rgba(202,160,106,.12)}
+.nav-group-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 12px;cursor:pointer;
+  font-size:11px;font-weight:900;letter-spacing:.8px;text-transform:uppercase;
+  transition:.15s;user-select:none;
+}
+.nav-group-header:hover{background:rgba(212,161,90,.07)}
+.nav-group-header .grp-icon{font-size:15px;margin-right:6px}
+.nav-group-header .grp-label{flex:1;color:var(--gold2)}
+.nav-group-header .grp-arrow{font-size:10px;color:var(--muted2);transition:.2s}
+.nav-group-header.open .grp-arrow{transform:rotate(90deg)}
+.nav-group-header.group-kunden{border-left:3px solid #d4a15a}
+.nav-group-header.group-personal{border-left:3px solid #5e9c72}
+.nav-group-header.group-buchhaltung{border-left:3px solid #b07a45}
+.nav-group-header.group-baustelle{border-left:3px solid #8f2d22}
+.nav-items{display:none;padding:4px 0;background:rgba(0,0,0,.18)}
+.nav-items.open{display:block}
+
+.navbtn{
+  width:100%;text-align:left;display:flex;align-items:center;justify-content:space-between;
+  padding:9px 14px 9px 18px;border:none;background:transparent;
+  color:var(--muted);font-size:13px;font-weight:700;cursor:pointer;
+  border-left:3px solid transparent;transition:.12s;
+}
+.navbtn:hover{background:rgba(212,161,90,.07);color:var(--text)}
+.navbtn.active{background:rgba(212,161,90,.13);color:var(--gold2);border-left-color:var(--gold)}
+.navbtn .badge{font-size:10.5px;background:rgba(139,94,52,.25);padding:2px 7px;
+  border-radius:999px;color:var(--gold2);border:1px solid rgba(212,161,90,.2)}
+
+/* ── CONTENT ── */
+.content{padding:18px;min-width:0}
+
+/* KPI-Leiste oben */
+.kpi-bar{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:16px}
+.kpi{background:rgba(22,16,13,.92);border:1px solid var(--line);border-radius:var(--r);
+  padding:14px 16px;box-shadow:var(--shadow)}
+.kpi .k{font-size:11px;color:var(--muted);font-weight:800;margin-bottom:6px}
+.kpi .v{font-size:22px;font-weight:900}
+.kpi .v.gr{color:var(--green)} .kpi .v.rd{color:var(--red2)} .kpi .v.gd{color:var(--gold)}
+
+/* PANELS */
+.panel{
+  background:rgba(22,16,13,.9);border:1px solid var(--line);border-radius:var(--r);
+  padding:20px;box-shadow:var(--shadow);margin-bottom:14px;
+}
+.panel h2{font-size:22px;font-weight:900;color:#f8efe3;margin-bottom:3px}
+.panel .sub{color:var(--muted);font-size:13px;margin-bottom:14px}
+.panel h3{font-size:16px;font-weight:900;color:var(--gold2);margin:14px 0 8px}
+
+/* FORMULAR */
+.fg{display:grid;gap:10px;margin:10px 0}
+.fg.c2{grid-template-columns:1fr 1fr}
+.fg.c3{grid-template-columns:1fr 1fr 1fr}
+.fg.c4{grid-template-columns:1fr 1fr 1fr 1fr}
+.fg.full{grid-column:1/-1}
+label.lbl{display:block;font-size:11.5px;font-weight:900;color:#ddd;margin-bottom:5px}
+input,select,textarea{
+  width:100%;background:#110d0a;color:var(--text);
+  border:1px solid #5a4030;border-radius:var(--r2);
+  padding:10px 12px;outline:none;font-size:13.5px;
+}
+textarea{min-height:90px;resize:vertical}
+input:focus,select:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 0 2px rgba(212,161,90,.14)}
+
+/* BUTTONS */
+.btn{
+  border:1px solid var(--line);background:#201611;color:var(--text);
+  border-radius:var(--r2);padding:9px 14px;font-weight:800;cursor:pointer;
+  transition:.15s;font-size:13px;display:inline-flex;align-items:center;gap:6px;
+}
+.btn:hover{border-color:var(--gold3);background:#2a1d15;transform:translateY(-1px)}
+.btn.primary{background:linear-gradient(135deg,#b07a45,#7a5525);border-color:var(--gold2)}
+.btn.green{background:linear-gradient(135deg,#4a7a3a,#335526);border-color:#7ab870}
+.btn.red{background:linear-gradient(135deg,#8f2d22,#5e1a14);border-color:#d67b70}
+.btn.ghost{background:transparent}
+.btn.sm{padding:6px 10px;font-size:12px}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+
+/* TABELLEN */
+.tablewrap{overflow:auto;border:1px solid var(--line);border-radius:14px;margin-top:10px}
+table{width:100%;border-collapse:collapse;min-width:500px;background:#130f0c}
+th,td{border-bottom:1px solid #34251b;padding:9px 10px;text-align:left;font-size:13px;vertical-align:top}
+th{background:#1d1510;color:#fff;position:sticky;top:0;z-index:1;font-size:12px;font-weight:800}
+tr:hover td{background:#1c140f}
+
+/* PILLS */
+.pill{display:inline-block;padding:3px 9px;border-radius:999px;font-size:11px;font-weight:800}
+.pill.gr{background:rgba(94,156,114,.18);color:var(--green2);border:1px solid rgba(94,156,114,.4)}
+.pill.rd{background:rgba(214,123,112,.15);color:#ff8070;border:1px solid rgba(214,123,112,.4)}
+.pill.gd{background:rgba(212,161,90,.15);color:var(--gold);border:1px solid rgba(212,161,90,.35)}
+.pill.gy{background:rgba(255,255,255,.08);color:#ccc;border:1px solid rgba(255,255,255,.15)}
+.pill.bl{background:rgba(176,122,69,.15);color:var(--blue);border:1px solid rgba(176,122,69,.35)}
+
+/* CUSTOMER CARDS */
+.cust-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-top:12px}
+.cust-card{
+  border:1px solid var(--line);border-radius:var(--r);background:#101010;
+  padding:14px;box-shadow:var(--shadow);position:relative;overflow:hidden;cursor:pointer;
+  transition:.14s;
+}
+.cust-card:hover{border-color:var(--gold3);background:#161010}
+.cust-card::before{content:"";position:absolute;left:0;top:0;width:5px;height:100%;background:#555}
+.cust-card.neu::before{background:#888}
+.cust-card.aktiv::before{background:var(--gold)}
+.cust-card.abgeschlossen::before{background:var(--green)}
+.cust-card.problem::before{background:var(--red2)}
+.cust-card h3{font-size:14.5px;font-weight:900;color:#f4ede4;padding-left:6px;margin-bottom:5px}
+.cust-meta{font-size:12px;color:var(--muted);line-height:1.5;padding-left:6px}
+
+/* AUFMASS */
+.room-block{border:1px solid var(--line);border-radius:var(--r2);padding:13px;margin:8px 0;background:#0d0a07}
+.room-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
+.thumbs{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.thumb{position:relative;width:90px;height:90px;border-radius:10px;overflow:hidden;border:1px solid var(--line);cursor:pointer;transition:.14s}
+.thumb:hover{border-color:var(--gold);transform:scale(1.04)}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.thumb .del-btn{position:absolute;top:3px;right:3px;background:rgba(0,0,0,.75);color:#fff;
+  border:none;border-radius:5px;width:20px;height:20px;cursor:pointer;font-size:12px;line-height:1;z-index:2}
+.thumb .zoom-hint{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.55);
+  color:#fff;font-size:10px;text-align:center;padding:2px;opacity:0;transition:.2s;pointer-events:none}
+.thumb:hover .zoom-hint{opacity:1}
+.cam-btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+
+/* ── LIGHTBOX ── */
+#lightbox{position:fixed;inset:0;background:rgba(0,0,0,.93);z-index:1000;display:none;
+  align-items:center;justify-content:center;flex-direction:column}
+#lightbox.open{display:flex}
+#lb-img{max-width:92vw;max-height:80vh;border-radius:10px;object-fit:contain;box-shadow:0 0 60px rgba(0,0,0,.8)}
+#lb-toolbar{display:flex;align-items:center;gap:14px;margin-top:14px}
+#lb-counter{color:var(--muted);font-size:13px;min-width:60px;text-align:center}
+#lb-caption{color:var(--sand-200,#e8dcc8);font-size:12px;margin-top:6px;text-align:center}
+.lb-btn{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;
+  padding:9px 16px;border-radius:10px;cursor:pointer;font-size:14px;transition:.15s}
+.lb-btn:hover{background:rgba(212,161,90,.25);border-color:var(--gold)}
+#lb-close{position:absolute;top:16px;right:20px;background:transparent;border:none;color:#fff;
+  font-size:28px;cursor:pointer;opacity:.7;line-height:1}
+#lb-close:hover{opacity:1}
+
+/* Leistungs-Bereich Aufmaß */
+.svc-panel{border:1px solid var(--gold3);border-radius:var(--r);padding:16px;margin-bottom:14px;
+  background:rgba(212,161,90,.04)}
+.svc-panel h3{color:var(--gold2);margin-bottom:10px}
+.svc-badge{display:inline-block;padding:3px 10px;border-radius:8px;font-size:12px;font-weight:800;
+  background:rgba(212,161,90,.18);color:var(--gold2);border:1px solid var(--gold3);margin-bottom:10px}
+.geraet-row{display:flex;gap:8px;align-items:center;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.geraet-row label{flex:1;font-size:13px;color:var(--text)}
+.geraet-row input[type=number]{width:70px;flex:0 0 70px;padding:6px 8px}
+
+/* PRINTABLE DOC */
+.doc-preview{background:#fff;color:#111;border-radius:var(--r2);padding:26px;margin-top:12px}
+.doc-preview h1,.doc-preview h2,.doc-preview h3{color:#111}
+.doc-preview table{background:#fff;color:#111;min-width:auto}
+.doc-preview th{background:#f0f0f0;color:#111;position:static}
+.doc-preview td,.doc-preview th{border:1px solid #ddd}
+
+/* MISC */
+.divider{height:1px;background:linear-gradient(90deg,transparent,var(--line),transparent);margin:14px 0}
+.out-box{white-space:pre-wrap;background:#0a0706;border:1px solid var(--line);border-radius:var(--r2);
+  padding:13px;color:#f4f4f4;line-height:1.5;min-height:80px}
+.warn-list{list-style:none;padding:0}
+.warn-list li{padding:7px 10px;border-radius:8px;margin:4px 0;font-size:13px;
+  background:rgba(212,161,90,.07);border-left:3px solid var(--gold)}
+.warn-list li.red-warn{background:rgba(214,123,112,.08);border-left-color:var(--red2)}
+.info-row{display:flex;align-items:center;gap:8px;font-size:12.5px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.info-row .lk{color:var(--muted);font-weight:800;min-width:140px}
+.bank-rule{display:flex;justify-content:space-between;padding:7px 10px;border-radius:8px;
+  background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);margin:4px 0;font-size:12px}
+.bank-rule b{color:var(--gold2)}
+.bank-rule span{color:var(--muted)}
+.drop-zone{border:2px dashed var(--gold3);border-radius:var(--r);padding:30px;text-align:center;
+  color:var(--muted);cursor:pointer;transition:.15s;background:rgba(212,161,90,.03)}
+.drop-zone:hover,.drop-zone.dragover{border-color:var(--gold);background:rgba(212,161,90,.07);color:var(--text)}
+.item-row{display:grid;grid-template-columns:2fr 80px 80px 110px 130px 36px;gap:8px;align-items:end;
+  border-bottom:1px solid rgba(255,255,255,.05);padding:7px 0}
+.item-row:last-child{border-bottom:none}
+.tag{display:inline-block;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:800}
+.tag.kunden{background:rgba(212,161,90,.2);color:var(--gold2)}
+.tag.personal{background:rgba(94,156,114,.2);color:var(--green2)}
+.tag.buch{background:rgba(176,122,69,.2);color:var(--blue)}
+.tag.bau{background:rgba(143,45,34,.2);color:var(--red2)}
+
+@media(max-width:900px){
+  .shell{grid-template-columns:1fr}
+  .sidebar{position:fixed;left:-260px;top:74px;height:calc(100vh - 74px);z-index:25;transition:.25s}
+  .sidebar.mobile-open{left:0}
+  .kpi-bar{grid-template-columns:1fr 1fr}
+  .fg.c4{grid-template-columns:1fr 1fr}
+  .fg.c3{grid-template-columns:1fr 1fr}
+}
+@media print{.sidebar,.topbar,.btn,.btn-row,.no-print{display:none!important}.content{padding:0}}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="brand">
+    <div class="brand-mark">V&amp;V</div>
+    <div class="brand-text">
+      <h1>Verlegt &amp; Verschraubt</h1>
+      <p>Lokales Firmen-Cockpit 2026 · Z.O.Z – Zuverlässig. Ordentlich. Zügig.</p>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <span class="top-save-info" id="saveInfo">–</span>
+    <button class="btn sm" onclick="doExport()">📦 Backup</button>
+    <button class="btn sm" onclick="document.getElementById('importFile').click()">📥 Import</button>
+    <input type="file" id="importFile" accept=".json" style="display:none" onchange="doImport(event)">
+    <button class="btn sm no-print" id="mobileMenu" onclick="document.querySelector('.sidebar').classList.toggle('mobile-open')" style="display:none">☰</button>
+  </div>
+</div>
+
+<div class="shell">
+<!-- ═══════════════════ SIDEBAR ═══════════════════ -->
+<aside class="sidebar">
+
+  <!-- ① KUNDENBEREICH -->
+  <div class="nav-group">
+    <div class="nav-group-header group-kunden" onclick="toggleGroup(this)">
+      <span class="grp-icon">👥</span><span class="grp-label">Kundenbereich</span><span class="grp-arrow">›</span>
+    </div>
+    <div class="nav-items open">
+      <button class="navbtn active" data-sec="dashboard">Dashboard <span class="badge" id="badgeDash">Start</span></button>
+      <button class="navbtn" data-sec="crm">Kunden-CRM <span class="badge" id="badgeCrm">0</span></button>
+      <button class="navbtn" data-sec="akte">Kundenkartei</button>
+      <button class="navbtn" data-sec="aufmass">Aufmaß-Tool <span class="badge" id="badgeAufmass">0</span></button>
+      <button class="navbtn" data-sec="angebote">Angebote <span class="badge" id="badgeOffers">0</span></button>
+      <button class="navbtn" data-sec="leads">Kundenanfragen <span class="badge" id="badgeLeads">0</span></button>
+      <button class="navbtn" data-sec="marketing">Marketing / KI</button>
+      <button class="navbtn" data-sec="agents">Agents / KI</button>
+    </div>
+  </div>
+
+  <!-- ② PERSONALBEREICH -->
+  <div class="nav-group">
+    <div class="nav-group-header group-personal" onclick="toggleGroup(this)">
+      <span class="grp-icon">🧑‍💼</span><span class="grp-label">Personalbereich</span><span class="grp-arrow">›</span>
+    </div>
+    <div class="nav-items">
+      <button class="navbtn" data-sec="calculator">Preisrechner</button>
+      <button class="navbtn" data-sec="materials">Material &amp; Werkzeug</button>
+      <button class="navbtn" data-sec="recurring">Fixkosten / Abos</button>
+      <button class="navbtn" data-sec="mileage">Fahrtenbuch</button>
+      <button class="navbtn" data-sec="settings">Firmendaten</button>
+      <button class="navbtn" data-sec="backup">Backup</button>
+    </div>
+  </div>
+
+  <!-- ③ BUCHHALTUNGSBEREICH -->
+  <div class="nav-group">
+    <div class="nav-group-header group-buchhaltung" onclick="toggleGroup(this)">
+      <span class="grp-icon">📊</span><span class="grp-label">Buchhaltungsbereich</span><span class="grp-arrow">›</span>
+    </div>
+    <div class="nav-items">
+      <button class="navbtn" data-sec="rechnungen">Rechnungen <span class="badge" id="badgeInv">0</span></button>
+      <button class="navbtn" data-sec="openitems">Offene Posten <span class="badge" id="badgeOpen">0</span></button>
+      <button class="navbtn" data-sec="bookkeeping">Buchhaltung</button>
+      <button class="navbtn" data-sec="banksync">Bank-CSV / Sync</button>
+    </div>
+  </div>
+
+  <!-- ④ BAUSTELLENBEREICH -->
+  <div class="nav-group">
+    <div class="nav-group-header group-baustelle" onclick="toggleGroup(this)">
+      <span class="grp-icon">🏗️</span><span class="grp-label">Baustellenbereich</span><span class="grp-arrow">›</span>
+    </div>
+    <div class="nav-items">
+      <button class="navbtn" data-sec="projekte">Baustellenplaner <span class="badge" id="badgeProj">0</span></button>
+      <button class="navbtn" data-sec="checkliste">Checkliste</button>
+    </div>
+  </div>
+
+</aside>
+
+<!-- ═══════════════════ CONTENT ═══════════════════ -->
+<main class="content" id="main">
+  <div class="panel"><p style="color:var(--muted)">Lade…</p></div>
+</main>
+</div>
+
+<script>
+"use strict";
+/* ==========================================================
+   DATEN & SPEICHER
+   ========================================================== */
+const STORE_KEY = "VV_COCKPIT_2026";
+let data = {
+  leads:[], customers:[], measurements:[], projects:[], mileage:[],
+  offers:[], invoices:[], bookings:[], openItems:[], materials:[], recurring:[],
+  marketingAssets:[]
+};
+let afmDraft = { customerId:"", newName:"", rooms:[] };
+
+function uid(){ return "id_" + Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+function today(){ return new Date().toISOString().slice(0,10); }
+function nowISO(){ return new Date().toISOString(); }
+function money(n){ return Number(n||0).toFixed(2).replace(".",",")+"\u00a0€"; }
+function r2(n){ return Math.round((Number(n)+Number.EPSILON)*100)/100; }
+function fmtDate(iso){ if(!iso)return"–"; try{return new Date(iso).toLocaleDateString("de-DE");}catch{return iso;} }
+function fmtDT(iso){ if(!iso)return"–"; try{return new Date(iso).toLocaleString("de-DE");}catch{return iso;} }
+function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+function val(id){ const e=document.getElementById(id); return e?e.value.trim():""; }
+function setVal(id,v){ const e=document.getElementById(id); if(e) e.value=v||""; }
+function byId(id){ return document.getElementById(id); }
+function parseNum(s){ const n=parseFloat(String(s).replace(",",".")); return isNaN(n)?0:n; }
+
+function normalizeData(){
+  ["leads","customers","measurements","projects","mileage","offers","invoices",
+   "bookings","openItems","materials","recurring","marketingAssets"].forEach(k=>{
+    if(!Array.isArray(data[k])) data[k]=[];
+  });
+}
+
+/* ══════════════════════════════════════════════════════════════
+   MIGRATION: Altes Backup-Format → neues Cockpit-Format
+   ══════════════════════════════════════════════════════════════ */
+function migrateOldData(d){
+  if(!d) return d;
+
+  // --- Kunden: Feldnamen + verschachtelte Daten extrahieren ---
+  const seenM=new Set((d.measurements||[]).map(m=>m.id));
+  const seenO=new Set((d.offers||[]).map(o=>o.id));
+  const seenI=new Set((d.invoices||[]).map(i=>i.id));
+  const seenOI=new Set((d.openItems||[]).map(o=>o.id));
+
+  (d.customers||[]).forEach(c=>{
+    // Felder mappen
+    if(c.contact && !c.phone) c.phone = c.contact;
+    if(c.place && !c.address) c.address = c.place;
+    if(c.next && !c.nextStep) c.nextStep = c.next;
+    if(c.currentStage && !c.nextStep) c.nextStep = c.currentStage;
+    if(c.status==="active") c.status="aktiv";
+    if(c.status==="done") c.status="abgeschlossen";
+    if(c.status==="problem") c.status="aktiv";
+    if(!c.createdAt && c.created) c.createdAt = c.created;
+    if(!c.updatedAt) c.updatedAt = c.createdAt || nowISO();
+
+    // Verschachtelte Aufmaße → Top-Level
+    (c.measurements||[]).forEach(m=>{
+      migrateRooms(m);
+      m.customerId = m.customerId || c.id;
+      m.customerName = m.customerName || c.name;
+      m.totalSkirting = m.totalPerimeter || m.totalSkirting || 0;
+      if(!m.createdAt && m.created) m.createdAt = m.created;
+      if(!seenM.has(m.id)){ d.measurements=d.measurements||[]; d.measurements.push(m); seenM.add(m.id); }
+    });
+
+    // Verschachtelte Angebote → Top-Level
+    (c.offers||[]).forEach(o=>{
+      o.customerId = o.customerId || c.id;
+      o.customerName = o.customer || o.customerName || c.name;
+      o.number = o.no || o.number;
+      o.address = o.address || o.place || c.address;
+      if(!seenO.has(o.id)){ d.offers=d.offers||[]; d.offers.push(o); seenO.add(o.id); }
+    });
+
+    // Verschachtelte Rechnungen → Top-Level
+    (c.invoices||[]).forEach(inv=>{
+      inv.customerId = inv.customerId || c.id;
+      inv.customerName = inv.customer || inv.customerName || c.name;
+      inv.number = inv.no || inv.number;
+      inv.address = inv.address || c.address;
+      inv.depositPaid = inv.depositPaid ?? inv.paid ?? 0;
+      inv.remaining = inv.remaining ?? (Number(inv.total||0) - Number(inv.depositPaid||0));
+      if(!seenI.has(inv.id)){ d.invoices=d.invoices||[]; d.invoices.push(inv); seenI.add(inv.id); }
+    });
+
+    // Verschachtelte offene Posten → Top-Level
+    (c.openItems||[]).forEach(oi=>{
+      migrateOpenItem(oi, c);
+      if(!seenOI.has(oi.id)){ d.openItems=d.openItems||[]; d.openItems.push(oi); seenOI.add(oi.id); }
+    });
+  });
+
+  // --- Top-Level Aufmaße: Räume/Fotos normalisieren ---
+  (d.measurements||[]).forEach(m=>{ migrateRooms(m); m.totalSkirting = m.totalPerimeter || m.totalSkirting || 0; });
+
+  // --- Top-Level Angebote ---
+  (d.offers||[]).forEach(o=>{
+    if(o.no && !o.number) o.number = o.no;
+    if(o.customer && !o.customerName) o.customerName = o.customer;
+    if(o.place && !o.address) o.address = o.place;
+  });
+
+  // --- Top-Level Rechnungen ---
+  (d.invoices||[]).forEach(inv=>{
+    if(inv.no && !inv.number) inv.number = inv.no;
+    if(inv.customer && !inv.customerName) inv.customerName = inv.customer;
+    inv.depositPaid = inv.depositPaid ?? inv.paid ?? 0;
+    inv.remaining = inv.remaining ?? (Number(inv.total||0) - Number(inv.depositPaid||0));
+  });
+
+  // --- Top-Level offene Posten ---
+  (d.openItems||[]).forEach(oi=>migrateOpenItem(oi));
+
+  // --- Buchungen ---
+  (d.bookings||[]).forEach(b=>{
+    if(b.amountSigned!==undefined && b.signedAmount===undefined) b.signedAmount = b.amountSigned;
+  });
+
+  return d;
+}
+
+function migrateRooms(m){
+  (m.rooms||[]).forEach(r=>{
+    // Fläche
+    if(r.manualArea!==undefined && r.areaOverride===undefined) r.areaOverride = r.manualArea || null;
+    if(r.area!==undefined && r.areaAuto===undefined) r.areaAuto = r.area || 0;
+    // Sockelleisten
+    if(r.perimeter!==undefined && r.skirtingLfm===undefined) r.skirtingLfm = r.perimeter;
+    if(r.manualSockel!==undefined && r.skirtingLfm===undefined) r.skirtingLfm = r.manualSockel;
+    // Fotos: data → dataUrl
+    (r.photos||[]).forEach(p=>{
+      if(p.data && !p.dataUrl) p.dataUrl = p.data;
+      if(p.name && !p.fileName) p.fileName = p.name;
+    });
+  });
+}
+
+function migrateOpenItem(oi, customer){
+  if(oi.customer && !oi.customerName) oi.customerName = oi.customer;
+  if(customer){ oi.customerId = oi.customerId || customer.id; oi.customerName = oi.customerName || customer.name; }
+  if(oi.offerId && !oi.sourceId){ oi.sourceType = "offer"; oi.sourceId = oi.offerId; }
+  if(oi.offerNo && !oi.reference) oi.reference = oi.offerNo;
+  if(oi.job && !oi.note) oi.note = oi.job;
+  if(oi.due && !oi.dueDate) oi.dueDate = oi.due;
+  oi.open = oi.open || r2(Number(oi.total||0) - Number(oi.paid||0));
+}
+
+function migrateSettings(s){
+  if(!s) return;
+  // Altes Format: flach {company:"...", mail:"..."} → sichern für loadSettingsFields
+  if(s.mail && !s.email) s.email = s.mail;
+  localStorage.setItem("VV_SETTINGS_2026", JSON.stringify(s));
+}
+
+/* ══════════════════════════════════════════════════════════════ */
+
+function saveAll(alert_=false){
+  normalizeData();
+  localStorage.setItem(STORE_KEY, JSON.stringify({data, savedAt:nowISO()}));
+  updateBadges(); updateKPIs();
+  byId("saveInfo").textContent = "Gespeichert: " + new Date().toLocaleTimeString("de-DE");
+  if(alert_) alert("Gespeichert.");
+}
+
+function loadAll(){
+  const raw = localStorage.getItem(STORE_KEY);
+  if(!raw){ normalizeData(); return; }
+  try{
+    const p = JSON.parse(raw);
+    if(p.data) data = p.data;
+    normalizeData();
+    migrateOldData(data);
+    if(p.settings) migrateSettings(p.settings);
+  }catch(e){ normalizeData(); }
+}
+
+/* ── BACKUP / IMPORT ───────────────────────────────────────
+   Alle zusammenführbaren Datensammlungen */
+const COLLECTION_KEYS = ["leads","customers","measurements","projects","mileage",
+  "offers","invoices","bookings","openItems","materials","recurring","marketingAssets"];
+
+/* Importmodus: "merge" (Standard) oder "replace" */
+let _importMode = "merge";
+let _lastImportLog = null;
+
+/* Export: vollständiges Backup inkl. Settings */
+function doExport(){
+  saveAll(false);
+  const settings = getSettings(); // enthält company, owner, address, phone, email, web, tax, iban, legal, taxReserve, optional api
+  const payload = { version:"VV_COCKPIT_2026", exportedAt:nowISO(), data, settings };
+  const d = new Date(), pad = n => String(n).padStart(2,"0");
+  const fn = `vv-cockpit-backup-${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}.json`;
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([JSON.stringify(payload,null,2)],{type:"application/json"}));
+  a.download = fn; a.click(); URL.revokeObjectURL(a.href);
+  try{ localStorage.setItem("VV_LAST_BACKUP", nowISO()); }catch{}
+  const info = byId("backupLastInfo"); if(info) info.textContent = "Letztes Backup: " + fmtDT(nowISO()) + " · " + fn;
+}
+
+/* Einen Array von Datensätzen mergen (nach id).
+   - neue id → hinzufügen
+   - gleiche id → nur aktualisieren, wenn imported.updatedAt neuer ist
+   - kein updatedAt im Import → vorhandenen Datensatz behalten */
+function mergeArray(target, incoming){
+  const map = new Map(target.map(r => [r.id, r]));
+  let added=0, updated=0, skipped=0; const touched=[];
+  (incoming||[]).forEach(item=>{
+    if(!item || typeof item!=="object") return;
+    if(!item.id) item.id = uid();
+    const ex = map.get(item.id);
+    if(!ex){ target.push(item); map.set(item.id,item); added++; touched.push(item.id); return; }
+    const exU = String(ex.updatedAt || ex.createdAt || "");
+    const inU = String(item.updatedAt || item.createdAt || "");
+    if(inU && inU > exU){ Object.assign(ex, item); updated++; touched.push(item.id); }
+    else { skipped++; }
+  });
+  return {added, updated, skipped, touched};
+}
+
+/* Settings mergen: vorhandene (lokale) Werte gewinnen, fehlende aus Import ergänzt */
+function mergeSettings(incoming){
+  if(!incoming) return;
+  if(incoming.mail && !incoming.email) incoming.email = incoming.mail;
+  let cur = {};
+  try{ cur = JSON.parse(localStorage.getItem("VV_SETTINGS_2026")||"{}") || {}; }catch{ cur = {}; }
+  const merged = Object.assign({}, incoming, cur); // lokale Werte gewinnen
+  localStorage.setItem("VV_SETTINGS_2026", JSON.stringify(merged));
+  loadSettingsFields();
+}
+
+function doImport(ev){
+  const file = ev.target.files[0]; if(!file) return;
+  const r = new FileReader();
+  r.onload = e => {
+    let parsed;
+    try{ parsed = JSON.parse(e.target.result); }
+    catch(err){ alert("Ungültiges Backup: "+err.message); ev.target.value=""; return; }
+    runImport(parsed, _importMode);
+    ev.target.value="";
+  };
+  r.readAsText(file);
+}
+
+/* Zentrale Importlogik – Merge oder Alles ersetzen */
+function runImport(parsed, mode){
+  // Eingehende Daten ins neue Format bringen (Altbackups: verschachtelte Daten → Top-Level)
+  let inc = (parsed && parsed.data) ? parsed.data : (parsed || {});
+  COLLECTION_KEYS.forEach(k=>{ if(!Array.isArray(inc[k])) inc[k]=[]; });
+  if(!Array.isArray(inc.bookings)) inc.bookings=[];
+  try{ migrateOldData(inc); }catch(err){ console.warn("Migration:",err); }
+
+  if(mode==="replace"){
+    if(!confirm("⚠️ ALLES ERSETZEN\n\nDer komplette aktuelle Bestand (Kunden, Aufmaße, Fotos, Angebote, Rechnungen, Buchungen …) wird ÜBERSCHRIEBEN und kann nicht wiederhergestellt werden.\n\nWirklich fortfahren?")){ return; }
+    if(!confirm("Letzte Sicherheitsabfrage:\n\nAlle vorhandenen Daten dieses Geräts werden durch das Backup ERSETZT.\n\nFortfahren?")){ return; }
+    data = inc;
+    normalizeData();
+    try{ migrateOldData(data); }catch{}
+    if(parsed.settings) migrateSettings(parsed.settings);
+    saveAll(false);
+    _lastImportLog = { mode:"replace", at:nowISO(),
+      customers:(data.customers||[]).length, measurements:(data.measurements||[]).length,
+      rooms:(data.measurements||[]).reduce((s,m)=>s+(m.rooms||[]).length,0),
+      photos:(data.measurements||[]).reduce((s,m)=>(m.rooms||[]).reduce((s2,r)=>s2+(r.photos||[]).length,s),0),
+      offers:(data.offers||[]).length, invoices:(data.invoices||[]).length,
+      bookings:(data.bookings||[]).length, updated:0, skipped:0 };
+    showImportResult();
+    return;
+  }
+
+  // ── MERGE ──
+  normalizeData();
+  const res = {};
+  COLLECTION_KEYS.forEach(k=>{ if(!Array.isArray(data[k])) data[k]=[]; res[k] = mergeArray(data[k], inc[k]||[]); });
+
+  // Räume + Fotos aus berührten (neuen/aktualisierten) Aufmaßen zählen
+  let roomsImp=0, photosImp=0;
+  const touchedM = new Set(res.measurements.touched);
+  (inc.measurements||[]).forEach(m=>{
+    if(touchedM.has(m.id)){ (m.rooms||[]).forEach(rm=>{ roomsImp++; photosImp += (rm.photos||[]).length; }); }
+  });
+
+  mergeSettings(parsed.settings);
+  saveAll(false);
+
+  const sum = (f)=> COLLECTION_KEYS.reduce((s,k)=>s+(res[k]?res[k][f]:0),0);
+  _lastImportLog = {
+    mode:"merge", at:nowISO(),
+    customers: res.customers.added, measurements: res.measurements.added,
+    rooms: roomsImp, photos: photosImp,
+    offers: res.offers.added, invoices: res.invoices.added,
+    bookings: res.bookings.added, openItems: res.openItems.added,
+    updated: sum("updated"), skipped: sum("skipped")
+  };
+  showImportResult();
+}
+
+function showImportResult(){
+  const l = _lastImportLog; if(!l) return;
+  const title = l.mode==="replace" ? "Import (Alles ersetzt)" : "Import (Zusammengeführt)";
+  alert(`${title} erfolgreich!\n\n`+
+    `Kunden importiert: ${l.customers}\n`+
+    `Aufmaße importiert: ${l.measurements}\n`+
+    `Räume importiert: ${l.rooms}\n`+
+    `Fotos importiert: ${l.photos}\n`+
+    `Angebote importiert: ${l.offers}\n`+
+    `Rechnungen importiert: ${l.invoices}\n`+
+    `Buchungen importiert: ${l.bookings}\n`+
+    (l.mode==="merge" ? `\nAktualisiert: ${l.updated}\nÜbersprungen: ${l.skipped}\n` : "") );
+  if(currentSection==="backup") showSection("backup");
+  else showSection("dashboard");
+}
+
+/* ==========================================================
+   FINANZLOGIK
+   ========================================================== */
+const TX_TYPES = ["Einnahme","Ausgabe","Privateinlage","Privatentnahme","Umbuchung","Storno/Widerruf","Autorisierung"];
+
+function classifyBooking(b){
+  const p = String(b.partner||b.name||"").toLowerCase();
+  const ref = String(b.reference||b.note||"").toLowerCase();
+  const blob = p + " " + ref;
+  const amt = Number(b.signedAmount||b.amount||0);
+
+  if(/autorisierung|vorgemerkt|pending/.test(blob)){
+    return {...b, type:"Autorisierung", dashboardRelevant:false, status:"geprüft"};
+  }
+  if(/justus(\s+jonas)?\s+brosch/.test(p) && amt>0){
+    return {...b, type:"Privateinlage", dashboardRelevant:false, status:"geprüft"};
+  }
+  if(/justus(\s+jonas)?\s+brosch/.test(p)){
+    return {...b, type:"Umbuchung", dashboardRelevant:false, status:"geprüft"};
+  }
+  if(/storno|widerruf|rücklastschrift|rückzahlung|erstattung|refund|chargeback/.test(blob)){
+    return {...b, type:"Storno/Widerruf", dashboardRelevant:false, status:"geprüft"};
+  }
+  if(/hagebau/.test(p)) return {...b, type:"Ausgabe", category:"Material", dashboardRelevant:true, status:"geprüft"};
+  if(/myhammer/.test(p)) return {...b, type:"Ausgabe", category:"Vermittlungsgebühr", dashboardRelevant:true, status:"geprüft"};
+  if(/check24/.test(p)) return {...b, type:"Ausgabe", category:"Vermittlungsgebühr", dashboardRelevant:true, status:"geprüft"};
+  if(/lidl|aldi|rewe|edeka/.test(p)) return {...b, type:"Privatentnahme", dashboardRelevant:false, status:"geprüft"};
+  if(/birgit\s+schmidt/.test(p)) return {...b, type:"Einnahme", category:"Kundenzahlung", dashboardRelevant:true, status:"geprüft"};
+
+  if(amt > 0) return {...b, type:"Einnahme", category:b.category||"Kundenzahlung prüfen", dashboardRelevant:true, status:"offen prüfen"};
+  return {...b, type:"Ausgabe", category:b.category||"Betriebsausgabe prüfen", dashboardRelevant:true, status:"offen prüfen"};
+}
+
+function computeFinance(){
+  const taxPct = Number(getSettings().taxReserve||35);
+  let income=0, expenses=0;
+  (data.bookings||[]).forEach(b=>{
+    if(!b.dashboardRelevant) return;
+    if(b.type==="Einnahme") income += Math.abs(Number(b.signedAmount||b.amount||0));
+    else if(b.type==="Ausgabe") expenses += Math.abs(Number(b.signedAmount||b.amount||0));
+  });
+  const profit = r2(income - expenses);
+  const tax = r2(profit>0 ? profit*taxPct/100 : 0);
+  const openSum = r2((data.openItems||[]).reduce((s,o)=>s+Number(o.open||0),0));
+  return {income:r2(income), expenses:r2(expenses), profit, tax, taxPct, profitAfterTax:r2(profit-tax), openSum};
+}
+
+function rebuildOpenItems(){
+  const prev = new Map((data.openItems||[]).map(o=>[o.sourceType+":"+o.sourceId, o]));
+  const out = [];
+  (data.offers||[]).forEach(o=>{
+    if(o.status!=="Angenommen") return;
+    if((data.invoices||[]).some(i=>i.offerId===o.id)) return;
+    const open = r2(Number(o.total||0)-Number(o.depositPaid||0));
+    if(open<=0) return;
+    const old = prev.get("offer:"+o.id)||{};
+    out.push({id:old.id||uid(), sourceType:"offer", sourceId:o.id,
+      customerId:o.customerId, customerName:o.customerName||"",
+      reference:o.number, total:r2(o.total||0), paid:r2(o.depositPaid||0),
+      open, dueDate:old.dueDate||"", status:old.status||"offen", note:old.note||""});
+  });
+  (data.invoices||[]).forEach(inv=>{
+    const open = r2(Number(inv.remaining??(Number(inv.total||0)-Number(inv.depositPaid||0))));
+    if(open<=0) return;
+    const old = prev.get("invoice:"+inv.id)||{};
+    out.push({id:old.id||uid(), sourceType:"invoice", sourceId:inv.id,
+      customerId:inv.customerId, customerName:inv.customerName||"",
+      reference:inv.number, total:r2(inv.total||0), paid:r2(inv.depositPaid||0),
+      open, dueDate:old.dueDate||"", status:old.status||"offen", note:old.note||""});
+  });
+  data.openItems = out;
+}
+
+function buildWarnings(){
+  const w = [];
+  (data.measurements||[]).forEach(m=>{
+    if(!(data.offers||[]).some(o=>o.customerId===m.customerId))
+      w.push({t:"Aufmaß ohne Angebot: "+esc(m.customerName||""),c:"gd"});
+  });
+  (data.offers||[]).forEach(o=>{
+    if(o.status==="Angenommen"&&!(data.invoices||[]).some(i=>i.offerId===o.id))
+      w.push({t:"Angenommenes Angebot ohne Rechnung: "+esc(o.number),c:"rd"});
+  });
+  (data.invoices||[]).forEach(inv=>{
+    const open=Number(inv.remaining??(Number(inv.total||0)-Number(inv.depositPaid||0)));
+    if(open>0&&inv.status!=="bezahlt") w.push({t:"Rechnung offen: "+esc(inv.number)+" ("+money(open)+")",c:"rd"});
+  });
+  const pruefen=(data.bookings||[]).filter(b=>String(b.status||"").includes("prüfen")).length;
+  if(pruefen) w.push({t:pruefen+" Buchung(en) zu prüfen",c:"gd"});
+  return w;
+}
+
+/* ==========================================================
+   NUMMERNKREISE
+   ========================================================== */
+function nextOfferNumber(){
+  const y = new Date().getFullYear();
+  const nums = (data.offers||[]).map(o=>{
+    const m=String(o.number||"").match(/VV-\d{4}-(\d+)/); return m?parseInt(m[1]):0;
+  });
+  const n = (nums.length?Math.max(...nums):0)+1;
+  return `VV-${y}-${String(n).padStart(3,"0")}`;
+}
+function nextInvoiceNumber(){
+  const y = new Date().getFullYear();
+  const nums = (data.invoices||[]).map(i=>{
+    const m=String(i.number||"").match(/\d{4}-(\d+)/); return m?parseInt(m[1]):0;
+  });
+  const n = (nums.length?Math.max(...nums):0)+1;
+  return `${y}-${String(n).padStart(3,"0")}`;
+}
+
+/* ==========================================================
+   SETTINGS
+   ========================================================== */
+const SETTINGS_DEFAULTS = {
+  company:"Verlegt & Verschraubt Handwerkerservice",
+  owner:"Justus Brosch",
+  address:"Weichselstraße 12, 26388 Wilhelmshaven",
+  phone:"0163 4799286",
+  email:"justus.brosch@verlegt-verschraubt.de",
+  web:"verlegt-verschraubt.de",
+  tax:"",
+  iban:"",
+  legal:"Gemäß § 19 UStG wird keine Umsatzsteuer berechnet.",
+  taxReserve:35
+};
+/* Zuordnung Einstellungsfeld → Settings-Schlüssel */
+const SETTINGS_FIELDMAP = {
+  setCompany:"company", setOwner:"owner", setAddress:"address", setPhone:"phone",
+  setMail:"email", setWeb:"web", setTax:"tax", setIban:"iban",
+  setLegal:"legal", setTaxReserve:"taxReserve"
+};
+
+/* getSettings():
+   1) feste Defaults
+   2) gespeicherte Settings aus localStorage VV_SETTINGS_2026
+   3) falls Einstellungsfelder im DOM existieren → deren aktuelle (nicht-leeren) Werte
+   Funktioniert auch, wenn die Einstellungsseite vorher NIE geöffnet wurde. */
+function getSettings(){
+  let stored = {};
+  try{ stored = JSON.parse(localStorage.getItem("VV_SETTINGS_2026")||"{}") || {}; }catch{ stored = {}; }
+  if(stored.mail && !stored.email) stored.email = stored.mail; // Altformat
+  const s = Object.assign({}, SETTINGS_DEFAULTS, stored);
+  // DOM-Felder nur übernehmen, wenn vorhanden UND nicht leer
+  Object.entries(SETTINGS_FIELDMAP).forEach(([id,k])=>{
+    const e = byId(id);
+    if(e){ const v = (e.value||"").trim(); if(v!=="") s[k] = v; }
+  });
+  s.taxReserve = Number(s.taxReserve);
+  if(!isFinite(s.taxReserve)) s.taxReserve = SETTINGS_DEFAULTS.taxReserve;
+  if(stored.api) s.api = stored.api; // optionale API-Einstellungen erhalten
+  return s;
+}
+function loadSettingsFields(){
+  const raw = localStorage.getItem("VV_SETTINGS_2026");
+  if(!raw) return;
+  try{
+    const s = JSON.parse(raw);
+    if(s.mail && s.email===undefined) s.email = s.mail;
+    Object.entries(SETTINGS_FIELDMAP).forEach(([id,k])=>{ if(s[k]!==undefined) setVal(id,s[k]); });
+  }catch{}
+}
+function saveSettings(){
+  localStorage.setItem("VV_SETTINGS_2026", JSON.stringify(getSettings()));
+  alert("Firmendaten gespeichert.");
+}
+
+/* ==========================================================
+   PREISKALKULATION
+   ========================================================== */
+const FLOOR_PRICES = {
+  "Laminat schwimmend":16,"PVC schwimmend":12,"PVC verklebt":15,
+  "Vinyl schwimmend":18,"Vinyl verklebt":22,"Teppich lose":10,"Teppich vollflächig":12
+};
+const REMOVAL_PRICES = {
+  "schwimmend":4,"Teppich lose":{p:7,min:120},"Teppich verklebt":{p:12,min:180}
+};
+
+function runCalculator(){
+  const area = parseNum(val("cArea")), skirt = parseNum(val("cSkirt")), km = parseNum(val("cKm"));
+  const floorKey = val("cFloor"), removalKey = val("cRemoval"), express = parseNum(val("cExpress"));
+  const klfm = parseNum(val("cKlfm")), mat = parseNum(val("cMat"));
+  const s = getSettings(), pr = FLOOR_PRICES[floorKey]||0;
+  const taxPct = Number(s.taxReserve||35);
+  const anfahrtFrei = 35, anfahrtRate = 0.7;
+
+  let labor = r2(area * pr);
+  const skirtRate = val("cSkirtType")==="gehrung"?7:5;
+  const skirtCost = r2(skirt * skirtRate);
+  const daemmung = byId("cDaemmung")&&byId("cDaemmung").checked ? r2(area*1.5) : 0;
+  const matService = mat>0 ? r2(Math.max(mat*0.15, 150)) : 0;
+  const anfahrt = km > anfahrtFrei ? r2((km-anfahrtFrei)*anfahrtRate) : 0;
+  let removal = 0;
+  if(removalKey==="schwimmend") removal = r2(area*4);
+  else if(removalKey==="Teppich lose") removal = r2(Math.max(area*7, 120));
+  else if(removalKey==="Teppich verklebt") removal = r2(Math.max(area*12, 180));
+  let kitchen = 0;
+  if(byId("cKmont")&&byId("cKmont").checked) kitchen += r2(klfm*189);
+  if(byId("cKdem")&&byId("cKdem").checked) kitchen += r2(klfm*100);
+  if(byId("cKplatte")&&byId("cKplatte").checked) kitchen += r2(klfm*119);
+  if(byId("cKents")&&byId("cKents").checked) kitchen += 350;
+
+  const subtotal = r2(labor+skirtCost+daemmung+matService+mat+anfahrt+removal+kitchen);
+  const expressAdd = r2(subtotal*express/100);
+  const total = r2(subtotal+expressAdd);
+  const tax = r2(total>0?total*taxPct/100:0);
+  const net = r2(total-tax);
+
+  byId("calcResult").innerHTML = `
+    <div class="fg c3" style="margin-top:14px">
+      <div class="kpi"><div class="k">Arbeitsleistung</div><div class="v">${money(labor+skirtCost+kitchen)}</div></div>
+      <div class="kpi"><div class="k">Material/Service</div><div class="v">${money(mat+matService+daemmung)}</div></div>
+      <div class="kpi"><div class="k">Entsorgung</div><div class="v">${money(removal)}</div></div>
+      <div class="kpi"><div class="k">Anfahrt + Express</div><div class="v">${money(anfahrt+expressAdd)}</div></div>
+      <div class="kpi"><div class="k" style="font-size:13px;font-weight:900">Gesamtpreis</div><div class="v gd" style="font-size:28px">${money(total)}</div></div>
+      <div class="kpi"><div class="k">${taxPct}% Steuerrücklage</div><div class="v rd">${money(tax)}</div></div>
+    </div>
+    <div class="kpi" style="margin-top:8px"><div class="k">Gewinn nach Steuerrücklage</div><div class="v gr" style="font-size:24px">${money(net)}</div></div>
+    <div class="btn-row"><button class="btn primary" onclick="saveCalcToOffer(${total})">→ Angebot erstellen</button></div>`;
+  window._lastCalc = {labor,skirtCost,daemmung,matService,mat,anfahrt,removal,kitchen,expressAdd,total,area,skirt,floorKey};
+}
+function saveCalcToOffer(total){
+  const c = window._lastCalc||{};
+  window._offerDraftFromCalc = {total, items:[
+    c.labor+c.skirtCost+c.kitchen>0 && {description:"Arbeitsleistung ("+esc(c.floorKey||"")+(c.skirt>0?", Sockelleisten":"")+")",qty:1,unit:"Pausch.",unitPrice:c.labor+c.skirtCost+c.kitchen},
+    c.mat+c.matService+c.daemmung>0 && {description:"Material/Service",qty:1,unit:"Pausch.",unitPrice:c.mat+c.matService+c.daemmung},
+    c.removal>0 && {description:"Altbelag entfernen",qty:1,unit:"Pausch.",unitPrice:c.removal},
+    c.anfahrt+c.expressAdd>0 && {description:"Anfahrt / Expresszuschlag",qty:1,unit:"Pausch.",unitPrice:c.anfahrt+c.expressAdd},
+  ].filter(Boolean)};
+  showSection("angebote");
+}
+
+/* ==========================================================
+   CSV BANK IMPORT
+   ========================================================== */
+function detectDelim(line){ const c={";":0,",":0,"\t":0};[...line].forEach(ch=>{if(c[ch]!==undefined)c[ch]++;}); return Object.entries(c).sort((a,b)=>b[1]-a[1])[0][0]||";"; }
+function parseAmt(s){ s=String(s||"").trim().replace(/€|\s/g,""); if(!s)return 0; const neg=s.startsWith("-")||(/\(.*\)/.test(s)); s=s.replace(/[()-]/g,""); if(s.includes(",")&&s.includes(".")){ if(s.lastIndexOf(",")>s.lastIndexOf(".")) s=s.replace(/\./g,"").replace(",","."); else s=s.replace(/,/g,""); } else if(s.includes(",")) s=s.replace(/\./g,"").replace(",","."); const n=parseFloat(s); return isNaN(n)?0:(neg?-n:n); }
+function parseCSVText(text, filename){
+  text = text.replace(/^\uFEFF/,"");
+  const lines = text.split(/\r?\n/).filter(l=>l.trim());
+  if(!lines.length) return {count:0,skipped:0,duplicates:0};
+  const delim = detectDelim(lines[0]);
+  const splitLine = l => { const out=[]; let cur="",q=false; for(const ch of l){ if(ch==='"'){if(q&&l[l.indexOf(ch)+1]==='"'){cur+='"';}else q=!q;}else if(ch===delim&&!q){out.push(cur.trim());cur="";}else cur+=ch;} out.push(cur.trim()); return out; };
+  const headers = splitLine(lines[0]).map(h=>h.toLowerCase());
+  const gi = cands => { const idx=headers.findIndex(h=>cands.some(c=>h.includes(c))); return idx; };
+  const iDate=gi(["buchungstag","datum","date","valuta"]), iPartner=gi(["auftragg","empfänger","empfaenger","name","beguenstig"]);
+  const iRef=gi(["verwendungszweck","reference","zweck","buchungstext"]), iAmt=gi(["betrag","amount","umsatz","wert"]);
+  const iType=gi(["umsatzart","buchungstext","art","type"]);
+  const existing = new Set((data.bookings||[]).map(b=>b._hash).filter(Boolean));
+  let count=0, dup=0;
+  for(let i=1;i<lines.length;i++){
+    const cols=splitLine(lines[i]); if(cols.every(c=>!c)) continue;
+    const amt=parseAmt(iAmt>=0?cols[iAmt]:"");
+    const b = {
+      id:uid(), _hash:"", date: iDate>=0?cols[iDate]:"", partner: iPartner>=0?cols[iPartner]:"",
+      reference: iRef>=0?cols[iRef]:"", amount:Math.abs(amt), signedAmount:amt,
+      transactionType: iType>=0?cols[iType]:"", source:filename||"CSV",
+      note:"", manual:false, dashboardRelevant:true, type:"Ausgabe", status:"offen prüfen"
+    };
+    b._hash = [b.date,b.signedAmount,(b.partner||"").toLowerCase(),(b.reference||"").slice(0,40)].join("|");
+    if(existing.has(b._hash)){ dup++; continue; }
+    existing.add(b._hash);
+    const classified = classifyBooking(b);
+    data.bookings.push(classified); count++;
+  }
+  return {count, skipped:0, duplicates:dup};
+}
+
+/* ==========================================================
+   DOKUMENT-RENDERER (Angebot / Rechnung)
+   ========================================================== */
+function priceCell(it){ if(it.priceMode==="nicht_enthalten")return"nicht enthalten"; if(it.priceMode==="auf_anfrage")return"auf Anfrage"; if(it.priceMode==="inklusive_0")return"0,00\u00a0€"; return money(it.unitPrice||0); }
+function totalCell(it){ if(["nicht_enthalten","auf_anfrage"].includes(it.priceMode))return priceCell(it); return money(it.lineTotal!=null?it.lineTotal:(Number(it.qty||0)*Number(it.unitPrice||0))); }
+function renderDocHTML(type, doc, customer){
+  const s=getSettings();
+  const total=Number(doc.total||0), dep=Number(doc.depositPaid||0), rem=Number(doc.remaining??(total-dep));
+  return `<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><title>${type} ${esc(doc.number||"")}</title><style>
+    @page{size:A4;margin:18mm 16mm}*{box-sizing:border-box}body{font-family:Georgia,serif;color:#111;background:#fff;margin:0;padding:0}
+    .wrap{max-width:800px;margin:0 auto;padding:24px}.head{display:flex;justify-content:space-between;padding-bottom:14px;border-bottom:2.5px solid #c8a24a}
+    .brand{font-size:23px;font-weight:900;letter-spacing:.3px}.brand small{display:block;font-size:11px;color:#7a6a4a;letter-spacing:1px;font-weight:400;margin-top:2px}
+    .company-info{text-align:right;font-size:11.5px;line-height:1.55;color:#444}
+    .doctype{font-size:26px;font-weight:900;margin:22px 0 4px}.meta{font-size:12px;color:#666;margin-bottom:12px}
+    .parties{display:flex;justify-content:space-between;margin:16px 0;font-size:13px}
+    .parties h4{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#8a7647;margin:0 0 4px}
+    table{width:100%;border-collapse:collapse;margin-top:10px;font-size:12.5px}
+    th{background:#f4efe5;border-bottom:1px solid #d8c7aa;padding:8px 7px;font-size:11px;text-transform:uppercase;letter-spacing:.4px;text-align:left}
+    td{padding:7px;border-bottom:1px solid #eee;vertical-align:top}
+    .num{text-align:right;white-space:nowrap}
+    .totals{margin-left:auto;width:280px;margin-top:12px}
+    .totals div{display:flex;justify-content:space-between;padding:4px 0;font-size:13px}
+    .totals .grand{border-top:2px solid #c8a24a;margin-top:6px;padding-top:8px;font-weight:900;font-size:16px}
+    .hinweis{margin-top:14px;padding:10px 12px;background:#faf7f0;border:1px solid #e7dcc4;font-size:11.5px;border-radius:6px}
+    .notes{margin-top:16px;font-size:12px;color:#444;line-height:1.6}
+    .foot{margin-top:28px;border-top:1px solid #ddd;padding-top:10px;font-size:10.5px;color:#888;display:flex;justify-content:space-between}
+    .noprint{text-align:center;padding:14px;background:#f9f9f9;border-bottom:1px solid #ddd}
+    .btn{background:#c8a24a;color:#111;border:none;padding:10px 20px;border-radius:8px;font-size:14px;cursor:pointer;font-weight:700}
+    @media print{.noprint{display:none}}
+  </style></head><body>
+  <div class="noprint"><button class="btn" onclick="window.print()">📄 Als PDF drucken / speichern</button></div>
+  <div class="wrap">
+    <div class="head">
+      <div class="brand">V&amp;V<small>VERLEGT &amp; VERSCHRAUBT</small></div>
+      <div class="company-info"><strong>${esc(s.company)}</strong><br>${esc(s.address)}<br>Tel. ${esc(s.phone)}<br>${esc(s.email)}<br>${esc(s.web)}${s.tax?"<br>St.-Nr. "+esc(s.tax):""}</div>
+    </div>
+    <div class="doctype">${type}</div>
+    <div class="meta">${type}-Nr.: <strong>${esc(doc.number||"")}</strong> &nbsp;·&nbsp; Datum: ${esc(doc.date||"")}${doc.serviceDate?" &nbsp;·&nbsp; Leistungsdatum: "+esc(doc.serviceDate):""}</div>
+    <div class="parties">
+      <div><h4>Kunde</h4>${esc(customer.name||"")}<br>${esc(customer.address||"")}${customer.phone?"<br>"+esc(customer.phone):""}${customer.email?"<br>"+esc(customer.email):""}</div>
+      <div style="text-align:right"><h4>Projekt</h4>${esc(doc.project||"Handwerkerleistung")}</div>
+    </div>
+    <table>
+      <thead><tr><th class="num">Pos.</th><th>Leistung</th><th class="num">Menge</th><th>Einheit</th><th class="num">Einzelpreis</th><th class="num">Gesamt</th></tr></thead>
+      <tbody>${(doc.items||[]).map((it,i)=>`<tr><td class="num">${i+1}</td><td>${esc(it.description||"")}</td><td class="num">${esc(it.qty??"")}</td><td>${esc(it.unit||"")}</td><td class="num">${priceCell(it)}</td><td class="num">${totalCell(it)}</td></tr>`).join("")}</tbody>
+    </table>
+    <div class="totals">
+      ${type==="RECHNUNG"?`<div><span>Gesamtbetrag</span><span>${money(total)}</span></div><div><span>Anzahlung (bereits gezahlt)</span><span>− ${money(dep)}</span></div><div class="grand"><span>Restbetrag</span><span>${money(rem)}</span></div>`:`<div class="grand"><span>Gesamtsumme</span><span>${money(total)}</span></div>`}
+    </div>
+    <div class="hinweis">${esc(s.legal||"Gemäß § 19 UStG wird keine Umsatzsteuer berechnet.")}</div>
+    ${doc.notes?`<div class="notes">${esc(doc.notes)}</div>`:""}
+    <div class="foot"><span>${esc(s.company)} · Inh. ${esc(s.owner)}</span><span>Z.O.Z – Zuverlässig. Ordentlich. Zügig.</span></div>
+  </div></body></html>`;
+}
+function openDoc(html){
+  const w=window.open("","_blank");
+  if(!w){alert("Pop-ups erlauben, um das Dokument zu öffnen.");return;}
+  w.document.write(html);w.document.close();
+}
+
+/* ==========================================================
+   AUFMASS
+   ========================================================== */
+/* ── AUFMASS ── */
+function resetAfmDraft(){
+  afmDraft={
+    customerId:"", newName:"", serviceType:"Bodenverlegung", rooms:[],
+    serviceData:{ /* Küche */ lfm:"", unterschraenke:"", haengeschraenke:"", hochschraenke:"",
+      geraete:{herd:0,backofen:0,kuehlschrank:0,geschirrspueler:0,waschmaschine:0,sonstige:""},
+      wasseranschluss:false, starkstrom:false, demontage:false, entsorgung:false,
+      arbeitsplatte:false, arbeitsplatte_lfm:"",
+      /* Entrümpelung */ raeume:"", volumen_m3:"", etage:"", aufzug:false,
+      grosse_moebelteile:"", haengeschraenke_entrue:"", sondermuell:false,
+      elektroschrott:false, teppiche:false, notizen:"" }
+  };
+}
+
+function addRoom(){
+  afmDraft.rooms.push({id:uid(),name:"",length:"",width:"",areaAuto:0,areaOverride:"",
+    skirtingLfm:"", bodenbelag:"Laminat schwimmend", altbelag:"", notes:"", photos:[]});
+  renderAfmRooms();
+}
+function delRoom(idx){ afmDraft.rooms.splice(idx,1); renderAfmRooms(); }
+function updateRoomField(idx,f,v){
+  if(afmDraft.rooms[idx]){
+    afmDraft.rooms[idx][f]=v;
+    if(f==="length"||f==="width") recalcRoomArea(idx);
+    refreshAfmTotals();
+  }
+}
+function updateServiceData(f,v){ afmDraft.serviceData[f]=v; }
+function updateGeraet(g,v){ afmDraft.serviceData.geraete[g]=parseInt(v)||0; }
+function recalcRoomArea(idx){
+  const r=afmDraft.rooms[idx]; r.areaAuto=r2(parseNum(r.length)*parseNum(r.width));
+  const el=byId(`r_auto_${idx}`); if(el) el.value=r.areaAuto.toFixed(2).replace(".",",");
+  refreshAfmTotals();
+}
+function refreshAfmTotals(){
+  const svc=afmDraft.serviceType;
+  let ta=0,ts=0;
+  afmDraft.rooms.forEach(r=>{ ta+=(r.areaOverride!==""&&r.areaOverride!=null)?parseNum(r.areaOverride):r.areaAuto; ts+=parseNum(r.skirtingLfm); });
+  const ea=byId("afmTotalArea"),es=byId("afmTotalSkirt");
+  if(ea) ea.textContent=svc==="Küchenmontage"?(parseNum(afmDraft.serviceData.lfm).toFixed(2).replace(".",",")+" lfm"):(ta.toFixed(2).replace(".",",")+" m²");
+  if(es) es.textContent=svc==="Entrümpelung & Entsorgung"?(parseNum(afmDraft.serviceData.volumen_m3).toFixed(2).replace(".",",")+" m³"):(ts.toFixed(2).replace(".",",")+" lfm");
+}
+function changeServiceType(v){
+  afmDraft.serviceType=v;
+  const sp=byId("svcSpecific"); if(sp) sp.innerHTML=renderSvcSpecific();
+  const rh=byId("roomsHeader");
+  if(rh) rh.innerHTML=`<h3 style="margin:0">Räume / Bereiche <span class="svc-badge">${esc(v)}</span></h3><button class="btn sm primary" onclick="addRoom()">+ Bereich / Raum</button>`;
+  renderAfmRooms(); refreshAfmTotals();
+}
+
+/* ── Leistungs-spezifische Felder ── */
+function renderSvcSpecific(){
+  const sd=afmDraft.serviceData, svc=afmDraft.serviceType;
+  if(svc==="Küchenmontage") return `
+    <div class="svc-panel">
+      <h3>📐 Küchenmontage – Aufmaß</h3>
+      <div class="fg c3">
+        <div><label class="lbl">Küchenzeile gesamt (lfm)</label><input id="sd_lfm" value="${esc(sd.lfm)}" inputmode="decimal" oninput="updateServiceData('lfm',this.value);refreshAfmTotals()"></div>
+        <div><label class="lbl">Anzahl Unterschränke</label><input id="sd_us" type="number" min="0" value="${sd.unterschraenke||0}" oninput="updateServiceData('unterschraenke',this.value)"></div>
+        <div><label class="lbl">Anzahl Hängeschränke</label><input id="sd_hs" type="number" min="0" value="${sd.haengeschraenke||0}" oninput="updateServiceData('haengeschraenke',this.value)"></div>
+      </div>
+      <div class="fg c2" style="margin-top:0">
+        <div><label class="lbl">Anzahl Hochschränke</label><input type="number" min="0" value="${sd.hochschraenke||0}" oninput="updateServiceData('hochschraenke',this.value)"></div>
+        <div></div>
+      </div>
+      <h3 style="margin-top:12px">🔌 Geräte einbauen / anschließen</h3>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:8px">⚡ Starkstrom-/Elektroarbeiten nur durch zugelassene Elektrofachfirma! Normaler Geräte-Anschluss (Kühlschrank, Geschirrspüler etc.) im zulässigen Rahmen.</div>
+      ${[["herd","Herd / Kochfeld"],["backofen","Backofen (Einbau)"],["kuehlschrank","Kühlschrank"],["geschirrspueler","Geschirrspüler"],["waschmaschine","Waschmaschine"]].map(([g,l])=>`
+        <div class="geraet-row"><label>${l}</label><input type="number" min="0" value="${sd.geraete[g]||0}" oninput="updateGeraet('${g}',this.value)" style="width:70px"></div>`).join("")}
+      <div class="geraet-row"><label>Sonstige Geräte (Bezeichnung)</label><input value="${esc(sd.geraete.sonstige||"")}" oninput="updateGeraet('sonstige',this.value)" placeholder="z. B. Dampfgarer, Weinkühlschrank" style="max-width:280px"></div>
+      <h3 style="margin-top:12px">📋 Zusatzinfos</h3>
+      <div class="fg c2">
+        <div>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:6px 0">
+            <input type="checkbox" ${sd.wasseranschluss?"checked":""} style="width:auto" onchange="updateServiceData('wasseranschluss',this.checked)"> Wasseranschluss herstellen / prüfen</label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:6px 0">
+            <input type="checkbox" ${sd.starkstrom?"checked":""} style="width:auto" onchange="updateServiceData('starkstrom',this.checked)"> Starkstromprüfung benötigt (Elektriker)
+            ${sd.starkstrom?'<span style="color:var(--red2);font-size:11px"> → separat beauftragen!</span>':""}</label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:6px 0">
+            <input type="checkbox" ${sd.demontage?"checked":""} style="width:auto" onchange="updateServiceData('demontage',this.checked)"> Alte Küche demontieren</label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:6px 0">
+            <input type="checkbox" ${sd.entsorgung?"checked":""} style="width:auto" onchange="updateServiceData('entsorgung',this.checked)"> Alte Küche entsorgen</label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:6px 0">
+            <input type="checkbox" ${sd.arbeitsplatte?"checked":""} style="width:auto" onchange="updateServiceData('arbeitsplatte',this.checked)"> Arbeitsplatte tauschen</label>
+          ${sd.arbeitsplatte?`<div class="fg c2" style="margin-top:4px"><div><label class="lbl">Arbeitsplatte lfm</label><input value="${esc(sd.arbeitsplatte_lfm)}" inputmode="decimal" oninput="updateServiceData('arbeitsplatte_lfm',this.value)"></div><div></div></div>`:""}
+        </div>
+        <div></div>
+      </div>
+    </div>`;
+  if(svc==="Entrümpelung & Entsorgung") return `
+    <div class="svc-panel">
+      <h3>🗑️ Entrümpelung & Entsorgung – Aufmaß</h3>
+      <div class="fg c3">
+        <div><label class="lbl">Anzahl Räume</label><input type="number" min="0" value="${sd.raeume||0}" oninput="updateServiceData('raeume',this.value)"></div>
+        <div><label class="lbl">Geschätztes Volumen (m³)</label><input value="${esc(sd.volumen_m3)}" inputmode="decimal" oninput="updateServiceData('volumen_m3',this.value);refreshAfmTotals()" placeholder="z. B. 15"></div>
+        <div><label class="lbl">Etage</label><input type="number" min="0" value="${sd.etage||0}" oninput="updateServiceData('etage',this.value)" placeholder="EG = 0"></div>
+      </div>
+      <div class="fg c2">
+        <div>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:6px 0">
+            <input type="checkbox" ${sd.aufzug?"checked":""} style="width:auto" onchange="updateServiceData('aufzug',this.checked)"> Aufzug vorhanden</label>
+        </div>
+        <div></div>
+      </div>
+      <h3 style="margin-top:10px">📦 Inhalt</h3>
+      <div class="fg c3">
+        <div><label class="lbl">Große Möbelstücke (Schränke, Sofas …)</label><input type="number" min="0" value="${sd.grosse_moebelteile||0}" oninput="updateServiceData('grosse_moebelteile',this.value)"></div>
+        <div><label class="lbl">Hängeschränke</label><input type="number" min="0" value="${sd.haengeschraenke_entrue||0}" oninput="updateServiceData('haengeschraenke_entrue',this.value)"></div>
+        <div></div>
+      </div>
+      <div class="fg c2" style="margin-top:4px">
+        <div>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:6px 0">
+            <input type="checkbox" ${sd.sondermuell?"checked":""} style="width:auto" onchange="updateServiceData('sondermuell',this.checked)"> Sondermüll / Gefahrstoffe vorhanden</label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:6px 0">
+            <input type="checkbox" ${sd.elektroschrott?"checked":""} style="width:auto" onchange="updateServiceData('elektroschrott',this.checked)"> Elektroschrott vorhanden</label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:6px 0">
+            <input type="checkbox" ${sd.teppiche?"checked":""} style="width:auto" onchange="updateServiceData('teppiche',this.checked)"> Teppiche / Vorhänge zum Entfernen</label>
+        </div>
+        <div></div>
+      </div>
+      <label class="lbl" style="margin-top:10px">Zusätzliche Infos / was genau wird entrümpelt</label>
+      <textarea oninput="updateServiceData('notizen',this.value)" placeholder="z. B. Wohnzimmer komplett + Keller …">${esc(sd.notizen||"")}</textarea>
+    </div>`;
+  /* Bodenverlegung: Felder direkt in den Räumen */
+  return "";
+}
+
+/* ── Raum-Editor (per Raum) ── */
+function renderAfmRooms(){
+  const el=byId("afmRooms"); if(!el) return;
+  const svc=afmDraft.serviceType;
+  el.innerHTML=afmDraft.rooms.map((r,i)=>`
+    <div class="room-block">
+      <div class="room-head">
+        <input value="${esc(r.name)}" placeholder="${svc==="Küchenmontage"?"Küchenbereich / Wand":"Raumname"}" style="max-width:55%" oninput="updateRoomField(${i},'name',this.value)">
+        <button class="btn red sm" onclick="delRoom(${i})">Bereich löschen</button>
+      </div>
+      ${svc==="Bodenverlegung"?`
+      <div class="fg c4">
+        <div><label class="lbl">Länge (m)</label><input value="${esc(r.length)}" inputmode="decimal" oninput="updateRoomField(${i},'length',this.value)"></div>
+        <div><label class="lbl">Breite (m)</label><input value="${esc(r.width)}" inputmode="decimal" oninput="updateRoomField(${i},'width',this.value)"></div>
+        <div><label class="lbl">Fläche auto (m²)</label><input id="r_auto_${i}" value="${r.areaAuto.toFixed(2).replace(".",",")}" disabled></div>
+        <div><label class="lbl">Fläche manuell</label><input value="${esc(r.areaOverride)}" inputmode="decimal" oninput="updateRoomField(${i},'areaOverride',this.value)" placeholder="(leer = auto)"></div>
+      </div>
+      <div class="fg c3">
+        <div><label class="lbl">Bodenbelag</label><select onchange="updateRoomField(${i},'bodenbelag',this.value)">${["Laminat schwimmend","PVC schwimmend","PVC verklebt","Vinyl schwimmend","Vinyl verklebt","Teppich lose","Teppich vollflächig","Linoleum","Sonstiges"].map(b=>`<option ${r.bodenbelag===b?"selected":""}>${b}</option>`).join("")}</select></div>
+        <div><label class="lbl">Altbelag</label><select onchange="updateRoomField(${i},'altbelag',this.value)">${["– kein –","schwimmend (4 €/m²)","Teppich lose (7 €/m²)","Teppich verklebt (12 €/m²)","auf Anfrage"].map(b=>`<option ${r.altbelag===b?"selected":""}>${b}</option>`).join("")}</select></div>
+        <div><label class="lbl">Sockelleisten (lfm)</label><input value="${esc(r.skirtingLfm)}" inputmode="decimal" oninput="updateRoomField(${i},'skirtingLfm',this.value)"></div>
+      </div>`:""}
+      ${svc==="Küchenmontage"?`
+      <div class="fg c3">
+        <div><label class="lbl">Lfm dieser Wand</label><input value="${esc(r.length)}" inputmode="decimal" oninput="updateRoomField(${i},'length',this.value)"></div>
+        <div><label class="lbl">Anzahl Schränke hier</label><input type="number" min="0" value="${esc(r.width||0)}" oninput="updateRoomField(${i},'width',this.value)"></div>
+        <div></div>
+      </div>`:""}
+      ${svc==="Entrümpelung & Entsorgung"?`
+      <div class="fg c3">
+        <div><label class="lbl">Raumname / Bereich</label><input value="${esc(r.notes)}" oninput="updateRoomField(${i},'notes',this.value)" placeholder="z. B. Keller Abteil 2"></div>
+        <div><label class="lbl">Geschätzte m³ in diesem Bereich</label><input value="${esc(r.areaOverride)}" inputmode="decimal" oninput="updateRoomField(${i},'areaOverride',this.value)"></div>
+        <div></div>
+      </div>`:""}
+      <div><label class="lbl">Besonderheiten</label><input value="${esc(r.notes)}" oninput="updateRoomField(${i},'notes',this.value)" placeholder="Notizen zu diesem Bereich"></div>
+      <!-- FOTO-BUTTONS -->
+      <div class="cam-btns">
+        <button type="button" class="btn sm primary" onclick="byId('cam_${i}').click()">📷 Kamera</button>
+        <button type="button" class="btn sm ghost" onclick="byId('gal_${i}').click()">🖼️ Galerie</button>
+        <span style="color:var(--muted);font-size:12px;align-self:center">${r.photos.length} Foto${r.photos.length!==1?"s":""}</span>
+      </div>
+      <input type="file" id="cam_${i}" accept="image/*" capture="environment" multiple style="display:none" onchange="handleRoomPhotos(${i},this.files);this.value=''">
+      <input type="file" id="gal_${i}" accept="image/*" multiple style="display:none" onchange="handleRoomPhotos(${i},this.files);this.value=''">
+      <div class="thumbs" id="thumbs_${i}">${thumbsHTML(i)}</div>
+    </div>`).join("");
+  bindThumbClicks(); refreshAfmTotals();
+}
+
+/* ── Foto-Handling ── */
+function compressImage(file,max=1200,q=0.65){
+  return new Promise(res=>{
+    const rd=new FileReader();
+    rd.onload=()=>{
+      const img=new Image();
+      img.onload=()=>{
+        let{width:w,height:h}=img;
+        if(w>h&&w>max){h=Math.round(h*max/w);w=max;}
+        else if(h>max){w=Math.round(w*max/h);h=max;}
+        const cv=document.createElement("canvas");cv.width=w;cv.height=h;
+        cv.getContext("2d").drawImage(img,0,0,w,h);
+        res(cv.toDataURL("image/jpeg",q));
+      };
+      img.onerror=()=>res(rd.result);
+      img.src=rd.result;
+    };
+    rd.readAsDataURL(file);
+  });
+}
+async function handleRoomPhotos(idx,files){
+  for(const f of Array.from(files||[])){
+    const dataUrl=await compressImage(f);
+    afmDraft.rooms[idx].photos.push({id:uid(),fileName:f.name||("foto-"+Date.now()+".jpg"),dataUrl});
+  }
+  const box=byId(`thumbs_${idx}`);
+  if(box){box.innerHTML=thumbsHTML(idx);bindThumbClicks();}
+  // Foto-Zähler updaten
+  const btn=box&&box.parentElement&&box.parentElement.querySelector(".cam-btns span");
+  if(btn) btn.textContent=afmDraft.rooms[idx].photos.length+" Foto(s)";
+}
+function delPhoto(ridx,pidx){
+  afmDraft.rooms[ridx].photos.splice(pidx,1);
+  const box=byId(`thumbs_${ridx}`);
+  if(box){box.innerHTML=thumbsHTML(ridx);bindThumbClicks();}
+}
+
+function thumbsHTML(ridx){
+  return (afmDraft.rooms[ridx].photos||[]).map((p,pi)=>`
+    <div class="thumb" onclick="openLightbox(${ridx},${pi})">
+      <img src="${esc(p.dataUrl)}" loading="lazy" alt="${esc(p.fileName||"")}">
+      <button class="del-btn" type="button" data-ridx="${ridx}" data-pidx="${pi}" onclick="event.stopPropagation();delPhoto(${ridx},${pi})">×</button>
+      <div class="zoom-hint">🔍 Vergrößern</div>
+    </div>`).join("");
+}
+function bindThumbClicks(){
+  // Löschen-Buttons (werden inline über onclick gebunden, aber hier absichern)
+  document.querySelectorAll(".del-btn").forEach(b=>{
+    b.addEventListener("click",e=>{ e.stopPropagation(); });
+  });
+}
+
+/* ── LIGHTBOX ── */
+let _lbRidx=0, _lbPidx=0;
+function openLightbox(ridx,pidx){
+  _lbRidx=ridx; _lbPidx=pidx;
+  const lb=byId("lightbox"); if(!lb)return;
+  lb.classList.add("open");
+  renderLightboxImage();
+}
+function renderLightboxImage(){
+  const photos=afmDraft.rooms[_lbRidx]?.photos||[];
+  if(!photos.length){closeLightbox();return;}
+  _lbPidx=Math.max(0,Math.min(_lbPidx,photos.length-1));
+  const p=photos[_lbPidx];
+  const img=byId("lb-img");if(img){img.src=p.dataUrl;img.alt=p.fileName||"";}
+  const ctr=byId("lb-counter");if(ctr)ctr.textContent=`${_lbPidx+1} / ${photos.length}`;
+  const cap=byId("lb-caption");if(cap)cap.textContent=p.fileName||"";
+  // Pfeile: alle Räume zusammen für Navigation innerhalb eines Raums
+}
+function lbPrev(){
+  const photos=afmDraft.rooms[_lbRidx]?.photos||[];
+  if(_lbPidx>0){_lbPidx--;renderLightboxImage();}
+}
+function lbNext(){
+  const photos=afmDraft.rooms[_lbRidx]?.photos||[];
+  if(_lbPidx<photos.length-1){_lbPidx++;renderLightboxImage();}
+}
+function closeLightbox(){ const lb=byId("lightbox");if(lb)lb.classList.remove("open"); }
+function downloadCurrentPhoto(){
+  const p=afmDraft.rooms[_lbRidx]?.photos[_lbPidx];
+  if(!p)return;
+  const a=document.createElement("a");
+  a.href=p.dataUrl;
+  a.download=p.fileName||("vv-foto-"+Date.now()+".jpg");
+  a.click();
+}
+
+/* ── Aufmaß speichern ── */
+function saveAfmass(){
+  const selCid=val("afmCustomer"), newName=val("afmNewName");
+  const svc=afmDraft.serviceType;
+  if(svc==="Bodenverlegung"&&!afmDraft.rooms.length){alert("Bitte mindestens einen Raum anlegen.");return;}
+  let c;
+  if(selCid){ c=data.customers.find(x=>x.id===selCid); }
+  else if(newName){ c={id:uid(),name:newName,status:"aktiv",phone:"",email:"",address:"",note:"",service:svc,source:"",createdAt:nowISO(),updatedAt:nowISO()}; data.customers.push(c); }
+  if(!c){alert("Bitte Kunden wählen oder neuen Namen eintragen.");return;}
+  let ta=0,ts=0;
+  const rooms=afmDraft.rooms.map(r=>{
+    const a=(r.areaOverride!==""&&r.areaOverride!=null)?parseNum(r.areaOverride):r.areaAuto;
+    ta+=a; ts+=parseNum(r.skirtingLfm);
+    return {id:uid(),name:r.name||"Bereich",length:parseNum(r.length),width:parseNum(r.width),
+      areaAuto:r.areaAuto,areaOverride:r.areaOverride===""?null:parseNum(r.areaOverride),
+      skirtingLfm:parseNum(r.skirtingLfm),bodenbelag:r.bodenbelag||"",altbelag:r.altbelag||"",
+      notes:r.notes,photos:r.photos};
+  });
+  data.measurements.push({id:uid(),customerId:c.id,customerName:c.name,
+    serviceType:svc,serviceData:JSON.parse(JSON.stringify(afmDraft.serviceData)),
+    rooms,totalArea:r2(ta),totalSkirting:r2(ts),createdAt:nowISO(),updatedAt:nowISO()});
+  saveAll(false); resetAfmDraft();
+  alert("Aufmaß gespeichert! Tipp: jetzt Backup exportieren (📦 oben rechts).");
+  showSection("akte");
+}
+
+/* ==========================================================
+   ITEM-EDITOR (für Angebote und Rechnungen)
+   ========================================================== */
+let _itemContainer = null;
+function initItems(containerId, initial){
+  _itemContainer = containerId;
+  const el=byId(containerId); if(!el) return;
+  el.innerHTML="";
+  (initial||[]).forEach((it,i)=>addItemRow(containerId,it));
+}
+function addItemRow(containerId, it){
+  it=it||{description:"",qty:"",unit:"Pausch.",unitPrice:"",priceMode:"betrag"};
+  const el=byId(containerId); if(!el) return;
+  const idx = el.children.length;
+  const d=document.createElement("div"); d.className="item-row";
+  d.innerHTML=`
+    <div><label class="lbl">Leistung</label><input data-f="description" value="${esc(it.description||"")}" oninput="calcLineTotal(this)"></div>
+    <div><label class="lbl">Menge</label><input data-f="qty" value="${esc(it.qty??"")}" inputmode="decimal" oninput="calcLineTotal(this)"></div>
+    <div><label class="lbl">Einheit</label><input data-f="unit" value="${esc(it.unit||"Pausch.")}"></div>
+    <div><label class="lbl">Preis (€)</label><input data-f="unitPrice" value="${esc(it.unitPrice??"")}" inputmode="decimal" oninput="calcLineTotal(this)"></div>
+    <div><label class="lbl">Modus</label><select data-f="priceMode">${[["betrag","Betrag"],["inklusive_0","0,00 €"],["nicht_enthalten","nicht enthalten"],["auf_anfrage","auf Anfrage"]].map(([v,l])=>`<option value="${v}" ${it.priceMode===v?"selected":""}>${l}</option>`).join("")}</select></div>
+    <button type="button" class="btn red sm" style="align-self:flex-end;margin-bottom:2px" onclick="this.closest('.item-row').remove()">×</button>`;
+  el.appendChild(d);
+}
+function calcLineTotal(inp){}
+function getItems(containerId){
+  return [...byId(containerId).querySelectorAll(".item-row")].map(row=>{
+    const g=f=>{ const el=row.querySelector(`[data-f="${f}"]`); return el?el.value:""; };
+    const qty=parseNum(g("qty")),up=parseNum(g("unitPrice")),pm=g("priceMode");
+    return {description:g("description"),qty:g("qty")?qty:"",unit:g("unit"),unitPrice:up,priceMode:pm||"betrag",lineTotal:r2(qty*up)};
+  });
+}
+function sumItems(items){ return r2(items.filter(it=>!["nicht_enthalten","auf_anfrage"].includes(it.priceMode)).reduce((s,it)=>s+Number(it.lineTotal||0),0)); }
+
+/* ==========================================================
+   BADGE-UPDATE
+   ========================================================== */
+function updateBadges(){
+  normalizeData();
+  const s=(id,n)=>{ const e=byId(id); if(e) e.textContent=n; };
+  s("badgeCrm", data.customers.length);
+  s("badgeAufmass", data.measurements.length);
+  s("badgeOffers", data.offers.length);
+  s("badgeLeads", data.leads.length);
+  s("badgeInv", data.invoices.length);
+  s("badgeOpen", data.openItems.length);
+  s("badgeProj", data.projects.length);
+}
+function updateKPIs(){
+  const fin=computeFinance();
+  const s=(id,v,cls)=>{ const e=byId(id); if(!e)return; e.textContent=v; if(cls)e.className="v "+cls; };
+  s("kpiIncome",money(fin.income),"gr"); s("kpiExpenses",money(fin.expenses),"rd");
+  s("kpiProfit",money(fin.profit),""); s("kpiTax",money(fin.tax),"gd");
+  s("kpiOpen",money(fin.openSum),"gd");
+}
+
+/* ==========================================================
+   SEKTION-ROUTER
+   ========================================================== */
+let currentSection = "dashboard";
+
+function showSection(id){
+  const main = byId("main"); if(!main) return;
+  currentSection = id;
+  // nav badges update
+  document.querySelectorAll(".navbtn").forEach(b=>{ b.classList.toggle("active", b.dataset.sec===id); });
+  normalizeData(); rebuildOpenItems(); updateBadges(); updateKPIs();
+  main.innerHTML = renderSection(id);
+  afterRender(id);
+}
+
+function renderSection(id){
+  switch(id){
+    case "dashboard":    return renderDashboard();
+    case "crm":          return renderCRM();
+    case "akte":         return renderAkte();
+    case "aufmass":      return renderAufmass();
+    case "angebote":     return renderAngebote();
+    case "leads":        return renderLeads();
+    case "marketing":    return renderMarketing();
+    case "agents":       return renderAgents();
+    case "backup":       return renderBackup();
+    case "calculator":   return renderCalculator();
+    case "materials":    return renderMaterials();
+    case "recurring":    return renderRecurring();
+    case "mileage":      return renderMileage();
+    case "settings":     return renderSettings();
+    case "rechnungen":   return renderRechnungen();
+    case "openitems":    return renderOpenItems();
+    case "bookkeeping":  return renderBookkeeping();
+    case "banksync":     return renderBankSync();
+    case "projekte":     return renderProjekte();
+    case "checkliste":   return renderCheckliste();
+    case "crm_detail":   return renderCRMDetail(currentDetailId);
+    default: return `<div class="panel"><h2>${esc(id)}</h2><p class="sub">Sektion wird geladen…</p></div>`;
+  }
+}
+
+function afterRender(id){
+  if(id==="aufmass"){ renderAfmRooms(); bindThumbClicks(); }
+  if(id==="settings"){ loadSettingsFields(); }
+  if(id==="backup"){ const rb=byId("impMode_"+_importMode); if(rb) rb.checked=true; }
+  if(id==="agents"){ agSyncKey(); }
+  if(id==="angebote"&&window._offerDraftFromCalc){ openNewOfferForm(window._offerDraftFromCalc); window._offerDraftFromCalc=null; }
+}
+
+/* ==========================================================
+   1) DASHBOARD
+   ========================================================== */
+function renderDashboard(){
+  const fin=computeFinance(), w=buildWarnings(), d=data;
+  const lastBk=[...d.bookings].sort((a,b)=>String(b.date).localeCompare(String(a.date))).slice(0,6);
+  return `
+  <div class="kpi-bar">
+    <div class="kpi"><div class="k">Einnahmen</div><div class="v gr" id="kpiIncome">${money(fin.income)}</div></div>
+    <div class="kpi"><div class="k">Ausgaben</div><div class="v rd" id="kpiExpenses">${money(fin.expenses)}</div></div>
+    <div class="kpi"><div class="k">Gewinn</div><div class="v" id="kpiProfit">${money(fin.profit)}</div></div>
+    <div class="kpi"><div class="k">${fin.taxPct}% Steuerrücklage</div><div class="v gd" id="kpiTax">${money(fin.tax)}</div></div>
+    <div class="kpi"><div class="k">Offene Posten</div><div class="v gd" id="kpiOpen">${money(fin.openSum)}</div></div>
+  </div>
+  <div class="fg c4" style="margin-bottom:14px">
+    <div class="kpi"><div class="k">Kunden</div><div class="v">${d.customers.length}</div></div>
+    <div class="kpi"><div class="k">Aufmaße</div><div class="v">${d.measurements.length}</div></div>
+    <div class="kpi"><div class="k">Angebote</div><div class="v">${d.offers.length}</div></div>
+    <div class="kpi"><div class="k">Rechnungen</div><div class="v">${d.invoices.length}</div></div>
+  </div>
+  ${w.length?`<div class="panel"><h3>⚠️ Warnungen</h3><ul class="warn-list">${w.map(x=>`<li class="${x.c==="rd"?"red-warn":""}">${x.t}</li>`).join("")}</ul></div>`:""}
+  <div class="panel">
+    <h3>Letzte Buchungen</h3>
+    ${lastBk.length?`<div class="tablewrap"><table><thead><tr><th>Datum</th><th>Partner</th><th>Typ</th><th>Betrag</th><th>Status</th></tr></thead><tbody>${lastBk.map(b=>`<tr><td>${esc(b.date||"")}</td><td>${esc(b.partner||"")}</td><td>${esc(b.type||"")}</td><td>${money(b.signedAmount||b.amount||0)}</td><td>${esc(b.status||"")}</td></tr>`).join("")}</tbody></table></div>`:'<p style="color:var(--muted)">Noch keine Buchungen. Bank-CSV importieren unter Buchhaltungsbereich → Bank-CSV / Sync.</p>'}
+  </div>
+  <div class="panel">
+    <h3>Schnellstart</h3>
+    <div class="btn-row">
+      <button class="btn primary" onclick="showSection('aufmass')">📐 Aufmaß</button>
+      <button class="btn primary" onclick="showSection('crm')">👤 Neuer Kunde</button>
+      <button class="btn" onclick="showSection('angebote')">📋 Angebot</button>
+      <button class="btn" onclick="showSection('calculator')">🔢 Preisrechner</button>
+      <button class="btn" onclick="doExport()">📦 Backup</button>
+    </div>
+  </div>`;
+}
+
+/* ==========================================================
+   2) KUNDEN-CRM
+   ========================================================== */
+let _crmSearch="", currentDetailId=null;
+function renderCRM(){
+  const list = data.customers.filter(c=>!_crmSearch||[c.name,c.phone,c.address,c.service].some(v=>String(v||"").toLowerCase().includes(_crmSearch)));
+  return `<div class="panel">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+      <div><h2>Kunden-CRM</h2><p class="sub">Alle Kunden · Klick auf Karte = Akte öffnen</p></div>
+      <button class="btn primary" onclick="openCrmForm()">+ Neuer Kunde</button>
+    </div>
+    <input placeholder="Suche (Name, Telefon, Ort …)" oninput="_crmSearch=this.value.toLowerCase();renderCRMList()" style="max-width:340px;margin:10px 0">
+    <div class="cust-grid" id="crmList">${custCards(list)}</div>
+    <div id="crmForm"></div>
+  </div>`;
+}
+function custCards(list){
+  if(!list.length) return `<p style="color:var(--muted)">Keine Kunden gefunden.</p>`;
+  return list.map(c=>`
+    <div class="cust-card ${esc(c.status||"neu")}" onclick="openAkte('${c.id}')">
+      <h3>${esc(c.name||"Ohne Name")}</h3>
+      <div class="cust-meta">
+        ${c.phone?`📞 ${esc(c.phone)}<br>`:""}
+        ${c.service?`🔧 ${esc(c.service)}<br>`:""}
+        ${c.address?`📍 ${esc(c.address)}<br>`:""}
+        <span class="pill ${c.status==="abgeschlossen"?"gr":c.status==="aktiv"?"gd":"gy"}">${esc(c.status||"neu")}</span>
+        ${c.nextStep?`<br>➡ ${esc(c.nextStep)}`:""}
+      </div>
+    </div>`).join("");
+}
+function renderCRMList(){ const el=byId("crmList"); if(el){ const list=data.customers.filter(c=>!_crmSearch||[c.name,c.phone,c.address,c.service].some(v=>String(v||"").toLowerCase().includes(_crmSearch))); el.innerHTML=custCards(list); } }
+function openCrmForm(c){
+  c=c||{};
+  const el=byId("crmForm"); if(!el) return;
+  el.innerHTML=`<div class="panel" style="margin-top:14px"><h3>${c.id?"Kunde bearbeiten":"Neuer Kunde"}</h3>
+    <input type="hidden" id="cf_id" value="${esc(c.id||"")}">
+    <div class="fg c2">
+      <div><label class="lbl">Name *</label><input id="cf_name" value="${esc(c.name||"")}"></div>
+      <div><label class="lbl">Telefon</label><input id="cf_phone" value="${esc(c.phone||"")}"></div>
+    </div>
+    <div class="fg c2">
+      <div><label class="lbl">E-Mail</label><input id="cf_email" value="${esc(c.email||"")}"></div>
+      <div><label class="lbl">Dienstleistung</label><input id="cf_service" value="${esc(c.service||"")}" placeholder="z. B. Bodenverlegung"></div>
+    </div>
+    <div class="fg c2">
+      <div><label class="lbl">Adresse</label><input id="cf_address" value="${esc(c.address||"")}"></div>
+      <div><label class="lbl">Quelle</label><input id="cf_source" value="${esc(c.source||"")}" placeholder="MyHammer, Empfehlung …"></div>
+    </div>
+    <div class="fg c2">
+      <div><label class="lbl">Status</label><select id="cf_status">${["neu","kontaktiert","aktiv","abgeschlossen","inaktiv"].map(s=>`<option ${(c.status||"neu")===s?"selected":""}>${s}</option>`).join("")}</select></div>
+      <div><label class="lbl">Nächster Schritt</label><input id="cf_next" value="${esc(c.nextStep||"")}"></div>
+    </div>
+    <div><label class="lbl">Notiz</label><textarea id="cf_note">${esc(c.note||"")}</textarea></div>
+    <div class="btn-row">
+      ${c.id?`<button class="btn red" onclick="deleteCustomer('${c.id}')">Löschen</button>`:""}
+      <button class="btn ghost" onclick="byId('crmForm').innerHTML=''">Abbrechen</button>
+      <button class="btn primary" onclick="saveCustomer()">Speichern</button>
+    </div></div>`;
+}
+function saveCustomer(){
+  const id=val("cf_id"); const name=val("cf_name");
+  if(!name){alert("Name ist Pflicht.");return;}
+  const fields={name,phone:val("cf_phone"),email:val("cf_email"),service:val("cf_service"),address:val("cf_address"),source:val("cf_source"),status:val("cf_status"),nextStep:val("cf_next"),note:val("cf_note"),updatedAt:nowISO()};
+  if(id){ Object.assign(data.customers.find(c=>c.id===id)||{},fields); }
+  else { data.customers.push({id:uid(),createdAt:nowISO(),...fields}); }
+  saveAll(false); showSection("crm");
+}
+function deleteCustomer(id){ if(!confirm("Diesen Kunden wirklich löschen?"))return; data.customers=data.customers.filter(c=>c.id!==id); saveAll(false); showSection("crm"); }
+
+/* ==========================================================
+   3) KUNDENKARTEI / AKTE
+   ========================================================== */
+let _akteTab="uebersicht";
+function openAkte(id){ currentDetailId=id; _akteTab="uebersicht"; showSection("crm_detail"); }
+function renderAkte(){
+  const list=data.customers.slice().sort((a,b)=>(a.name||"").localeCompare(b.name||""));
+  return `<div class="panel"><h2>Kundenkartei</h2><p class="sub">Klicke auf einen Kunden, um die Akte zu öffnen.</p>
+    <div class="tablewrap"><table><thead><tr><th>Name</th><th>Dienstleistung</th><th>Status</th><th>Nächster Schritt</th><th>Aufmaße</th></tr></thead><tbody>${
+    list.map(c=>`<tr style="cursor:pointer" onclick="openAkte('${c.id}')"><td><b>${esc(c.name)}</b></td><td>${esc(c.service||"–")}</td><td><span class="pill gy">${esc(c.status||"neu")}</span></td><td>${esc(c.nextStep||"–")}</td><td>${data.measurements.filter(m=>m.customerId===c.id).length}</td></tr>`).join("")
+    }</tbody></table></div>
+  </div>`;
+}
+function renderCRMDetail(id){
+  const c=data.customers.find(x=>x.id===id);
+  if(!c) return `<div class="panel"><p>Kunde nicht gefunden.</p><button class="btn" onclick="showSection('akte')">Zurück</button></div>`;
+  const tabs=[["uebersicht","Übersicht"],["aufmass","Aufmaß & Fotos"],["angebote","Angebote"],["rechnungen","Rechnungen"],["verlauf","Verlauf"]];
+  const ms=data.measurements.filter(m=>m.customerId===id);
+  const os=data.offers.filter(o=>o.customerId===id);
+  const is=data.invoices.filter(i=>i.customerId===id);
+  let body="";
+  if(_akteTab==="uebersicht") body=`
+    <div class="fg c2">
+      <div><div class="info-row"><span class="lk">Telefon</span>${esc(c.phone||"–")}</div>
+        <div class="info-row"><span class="lk">E-Mail</span>${esc(c.email||"–")}</div>
+        <div class="info-row"><span class="lk">Adresse</span>${esc(c.address||"–")}</div>
+        <div class="info-row"><span class="lk">Dienstleistung</span>${esc(c.service||"–")}</div>
+        <div class="info-row"><span class="lk">Status</span><span class="pill gy">${esc(c.status||"neu")}</span></div>
+        <div class="info-row"><span class="lk">Quelle</span>${esc(c.source||"–")}</div>
+        <div class="info-row"><span class="lk">Nächster Schritt</span>${esc(c.nextStep||"–")}</div>
+      </div>
+      <div><div class="info-row"><span class="lk">Notiz</span>${esc(c.note||"–")}</div></div>
+    </div>
+    <div class="btn-row"><button class="btn" onclick="openCrmForm(data.customers.find(x=>x.id==='${id}'));showSection('crm')">Bearbeiten</button>
+      <button class="btn primary" onclick="afmDraft.customerId='${id}';showSection('aufmass')">Aufmaß anlegen</button></div>`;
+  else if(_akteTab==="aufmass") body=ms.length?ms.map(m=>`
+    <div style="border:1px solid var(--line);border-radius:var(--r2);padding:13px;margin:8px 0;background:#0d0a07">
+      <b>Aufmaß vom ${fmtDate(m.createdAt)}</b> · ${m.totalArea?.toFixed(2)||0} m² · ${m.totalSkirting?.toFixed(2)||0} lfm
+      ${(m.rooms||[]).map(r=>`
+        <div style="margin:8px 0 4px;padding-left:10px;border-left:2px solid var(--gold3)">
+          <b>${esc(r.name||"Raum")}</b> – ${((r.areaOverride??r.areaAuto)||0).toFixed(2)} m² – ${(r.skirtingLfm||0)} lfm
+          ${r.notes?`<span style="color:var(--muted)"> · ${esc(r.notes)}</span>`:""}
+          ${(r.photos||[]).length?`<div class="thumbs">${(r.photos||[]).map(p=>`<div class="thumb"><img src="${esc(p.dataUrl)}" loading="lazy"></div>`).join("")}</div>`:""}
+        </div>`).join("")}
+    </div>`).join("") : `<p style="color:var(--muted)">Kein Aufmaß. <button class="btn sm" onclick="afmDraft.customerId='${id}';showSection('aufmass')">Aufmaß anlegen</button></p>`;
+  else if(_akteTab==="angebote") body=os.length?offerTableHTML(os):'<p style="color:var(--muted)">Keine Angebote.</p>';
+  else if(_akteTab==="rechnungen") body=is.length?invoiceTableHTML(is):'<p style="color:var(--muted)">Keine Rechnungen.</p>';
+  else body=`<p style="color:var(--muted)">Verlauf kommt in Kürze.</p>`;
+
+  return `<div class="panel">
+    <button class="btn ghost sm" onclick="showSection('akte')">← Kundenkartei</button>
+    <h2 style="margin-top:10px">${esc(c.name)}</h2>
+    <p class="sub">Kunde seit ${fmtDate(c.createdAt)}</p>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;margin:10px 0">
+      ${tabs.map(([tid,tl])=>`<button class="btn ${_akteTab===tid?"primary":"ghost"} sm" onclick="_akteTab='${tid}';showSection('crm_detail')">${tl}</button>`).join("")}
+    </div>
+    ${body}
+  </div>`;
+}
+
+/* ==========================================================
+   4) AUFMASS
+   ========================================================== */
+function renderAufmass(){
+  const custOpts=data.customers.slice().sort((a,b)=>(a.name||"").localeCompare(b.name||"")).map(c=>`<option value="${c.id}" ${afmDraft.customerId===c.id?"selected":""}>${esc(c.name)}</option>`).join("");
+  const svc=afmDraft.serviceType||"Bodenverlegung";
+  const totalLabel=svc==="Küchenmontage"?"Küchenzeile (lfm)":svc==="Entrümpelung & Entsorgung"?"Volumen (m³)":"Gesamtfläche (m²)";
+  const totalLabel2=svc==="Entrümpelung & Entsorgung"?"Räume":svc==="Küchenmontage"?"Bereiche":"Sockelleisten (lfm)";
+  return `<div class="panel">
+    <h2>📐 Aufmaß-Tool</h2>
+    <p class="sub">Räume/Bereiche erfassen, Fotos aufnehmen → Backup exportieren → am PC importieren.</p>
+    <div class="fg c2" style="margin-bottom:12px">
+      <div><label class="lbl">Bestehender Kunde</label><select id="afmCustomer" onchange="afmDraft.customerId=this.value"><option value="">– neuer Kunde –</option>${custOpts}</select></div>
+      <div><label class="lbl">… oder neuer Kundenname</label><input id="afmNewName" value="${esc(afmDraft.newName||"")}" oninput="afmDraft.newName=this.value" placeholder="Name eintragen"></div>
+    </div>
+    <div style="margin-bottom:12px">
+      <label class="lbl">Leistungsart</label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        ${["Bodenverlegung","Küchenmontage","Entrümpelung & Entsorgung"].map(s=>`
+          <label style="display:flex;align-items:center;gap:7px;padding:9px 14px;border:1px solid ${svc===s?"var(--gold)":"var(--line)"};border-radius:10px;cursor:pointer;background:${svc===s?"rgba(212,161,90,.12)":"transparent"};font-weight:${svc===s?"900":"400"}">
+            <input type="radio" name="afmSvc" value="${s}" ${svc===s?"checked":""} style="width:auto" onchange="changeServiceType(this.value)"> ${s}</label>`).join("")}
+      </div>
+    </div>
+  </div>
+  <!-- Leistungs-spezifische Felder -->
+  <div id="svcSpecific">${renderSvcSpecific()}</div>
+  <!-- Räume/Bereiche -->
+  <div class="panel">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px" id="roomsHeader">
+      <h3 style="margin:0">Räume / Bereiche <span class="svc-badge">${esc(svc)}</span></h3>
+      <button class="btn sm primary" onclick="addRoom()">+ Bereich / Raum</button>
+    </div>
+    <div id="afmRooms"></div>
+    ${afmDraft.rooms.length===0?`<p style="color:var(--muted);margin-top:8px">Noch keine Räume/Bereiche. „+ Bereich / Raum" klicken.</p>`:""}
+    <div class="divider"></div>
+    <div class="fg c2" style="margin-top:4px">
+      <div><span style="color:var(--muted);font-size:12px">${totalLabel}</span><div style="font-size:26px;font-weight:900;color:#f4ede4" id="afmTotalArea">0,00</div></div>
+      <div><span style="color:var(--muted);font-size:12px">${totalLabel2}</span><div style="font-size:26px;font-weight:900;color:#f4ede4" id="afmTotalSkirt">0,00</div></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn ghost" onclick="if(confirm('Aufmaß verwerfen?')){resetAfmDraft();showSection('aufmass');}">Verwerfen</button>
+      <button class="btn primary" onclick="saveAfmass()">✓ Aufmaß speichern</button>
+    </div>
+  </div>`;
+}
+
+/* ==========================================================
+   5) ANGEBOTE
+   ========================================================== */
+let _editingOfferId = null;
+function renderAngebote(){
+  const list=data.offers.slice().sort((a,b)=>String(b.createdAt||"").localeCompare(String(a.createdAt||"")));
+  return `<div class="panel">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+      <div><h2>Angebote</h2><p class="sub">Nummernkreis: VV-YYYY-001</p></div>
+      <button class="btn primary" onclick="openNewOfferForm()">+ Neues Angebot</button>
+    </div>
+    ${list.length?`<div class="tablewrap"><table><thead><tr><th>Nr.</th><th>Kunde</th><th>Datum</th><th>Gesamt</th><th>Status</th><th>Aktionen</th></tr></thead><tbody>${offerTableHTML(list)}</tbody></table></div>`:'<p style="color:var(--muted);margin-top:10px">Noch keine Angebote. Tipp: über den Preisrechner direkt erstellen.</p>'}
+    <div id="offerFormArea"></div>
+  </div>`;
+}
+function offerTableHTML(list){
+  return list.map(o=>`<tr><td><b>${esc(o.number||"")}</b></td><td>${esc(o.customerName||"")}</td><td>${esc(o.date||"")}</td><td>${money(o.total||0)}</td>
+    <td><span class="pill ${o.status==="Angenommen"?"gr":o.status==="Abgelehnt"?"rd":"gd"}">${esc(o.status||"Entwurf")}</span></td>
+    <td><button class="btn sm ghost" onclick="printOffer('${o.id}')">PDF</button>
+        <button class="btn sm" onclick="editOffer('${o.id}')">Bearbeiten</button>
+        <button class="btn sm green" onclick="acceptOffer('${o.id}')">✓ Angenommen</button>
+        <button class="btn sm red" onclick="deleteOffer('${o.id}')">×</button></td></tr>`).join("");
+}
+function openNewOfferForm(draft){
+  _editingOfferId=null;
+  const custOpts=data.customers.slice().sort((a,b)=>(a.name||"").localeCompare(b.name||"")).map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join("");
+  const el=byId("offerFormArea")||byId("main"); if(!el)return;
+  el.insertAdjacentHTML("beforeend",`<div class="panel" id="offerForm" style="margin-top:14px">
+    <h3>Neues Angebot</h3>
+    <div class="fg c3">
+      <div><label class="lbl">Kunde</label><select id="of_cust"><option value="">– wählen –</option>${custOpts}</select></div>
+      <div><label class="lbl">Datum</label><input id="of_date" type="date" value="${today()}"></div>
+      <div><label class="lbl">Status</label><select id="of_status">${["Entwurf","Gesendet","Angenommen","Abgelehnt"].map(s=>`<option>${s}</option>`).join("")}</select></div>
+    </div>
+    <div><label class="lbl">Projekt / Bezeichnung</label><input id="of_project" placeholder="z. B. Bodenverlegung Wohnzimmer"></div>
+    <h3>Positionen</h3>
+    <div id="of_items"></div>
+    <button class="btn sm" onclick="addItemRow('of_items')">+ Position</button>
+    <div><label class="lbl" style="margin-top:10px">Hinweise</label><textarea id="of_notes"></textarea></div>
+    <div class="btn-row">
+      <button class="btn ghost" onclick="byId('offerForm').remove()">Abbrechen</button>
+      <button class="btn primary" onclick="saveOffer()">Speichern</button>
+    </div></div>`);
+  initItems("of_items", draft?draft.items:[]);
+  if(draft&&draft.total) byId("of_notes").value="Angebot erstellt aus Preisrechner.";
+}
+function editOffer(id){
+  _editingOfferId=id;
+  const o=data.offers.find(x=>x.id===id);if(!o)return;
+  const custOpts=data.customers.slice().sort((a,b)=>(a.name||"").localeCompare(b.name||"")).map(c=>`<option value="${c.id}" ${o.customerId===c.id?"selected":""}>${esc(c.name)}</option>`).join("");
+  const el=byId("offerFormArea"); if(!el) return;
+  el.innerHTML=`<div class="panel" id="offerForm" style="margin-top:14px">
+    <h3>Angebot ${esc(o.number)} bearbeiten</h3>
+    <div class="fg c3">
+      <div><label class="lbl">Kunde</label><select id="of_cust"><option value="">– wählen –</option>${custOpts}</select></div>
+      <div><label class="lbl">Datum</label><input id="of_date" type="date" value="${esc(o.date||today())}"></div>
+      <div><label class="lbl">Status</label><select id="of_status">${["Entwurf","Gesendet","Angenommen","Abgelehnt"].map(s=>`<option ${o.status===s?"selected":""}>${s}</option>`).join("")}</select></div>
+    </div>
+    <div><label class="lbl">Projekt</label><input id="of_project" value="${esc(o.project||"")}"></div>
+    <h3>Positionen</h3><div id="of_items"></div>
+    <button class="btn sm" onclick="addItemRow('of_items')">+ Position</button>
+    <div><label class="lbl" style="margin-top:10px">Hinweise</label><textarea id="of_notes">${esc(o.notes||"")}</textarea></div>
+    <div class="btn-row"><button class="btn ghost" onclick="byId('offerForm').remove()">Abbrechen</button><button class="btn primary" onclick="saveOffer()">Speichern</button></div></div>`;
+  initItems("of_items", o.items||[]);
+}
+function saveOffer(){
+  const id=_editingOfferId; const cid=val("of_cust"); const c=data.customers.find(x=>x.id===cid);
+  const items=getItems("of_items"); const total=sumItems(items);
+  const base={customerId:cid,customerName:c?c.name:"",date:val("of_date"),status:val("of_status"),project:val("of_project"),notes:val("of_notes"),items,total,updatedAt:nowISO()};
+  if(id){ Object.assign(data.offers.find(o=>o.id===id)||{},base); }
+  else { data.offers.push({id:uid(),number:nextOfferNumber(),depositPaid:0,createdAt:nowISO(),...base}); }
+  _editingOfferId=null; saveAll(false); showSection("angebote");
+}
+function acceptOffer(id){ const o=data.offers.find(x=>x.id===id);if(!o)return; o.status="Angenommen";o.updatedAt=nowISO(); saveAll(false); showSection("angebote"); }
+function deleteOffer(id){ if(!confirm("Angebot löschen?"))return; data.offers=data.offers.filter(o=>o.id!==id); saveAll(false); showSection("angebote"); }
+function printOffer(id){
+  const o=data.offers.find(x=>x.id===id);if(!o)return;
+  const c=data.customers.find(x=>x.id===o.customerId)||{name:o.customerName||""};
+  openDoc(renderDocHTML("ANGEBOT",o,c));
+}
+
+/* ==========================================================
+   6) KUNDENANFRAGEN / LEADS
+   ========================================================== */
+function renderLeads(){
+  const list=data.leads||[];
+  return `<div class="panel">
+    <h2>Kundenanfragen</h2><p class="sub">Anfrage analysieren → Rückfragen & Antwortvorschlag automatisch generieren</p>
+    <div class="fg c2">
+      <div><label class="lbl">Name / Quelle</label><input id="leadName" placeholder="z. B. Max Müller – MyHammer"></div>
+      <div><label class="lbl">Status</label><select id="leadStatus"><option>offen</option><option>beantwortet</option><option>abgelehnt</option><option>Auftrag erhalten</option></select></div>
+    </div>
+    <div><label class="lbl">Anfragetext (aus Nachricht einfügen)</label><textarea id="leadText" rows="5" placeholder="Hallo, wir benötigen eine neue Küche …"></textarea></div>
+    <div class="btn-row">
+      <button class="btn primary" onclick="analyzeLead()">🔍 Analysieren</button>
+      <button class="btn" onclick="saveLead()">Anfrage speichern</button>
+    </div>
+    <div id="leadAnalysis" class="out-box" style="margin-top:12px"></div>
+  </div>
+  ${list.length?`<div class="panel"><h3>Gespeicherte Anfragen (${list.length})</h3><div class="tablewrap"><table><thead><tr><th>Datum</th><th>Name</th><th>Status</th><th>Vorschau</th><th></th></tr></thead><tbody>${
+    list.map(l=>`<tr><td>${esc(l.date||"")}</td><td>${esc(l.name||"")}</td><td><span class="pill gy">${esc(l.status||"")}</span></td><td>${esc((l.text||"").slice(0,80))}…</td><td><button class="btn red sm" onclick="deleteLead('${l.id}')">×</button></td></tr>`).join("")
+  }</tbody></table></div></div>`:""}`;
+}
+function analyzeLead(){
+  const text=val("leadText"), t=text.toLowerCase();
+  const services=[];
+  if(/küche|kueche|ikea|spüle|arbeitsplatte|herd|backofen|geschirrspüler/.test(t)) services.push("Küchenmontage");
+  if(/laminat|vinyl|boden|sockelleisten|leisten|pvc/.test(t)) services.push("Bodenverlegung");
+  if(/umzug|transport|tragen|abbau|aufbau/.test(t)) services.push("Umzugshilfe");
+  if(/entsorgung|entrümpelung|demontage/.test(t)) services.push("Entrümpelung & Entsorgung");
+  const risks=[];
+  if(/herd|starkstrom|elektr/.test(t)) risks.push("⚡ Elektro/Starkstrom nur über Elektrofachfirma!");
+  if(/wasser|spüle|anschluss/.test(t)) risks.push("🔧 Wasseranschluss prüfen, Fotos anfordern.");
+  if(/etage|aufzug/.test(t)) risks.push("🏠 Etage/Aufzug für Preis unbedingt klären.");
+  if(/sofort|heute|morgen|dringend/.test(t)) risks.push("⏰ Dringlichkeit: Aufpreis/Verfügbarkeit kommunizieren.");
+  const service=services.length?services.join(", "):"Allgemeine Handwerksanfrage";
+  byId("leadAnalysis").textContent=`Erkannte Leistung: ${service}\n\nRisiken / Hinweise:\n${risks.length?risks.join("\n"):"Keine besonderen Risiken erkannt – trotzdem Fotos/Maße anfordern."}\n\nAntwortvorschlag:\nSchönen guten Tag,\n\nvielen Dank für Ihre Anfrage zur ${service}. Grundsätzlich können wir das gerne für Sie übernehmen.\n\nDamit ich Ihnen ein faires Angebot machen kann, bräuchte ich bitte noch ein paar Fotos, den genauen Einsatzort sowie die Etage und kurze Infos, ob Material und alle benötigten Teile bereits vor Ort sind.\n\nWichtig: Starkstrom-/Elektroarbeiten erfolgen ausschließlich über eine Elektrofachfirma.\n\nMit freundlichen Grüßen\n${getSettings().owner}\n${getSettings().company}`;
+}
+function saveLead(){ data.leads.unshift({id:uid(),date:today(),name:val("leadName"),status:val("leadStatus"),text:val("leadText"),analysis:byId("leadAnalysis")?.textContent||""}); saveAll(false); showSection("leads"); }
+function deleteLead(id){ if(!confirm("Anfrage löschen?"))return; data.leads=data.leads.filter(l=>l.id!==id); saveAll(false); showSection("leads"); }
+
+/* ==========================================================
+   7) MARKETING / KI
+   ========================================================== */
+function renderMarketing(){
+  const s=getSettings(), hist=data.marketingAssets||[];
+  return `<div class="panel">
+    <h2>Marketing / KI</h2><p class="sub">Lokale Vorlagen für Google, Facebook, Kleinanzeigen, Keywords, Bild-/Videoideen.</p>
+    <div class="fg c2">
+      <div><label class="lbl">Dienstleistung</label><select id="mk_service">${["Bodenverlegung","Küchenmontage","Entrümpelung & Entsorgung","Umzugshilfe","Küchenfolierung","Sockelleisten & Silikonarbeiten"].map(v=>`<option>${v}</option>`).join("")}</select></div>
+      <div><label class="lbl">Region</label><input id="mk_region" value="${esc(s.region||s.address?.split(",")[1]||"Wilhelmshaven")}"></div>
+    </div>
+    <div class="fg c2">
+      <div><label class="lbl">Angebot / Aktion (optional)</label><input id="mk_offer" placeholder="z. B. kostenlose Erstbesichtigung"></div>
+      <div><label class="lbl">CTA (optional)</label><input id="mk_cta" placeholder="z. B. Jetzt anfragen"></div>
+    </div>
+    <div class="btn-row"><button class="btn primary" onclick="generateMarketing()">✨ Texte erzeugen</button></div>
+    <div id="mk_out" style="margin-top:10px"></div>
+  </div>
+  ${hist.length?`<div class="panel"><h3>Gespeicherte Inhalte (${hist.length})</h3>${hist.slice(0,3).reverse().map(a=>`<div style="border:1px solid var(--line);border-radius:var(--r2);padding:10px;margin:6px 0"><b>${esc(a.service)}</b> · ${esc(a.region)} · ${esc(a.date)}<p style="color:var(--muted);font-size:12px;margin:4px 0">${esc((a.google||"").slice(0,120))}…</p><button class="btn red sm" onclick="deleteMkAsset('${a.id}')">Löschen</button></div>`).join("")}</div>`:""}`;
+}
+function generateMarketing(){
+  const service=val("mk_service"), region=val("mk_region"), offer=val("mk_offer"), cta=val("mk_cta")||("Jetzt anfragen: "+getSettings().web), claim=getSettings().claim||"Z.O.Z – Zuverlässig. Ordentlich. Zügig.";
+  const offerLine=offer?` ${offer}.`:"";
+  const google=`${service} in ${region}: sauber, termintreu und fair kalkuliert.${offerLine} ${claim} ${cta}`;
+  const fb=`🛠️ ${service} in ${region}\n\nZuverlässig, ordentlich, zügig – verbindliche Preise nach Aufmaß.${offerLine}\n\n${cta}`;
+  const klTitle=`${service} ${region} – zuverlässig & fair`;
+  const klText=`Wir bieten ${service.toLowerCase()} in ${region}.\n\n• Saubere Ausführung\n• Klare Absprachen\n• Preise nach Aufmaß/Besichtigung\n\n${claim}\n${cta}`;
+  const tags=["#"+region.replace(/\s/g,""),"#Handwerk","#"+service.replace(/[^a-zA-ZäöüÄÖÜ]/g,""),"#Wilhelmshaven","#Handwerker2026"];
+  const kws=[`${service} ${region}`,`${service} in der Nähe`,`Handwerker ${region}`];
+  const out=`GOOGLE-BEITRAG:\n${google}\n\nFACEBOOK-POST:\n${fb}\n\nKLEINANZEIGE – TITEL:\n${klTitle}\n\nKLEINANZEIGE – TEXT:\n${klText}\n\nHASHTAGS:\n${tags.join("  ")}\n\nLOKALE KEYWORDS:\n${kws.join(", ")}\n\nBILDIDEE:\nVorher/Nachher-Foto der ${service} – sauberer Übergang, Tageslicht, keine gestellten Fotos.\n\nVIDEOIDEE:\nKurzes Reel (15–30 s): Arbeitsschritte im Zeitraffer, Ergebnis + Claim-Einblendung.`;
+  const el=byId("mk_out");
+  el.innerHTML=`<div class="out-box">${esc(out)}</div><div class="btn-row"><button class="btn sm" onclick="navigator.clipboard&&navigator.clipboard.writeText(${JSON.stringify(out)});this.textContent='✓ Kopiert'">Kopieren</button><button class="btn sm primary" onclick="saveMkAsset()">Speichern</button></div>`;
+  window._lastMkOut={service,region,date:today(),google,fb,klTitle,klText,tags,kws};
+}
+function saveMkAsset(){ if(!window._lastMkOut){alert("Erst erzeugen.");return;} data.marketingAssets.push({id:uid(),...window._lastMkOut}); saveAll(false); showSection("marketing"); }
+function deleteMkAsset(id){ data.marketingAssets=data.marketingAssets.filter(a=>a.id!==id); saveAll(false); showSection("marketing"); }
+
+/* ==========================================================
+   7b) BACKUP
+   ========================================================== */
+function setImportMode(m){ _importMode = (m==="replace") ? "replace" : "merge"; }
+function renderBackup(){
+  let last = "";
+  try{ last = localStorage.getItem("VV_LAST_BACKUP")||""; }catch{}
+  const counts = {
+    customers:(data.customers||[]).length, measurements:(data.measurements||[]).length,
+    photos:(data.measurements||[]).reduce((s,m)=>(m.rooms||[]).reduce((s2,r)=>s2+(r.photos||[]).length,s),0),
+    offers:(data.offers||[]).length, invoices:(data.invoices||[]).length, bookings:(data.bookings||[]).length
+  };
+  const l=_lastImportLog;
+  const logHtml = l ? `<div class="out-box" style="margin-top:6px">Letzter Import (${l.mode==="replace"?"Alles ersetzt":"Zusammengeführt"}) · ${fmtDT(l.at)}
+Kunden importiert: ${l.customers}
+Aufmaße importiert: ${l.measurements}
+Räume importiert: ${l.rooms}
+Fotos importiert: ${l.photos}
+Angebote importiert: ${l.offers}
+Rechnungen importiert: ${l.invoices}
+Buchungen importiert: ${l.bookings}${l.mode==="merge"?`
+Aktualisiert: ${l.updated}
+Übersprungen: ${l.skipped}`:""}</div>` : `<p style="color:var(--muted);font-size:13px">Noch kein Import in dieser Sitzung.</p>`;
+  return `<div class="panel">
+    <h2>💾 Backup</h2>
+    <p class="sub">Sicherung exportieren und importieren – inkl. Aufmaße, Fotos, Angebote, Rechnungen & Firmendaten.</p>
+    <div style="background:rgba(212,161,90,.07);border:1px solid var(--gold3);border-radius:var(--r2);padding:12px;margin-bottom:14px;font-size:13px">
+      ⚠️ Diese lokale Version speichert Daten im Browser. <b>Regelmäßig Backup exportieren.</b>
+    </div>
+    <div class="fg c2">
+      <div class="kpi"><div class="k">Kunden / Aufmaße / Fotos</div><div class="v" style="font-size:18px">${counts.customers} · ${counts.measurements} · ${counts.photos}</div></div>
+      <div class="kpi"><div class="k">Angebote / Rechnungen / Buchungen</div><div class="v" style="font-size:18px">${counts.offers} · ${counts.invoices} · ${counts.bookings}</div></div>
+    </div>
+    <h3>Backup exportieren</h3>
+    <p style="color:var(--muted);font-size:13px;margin-bottom:8px">${last?("Letztes Backup: "+fmtDT(last)):"Noch kein Backup exportiert."}</p>
+    <span id="backupLastInfo"></span>
+    <div class="btn-row"><button class="btn primary" onclick="doExport()">📦 Backup exportieren</button></div>
+    <div class="divider"></div>
+    <h3>Backup importieren</h3>
+    <div style="margin:8px 0">
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:5px 0">
+        <input type="radio" name="impMode" id="impMode_merge" style="width:auto" ${_importMode!=="replace"?"checked":""} onchange="setImportMode('merge')">
+        <b>Zusammenführen / Merge</b> <span style="color:var(--muted);font-size:12px">(Standard – vorhandene Daten bleiben erhalten)</span></label>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:5px 0">
+        <input type="radio" name="impMode" id="impMode_replace" style="width:auto" ${_importMode==="replace"?"checked":""} onchange="setImportMode('replace')">
+        <b style="color:var(--red2)">Alles ersetzen</b> <span style="color:var(--muted);font-size:12px">(⚠️ überschreibt kompletten Bestand)</span></label>
+    </div>
+    <div class="btn-row">
+      <button class="btn" onclick="byId('backupImportFile').click()">📥 Backup-Datei wählen</button>
+      <input type="file" id="backupImportFile" accept=".json" style="display:none" onchange="doImport(event)">
+    </div>
+    <div class="divider"></div>
+    <h3>Import-Protokoll</h3>
+    ${logHtml}
+  </div>`;
+}
+
+/* ==========================================================
+   7c) AGENTS / KI  (lokal – keine API automatisch, keine Keys hardcoded)
+   ========================================================== */
+const AI_PROVIDERS = {
+  openai:    { label:"OpenAI",            model:"gpt-4o-mini" },
+  anthropic: { label:"Claude / Anthropic", model:"claude-sonnet-4-6" },
+  gemini:    { label:"Gemini",            model:"gemini-1.5-flash" }
+};
+const AI_AGENTS = {
+  marketing:  "Marketing-Agent",
+  angebot:    "Angebots-Agent",
+  rechnung:   "Rechnungs-Agent",
+  buchhaltung:"Buchhaltungs-Agent",
+  kunde:      "Kundenantwort-Agent",
+  seo:        "SEO-Agent"
+};
+function getApiSettings(){ const s=getSettings(); return (s.api&&typeof s.api==="object")?s.api:{}; }
+function saveApiKey(){
+  let cur={}; try{ cur=JSON.parse(localStorage.getItem("VV_SETTINGS_2026")||"{}")||{}; }catch{}
+  const api = (cur.api&&typeof cur.api==="object")?cur.api:{};
+  const prov = val("ag_provider");
+  api[prov] = val("ag_key");
+  cur.api = api;
+  localStorage.setItem("VV_SETTINGS_2026", JSON.stringify(cur));
+  alert("API-Key lokal gespeichert (nur in diesem Browser).");
+  showSection("agents");
+}
+function clearApiKey(){
+  let cur={}; try{ cur=JSON.parse(localStorage.getItem("VV_SETTINGS_2026")||"{}")||{}; }catch{}
+  const api=(cur.api&&typeof cur.api==="object")?cur.api:{};
+  delete api[val("ag_provider")];
+  cur.api=api; localStorage.setItem("VV_SETTINGS_2026", JSON.stringify(cur));
+  showSection("agents");
+}
+function renderAgents(){
+  const api = getApiSettings();
+  const provOpts = Object.entries(AI_PROVIDERS).map(([k,v])=>`<option value="${k}">${esc(v.label)}</option>`).join("");
+  const agentOpts = Object.entries(AI_AGENTS).map(([k,v])=>`<option value="${k}">${esc(v)}</option>`).join("");
+  const hasAny = Object.values(api).some(v=>v);
+  return `<div class="panel">
+    <h2>🤖 Agents / KI</h2>
+    <p class="sub">Jeder Agent funktioniert <b>ohne API</b> (lokale Vorlage + Prompt zum Kopieren). API ist optional.</p>
+    <div style="background:rgba(212,161,90,.07);border:1px solid var(--gold3);border-radius:var(--r2);padding:10px;margin-bottom:12px;font-size:12.5px">
+      🔒 API-Keys werden – falls eingegeben – <b>nur lokal in diesem Browser</b> gespeichert und niemals automatisch verwendet. Ohne Key arbeitet jeder Agent rein lokal.
+    </div>
+    <div class="fg c2">
+      <div><label class="lbl">Agent</label><select id="ag_agent">${agentOpts}</select></div>
+      <div><label class="lbl">KI-Anbieter (optional)</label><select id="ag_provider" onchange="agSyncKey()">${provOpts}</select></div>
+    </div>
+    <div class="fg c2">
+      <div><label class="lbl">API-Key (optional, lokal)</label><input id="ag_key" type="password" placeholder="leer lassen = nur lokal" value=""></div>
+      <div style="display:flex;align-items:flex-end;gap:8px">
+        <button class="btn sm" onclick="saveApiKey()">Key speichern</button>
+        <button class="btn sm ghost" onclick="clearApiKey()">Key löschen</button>
+        <span style="font-size:12px;color:var(--muted);align-self:center">${hasAny?"🔑 Key vorhanden":"kein Key"}</span>
+      </div>
+    </div>
+    <div><label class="lbl">Kontext / Eingabe für den Agent</label>
+      <textarea id="ag_context" rows="4" placeholder="z. B. Kundenname, Leistung, Anfragetext, Stichpunkte …"></textarea></div>
+    <div class="btn-row">
+      <button class="btn primary" onclick="runAgent('local')">📝 Lokale Vorlage</button>
+      <button class="btn" onclick="runAgent('prompt')">📋 Prompt anzeigen/kopieren</button>
+      <button class="btn" onclick="runAgent('api')">🌐 API verwenden (optional)</button>
+    </div>
+    <div id="ag_out" style="margin-top:12px"></div>
+  </div>`;
+}
+function agSyncKey(){ const api=getApiSettings(); const k=byId("ag_key"); if(k) k.value=api[val("ag_provider")]||""; }
+
+/* Lokale Vorlage je Agent (immer ohne API) */
+function agentLocalTemplate(agent, ctx){
+  const s=getSettings();
+  const sig=`Mit freundlichen Grüßen\n${s.owner}\n${s.company}\nTel. ${s.phone} · ${s.web}`;
+  switch(agent){
+    case "marketing": return `MARKETING-TEXT (Vorlage)\n\n${ctx||"[Leistung/Region eintragen]"} in Ihrer Region – zuverlässig, ordentlich, zügig.\nVerbindliche Preise nach Aufmaß. Saubere Ausführung, klare Absprachen.\n\nJetzt anfragen: ${s.web}`;
+    case "angebot": return `ANGEBOTS-ENTWURF (Vorlage)\n\nSehr geehrte/r ${ctx||"[Kundenname]"},\n\nvielen Dank für Ihr Interesse. Auf Basis der besprochenen Leistung schlagen wir vor:\n\n• Position 1 – Menge – Einzelpreis\n• Position 2 – Menge – Einzelpreis\n\nDer Gesamtpreis ergibt sich nach Aufmaß. ${s.legal}\n\n${sig}`;
+    case "rechnung": return `RECHNUNGS-TEXT (Vorlage)\n\nSehr geehrte/r ${ctx||"[Kundenname]"},\n\nvielen Dank für Ihren Auftrag. Wir erlauben uns, die erbrachte Leistung wie folgt in Rechnung zu stellen.\n\n${s.legal}\nZahlbar innerhalb von 14 Tagen auf ${s.iban||"[IBAN in Firmendaten hinterlegen]"}.\n\n${sig}`;
+    case "buchhaltung": return `BUCHHALTUNGS-HINWEIS (Vorlage)\n\nKontext: ${ctx||"[Buchung/Beleg]"}\n\nPrüfen: Einnahme/Ausgabe korrekt? Privateinlage/-entnahme richtig zugeordnet? Storno neutralisiert?\nSteuerrücklage: ${s.taxReserve}% des Gewinns zurücklegen.\nBelege geordnet ablegen (digital + Papier).`;
+    case "kunde": return `KUNDENANTWORT (Vorlage)\n\nSchönen guten Tag,\n\nvielen Dank für Ihre Nachricht zu „${ctx||"[Anliegen]"}". Gerne kümmern wir uns darum.\nFür ein faires Angebot bräuchten wir noch ein paar Fotos, den genauen Einsatzort sowie die Etage.\nHinweis: Starkstrom-/Elektroarbeiten erfolgen ausschließlich über eine Elektrofachfirma.\n\n${sig}`;
+    case "seo": return `SEO-VORLAGE\n\nFokus-Keyword: ${ctx||"[Leistung + Region]"}\n\nTitle (max. 60 Z.): ${ctx||"Handwerksleistung"} – ${s.company.split(" ")[0]} | Zuverlässig & fair\nMeta-Description (max. 155 Z.): Professionelle ${ctx||"Handwerksleistung"} in Ihrer Region. Saubere Ausführung, faire Preise nach Aufmaß. Jetzt anfragen!\nH1: ${ctx||"Handwerksleistung"} vom Fachbetrieb\nInhalt: Leistungen, Ablauf, Vorher/Nachher, FAQ, Kontakt.`;
+    default: return `(Vorlage)\n${ctx||""}`;
+  }
+}
+/* Prompt je Agent (zum Kopieren oder für API) */
+function agentPrompt(agent, ctx){
+  const s=getSettings();
+  const firma=`Firma: ${s.company}, Inhaber ${s.owner}, ${s.address}. Kleinunternehmer (§19 UStG).`;
+  const roleMap={
+    marketing:"Du bist Marketing-Texter für einen Handwerksbetrieb. Erstelle Google-Beitrag, Facebook-Post, Kleinanzeige (Titel+Text), Hashtags und lokale Keywords.",
+    angebot:"Du bist Angebots-Assistent für einen Handwerksbetrieb. Erstelle einen klaren, freundlichen Angebotstext mit nachvollziehbaren Positionen.",
+    rechnung:"Du bist Rechnungs-Assistent. Erstelle einen korrekten Rechnungstext für einen Kleinunternehmer (§19 UStG, keine USt.).",
+    buchhaltung:"Du bist Buchhaltungs-Assistent. Ordne Buchungen ein (Einnahme/Ausgabe/Privat/Storno) und gib Hinweise zur Steuerrücklage.",
+    kunde:"Du bist Kundenservice-Assistent. Formuliere eine freundliche, professionelle Antwort und stelle sinnvolle Rückfragen.",
+    seo:"Du bist SEO-Spezialist. Liefere Title, Meta-Description, H1 und Content-Struktur für eine lokale Handwerks-Landingpage."
+  };
+  return `${roleMap[agent]||"Du bist ein hilfreicher Assistent."}\n\n${firma}\n\nKontext/Eingabe:\n${ctx||"(kein Kontext angegeben)"}\n\nAntworte auf Deutsch, sachlich und einsatzbereit.`;
+}
+function runAgent(mode){
+  const agent=val("ag_agent"), ctx=val("ag_context");
+  const out=byId("ag_out"); if(!out) return;
+  if(mode==="local"){
+    const txt=agentLocalTemplate(agent,ctx);
+    out.innerHTML=agOutBox(txt,"Lokale Vorlage");
+    return;
+  }
+  if(mode==="prompt"){
+    const txt=agentPrompt(agent,ctx);
+    out.innerHTML=agOutBox(txt,"Prompt (zum Kopieren in ChatGPT/Claude/Gemini)");
+    return;
+  }
+  // mode === "api"
+  const prov=val("ag_provider"), api=getApiSettings(), key=api[prov]||"";
+  if(!key){
+    out.innerHTML=`<div class="out-box" style="border-color:var(--gold3)">Kein API-Key für ${esc(AI_PROVIDERS[prov].label)} hinterlegt.\n\nEs wird stattdessen der Prompt zum Kopieren angezeigt.</div>`+
+      agOutBox(agentPrompt(agent,ctx),"Prompt (kopieren & in den KI-Anbieter einfügen)");
+    return;
+  }
+  out.innerHTML=`<div class="out-box">⏳ Anfrage an ${esc(AI_PROVIDERS[prov].label)} läuft …</div>`;
+  callAIProvider(prov,key,agentPrompt(agent,ctx))
+    .then(txt=>{ out.innerHTML=agOutBox(txt,AI_PROVIDERS[prov].label+" – Antwort"); })
+    .catch(err=>{
+      out.innerHTML=`<div class="out-box" style="border-color:var(--red2)">⚠️ API-Fehler (${esc(AI_PROVIDERS[prov].label)}): ${esc(err.message||String(err))}\n\nMöglich: CORS-Beschränkung des Browsers, ungültiger Key oder kein Internet.\nAlternative: Prompt kopieren und direkt beim Anbieter einfügen.</div>`+
+        agOutBox(agentPrompt(agent,ctx),"Prompt (Alternative zum Kopieren)");
+    });
+}
+function agOutBox(txt,title){
+  return `<div style="margin-top:8px"><div style="font-size:12px;color:var(--gold2);font-weight:800;margin-bottom:4px">${esc(title)}</div>
+    <div class="out-box">${esc(txt)}</div>
+    <div class="btn-row"><button class="btn sm" onclick="navigator.clipboard&&navigator.clipboard.writeText(${JSON.stringify(txt)});this.textContent='✓ Kopiert'">Kopieren</button></div></div>`;
+}
+/* Optionaler API-Aufruf – best effort, lokal. Wirft bei Fehler (inkl. CORS). */
+async function callAIProvider(provider, key, prompt){
+  if(provider==="openai"){
+    const res=await fetch("https://api.openai.com/v1/chat/completions",{
+      method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+key},
+      body:JSON.stringify({model:AI_PROVIDERS.openai.model,messages:[{role:"user",content:prompt}]})});
+    if(!res.ok) throw new Error("HTTP "+res.status);
+    const j=await res.json(); return j.choices?.[0]?.message?.content||"(leere Antwort)";
+  }
+  if(provider==="anthropic"){
+    const res=await fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",headers:{"Content-Type":"application/json","x-api-key":key,
+        "anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},
+      body:JSON.stringify({model:AI_PROVIDERS.anthropic.model,max_tokens:1024,messages:[{role:"user",content:prompt}]})});
+    if(!res.ok) throw new Error("HTTP "+res.status);
+    const j=await res.json(); return (j.content&&j.content[0]&&j.content[0].text)||"(leere Antwort)";
+  }
+  if(provider==="gemini"){
+    const res=await fetch("https://generativelanguage.googleapis.com/v1beta/models/"+AI_PROVIDERS.gemini.model+":generateContent?key="+encodeURIComponent(key),{
+      method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({contents:[{parts:[{text:prompt}]}]})});
+    if(!res.ok) throw new Error("HTTP "+res.status);
+    const j=await res.json(); return j.candidates?.[0]?.content?.parts?.[0]?.text||"(leere Antwort)";
+  }
+  throw new Error("Unbekannter Anbieter");
+}
+
+/* ==========================================================
+   8) PREISRECHNER
+   ========================================================== */
+function renderCalculator(){
+  return `<div class="panel">
+    <h2>🔢 Preisrechner</h2><p class="sub">Interne Kalkulation · Preisbasis intern, Gesamtpreis + Steuerrücklage.</p>
+    <div class="fg c3">
+      <div><label class="lbl">Fläche (m²)</label><input id="cArea" inputmode="decimal" placeholder="0"></div>
+      <div><label class="lbl">Bodenart</label><select id="cFloor">${Object.keys(FLOOR_PRICES).map(k=>`<option>${k}</option>`).join("")}</select></div>
+      <div><label class="lbl">Altbelag entfernen</label><select id="cRemoval"><option value="">– keinen –</option>${Object.keys(REMOVAL_PRICES).map(k=>`<option>${k}</option>`).join("")}</select></div>
+    </div>
+    <div class="fg c3">
+      <div><label class="lbl">Sockelleisten (lfm)</label><input id="cSkirt" inputmode="decimal" placeholder="0"></div>
+      <div><label class="lbl">Sockel-Art</label><select id="cSkirtType"><option value="normal">Normal (5 €/lfm)</option><option value="gehrung">Gehrung (7 €/lfm)</option></select></div>
+      <div><label class="lbl">Express-Zuschlag</label><select id="cExpress"><option value="0">0 %</option><option value="10">+10 % (14 Tage)</option><option value="20">+20 % (7 Tage)</option></select></div>
+    </div>
+    <div class="fg c3">
+      <div><label class="lbl">Materialwert (€)</label><input id="cMat" inputmode="decimal" placeholder="0"></div>
+      <div><label class="lbl">Anfahrt (km)</label><input id="cKm" inputmode="decimal" placeholder="0"></div>
+      <div style="padding-top:18px"><label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" id="cDaemmung" style="width:auto"> Dämmung/Unterlage (1,50 €/m²)</label></div>
+    </div>
+    <div class="divider"></div><h3>Küche (optional)</h3>
+    <div class="fg c4">
+      <div><label class="lbl">Küchenzeile (lfm)</label><input id="cKlfm" inputmode="decimal" placeholder="0"></div>
+      <div style="padding-top:18px"><label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" id="cKmont" style="width:auto"> Montage (189 €/lfm)</label></div>
+      <div style="padding-top:18px"><label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" id="cKdem" style="width:auto"> Demontage (100 €/lfm)</label></div>
+      <div style="padding-top:18px"><label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" id="cKplatte" style="width:auto"> Arbeitsplatte (119 €/lfm)</label></div>
+    </div>
+    <div style="margin-top:8px"><label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" id="cKents" style="width:auto"> Alte Küche entsorgen (350 € pauschal)</label></div>
+    <div class="btn-row"><button class="btn primary" onclick="runCalculator()">Berechnen</button></div>
+    <div id="calcResult"></div>
+  </div>`;
+}
+
+/* ==========================================================
+   9) MATERIAL & WERKZEUG
+   ========================================================== */
+function renderMaterials(){
+  const list=data.materials||[];
+  return `<div class="panel">
+    <h2>Material &amp; Werkzeug</h2>
+    <div class="fg c3">
+      <div><label class="lbl">Bezeichnung *</label><input id="mat_name" placeholder="z. B. Akku-Bohrschrauber"></div>
+      <div><label class="lbl">Menge / Einheit</label><input id="mat_qty" placeholder="z. B. 1 Stk."></div>
+      <div><label class="lbl">Wert / Preis (€)</label><input id="mat_price" inputmode="decimal" placeholder="0"></div>
+    </div>
+    <div><label class="lbl">Notiz</label><input id="mat_note" placeholder="Standort, Zustand …"></div>
+    <div class="btn-row"><button class="btn primary" onclick="addMaterial()">+ Hinzufügen</button></div>
+    ${list.length?`<div class="tablewrap"><table><thead><tr><th>Bezeichnung</th><th>Menge</th><th>Wert</th><th>Notiz</th><th></th></tr></thead><tbody>${list.map(m=>`<tr><td>${esc(m.name)}</td><td>${esc(m.qty||"")}</td><td>${money(m.price||0)}</td><td>${esc(m.note||"")}</td><td><button class="btn red sm" onclick="delMaterial('${m.id}')">×</button></td></tr>`).join("")}</tbody></table></div>`:'<p style="color:var(--muted);margin-top:10px">Noch keine Einträge.</p>'}
+    <div class="divider"></div>
+    <p style="color:var(--muted);font-size:12px">Gesamtwert: <b>${money((list||[]).reduce((s,m)=>s+Number(m.price||0),0))}</b></p>
+  </div>`;
+}
+function addMaterial(){ const name=val("mat_name");if(!name)return; data.materials.push({id:uid(),name,qty:val("mat_qty"),price:parseNum(val("mat_price")),note:val("mat_note"),createdAt:nowISO()}); saveAll(false); showSection("materials"); }
+function delMaterial(id){ data.materials=data.materials.filter(m=>m.id!==id); saveAll(false); showSection("materials"); }
+
+/* ==========================================================
+   10) FIXKOSTEN / ABOS
+   ========================================================== */
+function renderRecurring(){
+  const list=data.recurring||[];
+  const total=list.reduce((s,r)=>s+(r.interval==="monatlich"?Number(r.amount||0)*12:Number(r.amount||0)),0);
+  return `<div class="panel">
+    <h2>Fixkosten / Abos</h2><p class="sub">Monatliche und jährliche Fixkosten.</p>
+    <div class="fg c3">
+      <div><label class="lbl">Bezeichnung *</label><input id="rec_name" placeholder="z. B. MyHammer Abo"></div>
+      <div><label class="lbl">Betrag (€)</label><input id="rec_amount" inputmode="decimal"></div>
+      <div><label class="lbl">Intervall</label><select id="rec_interval"><option>monatlich</option><option>jährlich</option><option>quartalsweise</option></select></div>
+    </div>
+    <div class="btn-row"><button class="btn primary" onclick="addRecurring()">+ Hinzufügen</button></div>
+    ${list.length?`<div class="tablewrap"><table><thead><tr><th>Bezeichnung</th><th>Betrag</th><th>Intervall</th><th>Jährlich</th><th></th></tr></thead><tbody>${list.map(r=>`<tr><td>${esc(r.name)}</td><td>${money(r.amount||0)}</td><td>${esc(r.interval)}</td><td>${money(r.interval==="monatlich"?Number(r.amount||0)*12:r.interval==="quartalsweise"?Number(r.amount||0)*4:Number(r.amount||0))}</td><td><button class="btn red sm" onclick="delRecurring('${r.id}')">×</button></td></tr>`).join("")}</tbody></table></div>`:'<p style="color:var(--muted);margin-top:10px">Noch keine Einträge.</p>'}
+    <div class="divider"></div><p style="color:var(--muted)">Fixkosten pro Jahr gesamt: <b>${money(total)}</b></p>
+  </div>`;
+}
+function addRecurring(){ const name=val("rec_name");if(!name)return; data.recurring.push({id:uid(),name,amount:parseNum(val("rec_amount")),interval:val("rec_interval"),createdAt:nowISO()}); saveAll(false); showSection("recurring"); }
+function delRecurring(id){ data.recurring=data.recurring.filter(r=>r.id!==id); saveAll(false); showSection("recurring"); }
+
+/* ==========================================================
+   11) FAHRTENBUCH
+   ========================================================== */
+function renderMileage(){
+  const list=data.mileage||[];
+  return `<div class="panel">
+    <h2>Fahrtenbuch</h2>
+    <div class="fg c3">
+      <div><label class="lbl">Datum</label><input id="ml_date" type="date" value="${today()}"></div>
+      <div><label class="lbl">Ziel / Zweck</label><input id="ml_dest" placeholder="z. B. Birgit Schmidt – Aufmaß"></div>
+      <div><label class="lbl">km (Hin- und Rückfahrt)</label><input id="ml_km" inputmode="decimal"></div>
+    </div>
+    <div class="btn-row"><button class="btn primary" onclick="addMileage()">+ Eintragen</button></div>
+    ${list.length?`<div class="tablewrap"><table><thead><tr><th>Datum</th><th>Ziel / Zweck</th><th>km</th><th></th></tr></thead><tbody>${list.slice().reverse().map(m=>`<tr><td>${esc(m.date)}</td><td>${esc(m.dest)}</td><td>${esc(m.km)} km</td><td><button class="btn red sm" onclick="delMileage('${m.id}')">×</button></td></tr>`).join("")}</tbody></table></div><p style="color:var(--muted);margin-top:8px">Gesamt: <b>${list.reduce((s,m)=>s+Number(m.km||0),0).toFixed(0)} km</b></p>`:'<p style="color:var(--muted);margin-top:10px">Noch keine Einträge.</p>'}
+  </div>`;
+}
+function addMileage(){ data.mileage.push({id:uid(),date:val("ml_date"),dest:val("ml_dest"),km:parseNum(val("ml_km")),createdAt:nowISO()}); saveAll(false); showSection("mileage"); }
+function delMileage(id){ data.mileage=data.mileage.filter(m=>m.id!==id); saveAll(false); showSection("mileage"); }
+
+/* ==========================================================
+   12) FIRMENDATEN
+   ========================================================== */
+function renderSettings(){
+  return `<div class="panel">
+    <h2>Firmendaten &amp; Einstellungen</h2>
+    <div class="fg c2">
+      <div><label class="lbl">Firmenname</label><input id="setCompany"></div>
+      <div><label class="lbl">Inhaber</label><input id="setOwner"></div>
+    </div>
+    <div><label class="lbl">Adresse</label><input id="setAddress"></div>
+    <div class="fg c2">
+      <div><label class="lbl">Telefon</label><input id="setPhone"></div>
+      <div><label class="lbl">E-Mail</label><input id="setMail"></div>
+    </div>
+    <div class="fg c2">
+      <div><label class="lbl">Website</label><input id="setWeb"></div>
+      <div><label class="lbl">IBAN</label><input id="setIban"></div>
+    </div>
+    <div class="fg c2">
+      <div><label class="lbl">Steuernummer</label><input id="setTax"></div>
+      <div><label class="lbl">Steuerrücklage %</label><input id="setTaxReserve" inputmode="decimal" value="35"></div>
+    </div>
+    <div><label class="lbl">Kleinunternehmer-Hinweis (auf Rechnungen)</label><textarea id="setLegal">Gemäß § 19 UStG wird keine Umsatzsteuer berechnet.</textarea></div>
+    <div class="btn-row"><button class="btn primary" onclick="saveSettings()">Speichern</button></div>
+    <div class="divider"></div>
+    <p style="color:var(--muted);font-size:12px">🔒 Diese lokale Version speichert Daten nur auf diesem Gerät. Bankzugangsdaten niemals eingeben. Optionale KI-API-Keys nur unter „Agents / KI" – sie bleiben ausschließlich lokal im Browser.</p>
+  </div>`;
+}
+
+/* ==========================================================
+   13) RECHNUNGEN
+   ========================================================== */
+let _editingInvId=null;
+function renderRechnungen(){
+  const list=data.invoices.slice().sort((a,b)=>String(b.createdAt||"").localeCompare(String(a.createdAt||"")));
+  const acceptedNoInv=data.offers.filter(o=>o.status==="Angenommen"&&!data.invoices.some(i=>i.offerId===o.id));
+  return `<div class="panel">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+      <div><h2>Rechnungen</h2><p class="sub">Nummernkreis: YYYY-001 · Kleinunternehmer § 19 UStG</p></div>
+      <button class="btn primary" onclick="openNewInvoiceForm()">+ Neue Rechnung</button>
+    </div>
+    ${acceptedNoInv.length?`<div style="background:rgba(212,161,90,.07);border:1px solid var(--gold3);border-radius:var(--r2);padding:12px;margin:10px 0"><b>${acceptedNoInv.length} angenommene(s) Angebot(e) ohne Rechnung:</b> ${acceptedNoInv.map(o=>`<button class="btn sm primary" onclick="invoiceFromOffer('${o.id}')" style="margin:4px">${esc(o.number)} – ${esc(o.customerName)}</button>`).join("")}</div>`:""}
+    ${list.length?`<div class="tablewrap"><table><thead><tr><th>Nr.</th><th>Kunde</th><th>Datum</th><th>Gesamt</th><th>Offen</th><th>Status</th><th>Aktionen</th></tr></thead><tbody>${invoiceTableHTML(list)}</tbody></table></div>`:'<p style="color:var(--muted);margin-top:10px">Noch keine Rechnungen.</p>'}
+    <div id="invFormArea"></div>
+  </div>`;
+}
+function invoiceTableHTML(list){
+  return list.map(inv=>{const rem=Number(inv.remaining??(Number(inv.total||0)-Number(inv.depositPaid||0)));return `<tr><td><b>${esc(inv.number||"")}</b></td><td>${esc(inv.customerName||"")}</td><td>${esc(inv.date||"")}</td><td>${money(inv.total||0)}</td><td>${money(rem)}</td>
+    <td><span class="pill ${inv.status==="bezahlt"?"gr":rem>0?"rd":"gd"}">${esc(inv.status||"erstellt")}</span></td>
+    <td><button class="btn sm ghost" onclick="printInvoice('${inv.id}')">PDF</button>
+        <button class="btn sm green" onclick="markInvoicePaid('${inv.id}')">✓ Bezahlt</button>
+        <button class="btn sm red" onclick="deleteInvoice('${inv.id}')">×</button></td></tr>`;}).join("");
+}
+function openNewInvoiceForm(inv){
+  _editingInvId=inv?inv.id:null;
+  const custOpts=data.customers.slice().sort((a,b)=>(a.name||"").localeCompare(b.name||"")).map(c=>`<option value="${c.id}" ${inv&&inv.customerId===c.id?"selected":""}>${esc(c.name)}</option>`).join("");
+  const el=byId("invFormArea"); if(!el) return;
+  el.innerHTML=`<div class="panel" id="invForm" style="margin-top:14px">
+    <h3>${inv?"Rechnung bearbeiten":"Neue Rechnung"}</h3>
+    <div class="fg c3">
+      <div><label class="lbl">Kunde</label><select id="iv_cust"><option value="">– wählen –</option>${custOpts}</select></div>
+      <div><label class="lbl">Datum</label><input id="iv_date" type="date" value="${inv?.date||today()}"></div>
+      <div><label class="lbl">Leistungsdatum</label><input id="iv_service" type="date" value="${inv?.serviceDate||""}"></div>
+    </div>
+    <div class="fg c2">
+      <div><label class="lbl">Projekt</label><input id="iv_project" value="${esc(inv?.project||"")}"></div>
+      <div><label class="lbl">Bereits bezahlte Anzahlung (€)</label><input id="iv_deposit" inputmode="decimal" value="${inv?.depositPaid||0}"></div>
+    </div>
+    <h3>Positionen</h3><div id="iv_items"></div>
+    <button class="btn sm" onclick="addItemRow('iv_items')">+ Position</button>
+    <div><label class="lbl" style="margin-top:10px">Hinweise</label><textarea id="iv_notes">${esc(inv?.notes||"")}</textarea></div>
+    <div style="background:rgba(212,161,90,.07);border:1px solid var(--gold3);border-radius:var(--r2);padding:10px;margin-top:10px;font-size:13px">
+      ${esc(getSettings().legal||"Gemäß § 19 UStG wird keine Umsatzsteuer berechnet.")}</div>
+    <div class="btn-row"><button class="btn ghost" onclick="byId('invForm').remove()">Abbrechen</button><button class="btn primary" onclick="saveInvoice()">Speichern</button></div>
+  </div>`;
+  initItems("iv_items", inv?.items||[]);
+}
+function saveInvoice(){
+  const id=_editingInvId; const cid=val("iv_cust"); const c=data.customers.find(x=>x.id===cid);
+  const items=getItems("iv_items"); const total=sumItems(items); const dep=parseNum(val("iv_deposit"));
+  const base={customerId:cid,customerName:c?c.name:"",date:val("iv_date"),serviceDate:val("iv_service"),project:val("iv_project"),notes:val("iv_notes"),items,total,depositPaid:dep,remaining:r2(total-dep),status:"erstellt",updatedAt:nowISO()};
+  if(id){ Object.assign(data.invoices.find(i=>i.id===id)||{},base); }
+  else { data.invoices.push({id:uid(),number:nextInvoiceNumber(),createdAt:nowISO(),...base}); }
+  _editingInvId=null; saveAll(false); showSection("rechnungen");
+}
+function invoiceFromOffer(offerId){
+  const o=data.offers.find(x=>x.id===offerId); if(!o)return;
+  const inv={id:uid(),number:nextInvoiceNumber(),offerId:o.id,customerId:o.customerId,customerName:o.customerName,date:today(),serviceDate:"",project:o.project,notes:"",items:JSON.parse(JSON.stringify(o.items||[])),total:o.total,depositPaid:o.depositPaid||0,remaining:r2(o.total-(o.depositPaid||0)),status:"erstellt",createdAt:nowISO(),updatedAt:nowISO()};
+  data.invoices.push(inv); saveAll(false); showSection("rechnungen");
+}
+function markInvoicePaid(id){ const inv=data.invoices.find(x=>x.id===id);if(!inv)return; inv.status="bezahlt";inv.remaining=0;inv.updatedAt=nowISO(); saveAll(false); showSection("rechnungen"); }
+function deleteInvoice(id){ if(!confirm("Rechnung löschen?"))return; data.invoices=data.invoices.filter(i=>i.id!==id); saveAll(false); showSection("rechnungen"); }
+function printInvoice(id){
+  const inv=data.invoices.find(x=>x.id===id);if(!inv)return;
+  const c=data.customers.find(x=>x.id===inv.customerId)||{name:inv.customerName||""};
+  openDoc(renderDocHTML("RECHNUNG",inv,c));
+}
+
+/* ==========================================================
+   14) OFFENE POSTEN
+   ========================================================== */
+function renderOpenItems(){
+  const list=data.openItems||[];
+  return `<div class="panel">
+    <h2>Offene Posten</h2><p class="sub">Automatisch aus angenommenen Angeboten und Rechnungen mit Restbetrag.</p>
+    ${list.length?`<div class="tablewrap"><table><thead><tr><th>Kunde</th><th>Beleg</th><th>Gesamt</th><th>Bezahlt</th><th>Offen</th><th>Fällig</th><th>Status</th></tr></thead><tbody>${
+      list.map(o=>`<tr><td>${esc(o.customerName||"")}</td><td>${esc(o.reference||"")}</td><td>${money(o.total)}</td><td>${money(o.paid)}</td><td><b>${money(o.open)}</b></td>
+        <td><input type="date" value="${esc(o.dueDate||"")}" onchange="updateOI('${o.id}','dueDate',this.value)" style="padding:4px;min-width:auto"></td>
+        <td><select onchange="updateOI('${o.id}','status',this.value)" style="padding:4px">${["offen","in Bearbeitung","gemahnt","erledigt"].map(s=>`<option ${o.status===s?"selected":""}>${s}</option>`).join("")}</select></td></tr>`).join("")
+    }</tbody></table></div>`:'<p style="color:var(--muted)">Keine offenen Posten.</p>'}
+    <div class="divider"></div>
+    <p>Gesamt offen: <b style="color:var(--gold)">${money(list.reduce((s,o)=>s+Number(o.open||0),0))}</b></p>
+  </div>`;
+}
+function updateOI(id,field,val_){ const o=data.openItems.find(x=>x.id===id);if(o){o[field]=val_;saveAll(false);} }
+
+/* ==========================================================
+   15) BUCHHALTUNG
+   ========================================================== */
+function renderBookkeeping(){
+  const fin=computeFinance();
+  const bk=data.bookings||[];
+  return `<div class="panel">
+    <h2>Buchhaltung</h2>
+    <div class="kpi-bar" style="margin-bottom:12px">
+      <div class="kpi"><div class="k">Einnahmen</div><div class="v gr">${money(fin.income)}</div></div>
+      <div class="kpi"><div class="k">Ausgaben</div><div class="v rd">${money(fin.expenses)}</div></div>
+      <div class="kpi"><div class="k">Gewinn</div><div class="v">${money(fin.profit)}</div></div>
+      <div class="kpi"><div class="k">${fin.taxPct}% Rücklage</div><div class="v gd">${money(fin.tax)}</div></div>
+      <div class="kpi"><div class="k">Gewinn nach Rücklage</div><div class="v gr">${money(fin.profitAfterTax)}</div></div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:8px">
+      <input id="bkSearch" placeholder="Suche …" style="max-width:240px" oninput="renderBkTable()">
+      <select id="bkTypeFilter" onchange="renderBkTable()"><option value="">Alle Typen</option>${TX_TYPES.map(t=>`<option>${t}</option>`).join("")}</select>
+      <button class="btn sm red" onclick="delSelectedBk()">Markierte löschen</button>
+      <button class="btn sm" onclick="(()=>{document.querySelectorAll('.bkChk').forEach(c=>c.checked=!c.checked)})()">Alle markieren</button>
+    </div>
+    <div class="tablewrap" id="bkTableWrap"><table><thead><tr><th></th><th>Datum</th><th>Partner</th><th>Typ</th><th>Betrag</th><th>Kategorie</th><th>Status</th><th>Dashboard</th></tr></thead><tbody id="bkTBody"></tbody></table></div>
+    <div style="margin-top:8px;font-size:12px;color:var(--muted)">Buchungen gesamt: ${bk.length} · Änderungen an Typ/Dashboard sofort gespeichert.</div>
+  </div>`;
+}
+function renderBkTable(){
+  const el=byId("bkTBody"); if(!el)return;
+  const search=(val("bkSearch")||"").toLowerCase(), tf=val("bkTypeFilter")||"";
+  const list=(data.bookings||[]).filter(b=>{
+    const blob=Object.values(b).join(" ").toLowerCase();
+    return (!search||blob.includes(search))&&(!tf||b.type===tf);
+  }).sort((a,b)=>String(b.date||"").localeCompare(String(a.date||"")));
+  el.innerHTML=list.map(b=>`<tr>
+    <td><input type="checkbox" class="bkChk" data-id="${b.id}" style="width:auto"></td>
+    <td>${esc(b.date||"")}</td><td>${esc(b.partner||"")}</td>
+    <td><select style="padding:4px;min-width:130px" onchange="updateBk('${b.id}','type',this.value)">${TX_TYPES.map(t=>`<option ${b.type===t?"selected":""}>${t}</option>`).join("")}</select></td>
+    <td>${money(b.signedAmount||b.amount||0)}</td>
+    <td>${esc(b.category||"")}</td>
+    <td><span class="pill ${b.status?.includes("prüfen")?"gd":"gy"}">${esc(b.status||"")}</span></td>
+    <td><input type="checkbox" ${b.dashboardRelevant?"checked":""} style="width:auto" onchange="updateBk('${b.id}','dashboardRelevant',this.checked)"></td>
+  </tr>`).join("");
+}
+function updateBk(id,field,val_){ const b=data.bookings.find(x=>x.id===id);if(b){b[field]=val_;b.manual=true;saveAll(false);updateKPIs();renderBkTable();} }
+function delSelectedBk(){
+  const ids=[...document.querySelectorAll(".bkChk:checked")].map(c=>c.dataset.id);
+  if(!ids.length){alert("Keine Buchung markiert.");return;}
+  if(!confirm(ids.length+" Buchung(en) löschen?"))return;
+  data.bookings=data.bookings.filter(b=>!ids.includes(b.id)); saveAll(false); showSection("bookkeeping");
+}
+
+/* ==========================================================
+   16) BANK-CSV / SYNC
+   ========================================================== */
+function renderBankSync(){
+  const fin=computeFinance();
+  const all=data.bookings||[];
+  const rel=all.filter(b=>b.dashboardRelevant&&(b.type==="Einnahme"||b.type==="Ausgabe"));
+  const excl=all.filter(b=>!b.dashboardRelevant);
+  const pruefen=all.filter(b=>String(b.status||"").includes("prüfen"));
+  return `<div class="panel">
+    <h2>Bank-CSV / Sync</h2><p class="sub">Kontoauszüge importieren · Klassifizierung nach V&V-Regeln · Dublettenschutz</p>
+    <div class="kpi-bar" style="margin-bottom:14px">
+      <div class="kpi"><div class="k">Buchungen gesamt</div><div class="v">${all.length}</div></div>
+      <div class="kpi"><div class="k">Dashboardrelevant</div><div class="v gr">${rel.length}</div></div>
+      <div class="kpi"><div class="k">Ausgeschlossen</div><div class="v">${excl.length}</div></div>
+      <div class="kpi"><div class="k">Zu prüfen</div><div class="v gd">${pruefen.length}</div></div>
+      <div class="kpi"><div class="k">Gewinn (echt)</div><div class="v gr">${money(fin.profit)}</div></div>
+    </div>
+    <div class="drop-zone" id="bankDropZone" onclick="byId('bankCsvInput').click()">
+      <div style="font-size:24px;margin-bottom:8px">📂</div>
+      <b>Bank-CSV hier ablegen oder klicken</b><br>
+      <span style="font-size:12px">Mehrere Dateien möglich · Dubletten werden erkannt</span>
+    </div>
+    <input type="file" id="bankCsvInput" accept=".csv,text/csv" multiple style="display:none" onchange="importBankCsvFiles(this.files)">
+    <div id="bankImportInfo" style="margin-top:8px"></div>
+    <div class="divider"></div>
+    <div class="fg c2">
+      <div><h3>Bekannte Buchungsregeln</h3>
+        ${[["Justus (Jonas) Brosch","Privateinlage – nie Umsatz"],["Hagebau","Betriebsausgabe / Material"],["MyHammer","Betriebsausgabe / Vermittlungsgebühr"],["CHECK24 Profis","Betriebsausgabe / Vermittlungsgebühr"],["Lidl / Aldi / Rewe","Privat – nicht dashboardrelevant"],["Birgit Schmidt","Kundenzahlung / Anzahlung"],["Storno/Widerruf","neutralisiert – nicht Umsatz"]].map(r=>`<div class="bank-rule"><b>${r[0]}</b><span>${r[1]}</span></div>`).join("")}
+      </div>
+      <div><h3>Regeln neu anwenden</h3>
+        <p style="color:var(--muted);font-size:13px;margin-bottom:10px">Alle nicht-manuell bearbeiteten Buchungen werden nach aktuellen Regeln neu klassifiziert.</p>
+        <button class="btn" onclick="reapplyAllRules()">🔄 Regeln neu anwenden</button>
+      </div>
+    </div>
+  </div>`;
+}
+function importBankCsvFiles(files){
+  let total=0,dup=0;
+  const arr=Array.from(files||[]);if(!arr.length)return;
+  let done=0;
+  arr.forEach(f=>{const r=new FileReader();r.onload=e=>{const res=parseCSVText(e.target.result,f.name);total+=res.count;dup+=res.duplicates;done++;if(done===arr.length){saveAll(false);const el=byId("bankImportInfo");if(el)el.innerHTML=`<div style="background:rgba(94,156,114,.1);border:1px solid rgba(94,156,114,.4);border-radius:var(--r2);padding:10px">${total} neue Buchungen importiert · ${dup} Dubletten übersprungen.</div>`;updateKPIs();updateBadges();}};r.readAsText(f);});
+}
+function reapplyAllRules(){
+  const s=data.bookings.length; data.bookings=data.bookings.map(b=>b.manual?b:classifyBooking(b)); saveAll(false); alert("Regeln neu angewendet auf "+(data.bookings.length-data.bookings.filter(b=>b.manual).length)+" Buchungen."); showSection("banksync");
+}
+
+/* ==========================================================
+   17) BAUSTELLENPLANER
+   ========================================================== */
+function renderProjekte(){
+  const list=data.projects||[];
+  const custOpts=data.customers.slice().sort((a,b)=>(a.name||"").localeCompare(b.name||"")).map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join("");
+  return `<div class="panel">
+    <h2>🏗️ Baustellenplaner</h2>
+    <div class="fg c3">
+      <div><label class="lbl">Kunde</label><select id="p_cust"><option value="">– wählen –</option>${custOpts}</select></div>
+      <div><label class="lbl">Leistung</label><input id="p_service" placeholder="z. B. Bodenverlegung Küche"></div>
+      <div><label class="lbl">Ort</label><input id="p_ort" placeholder="z. B. Müller, Hbf-Str. 4, WHV"></div>
+    </div>
+    <div class="fg c3">
+      <div><label class="lbl">Datum</label><input id="p_date" type="date" value="${today()}"></div>
+      <div><label class="lbl">Team</label><input id="p_team" placeholder="z. B. Justus allein"></div>
+      <div><label class="lbl">Status</label><select id="p_status"><option>geplant</option><option>läuft</option><option>abgeschlossen</option><option>pausiert</option></select></div>
+    </div>
+    <div><label class="lbl">Notizen / Material / Offene Fragen</label><textarea id="p_notes"></textarea></div>
+    <div class="btn-row"><button class="btn primary" onclick="addProject()">+ Baustelle anlegen</button></div>
+  </div>
+  ${list.length?`<div class="panel"><h3>Baustellen (${list.length})</h3><div class="tablewrap"><table><thead><tr><th>Datum</th><th>Kunde</th><th>Leistung</th><th>Ort</th><th>Team</th><th>Status</th><th></th></tr></thead><tbody>${
+    list.slice().sort((a,b)=>String(a.date||"").localeCompare(String(b.date||""))).map(p=>`<tr>
+      <td>${esc(p.date)}</td><td>${esc(p.customerName||"")}</td><td>${esc(p.service)}</td><td>${esc(p.ort)}</td><td>${esc(p.team||"")}</td>
+      <td><span class="pill ${p.status==="abgeschlossen"?"gr":p.status==="läuft"?"gd":"gy"}">${esc(p.status)}</span></td>
+      <td><button class="btn red sm" onclick="delProject('${p.id}')">×</button></td></tr>`).join("")
+  }</tbody></table></div></div>`:""}`;
+}
+function addProject(){ const cid=val("p_cust"),c=data.customers.find(x=>x.id===cid); data.projects.push({id:uid(),customerId:cid||null,customerName:c?c.name:"",service:val("p_service"),ort:val("p_ort"),date:val("p_date"),team:val("p_team"),status:val("p_status"),notes:val("p_notes"),createdAt:nowISO(),updatedAt:nowISO()}); saveAll(false); showSection("projekte"); }
+function delProject(id){ if(!confirm("Baustelle löschen?"))return; data.projects=data.projects.filter(p=>p.id!==id); saveAll(false); showSection("projekte"); }
+
+/* ==========================================================
+   18) CHECKLISTE
+   ========================================================== */
+function renderCheckliste(){
+  return `<div class="panel">
+    <h2>✅ Baustellen-Checkliste</h2><p class="sub">Standard-Checkliste vor und nach der Baustelle.</p>
+    ${[["Vor dem Einsatz",["Aufmaß und Fotos gesichert?","Material vollständig geladen?","Werkzeug vollständig?","Schutzfolie / Karton für Möbel/Boden?","Kundenkontakt bestätigt?","Route und Parkplatz gecheckt?"]],["Während des Einsatzes",["Boden/Fläche vor Beginn fotografiert?","Material passt zur Planung?","Änderungen / Extras dokumentiert?","Qualitätsprüfung zwischendurch?"]],["Nach dem Einsatz",["Nachher-Fotos gemacht?","Arbeitsbereich sauber hinterlassen?","Entsorgung erledigt?","Kunde abgenommen / unterschrieben?","Rechnung erstellt?","Zahlung vermerkt?","Akte aktualisiert?"]]].map(([title,items])=>`
+      <h3>${title}</h3>
+      ${items.map(it=>`<label style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.05);cursor:pointer"><input type="checkbox" style="width:auto"> ${it}</label>`).join("")}`).join("")}
+    <div class="btn-row"><button class="btn ghost" onclick="document.querySelectorAll('input[type=checkbox]').forEach(c=>c.checked=false)">Alle zurücksetzen</button></div>
+  </div>`;
+}
+
+/* ==========================================================
+   NAVIGATION TOGGLE
+   ========================================================== */
+function toggleGroup(header){
+  header.classList.toggle("open");
+  const items=header.nextElementSibling;
+  if(items) items.classList.toggle("open");
+}
+
+/* ==========================================================
+   INIT
+   ========================================================== */
+function render(id){ showSection(id||currentSection); }
+
+document.addEventListener("DOMContentLoaded",()=>{
+  // Nav-Buttons
+  document.querySelectorAll(".navbtn[data-sec]").forEach(b=>{
+    b.addEventListener("click",()=>{ showSection(b.dataset.sec); if(window.innerWidth<=900){ document.querySelector(".sidebar").classList.remove("mobile-open"); } });
+  });
+  // Mobile-Menu sichtbar machen
+  if(window.innerWidth<=900){ byId("mobileMenu").style.display="inline-flex"; }
+  // Drop-Zone
+  document.addEventListener("DOMContentLoaded",()=>{});
+
+  loadAll(); loadSettingsFields();
+  showSection("dashboard");
+  // Live Bank-Table wenn section aktiv
+  const obs=new MutationObserver(()=>{ if(currentSection==="bookkeeping") renderBkTable(); });
+  obs.observe(byId("main"),{childList:true});
+});
+</script>
+
+<!-- LIGHTBOX -->
+<div id="lightbox" onclick="if(event.target===this)closeLightbox()">
+  <button id="lb-close" onclick="closeLightbox()">✕</button>
+  <img id="lb-img" src="" alt="">
+  <div id="lb-toolbar">
+    <button class="lb-btn" onclick="lbPrev()">‹ Zurück</button>
+    <span id="lb-counter">1 / 1</span>
+    <button class="lb-btn" onclick="lbNext()">Weiter ›</button>
+    <button class="lb-btn" onclick="downloadCurrentPhoto()">⬇ Herunterladen</button>
+    <button class="lb-btn" onclick="closeLightbox()">✕ Schließen</button>
+  </div>
+  <div id="lb-caption"></div>
+</div>
+
+<script>
+// Drag-Drop für Bank-CSV global
+document.addEventListener("dragover",e=>e.preventDefault());
+document.addEventListener("drop",e=>{
+  if(e.target.id==="bankDropZone"||e.target.closest("#bankDropZone")){
+    e.preventDefault(); importBankCsvFiles(e.dataTransfer.files);
+  }
+});
+
+document.addEventListener("keydown",e=>{
+  const lb=byId("lightbox");
+  if(!lb||!lb.classList.contains("open"))return;
+  if(e.key==="Escape") closeLightbox();
+  else if(e.key==="ArrowLeft") lbPrev();
+  else if(e.key==="ArrowRight") lbNext();
+});
+// Mobile-Menu Sichtbarkeit
+window.addEventListener("resize",()=>{
+  const btn=byId("mobileMenu");
+  if(btn) btn.style.display=window.innerWidth<=900?"inline-flex":"none";
+});
+</script>
+</body>
+</html>
