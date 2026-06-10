@@ -578,7 +578,8 @@ function doExport(){
     normalizeData();
     saveAll(false);
     const settings = stripKeysForExport(getSettings()); // company, owner, … – API-Keys werden NIE exportiert
-    const payload = { version:"VV_COCKPIT_2026", exportedAt:nowISO(), keyNote:"API-Keys werden aus Sicherheitsgründen nicht exportiert.", data, settings };
+    let nexusBrainUser=null; try{ nexusBrainUser=getNexusBrainStored(); }catch(e){}
+    const payload = { version:"VV_COCKPIT_2026", exportedAt:nowISO(), keyNote:"NEXUS-Gehirn wird exportiert. API-Keys werden nicht exportiert.", data, settings, nexusBrainUser };
     const json = JSON.stringify(payload, null, 2);
     const d = new Date(), pad = n => String(n).padStart(2,"0");
     const fn = `vv-cockpit-backup-${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}.json`;
@@ -674,6 +675,7 @@ function runImport(parsed, mode){
     if(!data.openItemOverrides || typeof data.openItemOverrides!=="object" || Array.isArray(data.openItemOverrides)) data.openItemOverrides = inc.openItemOverrides && typeof inc.openItemOverrides==="object" ? inc.openItemOverrides : {};
     migrateOpenItemsCleanup();
     if(parsed.settings) migrateSettings(parsed.settings);
+    if(parsed.nexusBrainUser) try{ mergeNexusBrainUser(parsed.nexusBrainUser); }catch(e){}
     saveAll(false);
     _lastImportLog = { mode:"replace", at:nowISO(),
       customers:(data.customers||[]).length, measurements:(data.measurements||[]).length,
@@ -700,6 +702,7 @@ function runImport(parsed, mode){
   mergeOverrides(inc.openItemOverrides);
   if(inc.counters && typeof inc.counters==="object"){ data.counters = Object.assign({}, inc.counters, data.counters||{}); }
   mergeSettings(parsed.settings);
+  if(parsed.nexusBrainUser) try{ mergeNexusBrainUser(parsed.nexusBrainUser); }catch(e){}
   migrateOpenItemsCleanup();
   saveAll(false);
 
@@ -4967,8 +4970,8 @@ async function callLocalAI(agentType, payload){
    Ollama erkennt NUR die Absicht (JSON). Die Ausführung passiert
    ausschließlich im Cockpit-Code. Ollama speichert/löscht NICHTS.
    ========================================================== */
-const NX_ALLOWED_INTENTS = ["navigate","open_items_summary","finance_summary","search_customer","create_customer_draft","create_booking_draft","create_offer_draft","create_invoice_draft","project_summary","marketing_draft","open_agent","system_action","stop_speaking","confirm_action","cancel_action","mark_open_item_paid_draft","delete_open_items_draft","unknown"];
-const NX_ALLOWED_TOOLS = ["navigateTo","getOpenPositionsSummary","getFinanceSummary","searchCustomer","createCustomerDraft","createBookingDraft","createOfferDraft","createInvoiceDraft","getProjectSummary","createMarketingDraft","openAgent","stopSpeaking","confirmPendingAction","cancelPendingAction","markOpenItemPaidDraft","deleteOpenItemsDraft","askClarifyingQuestion"];
+const NX_ALLOWED_INTENTS = ["navigate","open_items_summary","finance_summary","search_customer","create_customer_draft","create_booking_draft","create_offer_draft","create_invoice_draft","project_summary","marketing_draft","open_agent","system_action","stop_speaking","confirm_action","cancel_action","mark_open_item_paid_draft","delete_open_items_draft","publish_marketing_draft","unknown"];
+const NX_ALLOWED_TOOLS = ["navigateTo","getOpenPositionsSummary","getFinanceSummary","searchCustomer","createCustomerDraft","createBookingDraft","createOfferDraft","createInvoiceDraft","getProjectSummary","createMarketingDraft","publishMarketingDraft","openAgent","stopSpeaking","confirmPendingAction","cancelPendingAction","markOpenItemPaidDraft","deleteOpenItemsDraft","askClarifyingQuestion"];
 const NX_INTENT_CONF_MIN = 0.75;
 let _nxOllamaErrNotified = false;
 
@@ -4989,7 +4992,7 @@ Wichtiges Cockpit-Wissen (V&V-Begriffe):
 - Will der Nutzer offene Posten LÖSCHEN/entfernen/wegmachen: intent=delete_open_items_draft, tool=askClarifyingQuestion, requiresConfirmation=true, requiresStrongConfirmation=true, clarifyingQuestion="Meinst du wirklich löschen oder nur als bezahlt/erledigt markieren? Löschen entfernt Datensätze dauerhaft."
 - Datenlöschung ist kritisch und braucht ausdrückliche Bestätigung. Massenlöschung ("alle", "sämtliche", "komplett") braucht starke Bestätigung ("Ja, endgültig löschen") -> requiresStrongConfirmation=true.
 - "zurücksetzen" ist sehr gefährlich -> nie direkt, immer Rückfrage. "veröffentlichen" ist extern -> nie ohne Bestätigung.
-- Nutze zusätzlich glossary, pages, tools, rules und localHints aus dem mitgesendeten KONTEXT-JSON. Wenn localHints einen Begriff erkannt hat, übernimm dessen Intent/Tool/Seite, sofern der Befehl nichts anderes verlangt.
+- Nutze zusätzlich glossaryHints, pageHints, toolHints, safetyRules und matchedConcepts aus dem mitgesendeten KONTEXT-JSON. Wenn matchedConcepts einen Begriff enthält, übernimm dessen Intent/Tool/Seite, sofern der Befehl nichts anderes verlangt.
 
 Antwortformat (immer alle Felder):
 {"intent":"string","tool":"string","confidence":0.0,"requiresConfirmation":false,"requiresStrongConfirmation":false,"entities":{"customerName":null,"amount":null,"date":null,"category":null,"service":null,"page":null,"target":null,"actionType":null},"spokenResponse":"string","clarifyingQuestion":null}
@@ -5128,6 +5131,9 @@ function executeIntentResult(ir, context){
   // Löschen offener Posten: IMMER über den geführten Sicherheitsdialog (nie direkt, nie nur Rückfrage-Text)
   if(ir.intent==="delete_open_items_draft" || ir.tool==="deleteOpenItemsDraft")
     return {handled:true, kind:"Aktion", text: nxBrainStartDeleteFlow()};
+  // Veröffentlichen: externe Aktion, nur mit starker Bestätigung („Ja, veröffentlichen“)
+  if(ir.intent==="publish_marketing_draft" || ir.tool==="publishMarketingDraft")
+    return {handled:true, kind:"Aktion", text: nxBrainStartPublishFlow()};
   // Unklar / niedrige Confidence -> Rückfrage statt falscher Aktion
   if(ir.intent==="unknown" || ir.tool==="askClarifyingQuestion")
     return {handled:true, kind:"Rückfrage", text: ir.clarifyingQuestion || ir.spokenResponse || nxClarifyFallback()};
@@ -5763,41 +5769,45 @@ function nxAiSaveRouting(){
    Intent-JSON – ausgeführt wird ausschließlich lokal.
    ========================================================== */
 
-/* ---- Seiten-Registry: Cockpit-Seiten + gesprochene Aliase ---- */
+/* ---- Seiten-Registry: Cockpit-Seiten mit Label + gesprochenen Aliasen.
+        Wird vom Build-Export (NEXUS_BRAIN/02_Cockpit_Seiten.md) gespiegelt. ---- */
 const NEXUS_PAGES = {
-  dashboard:   ["start","übersicht","uebersicht","dashboard","startseite"],
-  crm:         ["kunden crm","kundenliste","kunden","crm"],
-  akte:        ["kundenkartei","kundenakte","akte"],
-  aufmass:     ["aufmaß","aufmass","maß nehmen","mass nehmen"],
-  angebote:    ["angebote","kostenvoranschläge","kostenvoranschlaege","angebot"],
-  rechnungen:  ["rechnungen","rechnung"],
-  openitems:   ["offene posten","offene positionen","außenstände","aussenstaende","wer schuldet mir geld","offene rechnungen","offene forderungen","offene beträge","offene betraege"],
-  bookkeeping: ["buchhaltung","einnahmen","ausgaben","bank","csv","bank sync","steuerübersicht","steueruebersicht"],
-  belegscanner:["belege","belegscanner"],
-  projekte:    ["baustellen","projekte","aufträge","auftraege","auftrag"],
-  personal:    ["personal","personalwesen","mitarbeiter","stellen"],
-  nexus:       ["nexus","command deck","nexus deck"]
+  dashboard:   { label:"Dashboard",        aliases:["start","übersicht","uebersicht","dashboard","home","startseite"] },
+  crm:         { label:"Kunden-CRM",       aliases:["kunden crm","kundenliste","crm","kunden"] },
+  akte:        { label:"Kundenkartei",     aliases:["kundenkartei","kundenakte","kundendaten","akte"] },
+  aufmass:     { label:"Aufmaß-Tool",      aliases:["aufmaß","aufmass","maß nehmen","mass nehmen","aufmaß tool"] },
+  angebote:    { label:"Angebote",         aliases:["angebote","angebot","kostenvoranschläge","kostenvoranschlaege","kostenvoranschlag"] },
+  rechnungen:  { label:"Rechnungen",       aliases:["rechnungen","rechnung"] },
+  openitems:   { label:"Offene Posten",    aliases:["offene posten","offene positionen","außenstände","aussenstände","aussenstaende","wer schuldet mir geld","offene rechnungen","offene forderungen","offene beträge","offene betraege"] },
+  bookkeeping: { label:"Buchhaltung",      aliases:["buchhaltung","einnahmen","ausgaben","finanzen","buchungen","bank","csv","bank sync","kontoauszug"] },
+  belegscanner:{ label:"Belegscanner",     aliases:["belege","belegscanner","beleg scannen"] },
+  projekte:    { label:"Baustellenplaner", aliases:["baustellen","projekte","aufträge","auftraege","auftrag","baustellenplaner"] },
+  mkagents:    { label:"Marketing / KI",   aliases:["marketing","content","werbung","anzeigen"] },
+  personal:    { label:"Personalwesen",    aliases:["personal","personalwesen","mitarbeiter","stellen"] },
+  nexus:       { label:"NEXUS Deck",       aliases:["nexus","command deck","ki deck","nexus deck"] },
+  settings:    { label:"Firmendaten",      aliases:["firmendaten","einstellungen","settings"] }
 };
 
 /* ---- Tool-Registry: was NEXUS darf, was Bestätigung braucht ---- */
 const NEXUS_TOOLS = {
-  navigateTo:              { description:"Öffnet eine Cockpit-Seite.", safe:true, params:["page"], connected:true },
-  getOpenPositionsSummary: { description:"Zeigt offene Posten / unbezahlte Rechnungen / Außenstände.", safe:true, page:"openitems", connected:true },
-  getFinanceSummary:       { description:"Zeigt Einnahmen/Ausgaben/Gewinn aus der Buchhaltung.", safe:true, page:"bookkeeping", connected:true },
-  searchCustomer:          { description:"Sucht Kunden in der Kundenkartei.", safe:true, page:"crm", connected:true },
-  getProjectSummary:       { description:"Zeigt Baustellen/Projekte.", safe:true, page:"projekte", connected:true },
-  markOpenItemPaidDraft:   { description:"Bereitet vor, einen offenen Posten als bezahlt zu markieren.", safe:false, requiresConfirmation:true, connected:true },
-  deleteOpenItemsDraft:    { description:"Bereitet das Löschen offener Posten vor (Rückfrage + starke Bestätigung).", safe:false, requiresConfirmation:true, requiresStrongConfirmation:true, connected:false },
-  createCustomerDraft:     { description:"Bereitet das Anlegen eines Kunden vor.", safe:false, requiresConfirmation:true, connected:true },
-  createBookingDraft:      { description:"Bereitet Einnahme/Ausgabe vor.", safe:false, requiresConfirmation:true, connected:true },
-  createOfferDraft:        { description:"Bereitet ein Angebot vor (Preisrechner).", safe:false, requiresConfirmation:true, connected:true },
-  createInvoiceDraft:      { description:"Bereitet eine Rechnung vor.", safe:false, requiresConfirmation:true, connected:true },
-  createMarketingDraft:    { description:"Bereitet einen Marketing-Entwurf vor (nie automatisch veröffentlichen).", safe:false, requiresConfirmation:true, connected:true },
-  openAgent:               { description:"Öffnet einen KI-Mitarbeiter.", safe:true, connected:true },
-  stopSpeaking:            { description:"Stoppt die Sprachausgabe.", safe:true, connected:true },
-  confirmPendingAction:    { description:"Bestätigt die wartende Aktion (lokal).", safe:true, connected:true },
-  cancelPendingAction:     { description:"Bricht die wartende Aktion ab (lokal).", safe:true, connected:true },
-  askClarifyingQuestion:   { description:"Stellt eine Rückfrage, wenn etwas unklar ist.", safe:true, connected:true }
+  navigateTo:              { label:"Seite öffnen", description:"Öffnet eine Cockpit-Seite.", safe:true, params:["page"], connected:true },
+  getOpenPositionsSummary: { label:"Offene Posten anzeigen", description:"Zeigt offene Posten / unbezahlte Rechnungen / Außenstände.", safe:true, page:"openitems", connected:true },
+  getFinanceSummary:       { label:"Finanzübersicht", description:"Zeigt Einnahmen/Ausgaben/Gewinn aus der Buchhaltung.", safe:true, page:"bookkeeping", connected:true },
+  searchCustomer:          { label:"Kunde suchen", description:"Sucht Kunden in der Kundenkartei.", safe:true, params:["customerName"], page:"crm", connected:true },
+  getProjectSummary:       { label:"Baustellen anzeigen", description:"Zeigt Baustellen/Projekte.", safe:true, page:"projekte", connected:true },
+  markOpenItemPaidDraft:   { label:"Offenen Posten als bezahlt markieren", description:"Bereitet vor, einen offenen Posten als bezahlt zu markieren.", safe:false, requiresConfirmation:true, connected:true },
+  deleteOpenItemsDraft:    { label:"Offene Posten löschen vorbereiten", description:"Bereitet das Löschen offener Posten vor (Rückfrage + starke Bestätigung).", safe:false, requiresConfirmation:true, requiresStrongConfirmation:true, connected:false },
+  createCustomerDraft:     { label:"Kundenentwurf erstellen", description:"Bereitet das Anlegen eines Kunden vor.", safe:false, requiresConfirmation:true, connected:true },
+  createBookingDraft:      { label:"Buchungsentwurf erstellen", description:"Bereitet Einnahme/Ausgabe vor.", safe:false, requiresConfirmation:true, connected:true },
+  createOfferDraft:        { label:"Angebotsentwurf erstellen", description:"Bereitet ein Angebot vor (Preisrechner).", safe:false, requiresConfirmation:true, connected:true },
+  createInvoiceDraft:      { label:"Rechnungsentwurf erstellen", description:"Bereitet eine Rechnung vor.", safe:false, requiresConfirmation:true, connected:true },
+  createMarketingDraft:    { label:"Marketingentwurf erstellen", description:"Bereitet Anzeigen, Posts oder Beiträge vor (nie automatisch veröffentlichen).", safe:false, requiresConfirmation:true, connected:true },
+  publishMarketingDraft:   { label:"Marketing veröffentlichen", description:"Veröffentlicht vorbereitete Inhalte extern – nur mit starker Bestätigung.", safe:false, requiresConfirmation:true, requiresStrongConfirmation:true, connected:false },
+  openAgent:               { label:"KI-Mitarbeiter öffnen", description:"Öffnet einen KI-Mitarbeiter.", safe:true, connected:true },
+  stopSpeaking:            { label:"Sprachausgabe stoppen", description:"Stoppt die Sprachausgabe.", safe:true, connected:true },
+  confirmPendingAction:    { label:"Aktion bestätigen", description:"Bestätigt die wartende Aktion (lokal).", safe:true, connected:true },
+  cancelPendingAction:     { label:"Aktion abbrechen", description:"Bricht die wartende Aktion ab (lokal).", safe:true, connected:true },
+  askClarifyingQuestion:   { label:"Rückfrage stellen", description:"Stellt eine Rückfrage, wenn etwas unklar oder riskant ist.", safe:true, connected:true }
 };
 
 /* ---- Sicherheitsregeln (werden auch an die KI-Provider gesendet) ---- */
@@ -5843,22 +5853,85 @@ const NX_BRAIN_GLOSSARY_DEFAULT = [
   { term:"veröffentlichen", meaning:"externe Aktion, niemals ohne Bestätigung", aliases:["veröffentlichen","veroeffentlichen","posten","publizieren"] }
 ];
 
-/* ---- Gespeichertes Gehirn (settings.nexusBrain): gelernte Begriffe + Erinnerungen.
-        Liegt in den Settings -> wird im Backup MIT exportiert (Keys natürlich nicht). ---- */
+/* ---- Default-Gehirn: aus dem eingebetteten Export (window.NEXUS_BRAIN_DEFAULT,
+        erzeugt von tools/build-nexus-brain.js aus dem Markdown-Vault NEXUS_BRAIN/).
+        Fällt sonst auf die internen Mindeststrukturen zurück. ---- */
+function nxBrainDefault(){
+  try{ const d=window.NEXUS_BRAIN_DEFAULT; if(d&&typeof d==="object") return d; }catch(e){}
+  return null;
+}
+function nxBrainDefaultGlossary(){
+  const d=nxBrainDefault();
+  return (d&&Array.isArray(d.glossary)&&d.glossary.length)?d.glossary:NX_BRAIN_GLOSSARY_DEFAULT;
+}
+function nxBrainRules(){
+  const d=nxBrainDefault();
+  return (d&&Array.isArray(d.safetyRules)&&d.safetyRules.length)?d.safetyRules:NX_BRAIN_RULES;
+}
+function nxBrainBusiness(){
+  const d=nxBrainDefault();
+  if(d&&d.businessKnowledge&&typeof d.businessKnowledge==="object") return d.businessKnowledge;
+  return { name:"Verlegt & Verschraubt Handwerkerservice", type:"Handwerksservice",
+    region:"Wilhelmshaven und Umgebung", mainServices:["Bodenverlegung","Küchenmontage","Entrümpelung & Entsorgung"] };
+}
+function nxBrainExamplesList(){
+  const d=nxBrainDefault();
+  if(d&&Array.isArray(d.examples)&&d.examples.length)
+    return d.examples.map(x=>({user:x.user, expect:(x.json?(String(x.json.intent||"")+" → "+String(x.json.tool||"")+(x.json.entities&&x.json.entities.actionType?(" ("+x.json.entities.actionType+")"):"")):String(x.expect||""))}));
+  return NX_BRAIN_EXAMPLES;
+}
+
+/* ---- Nutzer-Lernspeicher: localStorage["VV_NEXUS_BRAIN_USER"] – strikt getrennt
+        vom Default-Gehirn. Wird ins Backup MIT exportiert (Keys natürlich nie). ---- */
+const NX_BRAIN_USER_SLOT="VV_NEXUS_BRAIN_USER";
 function getNexusBrainStored(){
-  const s=getSettings();
-  const b=(s.nexusBrain&&typeof s.nexusBrain==="object")?s.nexusBrain:{};
+  let b=null;
+  try{ b=JSON.parse(localStorage.getItem(NX_BRAIN_USER_SLOT)||"null"); }catch(e){ b=null; }
+  if(!b||typeof b!=="object"){
+    // einmalige Migration: früher lag der Lernspeicher in settings.nexusBrain.
+    // Sofort in den eigenen Slot schreiben, damit „Zurücksetzen“ ihn nicht wiederbelebt.
+    b={};
+    try{ const s=getSettings(); if(s.nexusBrain&&typeof s.nexusBrain==="object") b=s.nexusBrain; }catch(e){}
+    try{ localStorage.setItem(NX_BRAIN_USER_SLOT, JSON.stringify({version:1, glossary:b.glossary||[], notes:b.notes||[]})); }catch(e){}
+  }
   return { version:1,
     glossary:Array.isArray(b.glossary)?b.glossary.filter(g=>g&&g.term):[],
     notes:Array.isArray(b.notes)?b.notes.filter(n=>typeof n==="string"&&n.trim()):[] };
 }
 function saveNexusBrainStored(brain){
-  let cur={}; try{ cur=JSON.parse(localStorage.getItem("VV_SETTINGS_2026")||"{}")||{}; }catch(e){ cur={}; }
-  cur.nexusBrain=Object.assign({version:1}, getNexusBrainStored(), brain||{});
-  localStorage.setItem("VV_SETTINGS_2026", JSON.stringify(cur));
-  return cur.nexusBrain;
+  const next=Object.assign({version:1}, getNexusBrainStored(), brain||{});
+  try{ localStorage.setItem(NX_BRAIN_USER_SLOT, JSON.stringify(next)); }catch(e){}
+  return next;
 }
-function nexusBrainGlossary(){ return NX_BRAIN_GLOSSARY_DEFAULT.concat(getNexusBrainStored().glossary); }
+/* Import-Merge (Backup oder Brain-JSON): nur Begriffe + Notizen, keine Keys */
+function mergeNexusBrainUser(incoming){
+  if(!incoming||typeof incoming!=="object") return;
+  const cur=getNexusBrainStored();
+  const incG=Array.isArray(incoming.glossary)?incoming.glossary:[];
+  incG.forEach(g=>{
+    if(!g||!g.term||!g.meaning) return;
+    if(!cur.glossary.some(x=>String(x.term).toLowerCase()===String(g.term).toLowerCase()))
+      cur.glossary.push({term:String(g.term).slice(0,60), meaning:String(g.meaning).slice(0,300),
+        aliases:(Array.isArray(g.aliases)?g.aliases:[]).map(a=>String(a).toLowerCase().trim()).filter(Boolean).slice(0,20),
+        canonicalIntent:g.canonicalIntent||null, canonicalTool:g.canonicalTool||null, page:g.page||null,
+        source:"gelernt", createdAt:g.createdAt||nowISO()});
+  });
+  (Array.isArray(incoming.notes)?incoming.notes:[]).forEach(n=>{
+    n=String(n||"").trim().slice(0,200);
+    if(n && cur.notes.indexOf(n)<0) cur.notes.push(n);
+  });
+  saveNexusBrainStored({glossary:cur.glossary, notes:cur.notes.slice(-30)});
+}
+/* Gesamtes Gehirn: Default + Nutzer-Lernspeicher zusammengeführt */
+function getNexusBrain(){
+  const u=getNexusBrainStored();
+  return { version:1,
+    glossary:nxBrainDefaultGlossary().concat(u.glossary),
+    notes:u.notes,
+    pages:NEXUS_PAGES, tools:NEXUS_TOOLS,
+    safetyRules:nxBrainRules(), businessKnowledge:nxBrainBusiness(), examples:nxBrainExamplesList() };
+}
+function nexusBrainGlossary(){ return nxBrainDefaultGlossary().concat(getNexusBrainStored().glossary); }
 function saveNexusBrainEntry(entry){
   if(!entry||!String(entry.term||"").trim()) return false;
   const b=getNexusBrainStored();
@@ -5921,26 +5994,30 @@ function nxBrainAnalyze(userText){
 }
 
 /* ---- Kompakter KI-Kontext (nur Begriffe, Regeln, Zähler – KEINE Kundenakten) ---- */
-function buildNexusBrainContext(userText, context){
+function buildNexusBrainContext(userText, runtimeContext){
   const a=nxBrainAnalyze(userText);
   let op=null; try{ op=getOpenPositionsSummary(); }catch(e){}
-  const b=getNexusBrainStored();
+  const u=getNexusBrainStored();
+  const biz=nxBrainBusiness();
+  const pageHints={}; Object.keys(NEXUS_PAGES).forEach(p=>{ pageHints[p]=(NEXUS_PAGES[p].aliases||[]).slice(0,6); });
+  const toolHints={}; Object.keys(NEXUS_TOOLS).forEach(t=>{ const x=NEXUS_TOOLS[t];
+    toolHints[t]=x.description+(x.requiresStrongConfirmation?" [starke Bestätigung]":(x.safe?"":" [nur Entwurf+Bestätigung]")); });
   return {
-    business:{ name:"Verlegt & Verschraubt Handwerkerservice", type:"Handwerksservice",
-      mainAreas:["Bodenverlegung","Küchenmontage","Entrümpelung","Buchhaltung","Kundenverwaltung"] },
-    glossary:nexusBrainGlossary().map(g=>({term:g.term, meaning:g.meaning,
+    business:{ name:biz.name||"Verlegt & Verschraubt Handwerkerservice", type:biz.type||"Handwerksservice",
+      region:biz.region||"Wilhelmshaven und Umgebung",
+      mainServices:Array.isArray(biz.mainServices)&&biz.mainServices.length?biz.mainServices:["Bodenverlegung","Küchenmontage","Entrümpelung & Entsorgung"] },
+    matchedConcepts:a.concept?[{ term:a.concept, meaning:a.meaning,
+      suggestedIntent:a.suggestedIntent, suggestedTool:a.suggestedTool, suggestedPage:a.suggestedPage,
+      requiresConfirmation:a.dangerous, requiresStrongConfirmation:(a.dangerous&&a.mass) }]:[],
+    glossaryHints:nexusBrainGlossary().map(g=>({term:g.term, meaning:g.meaning,
       intent:g.canonicalIntent||null, tool:g.canonicalTool||null, page:g.page||null})),
-    pages:NEXUS_PAGES,
-    tools:Object.keys(NEXUS_TOOLS).map(t=>t+(NEXUS_TOOLS[t].safe?"":" (nur Entwurf+Bestätigung)")),
-    rules:NX_BRAIN_RULES,
-    memories:b.notes.slice(-10),
-    currentState:{ currentPage:(typeof currentSection!=="undefined"?currentSection:null)||(context&&context.currentPage)||"dashboard",
+    pageHints, toolHints,
+    safetyRules:nxBrainRules(),
+    memories:u.notes.slice(-10),
+    currentState:{ currentPage:(typeof currentSection!=="undefined"?currentSection:null)||(runtimeContext&&runtimeContext.currentPage)||"dashboard",
       openItemsCount:op?op.count:null,
       customersCount:(data.customers||[]).filter(c=>!(c.archived||c.deletedAt)).length,
-      invoicesCount:(data.invoices||[]).length },
-    localHints:a.concept?{ matchedBrainConcept:a.concept, resolvedMeaning:a.meaning,
-      suggestedIntent:a.suggestedIntent, suggestedTool:a.suggestedTool, suggestedPage:a.suggestedPage,
-      requiresConfirmation:a.dangerous, requiresStrongConfirmation:(a.dangerous&&a.mass) }:null
+      invoicesCount:(data.invoices||[]).length }
   };
 }
 
@@ -5955,6 +6032,10 @@ function nxBrainStartDeleteFlow(){
 function nxBrainExecuteDeleteOpenItems(){
   // Bewusst nicht verbunden: endgültige Massenlöschung ist im Cockpit nicht freigeschaltet.
   return "🛑 Diese Aktion ist geplant, aber noch nicht vollständig verbunden. Es wurde NICHTS gelöscht.\nDu kannst offene Posten einzeln im Bereich „Offene Posten“ bearbeiten, ausblenden oder als bezahlt markieren.";
+}
+function nxBrainStartPublishFlow(){
+  _nxBrainFlow={type:"publish", stage:"strong"};
+  return "⚠️ Veröffentlichen ist eine externe Aktion und passiert nie automatisch.\nEin normales „ja“ reicht hier NICHT. Schreibe exakt: „Ja, veröffentlichen“ – oder „abbrechen“.";
 }
 function nxBrainFlowHandle(raw, context){
   const f=_nxBrainFlow; if(!f) return null;
@@ -5978,6 +6059,14 @@ function nxBrainFlowHandle(raw, context){
       _nxBrainFlow=null; return "Nicht ausgeführt – Löschvorgang beendet, nichts verändert.";
     }
   }
+  if(f.type==="publish"){
+    if(/^ja[,.\s]+ver(ö|oe)ffentlichen\b/.test(l)){
+      _nxBrainFlow=null; navigateTo("mkagents");
+      return "🛑 Diese Aktion ist verstanden, aber noch nicht vollständig mit dem Cockpit verbunden. Es wurde NICHTS veröffentlicht.\nDen Entwurf findest du im Bereich „Marketing & KI-Agenten“ – von dort kannst du ihn selbst veröffentlichen.";
+    }
+    if(/^(ja|jap|jawohl|ok|okay)\b/.test(l)) return "Sicherheitsstufe: Für Veröffentlichungen reicht ein normales „ja“ nicht. Schreibe exakt „Ja, veröffentlichen“ – oder „abbrechen“.";
+    _nxBrainFlow=null; return "Nicht veröffentlicht – Vorgang beendet.";
+  }
   if(f.type==="learn"){
     if(/^(ja|jap|jawohl|ok|okay|merk|speicher|genau|gerne)/.test(l)){
       _nxBrainFlow=null;
@@ -5999,6 +6088,57 @@ function nxBrainDetectLearn(raw){
   if(!term||!meaning) return null;
   _nxBrainFlow={type:"learn", term, meaning};
   return "Soll ich mir merken, dass „"+term+"“ „"+meaning+"“ bedeutet? Ja/Nein.";
+}
+
+/* ---- Lokale Vorstufe VOR jedem Provider-Aufruf ----
+   1) normalisieren  2) Kontrollbefehle  3) Gehirn-Begriffe erkennen
+   4) Gefahrenwörter  5) eindeutige Befehle direkt lokal ausführen
+   6) riskante Befehle nie direkt, sondern Sicherheitsdialog */
+function preResolveNexusCommand(commandText, context){
+  context=context||{};
+  const raw=String(commandText||"").trim();
+  const l=raw.toLowerCase().replace(/\s+/g," ");
+  // laufender Gehirn-Dialog (Löschen/Veröffentlichen/Lernen) hat Vorrang –
+  // hier zählt auch, dass ein normales „ja“ bei starken Aktionen NICHT reicht
+  if(_nxBrainFlow){ const r=nxBrainFlowHandle(raw, context); if(r!=null){ _nxLastKind="Aktion"; return {handled:true, text:r}; } }
+  // „ja“/„nein“ ohne wartende Aktion führt nichts aus
+  if(/^(ja|jap|jawohl|ok|okay|nein|ne|nö|noe|bestätigen?|bestaetigen?)[!. ]*$/.test(l)
+     && !_nxFlow && !_nxPendingPaid && !_nxPendingBooking){
+    _nxLastKind="Info"; return {handled:true, text:"Es gibt gerade keine Aktion zur Bestätigung."};
+  }
+  // Bestätigungen, geführter Dialog, Stop/Abbruch IMMER lokal (hängen nie an einer KI)
+  if(_nxFlow || _nxPendingPaid || _nxPendingBooking || nxIsControlPhrase(l))
+    return {handled:true, text:handleNexusCommand(raw, context)};
+  // Lernangebot: „Mit X meine ich Y“ / „Merke dir: X bedeutet Y“
+  const learnAsk=nxBrainDetectLearn(raw);
+  if(learnAsk){ _nxLastKind="Rückfrage"; return {handled:true, text:learnAsk}; }
+  // Gehirn-Vorerkennung
+  const brain=nxBrainAnalyze(raw);
+  const dangerWords=(l.match(/(lösch\w*|loesch\w*|entfern\w*|zurücksetz\w*|zuruecksetz\w*|\breset\b|\balle[nrs]?\b|sämtliche|saemtliche|endgültig|endgueltig|bereinig\w*|veröffentlich\w*|veroeffentlich\w*|publizier\w*|\bsenden\b)/g)||[]);
+  let provOrder=""; try{ provOrder=getProviderRoutingOrder().join(" → ")||"(keine Provider)"; }catch(e){}
+  try{ nxBrainDebugNote({userText:raw, matchedConcept:brain.concept, suggestedIntent:brain.suggestedIntent, suggestedTool:brain.suggestedTool, suggestedPage:brain.suggestedPage, dangerous:brain.dangerous, mass:brain.mass, dangerWords:dangerWords.join(", ")||null, providerOrder:provOrder, provider:null, receivedIntent:null, executedTool:null}); }catch(e){}
+  // riskant: offene Posten löschen -> geführter Sicherheitsdialog (lokal, deterministisch)
+  if(brain.concept && brain.dangerous && brain.suggestedPage==="openitems"){
+    _nxLastKind="Aktion"; nxBrainDebugNote({executedTool:"deleteOpenItemsDraft (Sicherheitsdialog)"});
+    return {handled:true, text:nxBrainStartDeleteFlow()};
+  }
+  // riskant: Veröffentlichen -> nie direkt, starke Bestätigung
+  if(/(veröffentlich|veroeffentlich|publizier)/.test(l)){
+    _nxLastKind="Aktion"; nxBrainDebugNote({executedTool:"publishMarketingDraft (Sicherheitsdialog)"});
+    return {handled:true, text:nxBrainStartPublishFlow()};
+  }
+  // eindeutiger Cockpit-Begriff ohne Zusatz: direkt lokal ausführen (kein KI-Aufruf nötig)
+  if(brain.concept && brain.simple){
+    if(brain.suggestedTool==="getOpenPositionsSummary"){
+      if(/(öffne|oeffne|geh\b)/.test(l)){ _nxLastKind="Navigation"; navigateTo("openitems"); nxBrainDebugNote({executedTool:"navigateTo (lokal)"}); return {handled:true, text:"Öffne im Cockpit: Offene Posten."}; }
+      _nxLastKind="Abfrage"; nxBrainDebugNote({executedTool:"getOpenPositionsSummary (lokal)"});
+      return {handled:true, text:nxFormatOpenPositions()};
+    }
+    if(brain.suggestedTool==="getFinanceSummary"){ _nxLastKind="Abfrage"; nxBrainDebugNote({executedTool:"getFinanceSummary (lokal)"}); return {handled:true, text:nxFinanceText()}; }
+    if(brain.suggestedTool==="getProjectSummary"){ _nxLastKind="Abfrage"; nxBrainDebugNote({executedTool:"getProjectSummary (lokal)"}); return {handled:true, text:nxProjectSummaryText(null)}; }
+    if(brain.suggestedPage && /(öffne|oeffne|zeig|geh\b)/.test(l)){ _nxLastKind="Navigation"; navigateTo(brain.suggestedPage); nxBrainDebugNote({executedTool:"navigateTo (lokal)"}); return {handled:true, text:"Öffne im Cockpit: "+nxSecName(brain.suggestedPage)+"."}; }
+  }
+  return {handled:false, brain};
 }
 
 /* ---- Debug: letzter KI-Kontext (keine Keys, keine Kundenakten) ---- */
@@ -6025,7 +6165,10 @@ const _nxBrainUi={ tab:"begriffe" };
 function nxBrainTab(id){ _nxBrainUi.tab=id; nxBrainRenderPanel(); }
 function nxBrainTabBtn(id,label){ return '<button class="nx-btn'+(_nxBrainUi.tab===id?" on":"")+'" onclick="nxBrainTab(\''+id+'\')">'+label+'</button>'; }
 function nxBrainGlossaryHTML(){
-  const rows=nexusBrainGlossary().map(g=>{
+  const q=String(_nxBrainUi.q||"").toLowerCase().trim();
+  const all=nexusBrainGlossary();
+  const filtered=q?all.filter(g=>(String(g.term)+" "+String(g.meaning||"")+" "+(g.aliases||[]).join(" ")).toLowerCase().includes(q)):all;
+  const rows=filtered.map(g=>{
     const learned=(g.source==="gelernt");
     return '<div style="border:1px solid var(--nxline);border-radius:9px;padding:8px 10px;margin:6px 0">'+
       '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><b>'+esc(g.term)+'</b>'+
@@ -6037,7 +6180,10 @@ function nxBrainGlossaryHTML(){
       '</div>';
   }).join("");
   const pageOpts='<option value="">– keine Seite –</option>'+Object.keys(NX_SEC_NAME).map(p=>'<option value="'+p+'">'+esc(NX_SEC_NAME[p])+'</option>').join("");
-  return '<div class="nx-ai">'+rows+
+  return '<div class="nx-ai">'+
+    '<input id="nxBrainSearch" placeholder="🔍 Begriff suchen …" value="'+esc(_nxBrainUi.q||"")+'" oninput="nxBrainSearchInput(this.value)" style="margin-bottom:4px">'+
+    (q&&!filtered.length?'<div class="nx-muted" style="margin:8px 0">Kein Begriff zu „'+esc(q)+'“ gefunden.</div>':'')+
+    rows+
     '<div style="border:1px dashed var(--nxline);border-radius:9px;padding:10px;margin-top:10px">'+
     '<b style="font-size:12.5px">Neuen Begriff beibringen</b>'+
     '<div class="nx-ai-grid" style="margin-top:6px">'+
@@ -6050,7 +6196,7 @@ function nxBrainGlossaryHTML(){
 }
 function nxBrainPagesHTML(){
   return '<div class="nx-ai">'+Object.keys(NEXUS_PAGES).map(p=>
-    '<div class="nx-row"><span><b>'+esc(NX_SEC_NAME[p]||p)+'</b> <span class="nx-muted">('+esc(p)+')</span></span><span class="nx-muted" style="text-align:right">'+esc(NEXUS_PAGES[p].slice(0,5).join(", "))+'</span></div>'
+    '<div class="nx-row"><span><b>'+esc(NEXUS_PAGES[p].label||NX_SEC_NAME[p]||p)+'</b> <span class="nx-muted">('+esc(p)+')</span></span><span class="nx-muted" style="text-align:right">'+esc((NEXUS_PAGES[p].aliases||[]).slice(0,6).join(", "))+'</span></div>'
   ).join("")+'</div>';
 }
 function nxBrainToolsHTML(){
@@ -6063,11 +6209,11 @@ function nxBrainToolsHTML(){
   }).join("")+'<div class="nx-muted" style="margin-top:8px">„geplant“ = Aktion ist vorbereitet, aber noch nicht vollständig verbunden – sie führt nie etwas aus.</div></div>';
 }
 function nxBrainRulesHTML(){
-  return '<div class="nx-ai" style="line-height:1.7">'+NX_BRAIN_RULES.map(r=>'<div>• '+esc(r)+'</div>').join("")+
+  return '<div class="nx-ai" style="line-height:1.7">'+nxBrainRules().map(r=>'<div>• '+esc(r)+'</div>').join("")+
     '<div class="nx-muted" style="margin-top:8px">Diese Regeln werden auch an Gemini/Groq mitgesendet. Ausgeführt wird trotzdem ausschließlich lokal im Cockpit.</div></div>';
 }
 function nxBrainExamplesHTML(){
-  return '<div class="nx-ai">'+NX_BRAIN_EXAMPLES.map(x=>
+  return '<div class="nx-ai">'+nxBrainExamplesList().map(x=>
     '<div style="border:1px solid var(--nxline);border-radius:9px;padding:8px 10px;margin:6px 0">'+
     '<div>„'+esc(x.user)+'“</div><div class="nx-muted" style="margin-top:3px">→ '+esc(x.expect)+'</div>'+
     '<div style="margin-top:6px"><button class="nx-btn" style="padding:4px 9px;font-size:11.5px" onclick="nxBrainTryExample(\''+esc(x.user).replace(/'/g,"\\'")+'\')">In Eingabe übernehmen</button></div></div>'
@@ -6078,7 +6224,55 @@ function nxBrainMemoHTML(){
   return '<div class="nx-ai">'+
     (notes.length?notes.map((n,i)=>'<div class="nx-row"><span>'+esc(n)+'</span><button class="nx-btn" style="padding:3px 8px;font-size:11px" onclick="nxBrainDelNote('+i+')">löschen</button></div>').join(""):'<div class="nx-muted">Noch keine Erinnerungen gespeichert.</div>')+
     '<div style="display:flex;gap:6px;margin-top:8px"><input id="nxBrainNoteInput" placeholder="z. B. Rechnungen immer ohne Umsatzsteuer (§19 UStG)" style="flex:1"><button class="nx-btn cy" onclick="nxBrainAddNote()">Merken</button></div>'+
-    '<div class="nx-muted" style="margin-top:6px">Nur Begriffe, Regeln und Arbeitslogik speichern – keine sensiblen Daten. Erinnerungen werden als Kurz-Kontext an die KI mitgesendet und im Backup mit exportiert. Tipp: Im Chat geht auch „Merke dir: X bedeutet Y“.</div></div>';
+    '<div class="nx-h" style="margin-top:14px">Lernspeicher verwalten</div>'+
+    '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px">'+
+    '<button class="nx-btn" onclick="nxBrainExportJson()">Brain JSON exportieren</button>'+
+    '<button class="nx-btn" onclick="byId(\'nxBrainImportFile\').click()">Brain JSON importieren</button>'+
+    '<button class="nx-btn" onclick="nxBrainResetUser()">Nur Nutzer-Lernspeicher zurücksetzen</button>'+
+    '<input type="file" id="nxBrainImportFile" accept=".json" style="display:none" onchange="nxBrainImportJson(event)">'+
+    '</div>'+
+    '<div id="nxBrainIoMsg" class="nx-muted" style="margin-top:6px"></div>'+
+    '<div class="nx-muted" style="margin-top:6px">Nur Begriffe, Regeln und Arbeitslogik speichern – keine sensiblen Daten, keine API-Keys. Erinnerungen werden als Kurz-Kontext an die KI mitgesendet und im Backup mit exportiert. „Zurücksetzen“ löscht nur Gelerntes – das eingebaute Default-Gehirn bleibt. Tipp: Im Chat geht auch „Merke dir: X bedeutet Y“.</div></div>';
+}
+function nxBrainSearchInput(v){
+  _nxBrainUi.q=String(v||"");
+  // nur die Liste neu zeichnen, Fokus im Suchfeld behalten
+  const host=byId("nxBrainBody"); if(!host) return;
+  clearTimeout(_nxBrainUi._qT);
+  _nxBrainUi._qT=setTimeout(()=>{ nxBrainRenderPanel(); const i=byId("nxBrainSearch"); if(i){ i.focus(); try{ i.setSelectionRange(i.value.length,i.value.length); }catch(e){} } },250);
+}
+/* Export: zusammengeführtes Gehirn als nexus-brain.json (enthält NIE Keys) */
+function nxBrainExportJson(){
+  const brain=getNexusBrain();
+  const json=JSON.stringify(Object.assign({exportedAt:nowISO()}, brain), null, 2);
+  const blob=new Blob([json],{type:"application/json"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a"); a.href=url; a.download="nexus-brain.json"; a.style.display="none";
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(()=>{ try{ URL.revokeObjectURL(url); }catch(e){} },4000);
+  const msg=byId("nxBrainIoMsg"); if(msg) msg.innerHTML='<span style="color:#39e08a">✓ nexus-brain.json exportiert (ohne API-Keys).</span>';
+}
+function nxBrainImportJson(ev){
+  const file=ev.target.files&&ev.target.files[0]; if(!file) return;
+  const r=new FileReader();
+  r.onload=e=>{
+    try{
+      const j=JSON.parse(e.target.result);
+      mergeNexusBrainUser(j);
+      nxBrainRenderPanel();
+      const msg=byId("nxBrainIoMsg"); if(msg) msg.innerHTML='<span style="color:#39e08a">✓ Importiert: Begriffe und Erinnerungen in den Lernspeicher übernommen.</span>';
+    }catch(err){
+      const msg=byId("nxBrainIoMsg"); if(msg) msg.innerHTML='<span style="color:#ff9c8a">✗ Ungültige JSON-Datei: '+esc(err.message)+'</span>';
+    }
+    ev.target.value="";
+  };
+  r.readAsText(file);
+}
+function nxBrainResetUser(){
+  if(!confirm("Nur den Nutzer-Lernspeicher (gelernte Begriffe + Erinnerungen) zurücksetzen?\n\nDas eingebaute Default-Gehirn bleibt vollständig erhalten.")) return;
+  try{ localStorage.setItem(NX_BRAIN_USER_SLOT, JSON.stringify({version:1, glossary:[], notes:[]})); }catch(e){}
+  nxBrainRenderPanel();
+  const msg=byId("nxBrainIoMsg"); if(msg) msg.innerHTML='<span style="color:#39e08a">✓ Nutzer-Lernspeicher zurückgesetzt – Default-Gehirn unverändert.</span>';
 }
 function nxBrainDebugHTML(){
   const d=_nxBrainDebug.last;
@@ -6133,30 +6327,10 @@ async function nxProcessCommand(commandText, context){
   context=context||{};
   const raw=String(commandText||"").trim(); if(!raw) return "";
   const l=raw.toLowerCase();
-  // 1a) Laufender NEXUS-Gehirn-Dialog (Lösch-Rückfrage / Lernen) hat Vorrang –
-  //     hier zählt auch, dass ein normales „ja“ bei Massenlöschung NICHT reicht.
-  if(_nxBrainFlow){ const r=nxBrainFlowHandle(raw, context); if(r!=null){ _nxLastKind="Aktion"; return r; } }
-  // 1b) Bestätigungen, geführter Dialog, Stop/Abbruch IMMER lokal (hängen nie an einer KI)
-  if(_nxFlow || _nxPendingPaid || _nxPendingBooking || nxIsControlPhrase(l)) return handleNexusCommand(raw, context);
-  // 1c) Lernangebot: „Mit X meine ich Y“ / „Merke dir: X bedeutet Y“
-  const learnAsk=nxBrainDetectLearn(raw); if(learnAsk){ _nxLastKind="Rückfrage"; return learnAsk; }
-  // 1d) Lokale Vorerkennung über das NEXUS-Gehirn (vor jedem KI-Aufruf)
-  const brain=nxBrainAnalyze(raw);
-  try{ nxBrainDebugNote({userText:raw, matchedConcept:brain.concept, suggestedIntent:brain.suggestedIntent, suggestedTool:brain.suggestedTool, suggestedPage:brain.suggestedPage, dangerous:brain.dangerous, mass:brain.mass, provider:null, receivedIntent:null}); }catch(e){}
-  if(brain.concept && brain.dangerous && brain.suggestedPage==="openitems"){
-    // „lösche offene Positionen“ u. ä.: NIE löschen, immer geführte Rückfrage (lokal, deterministisch)
-    _nxLastKind="Aktion"; return nxBrainStartDeleteFlow();
-  }
-  if(brain.concept && brain.simple){
-    // eindeutiger Cockpit-Begriff ohne Zusatz: direkt lokal ausführen (kein KI-Aufruf nötig)
-    if(brain.suggestedTool==="getOpenPositionsSummary"){
-      if(/(öffne|oeffne|geh\b)/.test(l)){ _nxLastKind="Navigation"; navigateTo("openitems"); return "Öffne im Cockpit: Offene Posten."; }
-      _nxLastKind="Abfrage"; return nxFormatOpenPositions();
-    }
-    if(brain.suggestedTool==="getFinanceSummary"){ _nxLastKind="Abfrage"; return nxFinanceText(); }
-    if(brain.suggestedTool==="getProjectSummary"){ _nxLastKind="Abfrage"; return nxProjectSummaryText(null); }
-    if(brain.suggestedPage && /(öffne|oeffne|zeig|geh\b)/.test(l)){ _nxLastKind="Navigation"; navigateTo(brain.suggestedPage); return "Öffne im Cockpit: "+nxSecName(brain.suggestedPage)+"."; }
-  }
+  // 1) Lokale Vorstufe: Gehirn-Dialoge, Bestätigungen, Vorerkennung (nie KI-abhängig)
+  const pre=preResolveNexusCommand(raw, context);
+  if(pre.handled) return pre.text;
+  const brain=pre.brain;
 
   // 2) Provider-Kette: Direkt-APIs laut Routing-Einstellung, danach optional Ollama (lokal)
   const cfg=getNexusOllamaCfg();
@@ -6189,7 +6363,11 @@ async function nxProcessCommand(commandText, context){
       // Provider unsicher/unknown, aber das Gehirn kennt den Begriff -> Gehirn-Vorschlag bevorzugen (Stufe 4a)
       if(!nxIntentIsConfident(ir) && brain.concept && brain.suggestedTool && !brain.dangerous) break;
       const exec=executeIntentResult(ir, context);
-      if(exec && exec.handled){ _nxOllamaErrNotified=false; if(exec.kind) _nxLastKind=exec.kind; return note+exec.text; }
+      if(exec && exec.handled){
+        _nxOllamaErrNotified=false; if(exec.kind) _nxLastKind=exec.kind;
+        try{ nxBrainDebugNote({executedTool:ir.tool||null, requiresConfirmation:ir.requiresConfirmation===true||ir.requiresStrongConfirmation===true}); }catch(e){}
+        return note+exec.text;
+      }
       // nicht zuordenbar -> nächster Provider / Fallback
     }
     // sonst: zu unsicher und es gibt noch einen Provider -> weiter
@@ -9013,6 +9191,10 @@ document.addEventListener("DOMContentLoaded",()=>{
   const obs=new MutationObserver(()=>{ if(currentSection==="bookkeeping") renderBkTable(); });
   obs.observe(byId("main"),{childList:true});
 });
+
+// BEGIN NEXUS_BRAIN_DEFAULT
+window.NEXUS_BRAIN_DEFAULT = {"version":1,"updatedAt":"2026-06-10T12:30:50.010Z","glossary":[{"term":"offene Positionen","meaning":"Im V&V Cockpit bedeutet „offene Positionen“ standardmäßig offene Posten, offene Forderungen, unbezahlte Rechnungen oder Außenstände im Buchhaltungsbereich.","canonicalIntent":"open_items_summary","canonicalTool":"getOpenPositionsSummary","page":"openitems","aliases":["offene positionen","offene posten","offene rechnungen","außenstände","aussenstände","aussenstaende","unbezahlte rechnungen","offene forderungen","offene beträge","offene betraege","zahlung offen","wer schuldet mir geld","wer schuldet mir noch geld","schuldet mir geld","wer muss noch zahlen","kunden schulden geld","wer hat noch nicht bezahlt","welche rechnungen sind offen","welche kunden müssen noch zahlen"],"notMeant":["offene Stellen","Jobangebote","Personalpositionen","freie Arbeitsplätze"],"dangerousWhenCombinedWith":["löschen","entfernen","zurücksetzen","bereinigen","wegmachen","alles löschen","alle löschen","endgültig"],"clarificationRule":"Wenn der Nutzer offene Positionen löschen will, darf NEXUS niemals sofort löschen. Pflicht-Rückfrage: „Meinst du wirklich löschen oder nur als bezahlt/erledigt markieren? Löschen entfernt Datensätze dauerhaft.“ Bei Massenlöschung starke Bestätigung („Ja, endgültig löschen“) – normales „ja“ reicht nicht. Nur bei eindeutigem Personal-/HR-Kontext darf „Positionen“ als Stelle/Job verstanden werden."},{"term":"Buchhaltung","meaning":"Einnahmen, Ausgaben, Belege, Rechnungen, offene Posten, Steuerübersicht.","canonicalIntent":"navigate","canonicalTool":"navigateTo","page":"bookkeeping","aliases":["buchhaltung","finanzen","einnahmen","ausgaben","kasse","buchungen","belegübersicht","geldübersicht"],"notMeant":[],"dangerousWhenCombinedWith":[],"clarificationRule":null},{"term":"Kundenkartei","meaning":"Kundendaten, Kundennotizen, Projekte, Kommunikation, Angebote/Rechnungen pro Kunde.","canonicalIntent":"navigate","canonicalTool":"navigateTo","page":"akte","aliases":["kundenkartei","kundenakte","kundendaten","kundenübersicht","kundenliste"],"notMeant":[],"dangerousWhenCombinedWith":[],"clarificationRule":null},{"term":"Rechnung","meaning":"Offizielle Zahlungsanforderung an Kunden.","canonicalIntent":"navigate","canonicalTool":"navigateTo","page":"rechnungen","aliases":["rechnung","rechnungen","zahlungsanforderung","kundenrechnung"],"notMeant":[],"dangerousWhenCombinedWith":[],"clarificationRule":null},{"term":"Angebot","meaning":"Kostenvoranschlag / Angebot für Kunden, noch nicht Rechnung.","canonicalIntent":"navigate","canonicalTool":"navigateTo","page":"angebote","aliases":["angebot","angebote","kostenvoranschlag","preisangebot","kundenangebot"],"notMeant":[],"dangerousWhenCombinedWith":[],"clarificationRule":null},{"term":"Baustelle / Projekt / Auftrag","meaning":"Kundenauftrag bzw. Baustellenplanung.","canonicalIntent":"project_summary","canonicalTool":"getProjectSummary","page":"projekte","aliases":["baustelle","baustellen","projekt","projekte","auftrag","aufträge","auftraege","baustellenplaner"],"notMeant":[],"dangerousWhenCombinedWith":[],"clarificationRule":null},{"term":"bezahlt","meaning":"Eine offene Rechnung / ein offener Posten soll als bezahlt markiert werden, nicht gelöscht.","canonicalIntent":"mark_open_item_paid_draft","canonicalTool":"markOpenItemPaidDraft","page":"openitems","aliases":["als bezahlt markieren","bezahlt markieren","auf bezahlt setzen","als bezahlt","auf bezahlt","ist bezahlt","wurde bezahlt","hat bezahlt"],"notMeant":[],"dangerousWhenCombinedWith":[],"clarificationRule":"Bestätigung nötig (Ja/Nein), niemals löschen."},{"term":"löschen","meaning":"Kritische Aktion, niemals sofort ausführen – immer Bestätigung nötig, bei Massenlöschung starke Bestätigung.","canonicalIntent":null,"canonicalTool":null,"page":null,"aliases":["löschen","loeschen","entfernen"],"notMeant":[],"dangerousWhenCombinedWith":[],"clarificationRule":null},{"term":"zurücksetzen","meaning":"Kritische Aktion, sehr gefährlich, immer Extra-Bestätigung.","canonicalIntent":null,"canonicalTool":null,"page":null,"aliases":["zurücksetzen","zuruecksetzen","reset"],"notMeant":[],"dangerousWhenCombinedWith":[],"clarificationRule":null},{"term":"veröffentlichen","meaning":"Externe Aktion (Post, Anzeige, Google-Beitrag, Social-Media-Inhalt). Niemals ohne ausdrückliche Bestätigung veröffentlichen.","canonicalIntent":null,"canonicalTool":null,"page":null,"aliases":["veröffentlichen","veroeffentlichen","posten","publizieren"],"notMeant":[],"dangerousWhenCombinedWith":[],"clarificationRule":null},{"term":"Steuer-Rücklage","meaning":"Bei V&V werden intern 35 % jeder Einnahme als Steuer-Rücklage geplant.","canonicalIntent":null,"canonicalTool":null,"page":"bookkeeping","aliases":["steuerrücklage","steuer-rücklage","steuerruecklage","rücklage","ruecklage"],"notMeant":[],"dangerousWhenCombinedWith":[],"clarificationRule":null},{"term":"Kleinunternehmer","meaning":"V&V arbeitet mit Kleinunternehmerregelung nach §19 UStG. Rechnungen weisen keine Umsatzsteuer aus.","canonicalIntent":null,"canonicalTool":null,"page":null,"aliases":["kleinunternehmer","kleinunternehmerregelung","§19","paragraph 19","umsatzsteuer"],"notMeant":[],"dangerousWhenCombinedWith":[],"clarificationRule":null}],"pages":{"dashboard":{"label":"Dashboard","aliases":["start","übersicht","uebersicht","dashboard","home","startseite"]},"crm":{"label":"Kunden-CRM","aliases":["kunden crm","kundenliste","crm","kunden"]},"akte":{"label":"Kundenkartei","aliases":["kundenkartei","kundenakte","kundendaten","akte"]},"aufmass":{"label":"Aufmaß-Tool","aliases":["aufmaß","aufmass","maß nehmen","mass nehmen","aufmaß tool"]},"angebote":{"label":"Angebote","aliases":["angebote","angebot","kostenvoranschläge","kostenvoranschlaege","kostenvoranschlag"]},"rechnungen":{"label":"Rechnungen","aliases":["rechnungen","rechnung"]},"openitems":{"label":"Offene Posten","aliases":["offene posten","offene positionen","außenstände","aussenstände","aussenstaende","wer schuldet mir geld","offene rechnungen","offene forderungen"]},"bookkeeping":{"label":"Buchhaltung","aliases":["buchhaltung","einnahmen","ausgaben","finanzen","buchungen","bank","csv","bank sync","kontoauszug"]},"belegscanner":{"label":"Belegscanner","aliases":["belege","belegscanner","beleg scannen"]},"projekte":{"label":"Baustellenplaner","aliases":["baustellen","projekte","aufträge","auftraege","auftrag","baustellenplaner"]},"mkagents":{"label":"Marketing / KI","aliases":["marketing","content","werbung","anzeigen"]},"personal":{"label":"Personalwesen","aliases":["personal","personalwesen","mitarbeiter","stellen"]},"nexus":{"label":"NEXUS Deck","aliases":["nexus","command deck","ki deck","nexus deck"]},"settings":{"label":"Firmendaten","aliases":["firmendaten","einstellungen","settings"]}},"tools":{"navigateTo":{"label":"Seite öffnen","description":"Öffnet eine Cockpit-Seite.","safe":true,"requiresConfirmation":false,"requiresStrongConfirmation":false,"params":["page"],"page":null},"getOpenPositionsSummary":{"label":"Offene Posten anzeigen","description":"Zeigt offene Posten, unbezahlte Rechnungen und Außenstände.","safe":true,"requiresConfirmation":false,"requiresStrongConfirmation":false,"params":[],"page":"openitems"},"getFinanceSummary":{"label":"Finanzübersicht","description":"Zeigt Einnahmen/Ausgaben/Gewinn aus der Buchhaltung.","safe":true,"requiresConfirmation":false,"requiresStrongConfirmation":false,"params":[],"page":"bookkeeping"},"searchCustomer":{"label":"Kunde suchen","description":"Sucht Kunden in der Kundenkartei.","safe":true,"requiresConfirmation":false,"requiresStrongConfirmation":false,"params":["customerName"],"page":null},"getProjectSummary":{"label":"Baustellen anzeigen","description":"Zeigt Baustellen/Projekte.","safe":true,"requiresConfirmation":false,"requiresStrongConfirmation":false,"params":[],"page":"projekte"},"createCustomerDraft":{"label":"Kundenentwurf erstellen","description":"Bereitet einen neuen Kunden als Entwurf vor.","safe":false,"requiresConfirmation":true,"requiresStrongConfirmation":false,"params":[],"page":null},"createBookingDraft":{"label":"Buchungsentwurf erstellen","description":"Bereitet Einnahme oder Ausgabe als Entwurf vor.","safe":false,"requiresConfirmation":true,"requiresStrongConfirmation":false,"params":[],"page":null},"createOfferDraft":{"label":"Angebotsentwurf erstellen","description":"Bereitet ein Angebot als Entwurf vor.","safe":false,"requiresConfirmation":true,"requiresStrongConfirmation":false,"params":[],"page":null},"createInvoiceDraft":{"label":"Rechnungsentwurf erstellen","description":"Bereitet eine Rechnung als Entwurf vor.","safe":false,"requiresConfirmation":true,"requiresStrongConfirmation":false,"params":[],"page":null},"markOpenItemPaidDraft":{"label":"Offenen Posten als bezahlt markieren","description":"Bereitet vor, einen offenen Posten als bezahlt zu markieren.","safe":false,"requiresConfirmation":true,"requiresStrongConfirmation":false,"params":[],"page":null},"deleteOpenItemsDraft":{"label":"Offene Posten löschen vorbereiten","description":"Bereitet das Löschen offener Posten vor.","safe":false,"requiresConfirmation":true,"requiresStrongConfirmation":true,"params":[],"page":null},"createMarketingDraft":{"label":"Marketingentwurf erstellen","description":"Bereitet Anzeigen, Posts oder Beiträge vor.","safe":false,"requiresConfirmation":true,"requiresStrongConfirmation":false,"params":[],"page":null},"publishMarketingDraft":{"label":"Marketing veröffentlichen","description":"Veröffentlicht vorbereitete Inhalte extern.","safe":false,"requiresConfirmation":true,"requiresStrongConfirmation":true,"params":[],"page":null},"openAgent":{"label":"KI-Mitarbeiter öffnen","description":"Öffnet einen KI-Mitarbeiter.","safe":true,"requiresConfirmation":false,"requiresStrongConfirmation":false,"params":[],"page":null},"stopSpeaking":{"label":"Sprachausgabe stoppen","description":"Stoppt die Sprachausgabe.","safe":true,"requiresConfirmation":false,"requiresStrongConfirmation":false,"params":[],"page":null},"confirmPendingAction":{"label":"Aktion bestätigen","description":"Bestätigt die wartende Aktion (lokal).","safe":true,"requiresConfirmation":false,"requiresStrongConfirmation":false,"params":[],"page":null},"cancelPendingAction":{"label":"Aktion abbrechen","description":"Bricht die wartende Aktion ab (lokal).","safe":true,"requiresConfirmation":false,"requiresStrongConfirmation":false,"params":[],"page":null},"askClarifyingQuestion":{"label":"Rückfrage stellen","description":"Stellt eine Rückfrage, wenn der Befehl unklar oder riskant ist.","safe":true,"requiresConfirmation":false,"requiresStrongConfirmation":false,"params":[],"page":null}},"safetyRules":["„Offene Positionen“ bedeutet im Cockpit offene Posten / unbezahlte Rechnungen (Buchhaltung) – nicht offene Stellen.","Löschen ist kritisch und braucht immer eine Bestätigung.","Bei offenen Posten immer zwischen „löschen“ und „als bezahlt markieren“ unterscheiden.","Massenlöschung braucht die starke Bestätigung „Ja, endgültig löschen“ – ein normales „ja“ reicht nicht.","„Zurücksetzen“ ist sehr gefährlich und braucht eine Extra-Bestätigung.","Externe Veröffentlichungen (Anzeigen, Posts, Nachrichten) passieren niemals ohne ausdrückliche Bestätigung („Ja, veröffentlichen“).","Keine Daten erfinden.","Kritische Aktionen nur als Entwurf – ausgeführt wird erst nach Ja/Nein-Bestätigung im Cockpit.","Ohne wartende Aktion führen „ja“ und „nein“ nichts aus.","Rechnungen weisen nach §19 UStG keine Umsatzsteuer aus – niemals Umsatzsteuer erfinden.","Keine Kundenakten, Rechnungslisten oder privaten Daten an KI-Provider senden – nur Zähler, Begriffe und Tool-/Seitenhinweise.","API-Keys stehen nie im Gehirn, nie im Backup, nie in Logs."],"businessKnowledge":{"stammdaten":{"name":"Verlegt & Verschraubt Handwerkerservice","typ":"Handwerksservice","inhaber":"Justus Brosch","region":"Wilhelmshaven und Umgebung","claim":"Z.O.Z – Drei Werte. Ein Versprechen. Zuverlässig. Ordentlich. Zügig."},"hauptleistungen":["Bodenverlegung","Küchenmontage","Entrümpelung & Entsorgung"],"bodenverlegung":["Laminat","Klickvinyl","Klebevinyl","PVC","Teppich","Sockelleisten","Altbelag entfernen","Untergrund prüfen/vorbereiten"],"kuechenmontage":["Küchenaufbau","Anpassungen","Arbeitsplatte","Spüle","Unterbau-Geschirrspüler","Wasseranschluss im erlaubten Rahmen"],"grenzen":["keine Elektroarbeiten","keine Starkstrom-/Herdanschlüsse","keine unzulässigen meisterpflichtigen Tätigkeiten","Geräteanschluss nur als Zusatz bei Küchenmontage","Umzugshilfe nur ohne eigenen Transport, falls relevant"],"recht_und_steuern":["Einzelunternehmen","Kleinunternehmerregelung §19 UStG","keine Umsatzsteuer ausweisen","kein Handelsregistereintrag","HWK-Register eingetragen","intern werden 35 % jeder Einnahme als Steuer-Rücklage geplant"],"preisregel":{"hinweis verwenden":"„verbindliches Angebot nach Fotos, Aufmaß oder Besichtigung“."},"name":"Verlegt & Verschraubt Handwerkerservice","type":"Handwerksservice","owner":"Justus Brosch","region":"Wilhelmshaven und Umgebung","claim":"Z.O.Z – Drei Werte. Ein Versprechen. Zuverlässig. Ordentlich. Zügig.","mainServices":["Bodenverlegung","Küchenmontage","Entrümpelung & Entsorgung"]},"examples":[{"user":"Nexus wer schuldet mir noch Geld","json":{"intent":"open_items_summary","tool":"getOpenPositionsSummary","confidence":0.95,"requiresConfirmation":false,"requiresStrongConfirmation":false,"entities":{"customerName":null,"amount":null,"date":null,"category":null,"service":null,"page":"openitems","target":"offene_posten","actionType":"summary"},"spokenResponse":"Ich öffne die offenen Posten.","clarifyingQuestion":null}},{"user":"Nexus öffne offene Positionen","json":{"intent":"navigate","tool":"navigateTo","confidence":0.95,"requiresConfirmation":false,"requiresStrongConfirmation":false,"entities":{"customerName":null,"amount":null,"date":null,"category":null,"service":null,"page":"openitems","target":"offene_posten","actionType":"open"},"spokenResponse":"Ich öffne die offenen Posten.","clarifyingQuestion":null}},{"user":"Nexus lösche offene Positionen","json":{"intent":"delete_open_items_draft","tool":"askClarifyingQuestion","confidence":0.9,"requiresConfirmation":true,"requiresStrongConfirmation":true,"entities":{"customerName":null,"amount":null,"date":null,"category":null,"service":null,"page":"openitems","target":"offene_posten","actionType":"delete"},"spokenResponse":"","clarifyingQuestion":"Meinst du wirklich löschen oder nur als bezahlt/erledigt markieren? Löschen entfernt Datensätze dauerhaft."}},{"user":"Nexus markiere Müller als bezahlt","json":{"intent":"mark_open_item_paid_draft","tool":"markOpenItemPaidDraft","confidence":0.9,"requiresConfirmation":true,"requiresStrongConfirmation":false,"entities":{"customerName":"Müller","amount":null,"date":null,"category":null,"service":null,"page":"openitems","target":"offene_posten","actionType":"mark_paid"},"spokenResponse":"Ich bereite vor, den offenen Posten von Müller als bezahlt zu markieren.","clarifyingQuestion":null}},{"user":"Nexus lösche alle offenen Posten","json":{"intent":"delete_open_items_draft","tool":"askClarifyingQuestion","confidence":0.95,"requiresConfirmation":true,"requiresStrongConfirmation":true,"entities":{"customerName":null,"amount":null,"date":null,"category":null,"service":null,"page":"openitems","target":"offene_posten","actionType":"mass_delete"},"spokenResponse":"","clarifyingQuestion":"Das ist eine Massenlöschung. Meinst du wirklich endgültig löschen? Normales Ja reicht dafür nicht. Antworte mit: Ja, endgültig löschen."}},{"user":"Nexus neue Einnahme 500 Euro von Müller","json":{"intent":"create_booking_draft","tool":"createBookingDraft","confidence":0.92,"requiresConfirmation":true,"requiresStrongConfirmation":false,"entities":{"customerName":"Müller","amount":500,"date":null,"category":"Kundenzahlung","service":null,"page":"bookkeeping","target":"buchung","actionType":"create"},"spokenResponse":"Einnahme über 500 Euro von Müller – bitte bestätigen.","clarifyingQuestion":null}}],"docs":[{"file":"00_INDEX.md","title":"NEXUS-Gehirn – Index","summary":"Das NEXUS-Gehirn ist die lokale Wissensbasis des V&V-Cockpits. Es liegt als Markdown-Vault (Obsidian-kompatibel) in diesem Ordner und wird mit `node tools/build-nexus-brain.js` zu einer kompakten JSON-/JS-Wissensbasis exportiert, die direkt"},{"file":"06_Buchhaltung_und_offene_Posten.md","title":"Buchhaltung und offene Posten","summary":"Ein offener Posten ist eine Forderung, die noch nicht (vollständig) bezahlt wurde – typischerweise eine gestellte Rechnung oder ein vereinbarter Betrag. „Offene Positionen“, „Außenstände“, „offene Forderungen“ und „unbezahlte Rechnungen“ me"},{"file":"07_Kunden_und_Auftraege.md","title":"Kunden und Aufträge","summary":"- Zentrale Akte pro Kunde: Stammdaten (Name, Telefon, E-Mail, Adresse), Notizen, Zeitleiste, Status. - „Kundenkartei“ (Seite `akte`) = Detailansicht; „Kunden-CRM“ (Seite `crm`) = Liste/Pipeline. - Neue Kunden legt NEXUS nur als geführten En"},{"file":"08_Marketing_und_Content.md","title":"Marketing und Content","summary":"- Kleinanzeigen (eBay Kleinanzeigen / kleinanzeigen.de) - Facebook - Instagram - Google (Unternehmensprofil / Beiträge)"},{"file":"09_Agentenrollen.md","title":"Agentenrollen","summary":"NEXUS ist der Intent-Router und Koordinator. Die Fach-Agenten im Cockpit (Bereich „KI-Mitarbeiter“ / „Marketing & KI-Agenten“) haben klare Rollen:"},{"file":"11_Lernspeicher_und_Erinnerungen.md","title":"Lernspeicher und Erinnerungen","summary":"- Im Chat: „Mit X meine ich Y“ oder „Merke dir: X bedeutet Y“ → NEXUS fragt „Soll ich mir merken, dass X Y bedeutet?“ → nach „ja“ dauerhaft gespeichert. - Im Deck: Tab „Begriffe & Synonyme“ → Formular „Neuen Begriff beibringen“. - Gespeiche"}]};
+// END NEXUS_BRAIN_DEFAULT
 </script>
 
 <!-- LIGHTBOX -->
