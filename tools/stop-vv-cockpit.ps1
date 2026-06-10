@@ -1,6 +1,7 @@
 <#
   Stoppt die lokalen Cockpit-Server (Ports) und optional den Gemini-Proxy.
-  Ollama wird standardmäßig NICHT beendet.
+  Ollama wird standardmaessig NICHT beendet.
+  Datei bewusst in reinem ASCII gehalten (Windows PowerShell 5.1).
 #>
 $ErrorActionPreference = 'SilentlyContinue'
 
@@ -14,40 +15,48 @@ function Ok($m){   Write-Host $m -ForegroundColor Green }
 function Warn($m){ Write-Host $m -ForegroundColor Yellow }
 
 # Wenn der Gemini-Proxy bleiben soll, Port 8787 aus der Liste nehmen
-if(-not $StopGeminiProxy){ $PortsToStop = $PortsToStop | Where-Object { $_ -ne 8787 } }
+if (-not $StopGeminiProxy) { $PortsToStop = $PortsToStop | Where-Object { $_ -ne 8787 } }
 
 Info ("Suche lauschende Prozesse auf Ports: " + ($PortsToStop -join ', ') + " ...")
 
 # PID -> Port sammeln (nur lauschende Sockets)
 $pidMap = @{}
-foreach($port in $PortsToStop){
+foreach ($port in $PortsToStop) {
   $conns = Get-NetTCPConnection -State Listen -LocalPort $port -ErrorAction SilentlyContinue
-  foreach($c in $conns){ if($c.OwningProcess){ $pidMap[[int]$c.OwningProcess] = $port } }
+  foreach ($c in $conns) {
+    if ($c.OwningProcess) { $pidMap[[int]$c.OwningProcess] = $port }
+  }
 }
 
-if($pidMap.Count -eq 0){
+if ($pidMap.Count -eq 0) {
   Warn "Keine lauschenden Cockpit-/Proxy-Prozesse gefunden."
-} else {
-  foreach($procId in $pidMap.Keys){
+}
+else {
+  foreach ($procId in $pidMap.Keys) {
     $p = Get-Process -Id $procId -ErrorAction SilentlyContinue
-    $name = if($p){ $p.ProcessName } else { "?" }
+    $name = if ($p) { $p.ProcessName } else { "?" }
     # Sicherheit: nur erwartete Serverprozesse beenden (kein aggressives Kill-All)
-    if($name -match '^(python|pythonw|py|node)$'){
-      try{ Stop-Process -Id $procId -Force; Ok ("Beendet: " + $name + " (PID " + $procId + ", Port " + $pidMap[$procId] + ")") }
-      catch{ Warn ("Konnte PID " + $procId + " nicht beenden: " + $_.Exception.Message) }
-    } else {
-      Warn ("Übersprungen (kein erwarteter Server): " + $name + " (PID " + $procId + ", Port " + $pidMap[$procId] + ")")
+    if ($name -match '^(python|pythonw|py|node)$') {
+      try {
+        Stop-Process -Id $procId -Force
+        Ok ("Beendet: " + $name + " (PID " + $procId + ", Port " + $pidMap[$procId] + ")")
+      }
+      catch { Warn ("Konnte PID " + $procId + " nicht beenden: " + $_.Exception.Message) }
+    }
+    else {
+      Warn ("Uebersprungen (kein erwarteter Server): " + $name + " (PID " + $procId + ", Port " + $pidMap[$procId] + ")")
     }
   }
 }
 
-# Ollama nur auf ausdrücklichen Wunsch beenden
-if($StopOllama){
+# Ollama nur auf ausdruecklichen Wunsch beenden
+if ($StopOllama) {
   Get-Process ollama -ErrorAction SilentlyContinue | ForEach-Object {
-    try{ Stop-Process -Id $_.Id -Force; Ok ("Ollama beendet (PID " + $_.Id + ")") }catch{}
+    try { Stop-Process -Id $_.Id -Force; Ok ("Ollama beendet (PID " + $_.Id + ")") } catch {}
   }
-} else {
-  Info "Ollama wurde NICHT beendet (Standard: \$StopOllama=\$false)."
+}
+else {
+  Info "Ollama wurde NICHT beendet (Standardeinstellung)."
 }
 
 Ok "Stop abgeschlossen."
