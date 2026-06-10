@@ -136,8 +136,12 @@ async function callGemini(userText, context) {
     clearTimeout(to);
     if (!res.ok) {
       const t = await res.text().catch(() => '');
-      // Key niemals mitloggen; Fehlertext kürzen
-      throw new Error('Gemini HTTP ' + res.status + (t ? (': ' + t.slice(0, 200)) : ''));
+      // Key niemals mitloggen; verständliche Hinweise für häufige Codes
+      let hint = '';
+      if (res.status === 429) hint = ' – Kontingent/Rate-Limit überschritten. Google AI Studio: Plan/Billing prüfen oder später erneut versuchen.';
+      else if (res.status === 400 && /api key/i.test(t)) hint = ' – API-Key ungültig. Key in tools/gemini-proxy/.env prüfen.';
+      else if (res.status === 403) hint = ' – Zugriff verweigert. Key-Berechtigungen/Region prüfen.';
+      throw new Error('Gemini HTTP ' + res.status + hint + (t ? (' :: ' + t.slice(0, 160)) : ''));
     }
     const j = await res.json();
     const parts = (j && j.candidates && j.candidates[0] && j.candidates[0].content && j.candidates[0].content.parts) || [];
