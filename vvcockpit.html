@@ -514,19 +514,342 @@ function migrateSettings(s){
 
 /* ══════════════════════════════════════════════════════════════ */
 
+/* ==========================================================
+   DAUERHAFTE DATENSPEICHERUNG – INDEXEDDB (VVCockpitDB)
+   localStorage (~5 MB) ist mit Aufmaß-Fotos schnell voll – dann ging
+   beim Neuladen alles verloren und das Backup musste täglich neu
+   importiert werden. IndexedDB hat praktisch kein solches Limit:
+   Das Cockpit speichert jetzt automatisch dorthin und lädt beim
+   Öffnen automatisch. Backups sind nur noch für Sicherung/Umzug.
+   API-Keys (VV_AI_KEY_*) werden NIEMALS in diesen State übernommen.
+   ========================================================== */
+const VV_COCKPIT_APP_ID = "vv-cockpit-main";
+const VV_DB_NAME = "VVCockpitDB", VV_DB_VERSION = 1;
+const VV_STATE_FALLBACK_KEY = "VV_COCKPIT_STATE_FALLBACK";
+let _vvDbPromise = null, _vvDbBroken = false;
+let vvAutoSaveTimer = null;
+let _vvLastSaveInfo = { at:null, target:null, error:null };
+let _vvLastLoadInfo = { at:null, source:null };
+
+function vvDbAvailable(){ try{ return !_vvDbBroken && typeof indexedDB!=="undefined" && !!indexedDB; }catch(e){ return false; } }
+function vvDbOpen(){
+  if(!vvDbAvailable()) return Promise.reject(new Error("IndexedDB nicht verfügbar"));
+  if(_vvDbPromise) return _vvDbPromise;
+  _vvDbPromise = new Promise((res, rej)=>{
+    let req;
+    try{ req = indexedDB.open(VV_DB_NAME, VV_DB_VERSION); }
+    catch(e){ _vvDbBroken=true; rej(e); return; }
+    req.onupgradeneeded = ()=>{
+      const db = req.result;
+      if(!db.objectStoreNames.contains("appState"))     db.createObjectStore("appState");                 // key: "main"
+      if(!db.objectStoreNames.contains("snapshots"))    db.createObjectStore("snapshots", {keyPath:"id"});
+      if(!db.objectStoreNames.contains("migrationLog")) db.createObjectStore("migrationLog", {keyPath:"id"});
+      if(!db.objectStoreNames.contains("meta"))         db.createObjectStore("meta");                     // key: string
+    };
+    req.onsuccess = ()=>{ const db=req.result; db.onversionchange=()=>{ try{ db.close(); }catch(e){} _vvDbPromise=null; }; res(db); };
+    req.onerror   = ()=>{ _vvDbBroken=true; _vvDbPromise=null; rej(req.error||new Error("IndexedDB konnte nicht geöffnet werden")); };
+  });
+  return _vvDbPromise;
+}
+function vvDbGet(store, key){
+  return vvDbOpen().then(db=>new Promise((res,rej)=>{
+    const rq=db.transaction(store,"readonly").objectStore(store).get(key);
+    rq.onsuccess=()=>res(rq.result); rq.onerror=()=>rej(rq.error);
+  }));
+}
+function vvDbGetAll(store){
+  return vvDbOpen().then(db=>new Promise((res,rej)=>{
+    const rq=db.transaction(store,"readonly").objectStore(store).getAll();
+    rq.onsuccess=()=>res(rq.result||[]); rq.onerror=()=>rej(rq.error);
+  }));
+}
+function vvDbPut(store, value, key){
+  return vvDbOpen().then(db=>new Promise((res,rej)=>{
+    const tx=db.transaction(store,"readwrite");
+    (key!==undefined)?tx.objectStore(store).put(value,key):tx.objectStore(store).put(value);
+    tx.oncomplete=()=>res(true); tx.onerror=()=>rej(tx.error); tx.onabort=()=>rej(tx.error||new Error("abgebrochen"));
+  }));
+}
+function vvDbDelete(store, key){
+  return vvDbOpen().then(db=>new Promise((res,rej)=>{
+    const tx=db.transaction(store,"readwrite");
+    tx.objectStore(store).delete(key);
+    tx.oncomplete=()=>res(true); tx.onerror=()=>rej(tx.error);
+  }));
+}
+function vvDbSetMeta(key, value){ return vvDbAvailable()?vvDbPut("meta", value, key).catch(()=>{}):Promise.resolve(); }
+function vvDbGetMeta(key){ return vvDbAvailable()?vvDbGet("meta", key).catch(()=>null):Promise.resolve(null); }
+
+/* ---- Secrets strikt heraushalten (Felder + key-ähnliche Werte) ---- */
+const VV_SECRET_FIELD_RE=/^(apikey|api_key|geminikey|groqkey|access_token|refresh_token|authorization|bearer|client_secret|clientsecret|password)$/i;
+const VV_SECRET_VALUE_RE=/(sk-[A-Za-z0-9_-]{12,}|gsk_[A-Za-z0-9]{12,}|AIza[0-9A-Za-z_-]{20,}|Bearer\s+[A-Za-z0-9._-]{16,})/;
+let _vvSecretsFoundLastScan=false;
+function vvScrubSecrets(obj, depth){
+  depth=depth||0; if(depth>14 || !obj || typeof obj!=="object") return;
+  Object.keys(obj).forEach(k=>{
+    const v=obj[k];
+    if(VV_SECRET_FIELD_RE.test(k)){ delete obj[k]; _vvSecretsFoundLastScan=true; return; }
+    if(typeof v==="string" && v.length>=12 && VV_SECRET_VALUE_RE.test(v) && !/^data:image/.test(v)){
+      obj[k]="[aus Sicherheitsgründen entfernt]"; _vvSecretsFoundLastScan=true; return;
+    }
+    if(v && typeof v==="object") vvScrubSecrets(v, depth+1);
+  });
+}
+function vvStripSecretsFromState(state){
+  let s; try{ s=JSON.parse(JSON.stringify(state||{})); }catch(e){ return state; }
+  try{ if(s.settings) s.settings=stripKeysForExport(s.settings); }catch(e){}
+  _vvSecretsFoundLastScan=false;
+  try{ vvScrubSecrets(s); }catch(e){}
+  return s;
+}
+/* Kompletter Cockpit-Zustand OHNE API-Keys (Keys leben getrennt in VV_AI_KEY_*) */
+function vvBuildCockpitState(){
+  let nbu=null; try{ nbu=(typeof getNexusBrainStored==="function")?getNexusBrainStored():null; }catch(e){}
+  let st={}; try{ st=getSettings(); }catch(e){}
+  return vvStripSecretsFromState({ appId:VV_COCKPIT_APP_ID, schemaVersion:1, savedAt:nowISO(),
+    data, settings:st, nexusBrainUser:nbu });
+}
+
+/* ---- Speichern / Laden ---- */
+async function vvDbSaveState(state, options){
+  options=options||{};
+  const clean=state?vvStripSecretsFromState(state):vvBuildCockpitState();
+  if(vvDbAvailable()){
+    try{
+      await vvDbPut("appState", clean, "main");
+      await vvDbSetMeta("lastSavedAt", nowISO());
+      vvDbNoteSaved("Browser-Datenbank");
+      return {ok:true, target:"indexeddb"};
+    }catch(e){ console.warn("vvDbSaveState (IndexedDB):", e); }
+  }
+  // Fallback: localStorage (nur wenn klein genug)
+  try{
+    localStorage.setItem(VV_STATE_FALLBACK_KEY, JSON.stringify(clean));
+    vvDbNoteSaved("localStorage-Fallback");
+    return {ok:true, target:"fallback"};
+  }catch(e){ vvDbNoteSaveFailed(e); throw e; }
+}
+async function vvDbLoadState(){
+  if(vvDbAvailable()){
+    try{ const st=await vvDbGet("appState","main"); if(st&&st.data) return st; }catch(e){ console.warn("vvDbLoadState:", e); }
+  }
+  try{ const raw=localStorage.getItem(VV_STATE_FALLBACK_KEY); if(raw){ const st=JSON.parse(raw); if(st&&st.data) return st; } }catch(e){}
+  return null;
+}
+async function vvDbHasState(){ return !!(await vvDbLoadState().catch(()=>null)); }
+async function vvDbClearStateWithConfirmation(){
+  if(!confirm("⚠️ Dauerhaft gespeicherten Cockpit-Stand aus der Browser-Datenbank löschen?\n\nSnapshots bleiben erhalten. Diese Aktion betrifft NICHT deine Backup-Dateien.")) return false;
+  if(!confirm("Letzte Sicherheitsabfrage: Gespeicherten Stand wirklich löschen?")) return false;
+  try{ await vvDbCreateSnapshot("before_clear_state"); }catch(e){}
+  try{ if(vvDbAvailable()) await vvDbDelete("appState","main"); }catch(e){}
+  try{ localStorage.removeItem(VV_STATE_FALLBACK_KEY); }catch(e){}
+  try{ vvRenderDataPanel(); }catch(e){}
+  return true;
+}
+
+/* ---- Auto-Save (debounced – nicht bei jedem Tastendruck) ---- */
+function scheduleVvAutoSave(reason){
+  clearTimeout(vvAutoSaveTimer);
+  const si=byId("saveInfo"); if(si) si.textContent="Speichert …";
+  vvAutoSaveTimer=setTimeout(()=>{ vvDbSaveState(null,{reason:reason||"change"}).catch(e=>console.warn("AutoSave:",e)); }, 800);
+}
+function vvDbNoteSaved(target){
+  _vvLastSaveInfo={at:nowISO(), target, error:null};
+  const si=byId("saveInfo"); if(si) si.textContent="Gespeichert ("+target+"): "+new Date().toLocaleTimeString("de-DE");
+  try{ vvRenderDataPanel(); }catch(e){}
+}
+function vvDbNoteSaveFailed(e){
+  _vvLastSaveInfo={at:nowISO(), target:null, error:String((e&&e.message)||e)};
+  const si=byId("saveInfo"); if(si) si.textContent="⚠ Speichern fehlgeschlagen – bitte Backup exportieren!";
+  try{ vvRenderDataPanel(); }catch(e){}
+}
+
+/* ---- Snapshots (automatische Sicherheitsstände, max. 10) ---- */
+async function vvDbCreateSnapshot(reason){
+  if(!vvDbAvailable()) return null;   // Fallback-Speicher ist für Snapshots zu klein
+  const snap={ id:"snapshot_"+Date.now()+"_"+Math.random().toString(36).slice(2,7),
+    createdAt:nowISO(), reason:String(reason||"manuell"), state:vvBuildCockpitState() };
+  await vvDbPut("snapshots", snap);
+  const all=await vvDbGetAll("snapshots");
+  all.sort((a,b)=>String(a.createdAt).localeCompare(String(b.createdAt)));
+  while(all.length>10){ const old=all.shift(); try{ await vvDbDelete("snapshots", old.id); }catch(e){} }
+  return snap.id;
+}
+async function vvDbListSnapshots(){
+  if(!vvDbAvailable()) return [];
+  const all=await vvDbGetAll("snapshots");
+  return all.sort((a,b)=>String(b.createdAt).localeCompare(String(a.createdAt)))
+    .map(s=>({ id:s.id, createdAt:s.createdAt, reason:s.reason,
+      customers:((s.state&&s.state.data&&s.state.data.customers)||[]).length,
+      bookings:((s.state&&s.state.data&&s.state.data.bookings)||[]).length }));
+}
+async function vvDbRestoreSnapshot(snapshotId){
+  const snap=await vvDbGet("snapshots", snapshotId);
+  if(!snap||!snap.state||!snap.state.data) throw new Error("Snapshot nicht gefunden oder leer.");
+  await vvDbCreateSnapshot("before_snapshot_restore");   // aktuellen Stand vorher sichern
+  data=snap.state.data;
+  normalizeData(); try{ migrateOldData(data); migrateOpenItemsCleanup(); }catch(e){}
+  try{ if(snap.state.settings) localStorage.setItem("VV_SETTINGS_2026", JSON.stringify(snap.state.settings)); }catch(e){}
+  try{ if(snap.state.nexusBrainUser) mergeNexusBrainUser(snap.state.nexusBrainUser); }catch(e){}
+  saveAll(false);
+  return true;
+}
+async function vvDbDeleteSnapshot(snapshotId){ if(vvDbAvailable()) await vvDbDelete("snapshots", snapshotId); }
+async function vvDbDailySnapshot(){
+  if(!vvDbAvailable()) return;
+  const last=await vvDbGetMeta("lastDailySnapshot");
+  if(last===today()) return;
+  await vvDbCreateSnapshot("daily");
+  await vvDbSetMeta("lastDailySnapshot", today());
+}
+function vvDbLogMigration(text){
+  if(!vvDbAvailable()) return;
+  vvDbPut("migrationLog", { id:"mig_"+Date.now(), at:nowISO(), text:String(text||"") }).catch(()=>{});
+}
+
+/* ---- Backup-Import-Helfer ---- */
+function vvNormalizeImportedBackup(rawBackup){
+  let b=rawBackup&&typeof rawBackup==="object"?rawBackup:{};
+  _vvSecretsFoundLastScan=false;
+  b=vvStripSecretsFromState(b);                      // Secret-Scan + Entfernen
+  const secretsFound=_vvSecretsFoundLastScan;
+  const d=(b.data&&typeof b.data==="object")?b.data:b;   // Altbackups: Daten auf Top-Level
+  const counts={
+    customers:(d.customers||[]).length, invoices:(d.invoices||[]).length,
+    openItems:(d.openItems||[]).length, bookings:(d.bookings||[]).length,
+    offers:(d.offers||[]).length, projects:(d.projects||[]).length,
+    measurements:(d.measurements||[]).length,
+    brainGlossary:((b.nexusBrainUser&&b.nexusBrainUser.glossary)||[]).length
+  };
+  return { backup:b, secretsFound, counts };
+}
+/* mode: "replace" -> Importstand übernehmen, "merge" -> in runImport zusammenführen */
+function vvMergeImportedBackupIntoState(importedState, currentState, mode){
+  if(mode==="replace") return vvStripSecretsFromState(importedState);
+  return currentState; // Merge passiert datensatzweise in runImport (mergeArray)
+}
+
+/* ---- Auto-Load beim Start ---- */
+async function vvBootLoad(){
+  let loaded=false, source="";
+  try{
+    const st=await vvDbLoadState();
+    if(st && st.data){
+      data=st.data;
+      normalizeData(); try{ migrateOldData(data); migrateOpenItemsCleanup(); }catch(e){}
+      // Settings/Lernspeicher nur ergänzen, wenn lokal nichts (Neueres) vorliegt
+      try{ if(st.settings && !localStorage.getItem("VV_SETTINGS_2026")) localStorage.setItem("VV_SETTINGS_2026", JSON.stringify(st.settings)); }catch(e){}
+      try{ if(st.nexusBrainUser && !localStorage.getItem("VV_NEXUS_BRAIN_USER")) mergeNexusBrainUser(st.nexusBrainUser); }catch(e){}
+      loaded=true; source="Browser-Datenbank";
+      vvDbSetMeta("lastLoadedAt", nowISO());
+      _vvLastLoadInfo={at:nowISO(), source};
+    }
+  }catch(e){ console.warn("vvBootLoad:", e); }
+  if(!loaded){
+    // Migration: alte localStorage-Daten übernehmen und ab jetzt dauerhaft speichern
+    loadAll();
+    const hasData=["customers","bookings","invoices","offers","measurements","openItems"].some(k=>(data[k]||[]).length>0);
+    if(hasData){
+      loaded=true; source="localStorage (in Browser-Datenbank übernommen)";
+      _vvLastLoadInfo={at:nowISO(), source};
+      try{ await vvDbSaveState(null,{reason:"migration_from_localstorage"}); vvDbLogMigration("localStorage → IndexedDB übernommen"); }catch(e){}
+    }
+  }
+  try{ await vvDbDailySnapshot(); }catch(e){}
+  const si=byId("saveInfo");
+  if(si) si.textContent = loaded
+    ? ("Cockpit-Daten automatisch geladen ("+source+").")
+    : "Keine gespeicherten Daten gefunden. Du kannst ein Backup importieren (Bereich „Backup“).";
+  return loaded;
+}
+
+/* ---- UI: Bereich „Datenspeicher“ (in der Backup-Seite) ---- */
+async function vvRenderDataPanel(){
+  const host=byId("vvDataPanel"); if(!host) return;
+  const idb=vvDbAvailable();
+  let lastSaved=null, lastLoaded=null, snaps=[];
+  try{ lastSaved=await vvDbGetMeta("lastSavedAt"); }catch(e){}
+  try{ lastLoaded=await vvDbGetMeta("lastLoadedAt"); }catch(e){}
+  try{ snaps=await vvDbListSnapshots(); }catch(e){}
+  const row=(k,v)=>'<div style="display:flex;justify-content:space-between;gap:10px;padding:3px 0;border-bottom:1px dashed var(--line)"><span style="color:var(--muted)">'+k+'</span><b>'+esc(v==null?"–":String(v))+'</b></div>';
+  const snapRows=snaps.length?snaps.map(s=>
+    '<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px dashed var(--line);font-size:12.5px">'+
+    '<span style="flex:1">'+esc(fmtDT(s.createdAt))+' · '+esc(s.reason)+' <span style="color:var(--muted)">('+s.customers+' Kunden, '+s.bookings+' Buchungen)</span></span>'+
+    '<button class="btn sm" onclick="vvUiRestoreSnapshot(\''+s.id+'\')">Wiederherstellen</button>'+
+    '<button class="btn sm ghost" onclick="vvUiDeleteSnapshot(\''+s.id+'\')">Löschen</button></div>'
+  ).join(""):'<div style="color:var(--muted);font-size:12.5px">Noch keine Snapshots vorhanden.</div>';
+  host.innerHTML=
+    row("Speicherstatus", idb?"IndexedDB aktiv (VVCockpitDB)":"⚠ localStorage-Fallback (begrenzte Größe)")+
+    row("Aktive Datenquelle", _vvLastLoadInfo.source||"–")+
+    row("Letzter automatischer Ladevorgang", lastLoaded?fmtDT(lastLoaded):(_vvLastLoadInfo.at?fmtDT(_vvLastLoadInfo.at):"–"))+
+    row("Letzter Speichervorgang", _vvLastSaveInfo.at?fmtDT(_vvLastSaveInfo.at)+(_vvLastSaveInfo.target?(" ("+_vvLastSaveInfo.target+")"):""):(lastSaved?fmtDT(lastSaved):"–"))+
+    (_vvLastSaveInfo.error?row("Letzter Fehler", _vvLastSaveInfo.error):"")+
+    row("Snapshots", snaps.length+" / 10")+
+    '<div class="btn-row" style="margin-top:10px">'+
+    '<button class="btn sm primary" onclick="vvUiForceSave()">💾 Daten dauerhaft speichern</button>'+
+    '<button class="btn sm" onclick="vvUiDbCheck()">🔍 Datenbank prüfen</button>'+
+    '<button class="btn sm" onclick="vvDbCreateSnapshot(\'manuell\').then(()=>vvRenderDataPanel())">📸 Snapshot jetzt erstellen</button>'+
+    '<button class="btn sm ghost" onclick="vvUiCleanLegacy()">Alte localStorage-Daten bereinigen</button>'+
+    '</div>'+
+    '<div id="vvDataPanelMsg" style="margin-top:8px;font-size:12.5px;white-space:pre-wrap;color:var(--muted)"></div>'+
+    '<h4 style="margin:12px 0 4px">Lokale Sicherheitsstände</h4>'+snapRows;
+}
+function vvDataPanelMsg(t, ok){ const e=byId("vvDataPanelMsg"); if(e){ e.style.color=ok?"var(--green2)":"#ff8070"; e.textContent=t; } }
+function vvUiForceSave(){
+  vvDbSaveState(null,{reason:"manual_button"})
+    .then(r=>vvDataPanelMsg("✓ Dauerhaft gespeichert ("+(r.target==="fallback"?"localStorage-Fallback":"IndexedDB")+").", true))
+    .catch(e=>vvDataPanelMsg("✗ Speichern fehlgeschlagen: "+((e&&e.message)||e), false));
+}
+async function vvUiDbCheck(){
+  try{
+    const st=await vvDbLoadState();
+    let est=""; try{ if(navigator.storage&&navigator.storage.estimate){ const q=await navigator.storage.estimate(); est="\nSpeicher belegt: "+(q.usage/1048576).toFixed(1)+" MB von "+(q.quota/1048576).toFixed(0)+" MB verfügbar."; } }catch(e){}
+    if(!st){ vvDataPanelMsg("Datenbank erreichbar, aber noch kein gespeicherter Stand vorhanden. „Daten dauerhaft speichern“ klicken oder Backup importieren."+est, true); return; }
+    const d=st.data||{};
+    vvDataPanelMsg("✓ Datenbank in Ordnung. Gespeicherter Stand vom "+fmtDT(st.savedAt)+":\nKunden "+(d.customers||[]).length+" · Rechnungen "+(d.invoices||[]).length+" · Buchungen "+(d.bookings||[]).length+" · Offene Posten "+(d.openItems||[]).length+" · Aufmaße "+(d.measurements||[]).length+est, true);
+  }catch(e){ vvDataPanelMsg("✗ Datenbank-Prüfung fehlgeschlagen: "+((e&&e.message)||e), false); }
+}
+async function vvUiRestoreSnapshot(id){
+  const phrase=prompt("Snapshot wiederherstellen? Der AKTUELLE Stand wird vorher automatisch gesichert.\n\nZur Bestätigung bitte exakt eintippen:\nJa, Snapshot wiederherstellen");
+  if(String(phrase||"").trim().toLowerCase()!=="ja, snapshot wiederherstellen"){ vvDataPanelMsg("Abgebrochen – nichts verändert.", true); return; }
+  try{
+    await vvDbRestoreSnapshot(id);
+    vvDataPanelMsg("✓ Snapshot wiederhergestellt.", true);
+    showSection("backup"); updateBadges(); updateKPIs();
+  }catch(e){ vvDataPanelMsg("✗ Wiederherstellen fehlgeschlagen: "+((e&&e.message)||e), false); }
+}
+async function vvUiDeleteSnapshot(id){
+  if(!confirm("Diesen Snapshot löschen?")) return;
+  try{ await vvDbDeleteSnapshot(id); vvRenderDataPanel(); }catch(e){ vvDataPanelMsg("✗ "+((e&&e.message)||e), false); }
+}
+async function vvUiCleanLegacy(){
+  const st=await vvDbLoadState().catch(()=>null);
+  if(!st||!st.data){ vvDataPanelMsg("Bereinigung abgelehnt: Es ist noch kein Stand in der Browser-Datenbank gesichert.", false); return; }
+  const phrase=prompt("Alte localStorage-Kopie ("+STORE_KEY+") entfernen? Die Daten bleiben in der Browser-Datenbank erhalten.\n\nZur Bestätigung bitte exakt eintippen:\nJa, bereinigen");
+  if(String(phrase||"").trim().toLowerCase()!=="ja, bereinigen"){ vvDataPanelMsg("Abgebrochen.", true); return; }
+  try{ localStorage.removeItem(STORE_KEY); vvDbLogMigration("Alte localStorage-Kopie bereinigt"); vvDataPanelMsg("✓ Alte localStorage-Kopie entfernt – Daten liegen in der Browser-Datenbank.", true); }
+  catch(e){ vvDataPanelMsg("✗ "+((e&&e.message)||e), false); }
+}
+
 function saveAll(alert_=false){
   normalizeData();
-  let ok=true, err=null;
+  // Primärspeicher ist jetzt IndexedDB (debounced) – localStorage nur noch als
+  // Best-Effort-Zweitkopie für kleine Bestände (kann bei vielen Fotos voll sein).
+  let lsOk=true, err=null;
   try{
     localStorage.setItem(STORE_KEY, JSON.stringify({data, savedAt:nowISO()}));
-  }catch(e){ ok=false; err=e; console.warn("saveAll: Speichern fehlgeschlagen:", e); }
+  }catch(e){ lsOk=false; err=e; }
+  scheduleVvAutoSave(alert_?"manual":"change");
   updateBadges(); updateKPIs();
-  const si=byId("saveInfo");
-  if(si) si.textContent = ok ? ("Gespeichert: " + new Date().toLocaleTimeString("de-DE"))
-                             : "⚠ Nicht gespeichert – Speicher voll. Backup exportieren!";
+  const ok = lsOk || vvDbAvailable();
+  if(!ok){
+    const si=byId("saveInfo");
+    if(si) si.textContent="⚠ Nicht gespeichert – Speicher voll. Backup exportieren!";
+    console.warn("saveAll: localStorage voll und IndexedDB nicht verfügbar:", err);
+  }
   if(alert_){
-    if(ok) alert("Gespeichert.");
-    else alert("Speichern fehlgeschlagen: Der lokale Speicher (localStorage) ist voll.\n\nBitte ein Backup exportieren und ggf. alte/große Fotos reduzieren.\n\nDetails: "+((err&&err.name)||err));
+    if(ok) alert("Gespeichert – die dauerhafte Speicherung in der Browser-Datenbank läuft automatisch.");
+    else alert("Speichern fehlgeschlagen: Der lokale Speicher ist voll und die Browser-Datenbank ist nicht verfügbar.\n\nBitte ein Backup exportieren.\n\nDetails: "+((err&&err.name)||err));
   }
   return ok;
 }
@@ -579,7 +902,7 @@ function doExport(){
     saveAll(false);
     const settings = stripKeysForExport(getSettings()); // company, owner, … – API-Keys werden NIE exportiert
     let nexusBrainUser=null; try{ nexusBrainUser=getNexusBrainStored(); }catch(e){}
-    const payload = { version:"VV_COCKPIT_2026", exportedAt:nowISO(), keyNote:"NEXUS-Gehirn wird exportiert. API-Keys werden nicht exportiert.", data, settings, nexusBrainUser };
+    const payload = { version:"VV_COCKPIT_2026", exportedAt:nowISO(), keyNote:"Backup enthält Cockpit-Daten und NEXUS-Gehirn. API-Keys werden nicht exportiert.", data, settings, nexusBrainUser };
     const json = JSON.stringify(payload, null, 2);
     const d = new Date(), pad = n => String(n).padStart(2,"0");
     const fn = `vv-cockpit-backup-${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}.json`;
@@ -652,7 +975,18 @@ function doImport(ev){
     let parsed;
     try{ parsed = JSON.parse(e.target.result); }
     catch(err){ alert("Ungültiges Backup: "+err.message); ev.target.value=""; return; }
-    runImport(parsed, _importMode);
+    // Normalisieren + Secret-Scan (API-Keys/Token werden entfernt) + Import-Vorschau
+    const norm = vvNormalizeImportedBackup(parsed);
+    const c = norm.counts;
+    const preview = "Import-Vorschau:\n\n"+
+      "• Kunden: "+c.customers+"\n• Rechnungen: "+c.invoices+"\n• Offene Posten: "+c.openItems+"\n"+
+      "• Buchungen: "+c.bookings+"\n• Angebote: "+c.offers+"\n• Projekte: "+c.projects+"\n"+
+      "• Aufmaße: "+c.measurements+"\n• NEXUS-Lernspeicher: "+c.brainGlossary+" Begriffe\n\n"+
+      (norm.secretsFound?"⚠ Backup enthielt key-ähnliche Werte, diese wurden beim Import ausgeschlossen.\n\n":"")+
+      "Modus: "+(_importMode==="replace"?"Alles ersetzen":"Zusammenführen")+" (vorher wird automatisch ein Snapshot gesichert)\n\n"+
+      "Importieren und dauerhaft speichern?";
+    if(!confirm(preview)){ ev.target.value=""; return; }
+    runImport(norm.backup, _importMode);
     ev.target.value="";
   };
   r.readAsText(file);
@@ -660,6 +994,8 @@ function doImport(ev){
 
 /* Zentrale Importlogik – Merge oder Alles ersetzen */
 function runImport(parsed, mode){
+  // Sicherheitsstand VOR dem Import (Zustand wird synchron eingefroren)
+  try{ vvDbCreateSnapshot("before_backup_import").catch(()=>{}); }catch(e){}
   // Eingehende Daten ins neue Format bringen (Altbackups: verschachtelte Daten → Top-Level)
   let inc = (parsed && parsed.data) ? parsed.data : (parsed || {});
   COLLECTION_KEYS.forEach(k=>{ if(!Array.isArray(inc[k])) inc[k]=[]; });
@@ -729,7 +1065,8 @@ function showImportResult(){
     `Angebote importiert: ${l.offers}\n`+
     `Rechnungen importiert: ${l.invoices}\n`+
     `Buchungen importiert: ${l.bookings}\n`+
-    (l.mode==="merge" ? `\nAktualisiert: ${l.updated}\nÜbersprungen: ${l.skipped}\n` : "") );
+    (l.mode==="merge" ? `\nAktualisiert: ${l.updated}\nÜbersprungen: ${l.skipped}\n` : "")+
+    `\n✓ Backup importiert und dauerhaft gespeichert. Beim nächsten Öffnen wird es automatisch geladen – kein erneuter Upload nötig.`);
   if(currentSection==="backup") showSection("backup");
   else showSection("dashboard");
 }
@@ -2406,7 +2743,7 @@ function afterRender(id){
   if(id==="nexus"){ nxDrawChat(); nxUpdatePanels(); try{ nxAiRenderPanel(); }catch(e){} try{ nxBrainRenderPanel(); }catch(e){} try{ if(window.speechSynthesis){ window.speechSynthesis.onvoiceschanged=nxUpdatePanels; window.speechSynthesis.getVoices(); } }catch(e){} }
   if(id==="aufmass"){ renderAfmRooms(); bindThumbClicks(); }
   if(id==="settings"){ loadSettingsFields(); loadAiSettingsFields(); }
-  if(id==="backup"){ const rb=byId("impMode_"+_importMode); if(rb) rb.checked=true; }
+  if(id==="backup"){ const rb=byId("impMode_"+_importMode); if(rb) rb.checked=true; try{ vvRenderDataPanel(); }catch(e){} }
   if(id==="agents"){ agSyncKey(); }
   if(id==="calculator"){ if(_calcState.computed && _calcState.positions.length) renderCalcOutput(); }
   if(id==="materialcalc"){ if(window._mcPrefillCustomer){ setVal("mc_cust", window._mcPrefillCustomer); window._mcPrefillCustomer=null; mcCustomerChanged(); } recalcMaterial(); }
@@ -4795,9 +5132,13 @@ Aktualisiert: ${l.updated}
   return `<div class="panel">
     <h2>💾 Backup</h2>
     <p class="sub">Sicherung exportieren und importieren – inkl. Aufmaße, Fotos, Angebote, Rechnungen & Firmendaten.</p>
-    <div style="background:rgba(212,161,90,.07);border:1px solid var(--gold3);border-radius:var(--r2);padding:12px;margin-bottom:14px;font-size:13px">
-      ⚠️ Diese lokale Version speichert Daten im Browser. <b>Regelmäßig Backup exportieren.</b>
+    <div style="background:rgba(57,224,138,.06);border:1px solid rgba(57,224,138,.35);border-radius:var(--r2);padding:12px;margin-bottom:14px;font-size:13px">
+      ✓ <b>Dauerhafte Speicherung aktiv:</b> Das Cockpit speichert automatisch in die Browser-Datenbank (IndexedDB) und lädt beim Öffnen automatisch. Backups sind nur für Sicherung und Umzug gedacht – kein täglicher Import mehr nötig.<br>
+      <span style="color:var(--muted);font-size:12px">Öffne möglichst immer dieselbe Hauptdatei <b>vvcockpit.html</b> am selben Ort. Wenn du eine Kopie an anderem Ort öffnest, kann der Browser einen getrennten Speicher verwenden.</span>
     </div>
+    <h3>Datenspeicher</h3>
+    <div id="vvDataPanel" style="font-size:13px;margin-bottom:12px">Lade Status …</div>
+    <div class="divider"></div>
     <div class="fg c2">
       <div class="kpi"><div class="k">Kunden / Aufmaße / Fotos</div><div class="v" style="font-size:18px">${counts.customers} · ${counts.measurements} · ${counts.photos}</div></div>
       <div class="kpi"><div class="k">Angebote / Rechnungen / Buchungen</div><div class="v" style="font-size:18px">${counts.offers} · ${counts.invoices} · ${counts.bookings}</div></div>
@@ -9337,14 +9678,20 @@ document.addEventListener("DOMContentLoaded",()=>{
   // Drop-Zone
   document.addEventListener("DOMContentLoaded",()=>{});
 
-  loadAll(); loadSettingsFields();
-  try{ nxMigrateLegacyAiKeys(); }catch(e){} // Alt-Keys aus settings.ai.nexus in den getrennten Key-Store verschieben
-  showSection("dashboard");
-  try{ nxInjectGlobal(); }catch(e){} // globaler Mic-Chip + Antwort-Overlay (Zuhören erst nach Klick)
-  try{ nxTryLoadLocalConfig(); }catch(e){} // optionale lokale Startkonfiguration (nur über http, nie überschreibend)
-  // Live Bank-Table wenn section aktiv
-  const obs=new MutationObserver(()=>{ if(currentSection==="bookkeeping") renderBkTable(); });
-  obs.observe(byId("main"),{childList:true});
+  // Auto-Load: erst dauerhaft gespeicherte Daten (IndexedDB) laden, dann rendern.
+  // Fällt bei Fehlern sicher auf die alte localStorage-Ladung zurück.
+  (async()=>{
+    try{ await vvBootLoad(); }
+    catch(e){ console.warn("Boot:", e); try{ loadAll(); }catch(_){} }
+    loadSettingsFields();
+    try{ nxMigrateLegacyAiKeys(); }catch(e){} // Alt-Keys aus settings.ai.nexus in den getrennten Key-Store verschieben
+    showSection("dashboard");
+    try{ nxInjectGlobal(); }catch(e){} // globaler Mic-Chip + Antwort-Overlay (Zuhören erst nach Klick)
+    try{ nxTryLoadLocalConfig(); }catch(e){} // optionale lokale Startkonfiguration (nur über http, nie überschreibend)
+    // Live Bank-Table wenn section aktiv
+    const obs=new MutationObserver(()=>{ if(currentSection==="bookkeeping") renderBkTable(); });
+    obs.observe(byId("main"),{childList:true});
+  })();
 });
 
 // BEGIN NEXUS_BRAIN_DEFAULT
