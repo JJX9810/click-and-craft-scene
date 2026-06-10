@@ -4944,6 +4944,234 @@ async function callLocalAI(agentType, payload){
   return await callOllama(user, {system});
 }
 
+/* ==========================================================
+   NEXUS OLLAMA INTENT-ROUTER (lokal)
+   Ollama erkennt NUR die Absicht (JSON). Die Ausführung passiert
+   ausschließlich im Cockpit-Code. Ollama speichert/löscht NICHTS.
+   ========================================================== */
+const NX_ALLOWED_INTENTS = ["navigate","open_items_summary","finance_summary","search_customer","create_customer_draft","create_booking_draft","create_offer_draft","create_invoice_draft","project_summary","marketing_draft","open_agent","system_action","stop_speaking","confirm_action","cancel_action","unknown"];
+const NX_ALLOWED_TOOLS = ["navigateTo","getOpenPositionsSummary","getFinanceSummary","searchCustomer","createCustomerDraft","createBookingDraft","createOfferDraft","createInvoiceDraft","getProjectSummary","createMarketingDraft","openAgent","stopSpeaking","confirmPendingAction","cancelPendingAction","askClarifyingQuestion"];
+const NX_INTENT_CONF_MIN = 0.75;
+let _nxOllamaErrNotified = false;
+
+const NX_INTENT_SYSTEM = `Du bist NEXUS, der lokale Intent-Router für das V&V-Cockpit (Handwerksbetrieb Verlegt & Verschraubt, Wilhelmshaven).
+Du steuerst NICHT direkt die Oberfläche. Du klickst KEINE Buttons. Du speicherst/löschst NICHTS.
+Du entscheidest nur, welches erlaubte Cockpit-Tool verwendet werden soll.
+
+Antworte AUSSCHLIESSLICH mit gültigem JSON. Keine Markdown-Blöcke. Kein Text außerhalb des JSON. Kein Fließtext.
+
+Erlaubte intents: navigate, open_items_summary, finance_summary, search_customer, create_customer_draft, create_booking_draft, create_offer_draft, create_invoice_draft, project_summary, marketing_draft, open_agent, system_action, stop_speaking, confirm_action, cancel_action, unknown.
+
+Erlaubte tools (genau einen wählen): navigateTo, getOpenPositionsSummary, getFinanceSummary, searchCustomer, createCustomerDraft, createBookingDraft, createOfferDraft, createInvoiceDraft, getProjectSummary, createMarketingDraft, openAgent, stopSpeaking, confirmPendingAction, cancelPendingAction, askClarifyingQuestion.
+
+Antwortformat (immer alle Felder):
+{"intent":"string","tool":"string","confidence":0.0,"requiresConfirmation":false,"entities":{"customerName":null,"amount":null,"date":null,"category":null,"service":null,"page":null},"spokenResponse":"string","clarifyingQuestion":null}
+
+Regeln:
+- Kritische Aktionen brauchen IMMER Bestätigung: Buchung speichern, Kunde anlegen, offenen Posten als bezahlt markieren, Rechnung/Angebot finalisieren, Daten löschen/importieren, Nachricht senden, veröffentlichen. Wähle dafür NUR ein Draft-Tool (createCustomerDraft, createBookingDraft, createOfferDraft, createInvoiceDraft, createMarketingDraft) und setze requiresConfirmation=true.
+- Für Navigation setze tool=navigateTo und entities.page auf eine der Seiten-IDs aus dem Kontext.
+- Für Buchungen: entities.amount = Zahl, entities.customerName = Name falls genannt, und schreibe in spokenResponse klar "Einnahme" oder "Ausgabe".
+- Erfinde KEINE Daten. Fehlt etwas oder ist der Befehl unklar: intent=unknown bzw. tool=askClarifyingQuestion und fülle clarifyingQuestion.
+- confidence ehrlich zwischen 0 und 1. Bei Unsicherheit niedrig.
+- spokenResponse: kurze, freundliche deutsche Antwort für die Sprachausgabe.`;
+
+function getNexusOllamaCfg(){
+  const s=getSettings();
+  const ai=(s.ai&&typeof s.ai==="object")?s.ai:{};
+  const nx=(ai.nexus&&typeof ai.nexus==="object")?ai.nexus:{};
+  const base=getAISettings();
+  return {
+    enabled: nx.enabled===true,
+    url: String(nx.url||base.ollamaUrl||"http://localhost:11434").replace(/\/+$/,""),
+    model: nx.model||"llama3.2",
+    timeout: (Number(nx.timeout)>0)?Number(nx.timeout):15000,
+    fallback: nx.fallback!==false
+  };
+}
+function saveNexusOllamaCfg(patch){
+  let cur={}; try{ cur=JSON.parse(localStorage.getItem("VV_SETTINGS_2026")||"{}")||{}; }catch(e){ cur={}; }
+  cur.ai=cur.ai||{}; cur.ai.nexus=Object.assign({}, cur.ai.nexus||{}, patch||{});
+  localStorage.setItem("VV_SETTINGS_2026", JSON.stringify(cur));
+  return cur.ai.nexus;
+}
+
+/* /api/chat mit messages (nicht streamend), eigener Timeout, optional JSON-Format */
+async function callOllamaChat(messages, options){
+  options=options||{};
+  const cfg=getNexusOllamaCfg();
+  const base=String(options.url||cfg.url).replace(/\/+$/,"");
+  const model=options.model||cfg.model;
+  const ctrl=new AbortController(); const to=setTimeout(()=>ctrl.abort(), options.timeout||cfg.timeout||15000);
+  try{
+    const body={model, messages, stream:false};
+    if(options.format) body.format=options.format;
+    body.options=Object.assign({temperature:0}, options.options||{});
+    const res=await fetch(base+"/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body),signal:ctrl.signal});
+    clearTimeout(to);
+    if(!res.ok){ const t=await res.text().catch(()=>""); throw new Error("HTTP "+res.status+(t?(": "+t.slice(0,180)):"")); }
+    const j=await res.json();
+    return (j.message&&j.message.content)||j.response||"";
+  }catch(err){ clearTimeout(to); if(err.name==="AbortError") throw new Error("timeout"); throw err; }
+}
+
+/* Status & Modelle (nutzt vorhandenes ollamaTags) */
+async function checkOllamaStatus(){
+  const cfg=getNexusOllamaCfg();
+  try{
+    const models=await ollamaTags(cfg.url);
+    const modelFound=models.some(m=>m===cfg.model || String(m).split(":")[0]===String(cfg.model).split(":")[0]);
+    return {reachable:true, models, modelFound, model:cfg.model};
+  }catch(err){ return {reachable:false, error:ollamaErrorText(err), models:[], model:cfg.model}; }
+}
+async function listOllamaModels(){ return await ollamaTags(getNexusOllamaCfg().url); }
+
+/* Kompakter, faktischer Kontext für den Router (keine erfundenen Daten) */
+function nxIntentContextLine(context){
+  context=context||{};
+  let op=null; try{ op=getOpenPositionsSummary(); }catch(e){}
+  const cust=(data.customers||[]).filter(c=>!(c.archived||c.deletedAt)).length;
+  return [
+    "Aktuelle Seite: "+nxSecName(currentSection||context.currentPage||"dashboard"),
+    "Kunden im CRM: "+cust,
+    "Offene Positionen: "+(op?op.count:"unbekannt")+(op?(" (gesamt "+money(op.totalOpen)+")"):""),
+    "Gültige Seiten-IDs (für entities.page): "+Object.keys(NX_SEC_NAME).join(", ")
+  ].join("\n");
+}
+
+/* Freie Sprache -> strukturierter Intent */
+async function classifyNexusIntent(userText, context){
+  const cfg=getNexusOllamaCfg();
+  const messages=[
+    {role:"system", content:NX_INTENT_SYSTEM},
+    {role:"user", content:"KONTEXT:\n"+nxIntentContextLine(context)+"\n\nNUTZERTEXT:\n"+String(userText||"")}
+  ];
+  const raw=await callOllamaChat(messages, {format:"json", timeout:cfg.timeout});
+  const res=parseOllamaIntentResponse(raw);
+  if(res.ok) res.userText=String(userText||"");
+  return res;
+}
+
+/* Robuste JSON-Auswertung + Whitelist-Prüfung */
+function parseOllamaIntentResponse(raw){
+  let txt=String(raw||"").trim();
+  txt=txt.replace(/<think>[\s\S]*?<\/think>/gi,"").trim();   // qwen3-Reasoning entfernen
+  txt=txt.replace(/^```(?:json)?\s*/i,"").replace(/\s*```$/,"").trim();
+  let obj=null;
+  try{ obj=JSON.parse(txt); }catch(e){ const m=txt.match(/\{[\s\S]*\}/); if(m){ try{ obj=JSON.parse(m[0]); }catch(e2){} } }
+  if(!obj||typeof obj!=="object") return {ok:false, error:"invalid_json", rawText:String(raw||"")};
+  const intent=String(obj.intent||"unknown");
+  const tool=String(obj.tool||"");
+  let confidence=Number(obj.confidence); if(!isFinite(confidence)) confidence=0;
+  if(confidence>1) confidence=confidence>100?1:(confidence/100);
+  const entities=(obj.entities&&typeof obj.entities==="object")?obj.entities:{};
+  if(NX_ALLOWED_INTENTS.indexOf(intent)<0) return {ok:false, error:"intent_not_allowed", intent, rawText:String(raw||"")};
+  if(tool && NX_ALLOWED_TOOLS.indexOf(tool)<0) return {ok:false, error:"tool_not_allowed", tool, rawText:String(raw||"")};
+  return {ok:true, intent, tool, confidence, requiresConfirmation: obj.requiresConfirmation===true,
+    entities, spokenResponse: obj.spokenResponse!=null?String(obj.spokenResponse):"",
+    clarifyingQuestion: obj.clarifyingQuestion!=null?String(obj.clarifyingQuestion):null };
+}
+
+function nxClarifyFallback(){ return "Ich habe den Befehl nicht eindeutig verstanden. Meintest du Buchhaltung, Kundenkartei, offene Posten oder NEXUS Deck?"; }
+function nxResolvePage(page){ if(page==null) return null; const p=String(page).toLowerCase().trim(); if(!p) return null; if(NX_SEC_NAME[p]) return p; return nxNavTarget(p); }
+function nxParseAmount(a){ if(a==null) return NaN; if(typeof a==="number") return a; const m=String(a).match(/(\d+(?:[.,]\d+)?)/); if(!m) return NaN; const n=parseFloat(m[1].replace(",", ".")); return isFinite(n)?n:NaN; }
+function nxGuessBookingType(e,ir){ const s=(String(e&&e.category||"")+" "+String(e&&e.service||"")+" "+String(ir&&ir.spokenResponse||"")+" "+String(ir&&ir.userText||"")).toLowerCase(); if(/\bausgabe\b|kosten|gekauft|einkauf|material|werkzeug|sprit|tank|diesel|benzin|fahrt|miete|werbung|tankstelle|bezahlt für|bezahlt fuer/.test(s)) return "Ausgabe"; return "Einnahme"; }
+function nxProjectSummaryText(name){
+  const projs=(data.projects||[]).filter(p=>!(p.archived||p.deletedAt));
+  if(!projs.length) return "Aktuell sind keine Baustellen/Projekte im Cockpit hinterlegt.";
+  let list=projs;
+  if(name){ const q=String(name).toLowerCase(); const f=projs.filter(p=>String(p.customerName||"").toLowerCase().includes(q)||String(p.service||"").toLowerCase().includes(q)); if(f.length) list=f; }
+  navigateTo("projekte");
+  return "Baustellen/Projekte ("+list.length+"): "+list.slice(0,8).map(p=>((p.customerName||"Projekt")+(p.service?(" · "+p.service):"")+(p.status?(" – "+p.status):""))).join("; ")+". (Bereich „Baustellen“ geöffnet.)";
+}
+
+/* Wandelt einen geprüften Intent in eine sichere lokale Aktion um.
+   Kritische Aktionen erzeugen NUR Entwürfe + bestehende Ja/Nein-Bestätigung. */
+function executeIntentResult(ir, context){
+  context=context||{};
+  if(!ir||!ir.ok) return {handled:false};
+  // Unklar / niedrige Confidence -> Rückfrage statt falscher Aktion
+  if(ir.intent==="unknown" || ir.tool==="askClarifyingQuestion")
+    return {handled:true, kind:"Rückfrage", text: ir.clarifyingQuestion || ir.spokenResponse || nxClarifyFallback()};
+  if(ir.confidence < NX_INTENT_CONF_MIN)
+    return {handled:true, kind:"Rückfrage", text: ir.clarifyingQuestion || ("Ich bin mir nicht sicher (" + Math.round(ir.confidence*100) + "%). " + nxClarifyFallback())};
+  const e=ir.entities||{};
+  switch(ir.tool){
+    case "navigateTo": {
+      const sec=nxResolvePage(e.page) || nxNavTarget(String(e.page||ir.spokenResponse||"").toLowerCase());
+      if(!sec) return {handled:false};
+      navigateTo(sec); return {handled:true, kind:"Navigation", text: ir.spokenResponse || ("Öffne im Cockpit: "+nxSecName(sec)+".")};
+    }
+    case "getOpenPositionsSummary": return {handled:true, kind:"Abfrage", text: nxFormatOpenPositions()};
+    case "getFinanceSummary": return {handled:true, kind:"Abfrage", text: nxFinanceText()};
+    case "searchCustomer": {
+      const q=String(e.customerName||"").toLowerCase().trim();
+      if(!q) return {handled:true, kind:"Rückfrage", text:"Nach welchem Kunden soll ich suchen?"};
+      const hits=(data.customers||[]).filter(c=>String(c.name||"").toLowerCase().includes(q));
+      navigateTo("crm");
+      return {handled:true, kind:"Abfrage", text: hits.length?("Gefunden: "+hits.slice(0,5).map(c=>c.name).join(", ")+". (Kunden-CRM geöffnet.)"):("Kein Kunde mit „"+(e.customerName||q)+"“ gefunden.")};
+    }
+    case "createBookingDraft": {
+      const amount=nxParseAmount(e.amount);
+      if(!(amount>0)) return {handled:true, kind:"Rückfrage", text:"Für die Buchung brauche ich einen Betrag in Euro. Wie viel?"};
+      const type=nxGuessBookingType(e,ir);
+      const partner=String(e.customerName||"").trim();
+      let category=String(e.category||"").trim(); if(!category) category=(type==="Einnahme")?"Kundenzahlung":"Manuell";
+      _nxPendingBooking={type, amount, partner, category, note:(ir.userText||ir.spokenResponse||""), date:today()};
+      return {handled:true, kind:"Aktion", text:"Ich habe eine "+type+" über "+money(amount)+(partner?(" "+(type==="Ausgabe"?"für":"von")+" "+partner):"")+" erkannt (Kategorie: "+category+", Datum: heute). Soll ich diese Buchung speichern? Ja/Nein."};
+    }
+    case "createCustomerDraft": {
+      const nm=String(e.customerName||"").trim();
+      if(nm.length>=2){ _nxFlow={type:"newCustomer",step:"phone",data:{name:nm}}; return {handled:true, kind:"Aktion", text:"Neuer Kunde „"+nm+"“ (Entwurf). Telefonnummer? (oder „überspringen“)"}; }
+      _nxFlow={type:"newCustomer",step:"name",data:{}}; return {handled:true, kind:"Aktion", text:"Neuer Kunde – wie heißt der Kunde? (oder „abbrechen“)"};
+    }
+    case "createOfferDraft": { navigateTo("calculator"); return {handled:true, kind:"Aktion", text: ir.spokenResponse || "Ich öffne den Preisrechner für einen Angebots-Entwurf. Verbindlich erst nach Aufmaß/Prüfung (Orientierungswert). Finalisierung nur nach deiner Bestätigung."}; }
+    case "createInvoiceDraft": { navigateTo("rechnungen"); return {handled:true, kind:"Aktion", text: ir.spokenResponse || "Ich öffne den Bereich Rechnungen für einen Entwurf. Finalisieren nur nach deiner Bestätigung. Gemäß §19 UStG ohne Umsatzsteuer."}; }
+    case "createMarketingDraft": { navigateTo("mkagents"); return {handled:true, kind:"Aktion", text: ir.spokenResponse || "Ich öffne Marketing & KI-Agenten für einen Entwurf. Veröffentlichen nur nach deiner Freigabe."}; }
+    case "getProjectSummary": return {handled:true, kind:"Abfrage", text: nxProjectSummaryText(e.customerName)};
+    case "openAgent": { const ag=nxMatchAgent(String(e.service||e.category||ir.spokenResponse||"").toLowerCase()); navigateTo("agents"); if(ag){ try{ nxAgentSelect(ag); }catch(_){}} return {handled:true, kind:"Navigation", text: ir.spokenResponse || ("KI-Mitarbeiter geöffnet"+(ag?(": "+ag.charAt(0).toUpperCase()+ag.slice(1)):"")+".")}; }
+    case "stopSpeaking": nxStopSpeaking(); return {handled:true, kind:"Aktion", text:"🔇 Ausgabe gestoppt."};
+    case "confirmPendingAction": return {handled:true, kind:"Bestätigung", text: handleNexusCommand("ja", context)};
+    case "cancelPendingAction": return {handled:true, kind:"Aktion", text: handleNexusCommand("nein", context)};
+    default: return {handled:false};
+  }
+}
+
+function nxNoteOllamaError(err){
+  if(_nxOllamaErrNotified) return; _nxOllamaErrNotified=true;
+  try{ console.warn("[NEXUS] Ollama-Intent-Router nicht verfügbar – nutze lokale Befehlslogik. ("+((err&&err.message)||err)+")"); }catch(e){}
+}
+function nxIsControlPhrase(l){
+  return /^(ja|jap|jawohl|ok|okay|bestätig\w*|bestaetig\w*|genau|passt|nein|ne|nö|noe|abbrechen|abbruch|verwerfen|brich ab|stop|stopp|still|schweig|hör auf|hoer auf|leise|ruhe|mach das|ausführen|ausfuehren)\b/.test(l);
+}
+
+/* Orchestrierung: lokal-zuerst (Bestätigung/Stop), dann Ollama-Router, dann lokaler Fallback. */
+async function nxProcessCommand(commandText, context){
+  context=context||{};
+  const raw=String(commandText||"").trim(); if(!raw) return "";
+  const l=raw.toLowerCase();
+  // 1) Bestätigungen, geführter Dialog, Stop/Abbruch IMMER lokal (hängen nie an Ollama)
+  if(_nxFlow || _nxPendingPaid || _nxPendingBooking || nxIsControlPhrase(l)) return handleNexusCommand(raw, context);
+  // 2) Ollama-Intent-Router (falls aktiviert)
+  const cfg=getNexusOllamaCfg();
+  if(cfg.enabled){
+    try{
+      const ir=await classifyNexusIntent(raw, context);
+      if(ir && ir.ok){
+        const exec=executeIntentResult(ir, context);
+        if(exec && exec.handled){ _nxOllamaErrNotified=false; if(exec.kind) _nxLastKind=exec.kind; return exec.text; }
+        // nicht zuordenbar -> lokaler Fallback
+      }
+      // ungültiges JSON / nicht erlaubt -> lokaler Fallback (falls aktiviert)
+      if(!cfg.fallback) return "Ich habe das über die lokale KI nicht eindeutig verstanden. "+nxClarifyFallback();
+    }catch(err){
+      nxNoteOllamaError(err);
+      if(!cfg.fallback) return "Die lokale KI (Ollama) ist gerade nicht erreichbar. "+nxClarifyFallback();
+    }
+  }
+  // 3) Lokaler Fallback (bewährte Befehlslogik)
+  return handleNexusCommand(raw, context);
+}
+
 function renderAgents(){
   const api = getApiSettings();
   const ai = getAISettings();
@@ -5771,6 +5999,24 @@ function renderSettings(){
     <div style="background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:var(--r2);padding:8px 12px;margin-top:8px;font-size:11.5px;color:var(--muted);white-space:pre-wrap">${esc(VV_OLLAMA_CORS_HINT)}</div>
 
     <div class="divider"></div>
+    <h3>🔮 NEXUS Intent-Router (Ollama, lokal)</h3>
+    <p class="sub" style="color:var(--muted);font-size:12px;margin:0 0 8px">NEXUS versteht freie Sprache über Ollama. Ollama erkennt nur die <b>Absicht</b> – die Aktion führt ausschließlich das Cockpit aus. Kritische Aktionen brauchen weiterhin deine Bestätigung.</p>
+    <div class="fg c3">
+      <div><label class="lbl">Intent-Router aktivieren</label><select id="nxOllamaEnabled"><option value="nein">Nein (nur lokale Befehle)</option><option value="ja">Ja (Ollama-Verständnis)</option></select></div>
+      <div><label class="lbl">Ollama Base URL</label><input id="nxOllamaUrl" value="http://localhost:11434"></div>
+      <div><label class="lbl">Modell</label><input id="nxOllamaModel" value="llama3.2"></div>
+    </div>
+    <div class="fg c3">
+      <div><label class="lbl">Timeout (ms)</label><input id="nxOllamaTimeout" inputmode="numeric" value="15000"></div>
+      <div><label class="lbl">Fallback auf lokale Befehle</label><select id="nxOllamaFallback"><option value="ja">Ja (empfohlen)</option><option value="nein">Nein</option></select></div>
+      <div style="display:flex;align-items:flex-end;gap:8px"><button class="btn sm" onclick="nxTestIntentRouter()">Ollama testen</button><button class="btn sm ghost" onclick="nxTestIntentClassify()">Intent testen</button></div>
+    </div>
+    <div><label class="lbl">Test-Satz (für „Intent testen“)</label><input id="nxOllamaTestPrompt" value="Nexus, wer schuldet mir noch Geld?"></div>
+    <div id="nxOllamaTestStatus" style="font-size:12.5px;margin:6px 0;white-space:pre-wrap">–</div>
+    <div class="btn-row"><button class="btn primary" onclick="saveNexusIntentSettings()">NEXUS-Router speichern</button></div>
+    <div style="background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:var(--r2);padding:8px 12px;margin-top:8px;font-size:11.5px;color:var(--muted);white-space:pre-wrap">Empfohlene Modelle: llama3.2 oder qwen3:4b. Laden mit „ollama pull llama3.2“. Tipp bei „Browser blockiert/CORS“: Cockpit über den Starter (http://localhost) öffnen und in Ollama OLLAMA_ORIGINS passend setzen (z. B. http://localhost:8765).</div>
+
+    <div class="divider"></div>
     <p style="color:var(--muted);font-size:12px">🔒 Diese lokale Version speichert Daten nur auf diesem Gerät. Bankzugangsdaten niemals eingeben. Ollama läuft lokal (keine Cloud-Kosten); optionale externe KI-API-Keys nur unter „Agents / KI" – sie bleiben ausschließlich lokal im Browser.</p>
   </div>`;
 }
@@ -5778,6 +6024,49 @@ function loadAiSettingsFields(){
   const ai=getAISettings();
   setVal("aiMode", ai.mode); setVal("aiOllamaUrl", ai.ollamaUrl); setVal("aiOllamaModel", ai.ollamaModel);
   if(byId("aiExternalProvider")) setVal("aiExternalProvider", ai.externalProvider);
+  // NEXUS Intent-Router
+  const nx=getNexusOllamaCfg();
+  if(byId("nxOllamaEnabled")) setVal("nxOllamaEnabled", nx.enabled?"ja":"nein");
+  if(byId("nxOllamaUrl")) setVal("nxOllamaUrl", nx.url);
+  if(byId("nxOllamaModel")) setVal("nxOllamaModel", nx.model);
+  if(byId("nxOllamaTimeout")) setVal("nxOllamaTimeout", String(nx.timeout));
+  if(byId("nxOllamaFallback")) setVal("nxOllamaFallback", nx.fallback?"ja":"nein");
+}
+/* NEXUS Intent-Router – Einstellungen speichern */
+function saveNexusIntentSettings(silent){
+  saveNexusOllamaCfg({
+    enabled: (val("nxOllamaEnabled")==="ja"),
+    url: (val("nxOllamaUrl")||"http://localhost:11434").replace(/\/+$/,""),
+    model: val("nxOllamaModel")||"llama3.2",
+    timeout: Math.max(2000, parseInt(val("nxOllamaTimeout"),10)||15000),
+    fallback: (val("nxOllamaFallback")!=="nein")
+  });
+  _nxOllamaErrNotified=false;
+  if(!silent){ const st=byId("nxOllamaTestStatus"); if(st) st.innerHTML='<span style="color:var(--green2)">✓ NEXUS-Intent-Router gespeichert.</span>'; }
+}
+/* Verbindung + Modell prüfen */
+function nxTestIntentRouter(){
+  const out=byId("nxOllamaTestStatus");
+  const url=(val("nxOllamaUrl")||getNexusOllamaCfg().url).replace(/\/+$/,"");
+  const model=val("nxOllamaModel")||getNexusOllamaCfg().model;
+  if(out) out.innerHTML="⏳ Teste Ollama unter "+esc(url)+" …";
+  ollamaTags(url).then(models=>{
+    const has=models.some(m=>m===model || String(m).split(":")[0]===String(model).split(":")[0]);
+    let s='<span style="color:var(--green2)">✓ Ollama erreichbar. '+models.length+' Modell(e).</span>';
+    s+= has ? '<br><span style="color:var(--green2)">✓ Modell „'+esc(model)+'“ gefunden.</span>'
+            : '<br><span style="color:#ffb070">⚠ Modell „'+esc(model)+'“ fehlt. Verfügbar: '+esc(models.join(", ")||"–")+'. Laden mit „ollama pull '+esc(model)+'“.</span>';
+    if(out) out.innerHTML=s;
+  }).catch(err=>{ if(out) out.innerHTML='<div style="white-space:pre-wrap;color:#ff8070">✗ '+esc(ollamaErrorText(err))+'</div>'; });
+}
+/* Test-Satz live klassifizieren (zeigt das JSON) */
+function nxTestIntentClassify(){
+  const out=byId("nxOllamaTestStatus");
+  const q=val("nxOllamaTestPrompt")||"Nexus, wer schuldet mir noch Geld?";
+  saveNexusIntentSettings(true); // aktuelle Formularwerte übernehmen
+  if(out) out.innerHTML="⏳ Klassifiziere „"+esc(q)+"“ …";
+  classifyNexusIntent(q, nxBuildContext("text","")).then(ir=>{
+    if(out) out.innerHTML='<pre style="white-space:pre-wrap;margin:0">'+esc(JSON.stringify(ir,null,2))+'</pre>';
+  }).catch(err=>{ if(out) out.innerHTML='<div style="white-space:pre-wrap;color:#ff8070">✗ '+esc(ollamaErrorText(err))+'</div>'; });
 }
 function saveAiSettings(){
   saveAISettings({
@@ -6867,13 +7156,18 @@ function nxSend(text){
   if(!q) return;
   if(inp) inp.value="";
   _nxChat.push({role:"user",text:q});
-  const ans=handleNexusCommand(q, nxBuildContext("text",""));
-  _nxChat.push({role:"nexus",text:ans});
-  if(_nxChat.length>60) _nxChat=_nxChat.slice(-60);
+  const thinking=getNexusOllamaCfg().enabled?{role:"nexus",text:"🤔 denke nach …"}:null;
+  if(thinking) _nxChat.push(thinking);
   nxDrawChat();
-  nxUpdatePanels(); // rechte Zone + Dock aktualisieren (falls nicht navigiert wurde)
-  if(_nxAutoSpeak) nxSpeak(ans);
-  return ans;
+  const finish=(ans)=>{
+    if(thinking){ const i=_nxChat.indexOf(thinking); if(i>=0) _nxChat[i]={role:"nexus",text:ans}; else _nxChat.push({role:"nexus",text:ans}); }
+    else _nxChat.push({role:"nexus",text:ans});
+    if(_nxChat.length>60) _nxChat=_nxChat.slice(-60);
+    nxDrawChat();
+    nxUpdatePanels(); // rechte Zone + Dock aktualisieren (falls nicht navigiert wurde)
+    if(_nxAutoSpeak) nxSpeak(ans);
+  };
+  nxProcessCommand(q, nxBuildContext("text","")).then(finish).catch(e=>finish("Es ist ein Fehler aufgetreten. "+nxClarifyFallback()));
 }
 function nxQuick(q){ nxSend(q); }
 function nxClear(){ _nxChat=_nxChat.slice(0,1); _nxPendingPaid=null; _nxPendingBooking=null; _nxFlow=null; nxDrawChat(); nxUpdatePanels(); }
@@ -7191,12 +7485,15 @@ function nxRunVoiceCommand(cmd, rawTranscript){
   _nxLastWake.unshift({text:cmd, at:Date.now()}); if(_nxLastWake.length>8) _nxLastWake.pop();
   const ctx=nxBuildContext("voice", rawTranscript);
   _nxChat.push({role:"user",text:cmd});
-  const ans=handleNexusCommand(cmd, ctx);
-  _nxChat.push({role:"nexus",text:ans});
-  if(_nxChat.length>60) _nxChat=_nxChat.slice(-60);
-  if(currentSection==="nexus"){ nxDrawChat(); nxUpdatePanels(); }
-  else { nxShowOverlay(cmd, ans); }
-  nxSpeak(ans); // Vorlesen (Listener läuft weiter -> „Nexus“ kann erneut unterbrechen)
+  if(currentSection==="nexus") nxDrawChat();
+  const finish=(ans)=>{
+    _nxChat.push({role:"nexus",text:ans});
+    if(_nxChat.length>60) _nxChat=_nxChat.slice(-60);
+    if(currentSection==="nexus"){ nxDrawChat(); nxUpdatePanels(); }
+    else { nxShowOverlay(cmd, ans); }
+    nxSpeak(ans); // Vorlesen (Listener läuft weiter -> „Nexus“ kann erneut unterbrechen)
+  };
+  nxProcessCommand(cmd, ctx).then(finish).catch(e=>finish("Es ist ein Fehler aufgetreten."));
 }
 /* Rückwärtskompatibler Alias */
 function nxOnTranscript(t){ return handleNexusVoiceTranscript(t); }
