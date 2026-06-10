@@ -6276,9 +6276,21 @@ function nxBrainResetUser(){
 }
 function nxBrainDebugHTML(){
   const d=_nxBrainDebug.last;
-  if(!d) return '<div class="nx-ai nx-muted">Noch kein Befehl verarbeitet. Sende einen NEXUS-Befehl – hier erscheint dann der erkannte Begriff und der an die KI gesendete Kontext (ohne API-Keys, ohne Kundenakten).</div>';
   const row=(k,v)=>'<div class="nx-row"><span>'+k+'</span><b style="text-align:right">'+esc(v==null?"–":String(v))+'</b></div>';
-  return '<div class="nx-ai">'+
+  const voiceRows=
+    '<div class="nx-h" style="margin-bottom:6px">Sprachstatus</div>'+
+    row("voiceState", nxVoiceState)+
+    row("voiceEnabledByUser", nxVoiceEnabledByUser?"ja":"nein")+
+    row("recognitionActive", _nxGlobalRecog?"ja":"nein")+
+    row("recognitionStarting", _nxStarting?"ja":"nein")+
+    row("lastMicError", _nxLastMicError?(_nxLastMicError.slice(0,80)+(_nxLastMicErrorAt?(" ("+new Date(_nxLastMicErrorAt).toLocaleTimeString("de-DE")+")"):"")):null)+
+    row("restartCount", String(_nxRestartCount))+
+    row("lastTranscript", nexusVoiceState.lastTranscript||null)+
+    row("pendingActionId", nxCurrentPendingActionId())+
+    row("lastSpokenPendingActionId", nxLastSpokenPendingActionId)+
+    '<div class="nx-h" style="margin:10px 0 6px">Letzter Befehl</div>';
+  if(!d) return '<div class="nx-ai">'+voiceRows+'<div class="nx-muted">Noch kein Befehl verarbeitet. Sende einen NEXUS-Befehl – hier erscheint dann der erkannte Begriff und der an die KI gesendete Kontext (ohne API-Keys, ohne Kundenakten).</div></div>';
+  return '<div class="nx-ai">'+voiceRows+
     row("Zeitpunkt", d.at? fmtDT(d.at):null)+
     row("Nutzertext", d.userText)+
     row("Erkannter Begriff", d.matchedConcept)+
@@ -8385,10 +8397,22 @@ function nxSpeak(text){
     if(!("speechSynthesis" in window)) return;
     let spoken=String(text||"").replace(/[*#_`>•]/g,"");
     spoken=spoken.replace(/\bnexus\b/ig,"").replace(/\s{2,}/g," ").trim().slice(0,600); // eigenes Wake-Word nicht aussprechen
+    if(!spoken) return;
+    // Debounce: identische Meldung nicht innerhalb von 3 s erneut sprechen
+    const now=Date.now();
+    if(spoken===_nxLastSpokenMsg && (now-_nxLastSpokenMsgAt)<3000) return;
+    // Bestätigungsfragen pro wartender Aktion nur EINMAL sprechen – danach nur UI
+    const pid=nxCurrentPendingActionId();
+    if(pid){
+      if(nxLastSpokenPendingActionId===pid) return;
+      nxLastSpokenPendingActionId=pid;
+    } else {
+      nxLastSpokenPendingActionId=null;
+    }
+    _nxLastSpokenMsg=spoken; _nxLastSpokenMsgAt=now;
     nexusVoiceState.lastSpokenText=spoken.toLowerCase();
     _nxSpeaking=true; nexusVoiceState.mode="SPEAKING"; nxStatusRefresh();
-    // Listener weiterlaufen lassen (für Barge-in) bzw. starten
-    if(_nxGlobalOn && !_nxGlobalRecog) _nxStartRecogInstance();
+    // Listener läuft weiter (Barge-in) – aber hier wird KEINE Recognition mehr gestartet
     const u=new SpeechSynthesisUtterance(spoken); u.lang="de-DE";
     const v=(window.speechSynthesis.getVoices()||[]).find(x=>/de(-|_)/i.test(x.lang));
     if(v) u.voice=v;
@@ -8537,7 +8561,8 @@ function nxUpdatePanels(){
   const vs=byId("nxVoiceStatus"); if(vs) vs.textContent=nxMicLabel();
   const cs=byId("nxCmdStatus"); if(cs) cs.textContent="Letzter Typ: "+_nxLastKind;
   const vn=byId("nxVoiceName"); if(vn){ try{ const v=(window.speechSynthesis.getVoices()||[]).find(x=>/de(-|_)/i.test(x.lang)); vn.textContent=v?v.name:"Standard (de)"; }catch(e){ vn.textContent="Standard"; } }
-  const lb=byId("nxListenBtn"); if(lb) lb.textContent=_nxGlobalOn?"🛑 Globales Zuhören aus":"🎤 Globales Zuhören an";
+  const lb=byId("nxListenBtn"); if(lb) lb.textContent=_nxGlobalOn?"🛑 Sprachmodus deaktivieren":"🎤 Sprachmodus aktivieren";
+  try{ nxVoicePanelRefresh(); }catch(e){}
 }
 let _nxPerf=false;
 function nxTogglePerf(){ _nxPerf=!_nxPerf; const d=byId("nxDeck"); if(d) d.classList.toggle("nx-eco",_nxPerf); nxUpdatePanels(); const b=byId("nxPerfBtn"); if(b) b.textContent=_nxPerf?"⚡ Performance: AN":"⚡ Performance: AUS"; }
@@ -8592,6 +8617,53 @@ let _nxErrCount=0;          // Fehlerzähler -> Backoff/Abbruch
 let _nxRestartTimer=null;
 let _nxPermPending=false;   // läuft gerade eine Berechtigungs-Anfrage?
 let _nxPermDenied=false;    // Mikrofon dauerhaft blockiert -> kein Auto-Restart
+
+/* ---- Stabiler Sprachmodus: klare Zustände, Start NUR durch Nutzerklick ---- */
+const NX_VOICE_STATE={ OFF:"off", REQUESTING_PERMISSION:"requesting_permission", LISTENING:"listening", PROCESSING:"processing", PAUSED:"paused", ERROR:"error" };
+let nxVoiceState=NX_VOICE_STATE.OFF;     // Standard beim Laden: AUS – kein Mikrofon-Prompt
+let nxVoiceEnabledByUser=false;          // wird NUR durch Klick auf „Sprachmodus aktivieren“ true
+let _nxRestartTimes=[];                  // Zeitstempel der Auto-Neustarts (Limit-Prüfung)
+let _nxRestartCount=0;
+let _nxLastMicError="";
+let _nxLastMicErrorAt=0;
+let _nxLastVoiceMsg="";
+let nxLastSpokenPendingActionId=null;    // Bestätigungsfrage pro pendingAction nur 1x sprechen
+let _nxLastSpokenMsg="", _nxLastSpokenMsgAt=0; // gleiche Meldung nicht doppelt sprechen
+function nxSetVoiceState(s){ nxVoiceState=s; try{ nxStatusRefresh(); nxVoicePanelRefresh(); }catch(e){} }
+/* Sichtbare Statusmeldung statt blockierender alert()-Schleifen */
+function showVoiceStatus(msg, isErr){
+  _nxLastVoiceMsg=String(msg||"");
+  if(isErr){ _nxLastMicError=_nxLastVoiceMsg; _nxLastMicErrorAt=Date.now(); }
+  try{ console.info("[NEXUS Mikro] "+_nxLastVoiceMsg); }catch(e){}
+  try{ nxVoicePanelRefresh(); nxRenderChip(); }catch(e){}
+}
+/* Mikrofon-Berechtigungsstatus (Permissions API, sonst "unknown") */
+function nxMicPermissionState(){
+  try{
+    if(navigator.permissions && navigator.permissions.query)
+      return navigator.permissions.query({name:"microphone"}).then(r=>r.state).catch(()=>"unknown");
+  }catch(e){}
+  return Promise.resolve("unknown");
+}
+/* Eindeutige Kennung der gerade wartenden Bestätigung (für „nur 1x sprechen“) */
+function nxCurrentPendingActionId(){
+  try{
+    if(typeof _nxPendingPaid!=="undefined" && _nxPendingPaid) return "paid:"+_nxPendingPaid;
+    if(typeof _nxPendingBooking!=="undefined" && _nxPendingBooking) return "booking:"+JSON.stringify(_nxPendingBooking);
+    if(typeof _nxBrainFlow!=="undefined" && _nxBrainFlow) return "brain:"+_nxBrainFlow.type+":"+(_nxBrainFlow.stage||"");
+    if(typeof _nxFlow!=="undefined" && _nxFlow) return "flow:"+_nxFlow.type+":"+(_nxFlow.step||"");
+  }catch(e){}
+  return null;
+}
+/* Während einer wartenden Bestätigung per SPRACHE nur eindeutige Antworten annehmen –
+   unsichere Transkripte still ignorieren (verhindert Bestätigungs-Loops). */
+function nxVoicePendingGate(cmd){
+  const hasPending=(typeof _nxPendingPaid!=="undefined"&&_nxPendingPaid)||(typeof _nxPendingBooking!=="undefined"&&_nxPendingBooking)||(typeof _nxBrainFlow!=="undefined"&&_nxBrainFlow&&_nxBrainFlow.type!=="learn");
+  if(!hasPending) return false;
+  const l=String(cmd||"").toLowerCase().trim().replace(/[!.?]+$/,"");
+  const ok=/^(ja|jap|jawohl|ok|okay|nein|ne|nö|noe|abbrechen|abbruch|stop|stopp|löschen|loeschen|entfernen|(als )?bezahlt( markieren)?|bezahlt|erledigt|ja[,]?\s+endg(ü|ue)ltig\s+l(ö|oe)schen|ja[,]?\s+ver(ö|oe)ffentlichen)$/.test(l);
+  return !ok; // true = ignorieren
+}
 /* Sicherer Kontext: https und http://localhost/127.0.0.1 sind zuverlässig.
    file:// ist je nach Chrome-Version eingeschränkt – wir lassen den Versuch zu,
    der getUserMedia-Preflight entscheidet. Für zuverlässiges Mikrofon: Starter nutzen. */
@@ -8609,72 +8681,125 @@ function nxIsFileProtocol(){ try{ return location.protocol==="file:"; }catch(e){
 const VV_MIC_LAUNCHER_HINT = "\n\nChrome kann das Mikrofon bei file:// blockieren. Öffne das Cockpit über localhost (oder https) oder erlaube das Mikrofon im Browser. Alles andere – inklusive KI über Gemini/Groq – funktioniert auch per Doppelklick (file://); Befehle können jederzeit getippt werden.";
 function nxPermBlocked(){
   _nxPermDenied=true; _nxGlobalOn=false; _nxStarting=false; _nxPermPending=false;
+  nxVoiceEnabledByUser=false;            // KEINE weiteren Startversuche bis zum nächsten Nutzerklick
   try{ localStorage.setItem("VV_NX_LISTEN","0"); }catch(e){}
   if(_nxRestartTimer){ clearTimeout(_nxRestartTimer); _nxRestartTimer=null; }
+  _nxRestartTimes=[];
   if(_nxGlobalRecog){ try{ _nxGlobalRecog.onend=null; _nxGlobalRecog.onerror=null; _nxGlobalRecog.onresult=null; (_nxGlobalRecog.abort||_nxGlobalRecog.stop).call(_nxGlobalRecog); }catch(e){} _nxGlobalRecog=null; }
-  _nxMicState="err"; nexusVoiceState.mode="ERROR_RESTARTING"; nxStatusRefresh(); nxUpdatePanels();
+  _nxMicState="err"; nexusVoiceState.mode="ERROR_RESTARTING"; nxSetVoiceState(NX_VOICE_STATE.ERROR); nxStatusRefresh(); nxUpdatePanels();
 }
 function startGlobalNexusListener(){
-  if(!nxRecogSupported()){ alert("Spracherkennung wird von diesem Browser nicht unterstützt. Bitte Chrome/Edge nutzen und über http://localhost öffnen."); return false; }
-  if(!nxSecureOK()){ alert("Das Mikrofon funktioniert nur in einem sicheren Kontext (https oder http://localhost)."+VV_MIC_LAUNCHER_HINT); return false; }
-  if(_nxPermPending) return false; // keine doppelte Anfrage
+  // Sprachmodus startet AUSSCHLIESSLICH durch diese Nutzeraktion – nie automatisch.
+  if(!nxRecogSupported()){ showVoiceStatus("Spracherkennung wird von diesem Browser nicht unterstützt (Chrome/Edge empfohlen). Befehle können jederzeit getippt werden.", true); nxSetVoiceState(NX_VOICE_STATE.ERROR); return false; }
+  if(!nxSecureOK()){ showVoiceStatus("Das Mikrofon braucht einen sicheren Kontext (https, http://localhost oder lokale Datei)."+VV_MIC_LAUNCHER_HINT, true); nxSetVoiceState(NX_VOICE_STATE.ERROR); return false; }
+  if(_nxPermPending || _nxStarting || _nxGlobalRecog) return false; // läuft schon / keine doppelte Anfrage
   let noticed=false; try{ noticed=localStorage.getItem("VV_NX_NOTICE")==="1"; }catch(e){}
   if(!noticed){
-    const ok=confirm("NEXUS hört ab jetzt LOKAL in deinem Browser auf das Wake-Word „Nexus“.\n\n• Es werden keine Daten gesendet (alles bleibt lokal).\n• NEXUS reagiert nur auf Sätze, die mit „Nexus“ beginnen.\n• Normale Gespräche lösen nichts aus und werden nicht gespeichert.\n\nGlobales Zuhören aktivieren?");
+    const ok=confirm("NEXUS hört ab jetzt LOKAL in deinem Browser auf das Wake-Word „Nexus“.\n\n• Es werden keine Daten gesendet (alles bleibt lokal).\n• NEXUS reagiert nur auf Sätze, die mit „Nexus“ beginnen.\n• Normale Gespräche lösen nichts aus und werden nicht gespeichert.\n\nSprachmodus aktivieren?");
     if(!ok) return false;
     try{ localStorage.setItem("VV_NX_NOTICE","1"); }catch(e){}
   }
-  _nxErrCount=0; _nxPermDenied=false;
-  // file:// -> getUserMedia-Vorabcheck ist dort unzuverlaessig/blockiert.
-  // Wie der funktionierende NEXUS-Modus: SpeechRecognition DIREKT im Klick
-  // starten (fragt selbst nach Mikrofon-Erlaubnis). Bei echter Ablehnung
-  // meldet sich onerror "not-allowed" mit Starter-Hinweis.
-  if(nxIsFileProtocol()){
-    _nxGlobalOn=true; try{ localStorage.setItem("VV_NX_LISTEN","1"); }catch(e){}
-    _nxStartRecogInstance(); nxUpdatePanels();
-    return true;
-  }
-  // Permission-Preflight: EINMAL über getUserMedia abfragen, dann Tracks sofort stoppen.
-  const md = (navigator&&navigator.mediaDevices&&navigator.mediaDevices.getUserMedia) ? navigator.mediaDevices : null;
-  if(md){
-    _nxPermPending=true; _nxMicState="on"; nexusVoiceState.mode="COMMAND_CAPTURE"; nxStatusRefresh();
-    md.getUserMedia({audio:true}).then(stream=>{
-      try{ stream.getTracks().forEach(t=>t.stop()); }catch(e){}
-      _nxPermPending=false;
-      _nxGlobalOn=true; try{ localStorage.setItem("VV_NX_LISTEN","1"); }catch(e){}
-      _nxStartRecogInstance(); nxUpdatePanels();
-    }).catch(err=>{
-      _nxPermPending=false;
-      // Nicht hart blockieren: SpeechRecognition hat eine eigene Erlaubnis-Logik.
-      // Direkt versuchen; bei echter Ablehnung greift onerror "not-allowed".
-      _nxGlobalOn=true; try{ localStorage.setItem("VV_NX_LISTEN","1"); }catch(e){}
-      _nxStartRecogInstance(); nxUpdatePanels();
-    });
-    return true;
-  }
-  // Fallback ohne mediaDevices: direkt starten (Recognition fragt selbst nach)
+  _nxErrCount=0; _nxPermDenied=false; _nxRestartTimes=[]; _nxLastVoiceMsg="";
+  nxVoiceEnabledByUser=true;
+  nxSetVoiceState(NX_VOICE_STATE.REQUESTING_PERMISSION);
+  // SpeechRecognition DIREKT im Klick starten – sie fragt selbst nach der
+  // Mikrofon-Erlaubnis (genau EIN Prompt). Kein getUserMedia-Doppel-Preflight
+  // mehr, der zweite Dialoge erzeugen konnte. Bei Ablehnung greift onerror
+  // "not-allowed" und stoppt dauerhaft.
   _nxGlobalOn=true; try{ localStorage.setItem("VV_NX_LISTEN","1"); }catch(e){}
   _nxStartRecogInstance(); nxUpdatePanels();
   return true;
 }
-function stopGlobalNexusListener(){
+function stopGlobalNexusListener(opts){
+  nxVoiceEnabledByUser=false;            // Nutzerwunsch: AUS -> kein automatischer Neustart
   _nxGlobalOn=false; try{ localStorage.setItem("VV_NX_LISTEN","0"); }catch(e){}
   if(_nxRestartTimer){ clearTimeout(_nxRestartTimer); _nxRestartTimer=null; }
+  _nxRestartTimes=[];
   if(_nxGlobalRecog){ try{ _nxGlobalRecog.onend=null; _nxGlobalRecog.onerror=null; _nxGlobalRecog.onresult=null; _nxGlobalRecog.abort?_nxGlobalRecog.abort():_nxGlobalRecog.stop(); }catch(e){} _nxGlobalRecog=null; }
-  _nxStarting=false; _nxPermPending=false; nxSetMic("off"); nxUpdatePanels();
+  _nxStarting=false; _nxPermPending=false;
+  nxSetVoiceState(nxVoiceState===NX_VOICE_STATE.ERROR && opts && opts.keepError ? NX_VOICE_STATE.ERROR : NX_VOICE_STATE.OFF);
+  nxSetMic("off"); nxUpdatePanels();
+  if(!(opts&&opts.silent)) showVoiceStatus("Sprachmodus ist aus.");
 }
-function restartGlobalNexusListener(){ if(!_nxGlobalOn) return; if(_nxGlobalRecog){ try{ _nxGlobalRecog.onend=null; _nxGlobalRecog.stop(); }catch(e){} _nxGlobalRecog=null; } nxScheduleRestart(400); }
+function nxStopVoiceMode(opts){ return stopGlobalNexusListener(opts); }
+function restartGlobalNexusListener(){ if(!_nxGlobalOn||!nxVoiceEnabledByUser) return; if(_nxGlobalRecog){ try{ _nxGlobalRecog.onend=null; _nxGlobalRecog.stop(); }catch(e){} _nxGlobalRecog=null; } nxScheduleRestart(900); }
 function nxToggleGlobalListen(){ if(_nxGlobalOn) stopGlobalNexusListener(); else startGlobalNexusListener(); }
-/* Auto-Restart NUR wenn: aktiv, keine Permission-Anfrage offen, keine Instanz,
-   nicht gerade startend, nicht dauerhaft verweigert. */
-function nxCanRestart(){ return _nxGlobalOn && !_nxPermPending && !_nxPermDenied && !_nxStarting && _nxGlobalRecog===null; }
+/* Auto-Restart NUR wenn: vom Nutzer aktiviert, aktiv, keine Permission-Anfrage offen,
+   keine Instanz, nicht gerade startend, nicht dauerhaft verweigert. */
+function nxCanRestart(){ return nxVoiceEnabledByUser && _nxGlobalOn && !_nxPermPending && !_nxPermDenied && !_nxStarting && _nxGlobalRecog===null; }
+/* Kontrollierter Neustart: mit Delay, nie bei verweigerter Berechtigung, nie wenn der
+   Browser einen NEUEN Permission-Dialog verlangen würde, begrenzt bei unklarem Status. */
 function nxScheduleRestart(delay){
   if(!nxCanRestart()) return;
   if(_nxRestartTimer) return;            // bereits geplant
-  _nxRestartTimer=setTimeout(()=>{ _nxRestartTimer=null; if(nxCanRestart()) _nxStartRecogInstance(); }, Math.max(400, delay||600));
+  _nxRestartTimer=setTimeout(()=>{
+    _nxRestartTimer=null;
+    if(!nxCanRestart()) return;
+    nxMicPermissionState().then(st=>{
+      if(!nxCanRestart()) return;
+      if(st==="denied"){ nxPermBlocked(); return; }
+      if(st==="prompt"){
+        // Ein Auto-Neustart würde einen NEUEN Mikrofon-Dialog erzwingen (typisch bei file://).
+        stopGlobalNexusListener({silent:true});
+        showVoiceStatus("Sprachmodus beendet – der Browser verlangt eine neue Mikrofon-Bestätigung. Bitte „Sprachmodus aktivieren“ erneut klicken.", true);
+        return;
+      }
+      if(st!=="granted"){
+        // Status unbekannt: Neustarts begrenzen (max. 3 in 30 s), um Prompt-Schleifen sicher auszuschließen
+        const now=Date.now();
+        _nxRestartTimes=_nxRestartTimes.filter(t=>now-t<30000);
+        if(_nxRestartTimes.length>=3){
+          stopGlobalNexusListener({silent:true});
+          showVoiceStatus("Sprachmodus pausiert (zu viele Neustarts). Bitte „Sprachmodus aktivieren“ erneut klicken.", true);
+          return;
+        }
+        _nxRestartTimes.push(now);
+      }
+      _nxRestartCount++;
+      _nxStartRecogInstance();
+    });
+  }, Math.max(900, delay||900));
+}
+
+/* ---- UI: Bereich „Sprachsteuerung / Mikrofon“ im NEXUS Deck ---- */
+const NX_VOICE_STATE_LABEL={ off:"Aus", requesting_permission:"Berechtigung wird angefragt …", listening:"Lauscht (Wake-Word „Nexus“)", processing:"Verarbeitet …", paused:"Aktiv (kurz pausiert)", error:"Fehler" };
+let _nxTestRecog=null;
+function nxVoicePanelHTML(){
+  const lbl=NX_VOICE_STATE_LABEL[nxVoiceState]||nxVoiceState;
+  const cls=(nxVoiceState==="listening"||nxVoiceState==="processing")?"green":(nxVoiceState==="error"?"red":"yellow");
+  const isErrMsg=_nxLastVoiceMsg && _nxLastVoiceMsg===_nxLastMicError;
+  return '<div class="nx-row"><span>Status</span><span class="nx-badge '+cls+'">'+esc(lbl)+'</span></div>'+
+    '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">'+
+    '<button class="nx-btn cy" onclick="startGlobalNexusListener()" '+(_nxGlobalOn?"disabled":"")+'>🎤 Sprachmodus aktivieren</button>'+
+    '<button class="nx-btn" onclick="stopGlobalNexusListener()" '+(_nxGlobalOn?"":"disabled")+'>🛑 Sprachmodus deaktivieren</button>'+
+    '<button class="nx-btn" onclick="nxVoiceTestCapture()" '+(_nxTestRecog?"disabled":"")+'>Testaufnahme</button></div>'+
+    (_nxLastVoiceMsg?('<div style="margin-top:8px;font-size:12px;white-space:pre-wrap;color:'+(isErrMsg?"#ff9c8a":"#8af0fb")+'">'+esc(_nxLastVoiceMsg)+'</div>'):'')+
+    (nxIsFileProtocol()?'<div class="nx-muted" style="margin-top:8px">Bei lokal geöffneter Datei (file://) kann der Browser Mikrofonberechtigungen strenger behandeln. Wenn Probleme auftreten, nutze den Sprachmodus manuell über den Button oder öffne das Cockpit über eine vertrauenswürdige lokale Adresse. Tippen funktioniert immer.</div>':'')+
+    '<div class="nx-muted" style="margin-top:6px">Das Mikrofon startet nie automatisch – nur über „Sprachmodus aktivieren“. Beim Laden der Seite erscheint kein Mikrofon-Dialog.</div>';
+}
+function nxVoicePanelRefresh(){ const e=byId("nxVoicePanel"); if(e) e.innerHTML=nxVoicePanelHTML(); }
+/* Testaufnahme: bewusst EIN Durchlauf (continuous=false), kein Neustart */
+function nxVoiceTestCapture(){
+  if(_nxGlobalOn){ showVoiceStatus("Sprachmodus läuft bereits – sag einfach „Nexus …“. Zuletzt gehört: "+(_nxLastHeard||"–")); return; }
+  if(_nxTestRecog||_nxStarting||_nxGlobalRecog){ showVoiceStatus("Testaufnahme läuft bereits …"); return; }
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){ showVoiceStatus("Spracherkennung wird von diesem Browser nicht unterstützt.", true); return; }
+  showVoiceStatus("Testaufnahme: bitte jetzt kurz sprechen …");
+  try{
+    const r=new SR(); r.lang="de-DE"; r.continuous=false; r.interimResults=false; r.maxAlternatives=1;
+    r.onresult=ev=>{ const t=(ev.results[0]&&ev.results[0][0]&&ev.results[0][0].transcript)||""; showVoiceStatus("Testaufnahme erkannt: „"+t+"“ – ✓ Mikrofon funktioniert."); };
+    r.onerror=e=>{ const err=(e&&e.error)||"unbekannt";
+      showVoiceStatus(err==="not-allowed"?"Mikrofon wurde blockiert. Bitte im Browser erlauben und erneut versuchen."
+        :(err==="no-speech"?"Keine Sprache erkannt – bitte erneut versuchen."
+        :(err==="audio-capture"?"Kein Mikrofon gefunden oder Zugriff nicht möglich.":"Testaufnahme-Fehler: "+err)), err!=="no-speech"); };
+    r.onend=()=>{ _nxTestRecog=null; nxVoicePanelRefresh(); };
+    _nxTestRecog=r; r.start(); nxVoicePanelRefresh();
+  }catch(e){ _nxTestRecog=null; showVoiceStatus("Testaufnahme konnte nicht gestartet werden: "+((e&&e.message)||e), true); }
 }
 
 function _nxStartRecogInstance(){
+  // Singleton: es existiert IMMER nur eine SpeechRecognition-Instanz
+  if(!nxVoiceEnabledByUser) return;       // nie ohne ausdrückliche Nutzeraktion
   if(!_nxGlobalOn || _nxPermPending || _nxPermDenied) return; // läuft AUCH während _nxSpeaking weiter (Barge-in)
   if(_nxStarting || _nxGlobalRecog) return; // kein überlappender Start
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition; if(!SR) return;
@@ -8682,7 +8807,7 @@ function _nxStartRecogInstance(){
   let r;
   try{
     r=new SR(); r.lang="de-DE"; r.continuous=true; r.interimResults=false; r.maxAlternatives=1;
-    r.onstart=()=>{ _nxStarting=false; _nxErrCount=0; if(_nxGlobalOn){ _nxMicState="on"; nxStatusRefresh(); } };
+    r.onstart=()=>{ _nxStarting=false; _nxErrCount=0; if(_nxGlobalOn){ _nxMicState="on"; nxSetVoiceState(NX_VOICE_STATE.LISTENING); } };
     r.onresult=ev=>{
       _nxErrCount=0;
       for(let i=ev.resultIndex;i<ev.results.length;i++){
@@ -8692,25 +8817,44 @@ function _nxStartRecogInstance(){
     };
     r.onerror=e=>{
       _nxStarting=false; const err=(e&&e.error)||"";
+      _nxLastMicError=err; _nxLastMicErrorAt=Date.now();
       if(err==="not-allowed"||err==="service-not-allowed"){
-        var emsg = nxIsFileProtocol()
-          ? ("Mikrofon-Zugriff ist beim Öffnen per Datei (file://) blockiert."+VV_MIC_LAUNCHER_HINT)
-          : ("Mikrofon-Zugriff ist blockiert.\n\nSo wieder freigeben (Chrome/Edge):\n1) Schloss-Symbol links in der Adressleiste anklicken\n2) „Mikrofon“ auf „Zulassen“ setzen (bzw. Berechtigung zurücksetzen)\n3) Seite neu laden");
-        alert(emsg);
-        nxPermBlocked(); return;            // dauerhaft aus, KEIN Neustart
+        nxPermBlocked();                    // dauerhaft aus, KEIN Neustart, KEIN alert-Loop
+        showVoiceStatus("Mikrofon wurde blockiert. Bitte im Browser erlauben (Schloss-Symbol → Mikrofon → Zulassen) und Sprachmodus erneut aktivieren."+(nxIsFileProtocol()?VV_MIC_LAUNCHER_HINT:""), true);
+        return;
+      }
+      if(err==="audio-capture"){
+        // kein Mikrofon: NICHT neu starten
+        nxSetVoiceState(NX_VOICE_STATE.ERROR);
+        stopGlobalNexusListener({silent:true, keepError:true});
+        showVoiceStatus("Kein Mikrofon gefunden oder Zugriff nicht möglich.", true);
+        return;
       }
       if(err==="aborted"){ return; }        // meist eigener stop() – kein Neustart-Sturm
-      // no-speech / audio-capture / network: entzerrt neu starten, mit Limit
-      _nxErrCount++; _nxMicState="err"; nexusVoiceState.mode="ERROR_RESTARTING"; nxStatusRefresh();
-      if(_nxErrCount>8){ _nxGlobalOn=false; nxSetMic("off"); nxUpdatePanels(); return; } // dauerhafte Probleme -> stoppen
-      _nxGlobalRecog=null; nxScheduleRestart(1000*Math.min(_nxErrCount,5));
+      if(err==="no-speech"){ showVoiceStatus("Keine Sprache erkannt. Sprachmodus bleibt bereit."); return; } // onend übernimmt den kontrollierten Neustart
+      if(err==="network"){
+        _nxErrCount++;
+        showVoiceStatus("Spracherkennung aktuell nicht verfügbar (Netzwerk). Bitte später erneut versuchen.", true);
+      } else {
+        _nxErrCount++;
+        showVoiceStatus("Sprachfehler: "+err, true);
+      }
+      _nxMicState="err"; nexusVoiceState.mode="ERROR_RESTARTING"; nxSetVoiceState(NX_VOICE_STATE.ERROR); nxStatusRefresh();
+      if(_nxErrCount>4){ stopGlobalNexusListener({silent:true, keepError:true}); showVoiceStatus("Sprachmodus gestoppt – wiederholte Fehler ("+err+"). Bitte später erneut aktivieren.", true); return; }
+      _nxGlobalRecog=null; nxScheduleRestart(1200*Math.min(_nxErrCount,4));
     };
-    r.onend=()=>{ _nxStarting=false; _nxGlobalRecog=null; if(_nxGlobalOn) nxScheduleRestart(600); };
+    r.onend=()=>{
+      // KEIN sofortiger blinder Neustart – nur kontrolliert, wenn der Nutzer
+      // den Sprachmodus aktiv gelassen hat (Delay, Permission-Check, Limit).
+      _nxStarting=false; _nxGlobalRecog=null;
+      if(nxVoiceEnabledByUser && _nxGlobalOn){ nxSetVoiceState(NX_VOICE_STATE.PAUSED); nxScheduleRestart(900); }
+      else if(nxVoiceState!==NX_VOICE_STATE.ERROR) nxSetVoiceState(NX_VOICE_STATE.OFF);
+    };
     _nxGlobalRecog=r; r.start(); _nxMicState="on";
   }catch(e){
     _nxStarting=false; _nxGlobalRecog=null;
     // InvalidStateError (bereits gestartet) o. ä. -> ruhig, nicht spammen
-    if(_nxGlobalOn) nxScheduleRestart(900);
+    if(nxVoiceEnabledByUser && _nxGlobalOn) nxScheduleRestart(1200);
   }
 }
 
@@ -8745,7 +8889,11 @@ function handleNexusVoiceTranscript(transcript){
   nxRunVoiceCommand(w.commandText, w.rawTranscript);
 }
 function nxRunVoiceCommand(cmd, rawTranscript){
+  // Während einer wartenden Bestätigung nur eindeutige Antworten annehmen –
+  // unklare/falsch erkannte Transkripte still ignorieren (kein Bestätigungs-Loop)
+  if(nxVoicePendingGate(cmd)){ _nxLastHeard=String(cmd||""); nxStatusRefresh(); return; }
   nexusVoiceState.mode="PROCESSING"; nexusVoiceState.lastCommand=cmd; _nxLastRecognized=cmd;
+  nxSetVoiceState(NX_VOICE_STATE.PROCESSING);
   _nxLastWake.unshift({text:cmd, at:Date.now()}); if(_nxLastWake.length>8) _nxLastWake.pop();
   const ctx=nxBuildContext("voice", rawTranscript);
   _nxChat.push({role:"user",text:cmd});
@@ -8756,6 +8904,7 @@ function nxRunVoiceCommand(cmd, rawTranscript){
     if(currentSection==="nexus"){ nxDrawChat(); nxUpdatePanels(); }
     else { nxShowOverlay(cmd, ans); }
     nxSpeak(ans); // Vorlesen (Listener läuft weiter -> „Nexus“ kann erneut unterbrechen)
+    nxSetVoiceState(_nxGlobalRecog?NX_VOICE_STATE.LISTENING:(nxVoiceEnabledByUser&&_nxGlobalOn?NX_VOICE_STATE.PAUSED:nxVoiceState));
   };
   nxProcessCommand(cmd, ctx).then(finish).catch(e=>finish("Es ist ein Fehler aufgetreten."));
 }
@@ -8903,7 +9052,7 @@ function renderNexusDeck(){
     <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
       <div><h2>🔮 NEXUS COMMAND DECK</h2><div class="nx-sub">Globale Steuerzentrale · steuert das Cockpit per Sprache & Text · zentrale Cockpit-Datenbasis · Wake-Word „Nexus“.</div></div>
       <div style="display:flex;gap:6px;flex-wrap:wrap">
-        <button class="nx-btn cy" id="nxListenBtn" onclick="nxToggleGlobalListen()">${_nxGlobalOn?"🛑 Globales Zuhören aus":"🎤 Globales Zuhören an"}</button>
+        <button class="nx-btn cy" id="nxListenBtn" onclick="nxToggleGlobalListen()">${_nxGlobalOn?"🛑 Sprachmodus deaktivieren":"🎤 Sprachmodus aktivieren"}</button>
         <button class="nx-btn" id="nxFullBtn" onclick="nxToggleFull()">${_nxFull?"⤢ Vollbild verlassen":"⤢ NEXUS Vollbild"}</button>
         <button class="nx-btn" onclick="nxExitFull();showSection('dashboard')">↩ Zurück zum Cockpit</button>
       </div>
@@ -8941,6 +9090,12 @@ function renderNexusDeck(){
         <div class="nx-h" style="margin-top:12px">Letzte Aktionen</div><div id="nxActions"></div>
         <div class="nx-h" style="margin-top:12px">Erkannter Befehl</div><div id="nxRecognized"></div>
       </div>
+    </div>
+    <!-- SPRACHSTEUERUNG / MIKROFON -->
+    <div class="nx-col" style="margin-top:12px">
+      <div class="nx-h">🎙️ Sprachsteuerung / Mikrofon</div>
+      <div class="nx-muted" style="margin:-2px 0 10px">Sprachmodus startet nur auf Klick – nie automatisch beim Laden.</div>
+      <div id="nxVoicePanel">${nxVoicePanelHTML()}</div>
     </div>
     <!-- KI-VERBINDUNGEN / API-KEYS -->
     <div class="nx-col" style="margin-top:12px">
