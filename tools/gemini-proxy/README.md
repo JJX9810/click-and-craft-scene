@@ -22,10 +22,13 @@ Anzahl offener Posten/Kunden, erlaubte Tools) – **keine** Kundenakten.
      ```
    - **Variante B (Umgebungsvariable):** in Windows `GEMINI_API_KEY` setzen
      (z. B. `setx GEMINI_API_KEY "DEIN_ECHTER_KEY"`, danach neue Konsole öffnen).
-3. Starten (oder einfach den One-Click-Starter `start-vv-cockpit.bat` nutzen):
-   ```
-   node server.js
-   ```
+3. Starten – **drei Wege**:
+   - **Empfohlen:** den One-Click-Starter `start-vv-cockpit.bat` nutzen (startet den Proxy automatisch mit).
+   - **Nur der Proxy (zum Testen):** Doppelklick auf `start-gemini-proxy.bat` in diesem Ordner.
+   - **Manuell:**
+     ```
+     node server.js
+     ```
 
 ## Endpunkte
 
