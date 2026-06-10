@@ -7067,6 +7067,15 @@ function startGlobalNexusListener(){
     try{ localStorage.setItem("VV_NX_NOTICE","1"); }catch(e){}
   }
   _nxErrCount=0; _nxPermDenied=false;
+  // file:// -> getUserMedia-Vorabcheck ist dort unzuverlaessig/blockiert.
+  // Wie der funktionierende NEXUS-Modus: SpeechRecognition DIREKT im Klick
+  // starten (fragt selbst nach Mikrofon-Erlaubnis). Bei echter Ablehnung
+  // meldet sich onerror "not-allowed" mit Starter-Hinweis.
+  if(nxIsFileProtocol()){
+    _nxGlobalOn=true; try{ localStorage.setItem("VV_NX_LISTEN","1"); }catch(e){}
+    _nxStartRecogInstance(); nxUpdatePanels();
+    return true;
+  }
   // Permission-Preflight: EINMAL über getUserMedia abfragen, dann Tracks sofort stoppen.
   const md = (navigator&&navigator.mediaDevices&&navigator.mediaDevices.getUserMedia) ? navigator.mediaDevices : null;
   if(md){
@@ -7078,11 +7087,10 @@ function startGlobalNexusListener(){
       _nxStartRecogInstance(); nxUpdatePanels();
     }).catch(err=>{
       _nxPermPending=false;
-      var msg = nxIsFileProtocol()
-        ? ("Mikrofon-Zugriff ist beim Öffnen per Datei (file://) nicht möglich oder wurde abgelehnt."+VV_MIC_LAUNCHER_HINT)
-        : ("Mikrofon-Zugriff wurde abgelehnt oder ist blockiert.\n\nSo wieder freigeben (Chrome/Edge):\n1) Schloss-Symbol links in der Adressleiste anklicken\n2) „Mikrofon“ auf „Zulassen“ setzen (oder Berechtigung zurücksetzen)\n3) Seite neu laden");
-      alert(msg);
-      nxPermBlocked();
+      // Nicht hart blockieren: SpeechRecognition hat eine eigene Erlaubnis-Logik.
+      // Direkt versuchen; bei echter Ablehnung greift onerror "not-allowed".
+      _nxGlobalOn=true; try{ localStorage.setItem("VV_NX_LISTEN","1"); }catch(e){}
+      _nxStartRecogInstance(); nxUpdatePanels();
     });
     return true;
   }
