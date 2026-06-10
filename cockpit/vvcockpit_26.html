@@ -5172,6 +5172,36 @@ async function nxProcessCommand(commandText, context){
   return handleNexusCommand(raw, context);
 }
 
+/* Optionale lokale Startkonfiguration (vom One-Click-Starter erzeugt).
+   SICHER: nur über http(s), nie über file://; überschreibt bestehende
+   NEXUS-Einstellungen NIEMALS – belegt sie nur beim allerersten Start vor. */
+function nxNexusConfigured(){
+  try{ const s=JSON.parse(localStorage.getItem("VV_SETTINGS_2026")||"{}"); return !!(s&&s.ai&&s.ai.nexus&&typeof s.ai.nexus==="object"); }
+  catch(e){ return false; }
+}
+function nxTryLoadLocalConfig(){
+  try{
+    if(!/^https?:$/.test(location.protocol)) return;   // nicht über file://
+    if(nxNexusConfigured()) return;                    // bestehende Einstellungen NIE anfassen
+    fetch("/nexus-local-config.json",{cache:"no-store"})
+      .then(r=>r.ok?r.json():null)
+      .then(cfg=>{
+        if(!cfg||typeof cfg!=="object") return;
+        if(nxNexusConfigured()) return;                // doppelt absichern
+        saveNexusOllamaCfg({
+          enabled:true,
+          url:String(cfg.ollamaBaseUrl||"http://localhost:11434").replace(/\/+$/,""),
+          model:String(cfg.ollamaModel||"llama3.2"),
+          timeout:30000, fallback:true
+        });
+        _nxOllamaErrNotified=false;
+        try{ if(currentSection==="settings") loadAiSettingsFields(); }catch(e){}
+        try{ console.info("[NEXUS] Lokale Startkonfiguration übernommen (Ollama aktiviert)."); }catch(e){}
+      })
+      .catch(()=>{}); // keine Datei / kein Server -> still ignorieren
+  }catch(e){}
+}
+
 function renderAgents(){
   const api = getApiSettings();
   const ai = getAISettings();
@@ -7905,6 +7935,7 @@ document.addEventListener("DOMContentLoaded",()=>{
   loadAll(); loadSettingsFields();
   showSection("dashboard");
   try{ nxInjectGlobal(); }catch(e){} // globaler Mic-Chip + Antwort-Overlay (Zuhören erst nach Klick)
+  try{ nxTryLoadLocalConfig(); }catch(e){} // optionale lokale Startkonfiguration (nur über http, nie überschreibend)
   // Live Bank-Table wenn section aktiv
   const obs=new MutationObserver(()=>{ if(currentSection==="bookkeeping") renderBkTable(); });
   obs.observe(byId("main"),{childList:true});
