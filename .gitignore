@@ -25,6 +25,11 @@ tools/gemini-proxy/.env
 **/gemini-proxy/.env
 nexus-local-config.json
 
+# OS / Backups
+Thumbs.db
+*.bak
+*.tmp
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

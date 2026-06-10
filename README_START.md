@@ -13,8 +13,8 @@ Der Starter erledigt automatisch:
 5. **Kein `file://`** mehr → Mikrofon, NEXUS und der Ollama-Intent-Router funktionieren
 
 > Das schwarze Fenster **offen lassen**, solange du arbeitest. Zum Beenden das Fenster
-> schließen oder `tools\stop-vv-cockpit.bat` doppelklicken (beendet nur den Cockpit-Server,
-> **nicht** Ollama).
+> schließen oder `stop-vv-cockpit.bat` (im Hauptordner) doppelklicken (beendet Cockpit-Server
+> und Gemini-Proxy, **nicht** Ollama).
 
 ---
 
@@ -23,13 +23,21 @@ Der Starter erledigt automatisch:
 ```
 <Projektordner>\
 ├─ start-vv-cockpit.bat          ← DAS doppelklicken
+├─ stop-vv-cockpit.bat           ← beendet Server + Gemini-Proxy
+├─ README_START.md
+├─ .gitignore
 ├─ nexus-local-config.json       ← wird beim Start erzeugt (informativ)
 ├─ cockpit\
 │   └─ vvcockpit_26.html         ← die Cockpit-App
 └─ tools\
     ├─ start-vv-cockpit.ps1      ← Startlogik
     ├─ stop-vv-cockpit.ps1
-    └─ stop-vv-cockpit.bat
+    └─ gemini-proxy\
+        ├─ server.js             ← lokaler Gemini-Proxy (Key bleibt serverseitig)
+        ├─ package.json
+        ├─ README.md
+        ├─ .env.example          ← zu .env kopieren und Key eintragen
+        └─ start-gemini-proxy.bat  (optional, nur Proxy testen)
 ```
 
 Der Starter sucht die Cockpit-Datei automatisch (u. a. `cockpit/vvcockpit_26.html`,

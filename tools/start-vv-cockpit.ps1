@@ -22,8 +22,11 @@ $ForceOllamaCpu = $true
 $RestartOllamaIfCudaModeRequired = $false   # Standard: KEINE Prozess-Kills
 $EnableGeminiProxy = $true                  # optionaler Gemini-Fallback (nur wenn Key+Node vorhanden)
 $GeminiProxyPort   = 8787
+$GeminiProxyPath   = "tools/gemini-proxy/server.js"
 $AllowOrigins = @(
   "http://localhost:8000","http://127.0.0.1:8000",
+  "http://localhost:8001","http://127.0.0.1:8001",
+  "http://localhost:8002","http://127.0.0.1:8002",
   "http://localhost:8765","http://127.0.0.1:8765"
 )
 
@@ -136,8 +139,8 @@ if($ollamaApiUp){
 $geminiUp = $false
 if($EnableGeminiProxy){
   Info "Prüfe Gemini-Proxy ..."
-  $proxyDir = Join-Path $ProjectRoot "tools\gemini-proxy"
-  $proxyJs  = Join-Path $proxyDir "server.js"
+  $proxyJs  = Join-Path $ProjectRoot ($GeminiProxyPath -replace '/','\')
+  $proxyDir = Split-Path -Parent $proxyJs
   $node = Get-Command node -ErrorAction SilentlyContinue
   # Key aus Umgebungsvariable ODER .env (Platzhalter zählen NICHT als Key)
   $placeholder = 'your_gemini_api_key_here|HIER_KEY_EINTRAGEN'
