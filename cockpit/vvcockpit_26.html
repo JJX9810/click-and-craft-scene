@@ -4986,9 +4986,16 @@ function getNexusOllamaCfg(){
     model: nx.model||"llama3.2",
     timeout: (Number(nx.timeout)>0)?Number(nx.timeout):15000,
     fallback: nx.fallback!==false,
-    // Gemini (über lokalen Proxy – KEIN API-Key im Browser)
+    // Gemini: per lokalem Proxy (sicher) ODER direkt im Browser (Key lokal gespeichert)
     geminiMode: (["off","fallback","preferred"].indexOf(nx.geminiMode)>=0)?nx.geminiMode:"off",
-    geminiUrl: String(nx.geminiUrl||"http://localhost:8787").replace(/\/+$/,"")
+    geminiUrl: String(nx.geminiUrl||"http://localhost:8787").replace(/\/+$/,""),
+    geminiDirect: nx.geminiDirect===true,
+    geminiKey: String(nx.geminiKey||""),
+    geminiModel: String(nx.geminiModel||"gemini-2.0-flash"),
+    // Groq: direkt im Browser (Key lokal gespeichert)
+    groqMode: (["off","fallback","preferred"].indexOf(nx.groqMode)>=0)?nx.groqMode:"off",
+    groqKey: String(nx.groqKey||""),
+    groqModel: String(nx.groqModel||"llama-3.3-70b-versatile")
   };
 }
 function saveNexusOllamaCfg(patch){
@@ -5150,14 +5157,67 @@ function nxIsControlPhrase(l){
   return /^(ja|jap|jawohl|ok|okay|bestätig\w*|bestaetig\w*|genau|passt|nein|ne|nö|noe|abbrechen|abbruch|verwerfen|brich ab|stop|stopp|still|schweig|hör auf|hoer auf|leise|ruhe|mach das|ausführen|ausfuehren)\b/.test(l);
 }
 /* Router aktiv? (für Denk-Platzhalter in der Chat-UI) */
-function nxRouterActive(){ const c=getNexusOllamaCfg(); return c.enabled || c.geminiMode!=="off"; }
+function nxRouterActive(){ const c=getNexusOllamaCfg(); return c.enabled || c.geminiMode!=="off" || c.groqMode!=="off"; }
 /* Ist ein Intent „sicher genug“ zum Ausführen? */
 function nxIntentIsConfident(ir){ return !!(ir && ir.ok && ir.confidence>=NX_INTENT_CONF_MIN && ir.intent!=="unknown" && ir.tool && ir.tool!=="askClarifyingQuestion"); }
 
-/* Gemini-Intent über den lokalen Proxy (KEIN API-Key im Browser).
+/* Freundliche Fehlertexte für Cloud-APIs (Key wird NICHT angezeigt) */
+function nxCloudErr(name, status, t){
+  let h="";
+  if(status===429) h=" – Kontingent/Rate-Limit überschritten";
+  else if(status===401||status===403) h=" – API-Key ungültig oder keine Berechtigung";
+  else if(status===400) h=" – ungültige Anfrage (Modellname prüfen?)";
+  return name+" HTTP "+status+h+(t?(" :: "+String(t).replace(/\s+/g," ").slice(0,140)):"");
+}
+/* Nachricht für Cloud-Intent: System + minimaler Kontext (keine Kundenakten) */
+function nxCloudUserMsg(userText, context){
+  return "KONTEXT:\n"+nxIntentContextLine(context)+"\n\nNUTZERTEXT:\n"+String(userText||"");
+}
+/* Gemini DIREKT aus dem Browser (Key wird lokal gespeichert). Nur für file://-Nutzung. */
+async function classifyViaGeminiDirect(userText, context){
+  const cfg=getNexusOllamaCfg();
+  const key=cfg.geminiKey; if(!key) throw new Error("Kein Gemini API-Key hinterlegt.");
+  const model=cfg.geminiModel||"gemini-2.0-flash";
+  const url="https://generativelanguage.googleapis.com/v1beta/models/"+encodeURIComponent(model)+":generateContent?key="+encodeURIComponent(key);
+  const body={ system_instruction:{parts:[{text:NX_INTENT_SYSTEM}]},
+    contents:[{role:"user",parts:[{text:nxCloudUserMsg(userText,context)}]}],
+    generationConfig:{temperature:0, responseMimeType:"application/json"} };
+  const ctrl=new AbortController(); const to=setTimeout(()=>ctrl.abort(), cfg.timeout||15000);
+  try{
+    const res=await fetch(url,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body),signal:ctrl.signal});
+    clearTimeout(to);
+    if(!res.ok){ const t=await res.text().catch(()=>""); throw new Error(nxCloudErr("Gemini",res.status,t)); }
+    const j=await res.json();
+    const parts=(j&&j.candidates&&j.candidates[0]&&j.candidates[0].content&&j.candidates[0].content.parts)||[];
+    const text=parts.map(p=>p&&p.text?p.text:"").join("");
+    const r=parseOllamaIntentResponse(text); if(r.ok) r.userText=String(userText||""); return r;
+  }catch(err){ clearTimeout(to); if(err.name==="AbortError") throw new Error("timeout"); throw err; }
+}
+/* Groq DIREKT aus dem Browser (OpenAI-kompatibel, Key lokal gespeichert). */
+async function classifyViaGroq(userText, context){
+  const cfg=getNexusOllamaCfg();
+  const key=cfg.groqKey; if(!key) throw new Error("Kein Groq API-Key hinterlegt.");
+  const model=cfg.groqModel||"llama-3.3-70b-versatile";
+  const body={ model, temperature:0, response_format:{type:"json_object"},
+    messages:[{role:"system",content:NX_INTENT_SYSTEM},{role:"user",content:nxCloudUserMsg(userText,context)}] };
+  const ctrl=new AbortController(); const to=setTimeout(()=>ctrl.abort(), cfg.timeout||15000);
+  try{
+    const res=await fetch("https://api.groq.com/openai/v1/chat/completions",{method:"POST",
+      headers:{"Content-Type":"application/json","Authorization":"Bearer "+key},
+      body:JSON.stringify(body),signal:ctrl.signal});
+    clearTimeout(to);
+    if(!res.ok){ const t=await res.text().catch(()=>""); throw new Error(nxCloudErr("Groq",res.status,t)); }
+    const j=await res.json();
+    const text=(j&&j.choices&&j.choices[0]&&j.choices[0].message&&j.choices[0].message.content)||"";
+    const r=parseOllamaIntentResponse(text); if(r.ok) r.userText=String(userText||""); return r;
+  }catch(err){ clearTimeout(to); if(err.name==="AbortError") throw new Error("timeout"); throw err; }
+}
+
+/* Gemini-Intent: direkt (Key im Browser) ODER über lokalen Proxy.
    Sendet nur minimalen Kontext (Seite + Zähler), keine Kundenakten. */
 async function classifyViaGemini(userText, context){
   const cfg=getNexusOllamaCfg();
+  if(cfg.geminiDirect) return classifyViaGeminiDirect(userText, context);
   const url=cfg.geminiUrl.replace(/\/+$/,"")+"/intent";
   let opCount=null; try{ opCount=getOpenPositionsSummary().count; }catch(e){}
   const body={ userText:String(userText||""), context:{
@@ -5187,19 +5247,24 @@ async function nxProcessCommand(commandText, context){
   // 1) Bestätigungen, geführter Dialog, Stop/Abbruch IMMER lokal (hängen nie an einer KI)
   if(_nxFlow || _nxPendingPaid || _nxPendingBooking || nxIsControlPhrase(l)) return handleNexusCommand(raw, context);
 
-  // 2) Provider-Kette bestimmen
+  // 2) Provider-Kette bestimmen: bevorzugte Cloud -> Ollama -> Fallback-Cloud
   const cfg=getNexusOllamaCfg();
-  const ollamaOn = cfg.enabled;
-  const geminiOn = cfg.geminiMode!=="off";
   const providers=[];
-  if(cfg.geminiMode==="preferred"){ if(geminiOn) providers.push("gemini"); if(ollamaOn) providers.push("ollama"); }
-  else { if(ollamaOn) providers.push("ollama"); if(geminiOn) providers.push("gemini"); } // "fallback": Ollama zuerst, dann Gemini
+  if(cfg.geminiMode==="preferred") providers.push("gemini");
+  if(cfg.groqMode==="preferred")   providers.push("groq");
+  if(cfg.enabled)                  providers.push("ollama");
+  if(cfg.geminiMode==="fallback")  providers.push("gemini");
+  if(cfg.groqMode==="fallback")    providers.push("groq");
 
   // 3) Kette durchlaufen: bei niedriger Confidence/Fehler -> nächster Provider
   let lastIr=null;
   for(let idx=0; idx<providers.length; idx++){
     const prov=providers[idx]; let ir=null;
-    try{ ir = (prov==="gemini") ? await classifyViaGemini(raw, context) : await classifyNexusIntent(raw, context); }
+    try{
+      ir = (prov==="gemini") ? await classifyViaGemini(raw, context)
+         : (prov==="groq")   ? await classifyViaGroq(raw, context)
+         : await classifyNexusIntent(raw, context);
+    }
     catch(err){ if(prov==="ollama") nxNoteOllamaError(err); else nxNoteProviderError(prov, err); continue; }
     if(!ir || !ir.ok){ lastIr=ir; continue; }   // ungültiges JSON / verworfenes Tool -> nächster Provider
     lastIr=ir;
@@ -6093,18 +6158,41 @@ function renderSettings(){
     <div id="nxOllamaTestStatus" style="font-size:12.5px;margin:6px 0;white-space:pre-wrap">–</div>
 
     <div style="height:8px"></div>
-    <h4 style="margin:6px 0">🌐 Gemini-Fallback (über lokalen Proxy)</h4>
-    <p class="sub" style="color:var(--muted);font-size:12px;margin:0 0 8px">🔒 <b>Kein API-Key im Browser.</b> Der Schlüssel liegt nur lokal im Proxy (<code>tools/gemini-proxy/.env</code>). Das Cockpit spricht nur die Proxy-URL an und sendet nur minimalen Kontext (keine Kundenakten).</p>
+    <h4 style="margin:6px 0">🌐 Cloud-KI für NEXUS (Gemini / Groq)</h4>
+    <p class="sub" style="color:var(--muted);font-size:12px;margin:0 0 8px">⚠️ <b>Hinweis zum Key:</b> Beim Öffnen per Doppelklick (file://) gibt es keinen Proxy – der API-Key wird dann <b>lokal in diesem Browser gespeichert</b> (localStorage). Das ist für dein eigenes Gerät ok – <b>gib diese HTML-Datei dann aber nicht mit Keys weiter</b>. Es wird nur minimaler Kontext gesendet (keine Kundenakten).</p>
+
+    <h5 style="margin:8px 0 4px">Gemini</h5>
     <div class="fg c3">
       <div><label class="lbl">Gemini-Modus</label><select id="nxGeminiMode">
         <option value="off">Aus</option>
-        <option value="fallback">Fallback (nach Ollama)</option>
-        <option value="preferred">Bevorzugt (vor Ollama)</option>
+        <option value="fallback">Fallback</option>
+        <option value="preferred">Bevorzugt</option>
       </select></div>
-      <div><label class="lbl">Gemini Proxy URL</label><input id="nxGeminiUrl" value="http://localhost:8787"></div>
+      <div><label class="lbl">Verbindung</label><select id="nxGeminiDirect">
+        <option value="proxy">Proxy (localhost, sicher)</option>
+        <option value="direct">Direkt (Key im Browser)</option>
+      </select></div>
+      <div><label class="lbl">Gemini-Modell</label><input id="nxGeminiModel" value="gemini-2.0-flash"></div>
+    </div>
+    <div class="fg c3">
+      <div><label class="lbl">Gemini API-Key (nur „Direkt“)</label><input id="nxGeminiKey" type="password" autocomplete="off" placeholder="AI… (bleibt lokal)"></div>
+      <div><label class="lbl">Gemini Proxy URL (nur „Proxy“)</label><input id="nxGeminiUrl" value="http://localhost:8787"></div>
       <div style="display:flex;align-items:flex-end;gap:8px"><button class="btn sm" onclick="nxTestGemini()">Gemini testen</button><button class="btn sm ghost" onclick="nxTestGeminiIntent()">Gemini Intent testen</button></div>
     </div>
     <div id="nxGeminiTestStatus" style="font-size:12.5px;margin:6px 0;white-space:pre-wrap">–</div>
+
+    <h5 style="margin:10px 0 4px">Groq (direkt im Browser)</h5>
+    <div class="fg c3">
+      <div><label class="lbl">Groq-Modus</label><select id="nxGroqMode">
+        <option value="off">Aus</option>
+        <option value="fallback">Fallback</option>
+        <option value="preferred">Bevorzugt</option>
+      </select></div>
+      <div><label class="lbl">Groq-Modell</label><input id="nxGroqModel" value="llama-3.3-70b-versatile"></div>
+      <div style="display:flex;align-items:flex-end;gap:8px"><button class="btn sm" onclick="nxTestGroq()">Groq testen</button></div>
+    </div>
+    <div><label class="lbl">Groq API-Key (bleibt lokal im Browser)</label><input id="nxGroqKey" type="password" autocomplete="off" placeholder="gsk_… (bleibt lokal)"></div>
+    <div id="nxGroqTestStatus" style="font-size:12.5px;margin:6px 0;white-space:pre-wrap">–</div>
 
     <div class="btn-row"><button class="btn primary" onclick="saveNexusIntentSettings()">NEXUS-Router speichern</button></div>
     <div style="background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:var(--r2);padding:8px 12px;margin-top:8px;font-size:11.5px;color:var(--muted);white-space:pre-wrap">Empfohlene Modelle: llama3.2 oder qwen3:4b. Laden mit „ollama pull llama3.2“. Tipp bei „Browser blockiert/CORS“: Cockpit über den Starter (http://localhost) öffnen und in Ollama OLLAMA_ORIGINS passend setzen (z. B. http://localhost:8765).</div>
@@ -6126,6 +6214,12 @@ function loadAiSettingsFields(){
   if(byId("nxOllamaFallback")) setVal("nxOllamaFallback", nx.fallback?"ja":"nein");
   if(byId("nxGeminiMode")) setVal("nxGeminiMode", nx.geminiMode);
   if(byId("nxGeminiUrl")) setVal("nxGeminiUrl", nx.geminiUrl);
+  if(byId("nxGeminiDirect")) setVal("nxGeminiDirect", nx.geminiDirect?"direct":"proxy");
+  if(byId("nxGeminiModel")) setVal("nxGeminiModel", nx.geminiModel);
+  if(byId("nxGeminiKey")) setVal("nxGeminiKey", nx.geminiKey);
+  if(byId("nxGroqMode")) setVal("nxGroqMode", nx.groqMode);
+  if(byId("nxGroqModel")) setVal("nxGroqModel", nx.groqModel);
+  if(byId("nxGroqKey")) setVal("nxGroqKey", nx.groqKey);
 }
 /* NEXUS Intent-Router – Einstellungen speichern */
 function saveNexusIntentSettings(silent){
@@ -6138,13 +6232,29 @@ function saveNexusIntentSettings(silent){
   };
   if(byId("nxGeminiMode")) patch.geminiMode = val("nxGeminiMode")||"off";
   if(byId("nxGeminiUrl")) patch.geminiUrl = (val("nxGeminiUrl")||"http://localhost:8787").replace(/\/+$/,"");
+  if(byId("nxGeminiDirect")) patch.geminiDirect = (val("nxGeminiDirect")==="direct");
+  if(byId("nxGeminiModel")) patch.geminiModel = val("nxGeminiModel")||"gemini-2.0-flash";
+  if(byId("nxGeminiKey")) patch.geminiKey = (byId("nxGeminiKey").value||"").trim();
+  if(byId("nxGroqMode")) patch.groqMode = val("nxGroqMode")||"off";
+  if(byId("nxGroqModel")) patch.groqModel = val("nxGroqModel")||"llama-3.3-70b-versatile";
+  if(byId("nxGroqKey")) patch.groqKey = (byId("nxGroqKey").value||"").trim();
   saveNexusOllamaCfg(patch);
   _nxOllamaErrNotified=false;
   if(!silent){ const st=byId("nxOllamaTestStatus"); if(st) st.innerHTML='<span style="color:var(--green2)">✓ NEXUS-Intent-Router gespeichert.</span>'; }
 }
-/* Gemini-Proxy testen: GET /health */
+/* Gemini testen: Direkt-Modus -> echte Klassifikation; Proxy-Modus -> GET /health */
 function nxTestGemini(){
   const out=byId("nxGeminiTestStatus");
+  saveNexusIntentSettings(true); // aktuelle Formularwerte übernehmen
+  if(byId("nxGeminiDirect") && val("nxGeminiDirect")==="direct"){
+    if(!(byId("nxGeminiKey").value||"").trim()){ if(out) out.innerHTML='<span style="color:#ffb070">⚠ Kein Gemini API-Key eingetragen.</span>'; return; }
+    const q=val("nxOllamaTestPrompt")||"Nexus öffne Buchhaltung";
+    if(out) out.innerHTML="⏳ Teste Gemini direkt …";
+    classifyViaGeminiDirect(q, nxBuildContext("text","")).then(ir=>{
+      if(out) out.innerHTML='<span style="color:var(--green2)">✓ Gemini direkt erreichbar.</span><pre style="white-space:pre-wrap;margin:4px 0 0">'+esc(JSON.stringify(ir,null,2))+'</pre>';
+    }).catch(err=>{ if(out) out.innerHTML='<div style="white-space:pre-wrap;color:#ff8070">✗ '+esc(String(err&&err.message||err))+'</div>'; });
+    return;
+  }
   const url=(val("nxGeminiUrl")||getNexusOllamaCfg().geminiUrl).replace(/\/+$/,"");
   if(out) out.innerHTML="⏳ Teste Gemini-Proxy unter "+esc(url)+" …";
   const ctrl=new AbortController(); const to=setTimeout(()=>ctrl.abort(),8000);
@@ -6165,6 +6275,17 @@ function nxTestGeminiIntent(){
   if(out) out.innerHTML="⏳ Frage Gemini-Proxy zu „"+esc(q)+"“ …";
   classifyViaGemini(q, nxBuildContext("text","")).then(ir=>{
     if(out) out.innerHTML='<pre style="white-space:pre-wrap;margin:0">'+esc(JSON.stringify(ir,null,2))+'</pre>';
+  }).catch(err=>{ if(out) out.innerHTML='<div style="white-space:pre-wrap;color:#ff8070">✗ '+esc(String(err&&err.message||err))+'</div>'; });
+}
+/* Groq direkt testen (zeigt das geprüfte JSON) */
+function nxTestGroq(){
+  const out=byId("nxGroqTestStatus");
+  saveNexusIntentSettings(true);
+  if(!(byId("nxGroqKey").value||"").trim()){ if(out) out.innerHTML='<span style="color:#ffb070">⚠ Kein Groq API-Key eingetragen.</span>'; return; }
+  const q=val("nxOllamaTestPrompt")||"Nexus öffne Buchhaltung";
+  if(out) out.innerHTML="⏳ Teste Groq direkt …";
+  classifyViaGroq(q, nxBuildContext("text","")).then(ir=>{
+    if(out) out.innerHTML='<span style="color:var(--green2)">✓ Groq erreichbar.</span><pre style="white-space:pre-wrap;margin:4px 0 0">'+esc(JSON.stringify(ir,null,2))+'</pre>';
   }).catch(err=>{ if(out) out.innerHTML='<div style="white-space:pre-wrap;color:#ff8070">✗ '+esc(String(err&&err.message||err))+'</div>'; });
 }
 /* Verbindung + Modell prüfen */
