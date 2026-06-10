@@ -1232,7 +1232,9 @@ function doExport(){
     saveAll(false);
     const settings = stripKeysForExport(getSettings()); // company, owner, … – API-Keys werden NIE exportiert
     let nexusBrainUser=null; try{ nexusBrainUser=getNexusBrainStored(); }catch(e){}
-    const payload = { version:"VV_COCKPIT_2026", exportedAt:nowISO(), keyNote:"Backup enthält Cockpit-Daten und NEXUS-Gehirn. API-Keys und Login-Geheimnisse werden nicht exportiert.", data, settings, nexusBrainUser };
+    // Kompletten Export durch den Secret-Scrubber: entfernt auch key-ähnliche Werte,
+    // die versehentlich in Notizen/Feldern gelandet sind (wie bei Snapshots)
+    const payload = vvStripSecretsFromState({ version:"VV_COCKPIT_2026", exportedAt:nowISO(), keyNote:"Backup enthält Cockpit-Daten und NEXUS-Gehirn. API-Keys und Login-Geheimnisse werden nicht exportiert.", data, settings, nexusBrainUser });
     const json = JSON.stringify(payload, null, 2);
     const d = new Date(), pad = n => String(n).padStart(2,"0");
     const fn = `vv-cockpit-backup-${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}.json`;
@@ -6918,7 +6920,8 @@ function nxBrainSearchInput(v){
 }
 /* Export: zusammengeführtes Gehirn als nexus-brain.json (enthält NIE Keys) */
 function nxBrainExportJson(){
-  const brain=getNexusBrain();
+  // Secret-Scrubber auch hier: gelernte Begriffe/Notizen könnten key-ähnliche Werte enthalten
+  const brain=vvStripSecretsFromState(getNexusBrain());
   const json=JSON.stringify(Object.assign({exportedAt:nowISO()}, brain), null, 2);
   const blob=new Blob([json],{type:"application/json"});
   const url=URL.createObjectURL(blob);
