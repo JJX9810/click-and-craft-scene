@@ -1,0 +1,55 @@
+=====================================================================
+ V&V COCKPIT 2026 – So startest du es
+=====================================================================
+
+ORDNER-INHALT
+  vvcockpit_26.html ............. Das Cockpit (die eigentliche App)
+  Cockpit starten (mit Mikrofon).bat .. Windows-Starter (EMPFOHLEN)
+  Cockpit starten.command ....... Mac-Starter
+  _cockpit-server.ps1 ........... Hilfsdatei fuer den Windows-Starter
+  LIESMICH.txt .................. diese Datei
+
+WICHTIG: Alle Dateien immer im SELBEN Ordner lassen.
+
+
+---------------------------------------------------------------------
+ VARIANTE A – MIT Mikrofon / Sprachsteuerung "Nexus"   (empfohlen)
+---------------------------------------------------------------------
+WINDOWS:
+  1) Doppelklick auf:  Cockpit starten (mit Mikrofon).bat
+  2) Es oeffnet sich ein schwarzes Fenster -> OFFEN lassen.
+  3) Chrome oeffnet das Cockpit automatisch (http://localhost...).
+  4) Beim ersten Mikrofon-Start fragt Chrome nach Erlaubnis -> "Zulassen".
+  5) Zum Beenden: das schwarze Fenster schliessen.
+
+MAC:
+  1) Doppelklick auf:  Cockpit starten.command
+     (Beim 1. Mal evtl. Rechtsklick -> "Oeffnen" wegen Sicherheitsabfrage.)
+  2) Browser oeffnet das Cockpit automatisch.
+
+Warum dieser Umweg? Chrome erlaubt das Mikrofon nur in einem
+"sicheren Kontext" (https oder http://localhost). Beim direkten
+Doppelklick auf die HTML-Datei laeuft sie als "file://" – dort
+blockiert Chrome das Mikrofon. Der Starter liefert die Datei lokal
+ueber http://localhost aus (nichts geht ins Internet, alles bleibt
+auf deinem PC).
+
+
+---------------------------------------------------------------------
+ VARIANTE B – OHNE Mikrofon (nur ansehen/arbeiten ohne Sprache)
+---------------------------------------------------------------------
+  Doppelklick direkt auf:  vvcockpit_26.html
+  -> Cockpit funktioniert komplett, NUR die Sprachsteuerung ist
+     in diesem Modus nicht zuverlaessig (Browser-Einschraenkung).
+
+
+---------------------------------------------------------------------
+ DATEN
+---------------------------------------------------------------------
+  Alle Daten werden lokal im Browser gespeichert (localStorage).
+  Wichtig: Variante A (localhost) und Variante B (file://) haben
+  GETRENNTE Speicher. Am besten immer dieselbe Variante nutzen.
+  Empfehlung: immer Variante A (Starter) verwenden.
+  Sicherung ueber den Backup/Export-Knopf im Cockpit nicht vergessen.
+
+=====================================================================
