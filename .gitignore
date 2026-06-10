@@ -20,6 +20,11 @@ dist-ssr
 .wrangler/
 .dev.vars
 
+# NEXUS Gemini-Proxy – echten Key NIE einchecken (nur .env.example wird versioniert)
+tools/gemini-proxy/.env
+**/gemini-proxy/.env
+nexus-local-config.json
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

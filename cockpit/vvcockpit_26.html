@@ -4985,7 +4985,10 @@ function getNexusOllamaCfg(){
     url: String(nx.url||base.ollamaUrl||"http://localhost:11434").replace(/\/+$/,""),
     model: nx.model||"llama3.2",
     timeout: (Number(nx.timeout)>0)?Number(nx.timeout):15000,
-    fallback: nx.fallback!==false
+    fallback: nx.fallback!==false,
+    // Gemini (über lokalen Proxy – KEIN API-Key im Browser)
+    geminiMode: (["off","fallback","preferred"].indexOf(nx.geminiMode)>=0)?nx.geminiMode:"off",
+    geminiUrl: String(nx.geminiUrl||"http://localhost:8787").replace(/\/+$/,"")
   };
 }
 function saveNexusOllamaCfg(patch){
@@ -5138,38 +5141,81 @@ function executeIntentResult(ir, context){
 
 function nxNoteOllamaError(err){
   if(_nxOllamaErrNotified) return; _nxOllamaErrNotified=true;
-  try{ console.warn("[NEXUS] Ollama-Intent-Router nicht verfügbar – nutze lokale Befehlslogik. ("+((err&&err.message)||err)+")"); }catch(e){}
+  try{ console.warn("[NEXUS] Ollama-Intent-Router nicht verfügbar – nutze nächsten Provider/lokale Logik. ("+((err&&err.message)||err)+")"); }catch(e){}
+}
+function nxNoteProviderError(prov, err){
+  try{ console.warn("[NEXUS] Provider „"+prov+"“ nicht verfügbar: "+((err&&err.message)||err)); }catch(e){}
 }
 function nxIsControlPhrase(l){
   return /^(ja|jap|jawohl|ok|okay|bestätig\w*|bestaetig\w*|genau|passt|nein|ne|nö|noe|abbrechen|abbruch|verwerfen|brich ab|stop|stopp|still|schweig|hör auf|hoer auf|leise|ruhe|mach das|ausführen|ausfuehren)\b/.test(l);
 }
+/* Router aktiv? (für Denk-Platzhalter in der Chat-UI) */
+function nxRouterActive(){ const c=getNexusOllamaCfg(); return c.enabled || c.geminiMode!=="off"; }
+/* Ist ein Intent „sicher genug“ zum Ausführen? */
+function nxIntentIsConfident(ir){ return !!(ir && ir.ok && ir.confidence>=NX_INTENT_CONF_MIN && ir.intent!=="unknown" && ir.tool && ir.tool!=="askClarifyingQuestion"); }
 
-/* Orchestrierung: lokal-zuerst (Bestätigung/Stop), dann Ollama-Router, dann lokaler Fallback. */
+/* Gemini-Intent über den lokalen Proxy (KEIN API-Key im Browser).
+   Sendet nur minimalen Kontext (Seite + Zähler), keine Kundenakten. */
+async function classifyViaGemini(userText, context){
+  const cfg=getNexusOllamaCfg();
+  const url=cfg.geminiUrl.replace(/\/+$/,"")+"/intent";
+  let opCount=null; try{ opCount=getOpenPositionsSummary().count; }catch(e){}
+  const body={ userText:String(userText||""), context:{
+    currentPage: (currentSection||(context&&context.currentPage)||"dashboard"),
+    availableTools: NX_ALLOWED_TOOLS,
+    openItemsCount: opCount,
+    customersCount: (data.customers||[]).filter(c=>!(c.archived||c.deletedAt)).length
+  }};
+  const ctrl=new AbortController(); const to=setTimeout(()=>ctrl.abort(), cfg.timeout||15000);
+  try{
+    const res=await fetch(url,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body),signal:ctrl.signal});
+    clearTimeout(to);
+    if(!res.ok){ const t=await res.text().catch(()=>""); throw new Error("HTTP "+res.status+(t?(": "+t.slice(0,160)):"")); }
+    const j=await res.json();
+    const r=parseOllamaIntentResponse(JSON.stringify(j)); // gleiche Whitelist-/JSON-Prüfung wie bei Ollama
+    if(r.ok) r.userText=String(userText||"");
+    return r;
+  }catch(err){ clearTimeout(to); if(err.name==="AbortError") throw new Error("timeout"); throw err; }
+}
+
+/* Orchestrierung: lokal-zuerst (Bestätigung/Stop), dann Provider-Kette (Ollama/Gemini),
+   dann bewährte lokale Befehlslogik. Reihenfolge je nach Einstellung. */
 async function nxProcessCommand(commandText, context){
   context=context||{};
   const raw=String(commandText||"").trim(); if(!raw) return "";
   const l=raw.toLowerCase();
-  // 1) Bestätigungen, geführter Dialog, Stop/Abbruch IMMER lokal (hängen nie an Ollama)
+  // 1) Bestätigungen, geführter Dialog, Stop/Abbruch IMMER lokal (hängen nie an einer KI)
   if(_nxFlow || _nxPendingPaid || _nxPendingBooking || nxIsControlPhrase(l)) return handleNexusCommand(raw, context);
-  // 2) Ollama-Intent-Router (falls aktiviert)
+
+  // 2) Provider-Kette bestimmen
   const cfg=getNexusOllamaCfg();
-  if(cfg.enabled){
-    try{
-      const ir=await classifyNexusIntent(raw, context);
-      if(ir && ir.ok){
-        const exec=executeIntentResult(ir, context);
-        if(exec && exec.handled){ _nxOllamaErrNotified=false; if(exec.kind) _nxLastKind=exec.kind; return exec.text; }
-        // nicht zuordenbar -> lokaler Fallback
-      }
-      // ungültiges JSON / nicht erlaubt -> lokaler Fallback (falls aktiviert)
-      if(!cfg.fallback) return "Ich habe das über die lokale KI nicht eindeutig verstanden. "+nxClarifyFallback();
-    }catch(err){
-      nxNoteOllamaError(err);
-      if(!cfg.fallback) return "Die lokale KI (Ollama) ist gerade nicht erreichbar. "+nxClarifyFallback();
+  const ollamaOn = cfg.enabled;
+  const geminiOn = cfg.geminiMode!=="off";
+  const providers=[];
+  if(cfg.geminiMode==="preferred"){ if(geminiOn) providers.push("gemini"); if(ollamaOn) providers.push("ollama"); }
+  else { if(ollamaOn) providers.push("ollama"); if(geminiOn) providers.push("gemini"); } // "fallback": Ollama zuerst, dann Gemini
+
+  // 3) Kette durchlaufen: bei niedriger Confidence/Fehler -> nächster Provider
+  let lastIr=null;
+  for(let idx=0; idx<providers.length; idx++){
+    const prov=providers[idx]; let ir=null;
+    try{ ir = (prov==="gemini") ? await classifyViaGemini(raw, context) : await classifyNexusIntent(raw, context); }
+    catch(err){ if(prov==="ollama") nxNoteOllamaError(err); else nxNoteProviderError(prov, err); continue; }
+    if(!ir || !ir.ok){ lastIr=ir; continue; }   // ungültiges JSON / verworfenes Tool -> nächster Provider
+    lastIr=ir;
+    const isLast = (idx===providers.length-1);
+    if(nxIntentIsConfident(ir) || isLast){
+      const exec=executeIntentResult(ir, context);
+      if(exec && exec.handled){ _nxOllamaErrNotified=false; if(exec.kind) _nxLastKind=exec.kind; return exec.text; }
+      // nicht zuordenbar -> nächster Provider / Fallback
     }
+    // sonst: zu unsicher und es gibt noch einen Provider -> weiter
   }
-  // 3) Lokaler Fallback (bewährte Befehlslogik)
-  return handleNexusCommand(raw, context);
+
+  // 4) Provider erschöpft -> lokale Befehlslogik (falls erlaubt) bzw. Rückfrage
+  if(cfg.fallback || providers.length===0) return handleNexusCommand(raw, context);
+  if(lastIr && lastIr.ok){ const ex=executeIntentResult(lastIr, context); if(ex&&ex.handled) return ex.text; }
+  return "Ich habe den Befehl nicht eindeutig verstanden. Meintest du Buchhaltung, Kundenkartei, offene Posten oder NEXUS Deck?";
 }
 
 /* Optionale lokale Startkonfiguration (vom One-Click-Starter erzeugt).
@@ -5188,12 +5234,14 @@ function nxTryLoadLocalConfig(){
       .then(cfg=>{
         if(!cfg||typeof cfg!=="object") return;
         if(nxNexusConfigured()) return;                // doppelt absichern
-        saveNexusOllamaCfg({
+        const patch={
           enabled:true,
           url:String(cfg.ollamaBaseUrl||"http://localhost:11434").replace(/\/+$/,""),
           model:String(cfg.ollamaModel||"llama3.2"),
           timeout:30000, fallback:true
-        });
+        };
+        if(cfg.geminiProxyUrl){ patch.geminiUrl=String(cfg.geminiProxyUrl).replace(/\/+$/,""); patch.geminiMode = cfg.geminiEnabled ? "fallback" : "off"; }
+        saveNexusOllamaCfg(patch);
         _nxOllamaErrNotified=false;
         try{ if(currentSection==="settings") loadAiSettingsFields(); }catch(e){}
         try{ console.info("[NEXUS] Lokale Startkonfiguration übernommen (Ollama aktiviert)."); }catch(e){}
@@ -6043,6 +6091,21 @@ function renderSettings(){
     </div>
     <div><label class="lbl">Test-Satz (für „Intent testen“)</label><input id="nxOllamaTestPrompt" value="Nexus, wer schuldet mir noch Geld?"></div>
     <div id="nxOllamaTestStatus" style="font-size:12.5px;margin:6px 0;white-space:pre-wrap">–</div>
+
+    <div style="height:8px"></div>
+    <h4 style="margin:6px 0">🌐 Gemini-Fallback (über lokalen Proxy)</h4>
+    <p class="sub" style="color:var(--muted);font-size:12px;margin:0 0 8px">🔒 <b>Kein API-Key im Browser.</b> Der Schlüssel liegt nur lokal im Proxy (<code>tools/gemini-proxy/.env</code>). Das Cockpit spricht nur die Proxy-URL an und sendet nur minimalen Kontext (keine Kundenakten).</p>
+    <div class="fg c3">
+      <div><label class="lbl">Gemini-Modus</label><select id="nxGeminiMode">
+        <option value="off">Aus</option>
+        <option value="fallback">Fallback (nach Ollama)</option>
+        <option value="preferred">Bevorzugt (vor Ollama)</option>
+      </select></div>
+      <div><label class="lbl">Gemini Proxy URL</label><input id="nxGeminiUrl" value="http://localhost:8787"></div>
+      <div style="display:flex;align-items:flex-end;gap:8px"><button class="btn sm" onclick="nxTestGemini()">Gemini testen</button><button class="btn sm ghost" onclick="nxTestGeminiIntent()">Gemini Intent testen</button></div>
+    </div>
+    <div id="nxGeminiTestStatus" style="font-size:12.5px;margin:6px 0;white-space:pre-wrap">–</div>
+
     <div class="btn-row"><button class="btn primary" onclick="saveNexusIntentSettings()">NEXUS-Router speichern</button></div>
     <div style="background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:var(--r2);padding:8px 12px;margin-top:8px;font-size:11.5px;color:var(--muted);white-space:pre-wrap">Empfohlene Modelle: llama3.2 oder qwen3:4b. Laden mit „ollama pull llama3.2“. Tipp bei „Browser blockiert/CORS“: Cockpit über den Starter (http://localhost) öffnen und in Ollama OLLAMA_ORIGINS passend setzen (z. B. http://localhost:8765).</div>
 
@@ -6061,18 +6124,48 @@ function loadAiSettingsFields(){
   if(byId("nxOllamaModel")) setVal("nxOllamaModel", nx.model);
   if(byId("nxOllamaTimeout")) setVal("nxOllamaTimeout", String(nx.timeout));
   if(byId("nxOllamaFallback")) setVal("nxOllamaFallback", nx.fallback?"ja":"nein");
+  if(byId("nxGeminiMode")) setVal("nxGeminiMode", nx.geminiMode);
+  if(byId("nxGeminiUrl")) setVal("nxGeminiUrl", nx.geminiUrl);
 }
 /* NEXUS Intent-Router – Einstellungen speichern */
 function saveNexusIntentSettings(silent){
-  saveNexusOllamaCfg({
+  const patch={
     enabled: (val("nxOllamaEnabled")==="ja"),
     url: (val("nxOllamaUrl")||"http://localhost:11434").replace(/\/+$/,""),
     model: val("nxOllamaModel")||"llama3.2",
     timeout: Math.max(2000, parseInt(val("nxOllamaTimeout"),10)||15000),
     fallback: (val("nxOllamaFallback")!=="nein")
-  });
+  };
+  if(byId("nxGeminiMode")) patch.geminiMode = val("nxGeminiMode")||"off";
+  if(byId("nxGeminiUrl")) patch.geminiUrl = (val("nxGeminiUrl")||"http://localhost:8787").replace(/\/+$/,"");
+  saveNexusOllamaCfg(patch);
   _nxOllamaErrNotified=false;
   if(!silent){ const st=byId("nxOllamaTestStatus"); if(st) st.innerHTML='<span style="color:var(--green2)">✓ NEXUS-Intent-Router gespeichert.</span>'; }
+}
+/* Gemini-Proxy testen: GET /health */
+function nxTestGemini(){
+  const out=byId("nxGeminiTestStatus");
+  const url=(val("nxGeminiUrl")||getNexusOllamaCfg().geminiUrl).replace(/\/+$/,"");
+  if(out) out.innerHTML="⏳ Teste Gemini-Proxy unter "+esc(url)+" …";
+  const ctrl=new AbortController(); const to=setTimeout(()=>ctrl.abort(),8000);
+  fetch(url+"/health",{signal:ctrl.signal}).then(r=>r.ok?r.json():Promise.reject(new Error("HTTP "+r.status))).then(j=>{
+    clearTimeout(to);
+    if(j && j.ok){
+      if(out) out.innerHTML = j.hasKey
+        ? '<span style="color:var(--green2)">✓ Proxy erreichbar. API-Key erkannt: ja'+(j.model?(" · Modell: "+esc(j.model)):"")+'.</span>'
+        : '<span style="color:#ffb070">⚠ Proxy erreichbar, aber KEIN API-Key gesetzt. Key in tools/gemini-proxy/.env eintragen und Proxy neu starten.</span>';
+    } else { if(out) out.innerHTML='<span style="color:#ff8070">✗ Unerwartete Antwort vom Proxy.</span>'; }
+  }).catch(err=>{ clearTimeout(to); if(out) out.innerHTML='<div style="white-space:pre-wrap;color:#ff8070">✗ Proxy nicht erreichbar ('+esc(String(err&&err.message||err))+'). Läuft der Gemini-Proxy? Über start-vv-cockpit.bat starten.</div>'; });
+}
+/* Gemini-Intent live testen: POST /intent (zeigt das geprüfte JSON) */
+function nxTestGeminiIntent(){
+  const out=byId("nxGeminiTestStatus");
+  const q=val("nxOllamaTestPrompt")||"Nexus, wer schuldet mir noch Geld?";
+  saveNexusIntentSettings(true);
+  if(out) out.innerHTML="⏳ Frage Gemini-Proxy zu „"+esc(q)+"“ …";
+  classifyViaGemini(q, nxBuildContext("text","")).then(ir=>{
+    if(out) out.innerHTML='<pre style="white-space:pre-wrap;margin:0">'+esc(JSON.stringify(ir,null,2))+'</pre>';
+  }).catch(err=>{ if(out) out.innerHTML='<div style="white-space:pre-wrap;color:#ff8070">✗ '+esc(String(err&&err.message||err))+'</div>'; });
 }
 /* Verbindung + Modell prüfen */
 function nxTestIntentRouter(){
@@ -7186,7 +7279,7 @@ function nxSend(text){
   if(!q) return;
   if(inp) inp.value="";
   _nxChat.push({role:"user",text:q});
-  const thinking=getNexusOllamaCfg().enabled?{role:"nexus",text:"🤔 denke nach …"}:null;
+  const thinking=nxRouterActive()?{role:"nexus",text:"🤔 denke nach …"}:null;
   if(thinking) _nxChat.push(thinking);
   nxDrawChat();
   const finish=(ans)=>{

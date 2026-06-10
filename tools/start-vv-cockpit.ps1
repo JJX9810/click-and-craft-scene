@@ -20,6 +20,8 @@ $OpenBrowser   = $true
 $UseChromeIfAvailable = $true
 $ForceOllamaCpu = $true
 $RestartOllamaIfCudaModeRequired = $false   # Standard: KEINE Prozess-Kills
+$EnableGeminiProxy = $true                  # optionaler Gemini-Fallback (nur wenn Key+Node vorhanden)
+$GeminiProxyPort   = 8787
 $AllowOrigins = @(
   "http://localhost:8000","http://127.0.0.1:8000",
   "http://localhost:8765","http://127.0.0.1:8765"
@@ -130,6 +132,38 @@ if($ollamaApiUp){
   }catch{ Warn "Modell-Liste konnte nicht gelesen werden: $($_.Exception.Message)" }
 }
 
+# ---------------- 4b) Gemini-Proxy (optional, Key bleibt serverseitig) ----------------
+$geminiUp = $false
+if($EnableGeminiProxy){
+  Info "Prüfe Gemini-Proxy ..."
+  $proxyDir = Join-Path $ProjectRoot "tools\gemini-proxy"
+  $proxyJs  = Join-Path $proxyDir "server.js"
+  $node = Get-Command node -ErrorAction SilentlyContinue
+  # Key aus Umgebungsvariable ODER .env (Platzhalter zählen NICHT als Key)
+  $placeholder = 'your_gemini_api_key_here|HIER_KEY_EINTRAGEN'
+  $hasKey = $false
+  if($env:GEMINI_API_KEY -and $env:GEMINI_API_KEY.Trim() -ne "" -and $env:GEMINI_API_KEY -notmatch $placeholder){ $hasKey=$true }
+  $envFile = Join-Path $proxyDir ".env"
+  if(-not $hasKey -and (Test-Path -LiteralPath $envFile)){
+    $line = Select-String -Path $envFile -Pattern '^\s*GEMINI_API_KEY\s*=\s*(.+)$' -ErrorAction SilentlyContinue | Select-Object -First 1
+    if($line){ $v = $line.Matches[0].Groups[1].Value.Trim().Trim('"').Trim("'"); if($v -and $v -notmatch $placeholder){ $hasKey=$true } }
+  }
+
+  if(Test-HttpOk "http://localhost:$GeminiProxyPort/health"){ Ok "Gemini-Proxy läuft bereits (Port $GeminiProxyPort)."; $geminiUp=$true }
+  elseif(-not (Test-Path -LiteralPath $proxyJs)){ Warn "Gemini-Proxy-Datei nicht gefunden – übersprungen. (Cockpit nutzt Ollama/lokal.)" }
+  elseif(-not $node){ Warn "Node.js nicht gefunden – Gemini-Proxy übersprungen. Ollama/lokaler Fallback bleibt aktiv." }
+  elseif(-not $hasKey){ Warn "Gemini-Key nicht gefunden. Gemini-Fallback deaktiviert. Ollama/lokaler Fallback bleibt aktiv." }
+  else{
+    Info "Starte Gemini-Proxy (node server.js, Port $GeminiProxyPort) ..."
+    $env:GEMINI_ALLOW_ORIGINS = ($origins -join ",")
+    if(-not $env:GEMINI_PROXY_PORT){ $env:GEMINI_PROXY_PORT = "$GeminiProxyPort" }
+    try{ Start-Process -FilePath $node.Source -ArgumentList "server.js" -WorkingDirectory $proxyDir -WindowStyle Hidden | Out-Null }
+    catch{ Warn "Konnte Gemini-Proxy nicht starten: $($_.Exception.Message)" }
+    for($i=0;$i -lt 8;$i++){ Start-Sleep -Milliseconds 500; if(Test-HttpOk "http://localhost:$GeminiProxyPort/health"){ $geminiUp=$true; break } }
+    if($geminiUp){ Ok "Gemini-Proxy erreichbar (http://localhost:$GeminiProxyPort)." } else { Warn "Gemini-Proxy reagiert noch nicht – Cockpit startet trotzdem." }
+  }
+}
+
 # ---------------- 5) Python-Server starten ----------------
 $pyExe=$null
 $pc  = Get-Command python -ErrorAction SilentlyContinue
@@ -153,7 +187,8 @@ if($ready){ Ok "Cockpit-Server läuft auf Port $port." } else { Warn "Server ant
 
 # ---------------- 6) Konfigurationsdatei schreiben ----------------
 try{
-  $cfg = [ordered]@{ ollamaBaseUrl=$OllamaBaseUrl; ollamaModel=$OllamaModel; cockpitUrl=$cockpitUrl }
+  $cfg = [ordered]@{ ollamaBaseUrl=$OllamaBaseUrl; ollamaModel=$OllamaModel; cockpitUrl=$cockpitUrl;
+                     geminiProxyUrl=("http://localhost:$GeminiProxyPort"); geminiEnabled=$geminiUp }
   ($cfg | ConvertTo-Json) | Set-Content -LiteralPath (Join-Path $ProjectRoot "nexus-local-config.json") -Encoding UTF8
   Info "Konfiguration geschrieben: nexus-local-config.json"
 }catch{ Warn "Konnte nexus-local-config.json nicht schreiben: $($_.Exception.Message)" }
