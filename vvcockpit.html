@@ -270,6 +270,7 @@ tr:hover td{background:#1c140f}
     <button class="btn sm" onclick="doExport()">📦 Backup</button>
     <button class="btn sm" onclick="document.getElementById('importFile').click()">📥 Import</button>
     <input type="file" id="importFile" accept=".json" style="display:none" onchange="doImport(event)">
+    <button class="btn sm" onclick="vvAuthLock('manual')" title="Cockpit sperren">🔒 Sperren</button>
     <button class="btn sm no-print" id="mobileMenu" onclick="document.querySelector('.sidebar').classList.toggle('mobile-open')" style="display:none">☰</button>
   </div>
 </div>
@@ -581,7 +582,7 @@ function vvDbSetMeta(key, value){ return vvDbAvailable()?vvDbPut("meta", value, 
 function vvDbGetMeta(key){ return vvDbAvailable()?vvDbGet("meta", key).catch(()=>null):Promise.resolve(null); }
 
 /* ---- Secrets strikt heraushalten (Felder + key-ähnliche Werte) ---- */
-const VV_SECRET_FIELD_RE=/^(apikey|api_key|geminikey|groqkey|access_token|refresh_token|authorization|bearer|client_secret|clientsecret|password)$/i;
+const VV_SECRET_FIELD_RE=/^(apikey|api_key|geminikey|groqkey|access_token|refresh_token|authorization|bearer|client_secret|clientsecret|password|verifier|salt|recoverycodes|recovery_codes|authconfig|authfailstate)$/i;
 const VV_SECRET_VALUE_RE=/(sk-[A-Za-z0-9_-]{12,}|gsk_[A-Za-z0-9]{12,}|AIza[0-9A-Za-z_-]{20,}|Bearer\s+[A-Za-z0-9._-]{16,})/;
 let _vvSecretsFoundLastScan=false;
 function vvScrubSecrets(obj, depth){
@@ -598,6 +599,8 @@ function vvScrubSecrets(obj, depth){
 function vvStripSecretsFromState(state){
   let s; try{ s=JSON.parse(JSON.stringify(state||{})); }catch(e){ return state; }
   try{ if(s.settings) s.settings=stripKeysForExport(s.settings); }catch(e){}
+  // Login-Geheimnisse nie in State/Backup/Snapshot (Auth lebt nur im meta-Store/Fallback-Key)
+  try{ delete s.authConfig; delete s.authFailState; delete s.auth; }catch(e){}
   _vvSecretsFoundLastScan=false;
   try{ vvScrubSecrets(s); }catch(e){}
   return s;
@@ -831,6 +834,332 @@ async function vvUiCleanLegacy(){
   catch(e){ vvDataPanelMsg("✗ "+((e&&e.message)||e), false); }
 }
 
+/* ==========================================================
+   LOKALER COCKPIT-SCHUTZ – PASSWORT/PIN-LOGIN
+   Rein lokal (Web Crypto, PBKDF2-SHA256, 210000 Iterationen).
+   Kein Klartext, kein Passwort in localStorage/Backup/Logs.
+   Noch KEINE Handy-Push-/Passkey-/Cloud-Auth – nur Sperre + Login.
+   ========================================================== */
+const VV_AUTH_CONFIG_KEY="authConfig";          // IndexedDB meta-Store
+const VV_AUTH_CONFIG_FALLBACK="VV_AUTH_CONFIG"; // Fallback: nur Hash/Salt, nie Klartext
+const VV_AUTH_FAIL_KEY="VV_AUTH_FAIL_STATE";
+let _vvAuthLocked=false;            // Sichtsperre aktiv?
+let _vvAuthConfigCache=null;
+let _vvAuthLastActivity=Date.now();
+let _vvAuthTimer=null;
+let _vvAuthLastUnlockAt=null;
+
+function vvAuthCryptoOK(){ try{ return !!(crypto && crypto.subtle && crypto.getRandomValues); }catch(e){ return false; } }
+function vvBufToHex(buf){ return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,"0")).join(""); }
+function vvHexToBuf(hex){ const a=new Uint8Array(String(hex).length/2); for(let i=0;i<a.length;i++) a[i]=parseInt(hex.substr(i*2,2),16); return a; }
+async function vvAuthDeriveVerifier(password, saltHex, iterations){
+  const km=await crypto.subtle.importKey("raw", new TextEncoder().encode(String(password)), "PBKDF2", false, ["deriveBits"]);
+  const bits=await crypto.subtle.deriveBits({name:"PBKDF2", hash:"SHA-256", salt:vvHexToBuf(saltHex), iterations:iterations}, km, 256);
+  return vvBufToHex(bits);
+}
+function vvAuthSafeEqual(a,b){ a=String(a||""); b=String(b||""); if(a.length!==b.length) return false; let d=0; for(let i=0;i<a.length;i++) d|=a.charCodeAt(i)^b.charCodeAt(i); return d===0; }
+
+/* ---- Konfiguration laden/speichern (IndexedDB meta, Fallback localStorage) ---- */
+async function vvAuthLoadConfig(){
+  if(_vvAuthConfigCache!==undefined && _vvAuthConfigCache!==null) return _vvAuthConfigCache;
+  let cfg=null;
+  try{ cfg=await vvDbGetMeta(VV_AUTH_CONFIG_KEY); }catch(e){}
+  if(!cfg){ try{ const raw=localStorage.getItem(VV_AUTH_CONFIG_FALLBACK); if(raw) cfg=JSON.parse(raw); }catch(e){} }
+  _vvAuthConfigCache=cfg||null;
+  return _vvAuthConfigCache;
+}
+async function vvAuthSaveConfig(config){
+  _vvAuthConfigCache=config||null;
+  try{ await vvDbSetMeta(VV_AUTH_CONFIG_KEY, config); }catch(e){}
+  try{
+    if(config) localStorage.setItem(VV_AUTH_CONFIG_FALLBACK, JSON.stringify(config)); // nur Hash/Salt
+    else localStorage.removeItem(VV_AUTH_CONFIG_FALLBACK);
+  }catch(e){}
+  return config;
+}
+
+/* ---- Fehlversuchs-Schutz (nur Wartezeit, NIE Daten löschen) ---- */
+function vvAuthGetFailState(){
+  try{ const j=JSON.parse(localStorage.getItem(VV_AUTH_FAIL_KEY)||"null"); if(j&&typeof j==="object") return {count:Number(j.count)||0, lockUntil:Number(j.lockUntil)||0}; }catch(e){}
+  return {count:0, lockUntil:0};
+}
+function vvAuthSetFailState(st){ try{ localStorage.setItem(VV_AUTH_FAIL_KEY, JSON.stringify(st)); }catch(e){} return st; }
+function vvAuthFailWaitLeft(){ const st=vvAuthGetFailState(); const ms=st.lockUntil-Date.now(); return ms>0?Math.ceil(ms/1000):0; }
+function vvAuthNoteFail(){
+  const st=vvAuthGetFailState(); st.count++;
+  const sec = st.count>=20?600 : st.count>=10?120 : st.count>=5?30 : 0;
+  if(sec>0) st.lockUntil=Date.now()+sec*1000;
+  return vvAuthSetFailState(st);
+}
+function vvAuthResetFails(){ vvAuthSetFailState({count:0, lockUntil:0}); }
+
+/* ---- Einrichtung / Prüfung / Änderung ---- */
+function vvAuthValidateNewPassword(pw, pw2){
+  pw=String(pw||""); pw2=String(pw2||"");
+  if(pw.length<6) return {ok:false, error:"Mindestens 6 Zeichen erforderlich."};
+  if(pw!==pw2) return {ok:false, error:"Die beiden Eingaben stimmen nicht überein."};
+  const warn=(/^\d+$/.test(pw)&&pw.length<8)?"Hinweis: Eine reine Zahlen-PIN unter 8 Stellen ist schwach – ein längeres Passwort ist sicherer.":null;
+  return {ok:true, warn};
+}
+async function vvAuthSetupPassword(password){
+  if(!vvAuthCryptoOK()) throw new Error("Sichere Passwortprüfung wird von diesem Browser nicht unterstützt.");
+  const salt=vvBufToHex(crypto.getRandomValues(new Uint8Array(16)));
+  const iterations=210000;
+  const verifier=await vvAuthDeriveVerifier(password, salt, iterations);
+  const old=await vvAuthLoadConfig();
+  const cfg={ enabled:true, version:1, method:"password", kdf:"PBKDF2-SHA256", iterations, salt, verifier,
+    createdAt:(old&&old.createdAt)||nowISO(), updatedAt:nowISO(),
+    sessionTimeoutMinutes:(old&&Number(old.sessionTimeoutMinutes))||15,
+    autoLockEnabled: old? old.autoLockEnabled!==false : true };
+  await vvAuthSaveConfig(cfg);
+  vvAuthResetFails();
+  return true;
+}
+async function vvAuthVerifyPassword(password){
+  if(!vvAuthCryptoOK()) throw new Error("Sichere Passwortprüfung wird von diesem Browser nicht unterstützt.");
+  const cfg=await vvAuthLoadConfig();
+  if(!cfg||!cfg.enabled) return true;
+  const wait=vvAuthFailWaitLeft();
+  if(wait>0) throw new Error("Zu viele Fehlversuche. Bitte warte "+wait+" Sekunden.");
+  const v=await vvAuthDeriveVerifier(password, cfg.salt, Number(cfg.iterations)||210000);
+  if(vvAuthSafeEqual(v, cfg.verifier)){ vvAuthResetFails(); return true; }
+  const st=vvAuthNoteFail();
+  const w2=vvAuthFailWaitLeft();
+  throw new Error(w2>0?("Falsches Passwort. Zu viele Fehlversuche – bitte warte "+w2+" Sekunden."):("Falsches Passwort ("+st.count+". Fehlversuch)."));
+}
+async function vvAuthChangePassword(oldPassword, newPassword){
+  await vvAuthVerifyPassword(oldPassword);
+  await vvAuthSetupPassword(newPassword);
+  return true;
+}
+async function vvAuthDisableWithPassword(password){
+  await vvAuthVerifyPassword(password);   // ohne Passwort NICHT deaktivierbar
+  const cfg=await vvAuthLoadConfig();
+  await vvAuthSaveConfig({ enabled:false, version:1, disabledAt:nowISO(), createdAt:cfg&&cfg.createdAt||nowISO() });
+  vvAuthResetFails();
+  return true;
+}
+
+/* ---- Sperren / Entsperren ---- */
+function vvAuthIsUnlocked(){ return !_vvAuthLocked; }
+async function vvAuthLock(reason){
+  const cfg=await vvAuthLoadConfig().catch(()=>null);
+  if(!cfg||!cfg.enabled){
+    if(reason==="manual") alert("Es ist noch kein Login-Schutz eingerichtet.\n\nUnter „Firmendaten → Sicherheit / Login“ kannst du ein Passwort/PIN festlegen.");
+    return false;
+  }
+  _vvAuthLocked=true;
+  vvAuthStopAutoLockTimer();
+  // NEXUS/Mikrofon/Sprachausgabe sofort stoppen – nichts darf im Hintergrund weiterlaufen
+  try{ stopGlobalNexusListener({silent:true}); }catch(e){}
+  try{ if(typeof _nxTestRecog!=="undefined"&&_nxTestRecog){ _nxTestRecog.abort&&_nxTestRecog.abort(); _nxTestRecog=null; } }catch(e){}
+  try{ window.speechSynthesis&&window.speechSynthesis.cancel(); _nxSpeaking=false; }catch(e){}
+  try{ nxCloseOverlay(); }catch(e){}
+  // sensible Inhalte aus dem DOM entfernen (nicht nur überdecken)
+  try{ const main=byId("main"); if(main) main.innerHTML=""; }catch(e){}
+  try{ document.body.classList.add("vv-locked"); }catch(e){}
+  vvAuthRenderGate();
+  return true;
+}
+async function vvAuthUnlock(){
+  _vvAuthLocked=false;
+  _vvAuthLastUnlockAt=nowISO();
+  try{ vvDbSetMeta("lastUnlockAt", _vvAuthLastUnlockAt); }catch(e){}
+  try{ document.body.classList.remove("vv-locked"); }catch(e){}
+  const g=byId("vvAuthGate"); if(g&&g.parentNode) g.parentNode.removeChild(g);
+  try{ if(window.vvPostBoot) window.vvPostBoot(); }catch(e){}
+  try{ showSection(currentSection&&currentSection!=="nexus"?currentSection:"dashboard"); }catch(e){ try{ showSection("dashboard"); }catch(_){}}
+  vvAuthMarkActivity();
+  vvAuthStartAutoLockTimer();
+  return true;
+}
+
+/* ---- Auto-Lock (Session-Timeout) ---- */
+function vvAuthMarkActivity(){ _vvAuthLastActivity=Date.now(); }
+async function vvAuthAutoLockCheck(){
+  if(_vvAuthLocked) return;
+  const cfg=await vvAuthLoadConfig().catch(()=>null);
+  if(!cfg||!cfg.enabled||cfg.autoLockEnabled===false) return;
+  const mins=Math.max(1, Number(cfg.sessionTimeoutMinutes)||15);
+  if(Date.now()-_vvAuthLastActivity > mins*60000) vvAuthLock("auto");
+}
+function vvAuthStartAutoLockTimer(){
+  vvAuthStopAutoLockTimer();
+  _vvAuthTimer=setInterval(()=>{ vvAuthAutoLockCheck(); }, 10000);
+}
+function vvAuthStopAutoLockTimer(){ if(_vvAuthTimer){ clearInterval(_vvAuthTimer); _vvAuthTimer=null; } }
+function vvAuthBindActivityListeners(){
+  let lastMove=0;
+  try{
+    document.addEventListener("mousemove",()=>{ const n=Date.now(); if(n-lastMove>5000){ lastMove=n; vvAuthMarkActivity(); } });
+    ["mousedown","keydown","touchstart","input"].forEach(ev=>document.addEventListener(ev,vvAuthMarkActivity,true));
+  }catch(e){}
+}
+
+/* ---- Sperrbildschirm (Setup ODER Login) ---- */
+function vvAuthEnsureGateStyle(){
+  if(byId("vvAuthGateStyle")) return;
+  const s=document.createElement("style"); s.id="vvAuthGateStyle";
+  s.textContent=`
+  body.vv-locked .sidebar, body.vv-locked #main, body.vv-locked .topbar,
+  body.vv-locked #nxChip, body.vv-locked #nxOverlay { display:none!important; }
+  #vvAuthGate{position:fixed;inset:0;z-index:100000;display:flex;align-items:center;justify-content:center;
+    background:radial-gradient(900px 480px at 50% -10%,rgba(54,211,230,.08),transparent 60%),#0a0d14;color:#e7f0f6;font-family:inherit}
+  #vvAuthGate .vv-auth-card{width:min(420px,92vw);background:#10151f;border:1px solid #1d2636;border-radius:14px;padding:22px;box-shadow:0 14px 50px rgba(0,0,0,.55)}
+  #vvAuthGate h2{margin:0 0 4px;font-size:19px;color:#fff}
+  #vvAuthGate p{margin:6px 0;color:#7e8aa0;font-size:12.5px;line-height:1.5}
+  #vvAuthGate input{width:100%;background:#070a10;border:1px solid #1d2636;color:#e7f0f6;border-radius:9px;padding:10px;font:inherit;margin-top:8px}
+  #vvAuthGate button{margin-top:12px;width:100%;background:rgba(54,211,230,.16);border:1px solid #36d3e6;color:#fff;border-radius:9px;padding:10px;font:inherit;font-weight:700;cursor:pointer}
+  #vvAuthGate .vv-auth-msg{min-height:18px;margin-top:8px;font-size:12.5px;white-space:pre-wrap}
+  #vvAuthGate .vv-auth-skip{margin-top:10px;text-align:center;font-size:11.5px}
+  #vvAuthGate .vv-auth-skip a{color:#7e8aa0;cursor:pointer;text-decoration:underline}`;
+  document.head.appendChild(s);
+}
+function vvAuthRenderGate(){
+  vvAuthEnsureGateStyle();
+  let g=byId("vvAuthGate");
+  if(!g){ g=document.createElement("div"); g.id="vvAuthGate"; document.body.appendChild(g); }
+  const cfg=_vvAuthConfigCache;
+  if(!vvAuthCryptoOK()){
+    g.innerHTML='<div class="vv-auth-card"><h2>V&amp;V Cockpit</h2><p>Sichere Passwortprüfung wird von diesem Browser nicht unterstützt (Web Crypto fehlt). Bitte einen aktuellen Browser (Chrome/Edge/Firefox) verwenden.</p></div>';
+    return;
+  }
+  if(!cfg){
+    // Ersteinrichtung
+    g.innerHTML='<div class="vv-auth-card"><h2>Cockpit-Schutz einrichten</h2>'+
+      '<p>Lege ein Passwort oder eine PIN fest (mindestens 6 Zeichen).</p>'+
+      '<input id="vvAuthPw1" type="password" autocomplete="new-password" placeholder="Passwort oder PIN">'+
+      '<input id="vvAuthPw2" type="password" autocomplete="new-password" placeholder="Wiederholen" onkeydown="if(event.key===\'Enter\')vvAuthDoSetup()">'+
+      '<button onclick="vvAuthDoSetup()">Schutz aktivieren</button>'+
+      '<div id="vvAuthMsg" class="vv-auth-msg"></div>'+
+      '<p>⚠️ Bewahre dein Passwort sicher auf. Ohne Passwort kann das Cockpit nicht entsperrt werden.</p>'+
+      '<div class="vv-auth-skip"><a onclick="vvAuthSkipSetup()">Ohne Login-Schutz fortfahren (nicht empfohlen)</a></div></div>';
+    setTimeout(()=>{ const i=byId("vvAuthPw1"); if(i) i.focus(); },50);
+    return;
+  }
+  // Login
+  const wait=vvAuthFailWaitLeft();
+  g.innerHTML='<div class="vv-auth-card"><h2>V&amp;V Cockpit gesperrt</h2>'+
+    '<p>Bitte Passwort oder PIN eingeben, um das Cockpit zu entsperren.</p>'+
+    '<input id="vvAuthPwIn" type="password" autocomplete="current-password" placeholder="Passwort / PIN" onkeydown="if(event.key===\'Enter\')vvAuthDoUnlock()">'+
+    '<button onclick="vvAuthDoUnlock()">Entsperren</button>'+
+    '<div id="vvAuthMsg" class="vv-auth-msg">'+(wait>0?("Zu viele Fehlversuche. Bitte warte "+wait+" Sekunden."):"")+'</div></div>';
+  setTimeout(()=>{ const i=byId("vvAuthPwIn"); if(i) i.focus(); },50);
+}
+function vvAuthGateMsg(t, ok){ const e=byId("vvAuthMsg"); if(e){ e.style.color=ok?"#39e08a":"#ff9c8a"; e.textContent=t; } }
+async function vvAuthDoSetup(){
+  const i1=byId("vvAuthPw1"), i2=byId("vvAuthPw2");
+  const pw=(i1&&i1.value)||"", pw2=(i2&&i2.value)||"";
+  const v=vvAuthValidateNewPassword(pw, pw2);
+  if(!v.ok){ vvAuthGateMsg(v.error,false); return; }
+  try{
+    await vvAuthSetupPassword(pw);
+    if(i1) i1.value=""; if(i2) i2.value="";   // kein Klartext im DOM behalten
+    vvAuthGateMsg((v.warn?v.warn+"\n":"")+"✓ Schutz aktiviert – Cockpit wird entsperrt …", true);
+    setTimeout(()=>vvAuthUnlock(), v.warn?1200:300);
+  }catch(e){ vvAuthGateMsg(String((e&&e.message)||e), false); }
+}
+async function vvAuthSkipSetup(){
+  if(!confirm("Ohne Login-Schutz fortfahren?\n\nJeder mit Zugriff auf diesen Browser kann das Cockpit öffnen. Du kannst den Schutz später unter „Firmendaten → Sicherheit / Login“ aktivieren.")) return;
+  await vvAuthSaveConfig({ enabled:false, version:1, skippedAt:nowISO() });
+  vvAuthUnlock();
+}
+async function vvAuthDoUnlock(){
+  const i=byId("vvAuthPwIn"); const pw=(i&&i.value)||"";
+  if(i) i.value="";                                  // Eingabe sofort aus dem DOM entfernen
+  try{
+    await vvAuthVerifyPassword(pw);
+    vvAuthGateMsg("✓ Entsperrt.", true);
+    vvAuthUnlock();
+  }catch(e){ vvAuthGateMsg(String((e&&e.message)||e), false); }
+}
+/* Boot: true = Gate anzeigen (Setup nötig oder Schutz aktiv) */
+async function vvAuthInit(){
+  vvAuthBindActivityListeners();
+  if(!vvAuthCryptoOK()){
+    const cfg=await vvAuthLoadConfig().catch(()=>null);
+    if(cfg&&cfg.enabled){ _vvAuthLocked=true; try{ document.body.classList.add("vv-locked"); }catch(e){} return true; }
+    return false;
+  }
+  const cfg=await vvAuthLoadConfig();
+  if(cfg && cfg.enabled===false) return false;       // bewusst deaktiviert
+  _vvAuthLocked=true;                                // Setup nötig ODER Login nötig
+  try{ document.body.classList.add("vv-locked"); }catch(e){}
+  return true;
+}
+
+/* ---- Sicherheitsbereich (Seite „Firmendaten“) ---- */
+async function vvAuthRenderSecurityPanel(){
+  const host=byId("vvSecurityPanel"); if(!host) return;
+  const cfg=await vvAuthLoadConfig().catch(()=>null);
+  const fails=vvAuthGetFailState();
+  let lastUnlock=null; try{ lastUnlock=await vvDbGetMeta("lastUnlockAt"); }catch(e){}
+  const active=!!(cfg&&cfg.enabled);
+  const row=(k,v)=>'<div style="display:flex;justify-content:space-between;gap:10px;padding:3px 0;border-bottom:1px dashed var(--line);font-size:13px"><span style="color:var(--muted)">'+k+'</span><b>'+esc(v)+'</b></div>';
+  host.innerHTML=
+    row("Login-Schutz", active?"aktiv":"nicht eingerichtet")+
+    (active?row("Methode","Passwort/PIN (PBKDF2-SHA256, "+(cfg.iterations||210000)+" Iterationen)"):"")+
+    (active?row("Auto-Lock", cfg.autoLockEnabled!==false?"aktiv":"aus"):"")+
+    (active?row("Session-Timeout", (Number(cfg.sessionTimeoutMinutes)||15)+" Minuten"):"")+
+    row("Letzte Entsperrung", lastUnlock?fmtDT(lastUnlock):(_vvAuthLastUnlockAt?fmtDT(_vvAuthLastUnlockAt):"–"))+
+    row("Fehlversuche", String(fails.count||0))+
+    row("Auth-Speicher", vvDbAvailable()?"IndexedDB (meta)":"localStorage-Fallback (nur Hash/Salt)")+
+    '<div class="btn-row" style="margin-top:10px">'+
+    (active
+      ? '<button class="btn sm primary" onclick="vvAuthLock(\'manual\')">🔒 Cockpit jetzt sperren</button>'
+      : '')+
+    '</div>'+
+    (active
+      ? '<div class="fg c3" style="margin-top:8px">'+
+        '<div><label class="lbl">Altes Passwort</label><input id="vvSecOld" type="password" autocomplete="current-password"></div>'+
+        '<div><label class="lbl">Neues Passwort/PIN</label><input id="vvSecNew" type="password" autocomplete="new-password"></div>'+
+        '<div><label class="lbl">Neues wiederholen</label><input id="vvSecNew2" type="password" autocomplete="new-password"></div></div>'+
+        '<div class="btn-row"><button class="btn sm" onclick="vvSecChangePw()">Passwort ändern</button></div>'+
+        '<div class="fg c3" style="margin-top:8px">'+
+        '<div><label class="lbl">Session-Timeout (Minuten)</label><input id="vvSecTimeout" inputmode="numeric" value="'+(Number(cfg.sessionTimeoutMinutes)||15)+'"></div>'+
+        '<div><label class="lbl">Auto-Lock</label><select id="vvSecAutoLock"><option value="ja"'+(cfg.autoLockEnabled!==false?" selected":"")+'>Aktiv</option><option value="nein"'+(cfg.autoLockEnabled===false?" selected":"")+'>Aus</option></select></div>'+
+        '<div style="display:flex;align-items:flex-end"><button class="btn sm" onclick="vvSecSaveOptions()">Übernehmen</button></div></div>'+
+        '<div class="fg c2" style="margin-top:8px">'+
+        '<div><label class="lbl">Passwort (zum Deaktivieren)</label><input id="vvSecDisablePw" type="password" autocomplete="current-password"></div>'+
+        '<div style="display:flex;align-items:flex-end"><button class="btn sm ghost" onclick="vvSecDisable()">Login-Schutz deaktivieren</button></div></div>'
+      : '<div class="fg c3" style="margin-top:8px">'+
+        '<div><label class="lbl">Passwort oder PIN (min. 6 Zeichen)</label><input id="vvSecNew" type="password" autocomplete="new-password"></div>'+
+        '<div><label class="lbl">Wiederholen</label><input id="vvSecNew2" type="password" autocomplete="new-password"></div>'+
+        '<div style="display:flex;align-items:flex-end"><button class="btn sm primary" onclick="vvSecEnable()">Login-Schutz aktivieren</button></div></div>')+
+    '<div id="vvSecMsg" style="margin-top:8px;font-size:12.5px;white-space:pre-wrap;color:var(--muted)"></div>'+
+    '<p style="color:var(--muted);font-size:11.5px;margin-top:8px">Dieser Schutz verhindert normalen Zugriff im Browser. Bei direktem Zugriff auf die lokale Datei oder Entwicklerwerkzeuge ersetzt er keine Betriebssystem-Verschlüsselung. Handy-Bestätigung kann später ergänzt werden.</p>';
+}
+function vvSecMsg(t, ok){ const e=byId("vvSecMsg"); if(e){ e.style.color=ok?"var(--green2)":"#ff8070"; e.textContent=t; } }
+async function vvSecEnable(){
+  const pw=(byId("vvSecNew")&&byId("vvSecNew").value)||"", pw2=(byId("vvSecNew2")&&byId("vvSecNew2").value)||"";
+  const v=vvAuthValidateNewPassword(pw,pw2);
+  if(!v.ok){ vvSecMsg(v.error,false); return; }
+  try{ await vvAuthSetupPassword(pw); vvSecMsg((v.warn?v.warn+"\n":"")+"✓ Login-Schutz aktiviert. Beim nächsten Öffnen wird das Passwort verlangt.", true); vvAuthStartAutoLockTimer(); vvAuthRenderSecurityPanel(); }
+  catch(e){ vvSecMsg(String((e&&e.message)||e), false); }
+}
+async function vvSecChangePw(){
+  const o=(byId("vvSecOld")&&byId("vvSecOld").value)||"", n=(byId("vvSecNew")&&byId("vvSecNew").value)||"", n2=(byId("vvSecNew2")&&byId("vvSecNew2").value)||"";
+  const v=vvAuthValidateNewPassword(n,n2);
+  if(!v.ok){ vvSecMsg(v.error,false); return; }
+  try{ await vvAuthChangePassword(o,n); ["vvSecOld","vvSecNew","vvSecNew2"].forEach(id=>{ const e=byId(id); if(e) e.value=""; }); vvSecMsg("✓ Passwort wurde geändert.", true); vvAuthRenderSecurityPanel(); }
+  catch(e){ vvSecMsg(String((e&&e.message)||e), false); }
+}
+async function vvSecSaveOptions(){
+  const cfg=await vvAuthLoadConfig(); if(!cfg||!cfg.enabled){ vvSecMsg("Kein aktiver Login-Schutz.",false); return; }
+  cfg.sessionTimeoutMinutes=Math.min(240, Math.max(1, parseInt((byId("vvSecTimeout")&&byId("vvSecTimeout").value)||"15",10)||15));
+  cfg.autoLockEnabled=((byId("vvSecAutoLock")&&byId("vvSecAutoLock").value)||"ja")!=="nein";
+  cfg.updatedAt=nowISO();
+  await vvAuthSaveConfig(cfg);
+  vvSecMsg("✓ Übernommen: Timeout "+cfg.sessionTimeoutMinutes+" Min · Auto-Lock "+(cfg.autoLockEnabled?"aktiv":"aus")+".", true);
+  vvAuthRenderSecurityPanel();
+}
+async function vvSecDisable(){
+  const pw=(byId("vvSecDisablePw")&&byId("vvSecDisablePw").value)||"";
+  const e=byId("vvSecDisablePw"); if(e) e.value="";
+  try{ await vvAuthDisableWithPassword(pw); vvSecMsg("✓ Login-Schutz deaktiviert.", true); vvAuthStopAutoLockTimer(); vvAuthRenderSecurityPanel(); }
+  catch(err){ vvSecMsg(String((err&&err.message)||err), false); }
+}
+
 function saveAll(alert_=false){
   normalizeData();
   // Primärspeicher ist jetzt IndexedDB (debounced) – localStorage nur noch als
@@ -895,14 +1224,15 @@ function stripKeysForExport(settings){
   return s;
 }
 
-/* Export: vollständiges Backup inkl. Settings (ohne API-Keys) */
+/* Export: vollständiges Backup inkl. Settings (ohne API-Keys, ohne Login-Geheimnisse) */
 function doExport(){
+  if(typeof _vvAuthLocked!=="undefined" && _vvAuthLocked){ alert("Bitte Cockpit zuerst entsperren."); return; }
   try{
     normalizeData();
     saveAll(false);
     const settings = stripKeysForExport(getSettings()); // company, owner, … – API-Keys werden NIE exportiert
     let nexusBrainUser=null; try{ nexusBrainUser=getNexusBrainStored(); }catch(e){}
-    const payload = { version:"VV_COCKPIT_2026", exportedAt:nowISO(), keyNote:"Backup enthält Cockpit-Daten und NEXUS-Gehirn. API-Keys werden nicht exportiert.", data, settings, nexusBrainUser };
+    const payload = { version:"VV_COCKPIT_2026", exportedAt:nowISO(), keyNote:"Backup enthält Cockpit-Daten und NEXUS-Gehirn. API-Keys und Login-Geheimnisse werden nicht exportiert.", data, settings, nexusBrainUser };
     const json = JSON.stringify(payload, null, 2);
     const d = new Date(), pad = n => String(n).padStart(2,"0");
     const fn = `vv-cockpit-backup-${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}.json`;
@@ -2679,6 +3009,8 @@ let navHistory = [];
 let _currentView = null;
 
 function showSection(id, opts){
+  // Gesperrt: keine Inhalte rendern – nur der Sperrbildschirm ist sichtbar
+  if(typeof _vvAuthLocked!=="undefined" && _vvAuthLocked){ try{ vvAuthRenderGate(); }catch(e){} return; }
   opts = opts || {};
   const main = byId("main"); if(!main) return;
   // Historie pflegen (nur bei echtem Wechsel, nicht beim Zurückspringen)
@@ -2742,7 +3074,7 @@ function renderSection(id){
 function afterRender(id){
   if(id==="nexus"){ nxDrawChat(); nxUpdatePanels(); try{ nxAiRenderPanel(); }catch(e){} try{ nxBrainRenderPanel(); }catch(e){} try{ if(window.speechSynthesis){ window.speechSynthesis.onvoiceschanged=nxUpdatePanels; window.speechSynthesis.getVoices(); } }catch(e){} }
   if(id==="aufmass"){ renderAfmRooms(); bindThumbClicks(); }
-  if(id==="settings"){ loadSettingsFields(); loadAiSettingsFields(); }
+  if(id==="settings"){ loadSettingsFields(); loadAiSettingsFields(); try{ vvAuthRenderSecurityPanel(); }catch(e){} }
   if(id==="backup"){ const rb=byId("impMode_"+_importMode); if(rb) rb.checked=true; try{ vvRenderDataPanel(); }catch(e){} }
   if(id==="agents"){ agSyncKey(); }
   if(id==="calculator"){ if(_calcState.computed && _calcState.positions.length) renderCalcOutput(); }
@@ -5145,7 +5477,7 @@ Aktualisiert: ${l.updated}
     </div>
     <h3>Backup exportieren</h3>
     <p style="color:var(--muted);font-size:13px;margin-bottom:8px">${last?("Letztes Backup: "+fmtDT(last)):"Noch kein Backup exportiert."}</p>
-    <p style="color:var(--muted);font-size:12px;margin-bottom:8px">🧠 Das NEXUS-Gehirn (Begriffe, Regeln, Erinnerungen) wird exportiert. 🔒 API-Keys werden nicht exportiert.</p>
+    <p style="color:var(--muted);font-size:12px;margin-bottom:8px">🧠 Das NEXUS-Gehirn (Begriffe, Regeln, Erinnerungen) wird exportiert. 🔒 Backups enthalten keine API-Keys und keine Login-Geheimnisse (Passwort/Hash/Salt).</p>
     <span id="backupLastInfo"></span>
     <div class="btn-row"><button class="btn primary" onclick="doExport()">📦 Backup exportieren</button></div>
     <div class="divider"></div>
@@ -5766,6 +6098,7 @@ function nxAiErrorText(pid, err){ return normalizeProviderError(pid, err); }
 /* ---- Gemini-Adapter: direkt aus dem Browser (REST generateContent) ----
    messages = [{role:"system"|"user"|"assistant", content:"…"}] */
 async function callGeminiDirect(messages, options){
+  if(typeof _vvAuthLocked!=="undefined" && _vvAuthLocked) throw new Error("Cockpit ist gesperrt – bitte zuerst entsperren.");
   options=options||{};
   const st=getAiProviderSettings();
   const key=cleanApiKey(getAiKey("gemini")); if(!key) throw new Error("Gemini API-Key fehlt. Bitte Key im NEXUS Deck eintragen.");
@@ -5804,6 +6137,7 @@ async function callGeminiDirect(messages, options){
 
 /* ---- Groq-Adapter: direkt aus dem Browser (OpenAI-kompatible Chat-Completions) ---- */
 async function callGroqDirect(messages, options){
+  if(typeof _vvAuthLocked!=="undefined" && _vvAuthLocked) throw new Error("Cockpit ist gesperrt – bitte zuerst entsperren.");
   options=options||{};
   const st=getAiProviderSettings();
   const key=cleanApiKey(getAiKey("groq")); if(!key) throw new Error("Groq API-Key fehlt. Bitte Key im NEXUS Deck eintragen.");
@@ -6677,6 +7011,9 @@ function nxBrainTryExample(text){ const e=byId("nxInput"); if(e){ e.value=text; 
 /* Orchestrierung: lokal-zuerst (Bestätigung/Stop), dann Provider-Kette laut
    Routing (Gemini/Groq direkt, optional Ollama lokal), dann lokale Befehlslogik. */
 async function nxProcessCommand(commandText, context){
+  // Gesperrt: keine Datenausgabe, keine Provider-Anfragen
+  if(typeof _vvAuthLocked!=="undefined" && _vvAuthLocked) return "Bitte Cockpit zuerst entsperren.";
+  try{ vvAuthMarkActivity(); }catch(e){}
   context=context||{};
   const raw=String(commandText||"").trim(); if(!raw) return "";
   const l=raw.toLowerCase();
@@ -7576,6 +7913,10 @@ function renderSettings(){
     </div>
     <div><label class="lbl">Kleinunternehmer-Hinweis (auf Rechnungen)</label><textarea id="setLegal">Gemäß § 19 UStG wird keine Umsatzsteuer berechnet.</textarea></div>
     <div class="btn-row"><button class="btn primary" onclick="saveSettings()">Speichern</button></div>
+
+    <div class="divider"></div>
+    <h3>🔒 Sicherheit / Login</h3>
+    <div id="vvSecurityPanel" style="margin-bottom:8px">Lade Status …</div>
 
     <div class="divider"></div>
     <h3>🤖 KI-Einstellungen (lokal)</h3>
@@ -9031,6 +9372,7 @@ function nxPermBlocked(){
 }
 function startGlobalNexusListener(){
   // Sprachmodus startet AUSSCHLIESSLICH durch diese Nutzeraktion – nie automatisch.
+  if(typeof _vvAuthLocked!=="undefined" && _vvAuthLocked){ showVoiceStatus("Bitte Cockpit zuerst entsperren.", true); return false; }
   if(!nxRecogSupported()){ showVoiceStatus("Spracherkennung wird von diesem Browser nicht unterstützt (Chrome/Edge empfohlen). Befehle können jederzeit getippt werden.", true); nxSetVoiceState(NX_VOICE_STATE.ERROR); return false; }
   if(!nxSecureOK()){ showVoiceStatus("Das Mikrofon braucht einen sicheren Kontext (https, http://localhost oder lokale Datei)."+VV_MIC_LAUNCHER_HINT, true); nxSetVoiceState(NX_VOICE_STATE.ERROR); return false; }
   if(_nxPermPending || _nxStarting || _nxGlobalRecog) return false; // läuft schon / keine doppelte Anfrage
@@ -9681,16 +10023,26 @@ document.addEventListener("DOMContentLoaded",()=>{
   // Auto-Load: erst dauerhaft gespeicherte Daten (IndexedDB) laden, dann rendern.
   // Fällt bei Fehlern sicher auf die alte localStorage-Ladung zurück.
   (async()=>{
-    try{ await vvBootLoad(); }
+    // Login-Schutz ZUERST: bei aktivem Schutz bleibt alles verborgen, bis entsperrt ist
+    let gateNeeded=false;
+    try{ gateNeeded=await vvAuthInit(); }catch(e){ console.warn("Auth-Init:", e); gateNeeded=false; }
+    try{ await vvBootLoad(); }            // Daten dürfen intern laden – sichtbar wird nichts
     catch(e){ console.warn("Boot:", e); try{ loadAll(); }catch(_){} }
     loadSettingsFields();
     try{ nxMigrateLegacyAiKeys(); }catch(e){} // Alt-Keys aus settings.ai.nexus in den getrennten Key-Store verschieben
+    // Nach-Boot-Initialisierung (läuft bei aktivem Schutz erst nach dem Entsperren)
+    let postBootDone=false;
+    window.vvPostBoot=function(){
+      if(postBootDone) return; postBootDone=true;
+      try{ nxInjectGlobal(); }catch(e){} // globaler Mic-Chip + Antwort-Overlay (Zuhören erst nach Klick)
+      try{ nxTryLoadLocalConfig(); }catch(e){} // optionale lokale Startkonfiguration (nur über http, nie überschreibend)
+      // Live Bank-Table wenn section aktiv
+      const obs=new MutationObserver(()=>{ if(currentSection==="bookkeeping") renderBkTable(); });
+      obs.observe(byId("main"),{childList:true});
+    };
+    if(gateNeeded){ vvAuthRenderGate(); return; }   // Rendern passiert erst nach vvAuthUnlock()
     showSection("dashboard");
-    try{ nxInjectGlobal(); }catch(e){} // globaler Mic-Chip + Antwort-Overlay (Zuhören erst nach Klick)
-    try{ nxTryLoadLocalConfig(); }catch(e){} // optionale lokale Startkonfiguration (nur über http, nie überschreibend)
-    // Live Bank-Table wenn section aktiv
-    const obs=new MutationObserver(()=>{ if(currentSection==="bookkeeping") renderBkTable(); });
-    obs.observe(byId("main"),{childList:true});
+    window.vvPostBoot();
   })();
 });
 
