@@ -1010,9 +1010,7 @@ function vvAuthEnsureGateStyle(){
   #vvAuthGate p{margin:6px 0;color:#7e8aa0;font-size:12.5px;line-height:1.5}
   #vvAuthGate input{width:100%;background:#070a10;border:1px solid #1d2636;color:#e7f0f6;border-radius:9px;padding:10px;font:inherit;margin-top:8px}
   #vvAuthGate button{margin-top:12px;width:100%;background:rgba(54,211,230,.16);border:1px solid #36d3e6;color:#fff;border-radius:9px;padding:10px;font:inherit;font-weight:700;cursor:pointer}
-  #vvAuthGate .vv-auth-msg{min-height:18px;margin-top:8px;font-size:12.5px;white-space:pre-wrap}
-  #vvAuthGate .vv-auth-skip{margin-top:10px;text-align:center;font-size:11.5px}
-  #vvAuthGate .vv-auth-skip a{color:#7e8aa0;cursor:pointer;text-decoration:underline}`;
+  #vvAuthGate .vv-auth-msg{min-height:18px;margin-top:8px;font-size:12.5px;white-space:pre-wrap}`;
   document.head.appendChild(s);
 }
 function vvAuthRenderGate(){
@@ -1032,8 +1030,7 @@ function vvAuthRenderGate(){
       '<input id="vvAuthPw2" type="password" autocomplete="new-password" placeholder="Wiederholen" onkeydown="if(event.key===\'Enter\')vvAuthDoSetup()">'+
       '<button onclick="vvAuthDoSetup()">Schutz aktivieren</button>'+
       '<div id="vvAuthMsg" class="vv-auth-msg"></div>'+
-      '<p>⚠️ Bewahre dein Passwort sicher auf. Ohne Passwort kann das Cockpit nicht entsperrt werden.</p>'+
-      '<div class="vv-auth-skip"><a onclick="vvAuthSkipSetup()">Ohne Login-Schutz fortfahren (nicht empfohlen)</a></div></div>';
+      '<p>⚠️ Bewahre dein Passwort sicher auf. Ohne Passwort kann das Cockpit nicht entsperrt werden.</p></div>';
     setTimeout(()=>{ const i=byId("vvAuthPw1"); if(i) i.focus(); },50);
     return;
   }
@@ -1058,11 +1055,6 @@ async function vvAuthDoSetup(){
     vvAuthGateMsg((v.warn?v.warn+"\n":"")+"✓ Schutz aktiviert – Cockpit wird entsperrt …", true);
     setTimeout(()=>vvAuthUnlock(), v.warn?1200:300);
   }catch(e){ vvAuthGateMsg(String((e&&e.message)||e), false); }
-}
-async function vvAuthSkipSetup(){
-  if(!confirm("Ohne Login-Schutz fortfahren?\n\nJeder mit Zugriff auf diesen Browser kann das Cockpit öffnen. Du kannst den Schutz später unter „Firmendaten → Sicherheit / Login“ aktivieren.")) return;
-  await vvAuthSaveConfig({ enabled:false, version:1, skippedAt:nowISO() });
-  vvAuthUnlock();
 }
 async function vvAuthDoUnlock(){
   const i=byId("vvAuthPwIn"); const pw=(i&&i.value)||"";
