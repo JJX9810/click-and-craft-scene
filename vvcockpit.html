@@ -525,7 +525,7 @@ function migrateSettings(s){
    API-Keys (VV_AI_KEY_*) werden NIEMALS in diesen State übernommen.
    ========================================================== */
 const VV_COCKPIT_APP_ID = "vv-cockpit-main";
-const VV_DB_NAME = "VVCockpitDB", VV_DB_VERSION = 1;
+const VV_DB_NAME = "VVCockpitDB", VV_DB_VERSION = 2;   // v2: + measurementDrafts (Aufmaß-Entwürfe)
 const VV_STATE_FALLBACK_KEY = "VV_COCKPIT_STATE_FALLBACK";
 let _vvDbPromise = null, _vvDbBroken = false;
 let vvAutoSaveTimer = null;
@@ -546,6 +546,7 @@ function vvDbOpen(){
       if(!db.objectStoreNames.contains("snapshots"))    db.createObjectStore("snapshots", {keyPath:"id"});
       if(!db.objectStoreNames.contains("migrationLog")) db.createObjectStore("migrationLog", {keyPath:"id"});
       if(!db.objectStoreNames.contains("meta"))         db.createObjectStore("meta");                     // key: string
+      if(!db.objectStoreNames.contains("measurementDrafts")) db.createObjectStore("measurementDrafts", {keyPath:"id"}); // laufende Aufmaß-Entwürfe (inkl. Fotos)
     };
     req.onsuccess = ()=>{ const db=req.result; db.onversionchange=()=>{ try{ db.close(); }catch(e){} _vvDbPromise=null; }; res(db); };
     req.onerror   = ()=>{ _vvDbBroken=true; _vvDbPromise=null; rej(req.error||new Error("IndexedDB konnte nicht geöffnet werden")); };
@@ -950,6 +951,8 @@ async function vvAuthLock(reason){
   }
   _vvAuthLocked=true;
   vvAuthStopAutoLockTimer();
+  // offenen Aufmaß-Entwurf VOR dem Sperren sichern (manuell + Auto-Lock)
+  try{ if(typeof afmEmergencySave==="function") afmEmergencySave("lock_"+(reason||"manual")); }catch(e){}
   // NEXUS/Mikrofon/Sprachausgabe sofort stoppen – nichts darf im Hintergrund weiterlaufen
   try{ stopGlobalNexusListener({silent:true}); }catch(e){}
   try{ if(typeof _nxTestRecog!=="undefined"&&_nxTestRecog){ _nxTestRecog.abort&&_nxTestRecog.abort(); _nxTestRecog=null; } }catch(e){}
@@ -2657,21 +2660,196 @@ function resetAfmDraft(){
   };
 }
 
+/* ==========================================================
+   AUFMASS-ENTWURFSSPEICHER (Auto-Save, Standby-/Reload-sicher)
+   Ursache des Baustellen-Datenverlusts: afmDraft lag nur im RAM und
+   wurde erst beim finalen „Aufmaß speichern“ persistiert. Wirft das
+   Handy den Tab im Standby aus dem Speicher, war alles weg.
+   Jetzt: jede Eingabe speichert den Entwurf (debounced) in den
+   IndexedDB-Store measurementDrafts (inkl. Fotos) + kompakten
+   localStorage-Fallback ohne Fotos. Keine Keys, keine Auth-Daten.
+   ========================================================== */
+const AFM_DRAFT_LITE_KEY="VV_AFM_DRAFT_LITE";
+let _afmSaveTimer=null;
+let _afmLastSavedAt=null;
+let _afmSaveState="idle";   // idle|pending|saving|saved|restored|error
+
+function afmEnsureDraftMeta(){
+  if(!afmDraft.id){
+    afmDraft.id="measure_"+Date.now()+"_"+Math.random().toString(36).slice(2,7);
+    afmDraft.createdAt=nowISO();
+    afmDraft.status="draft";
+    afmDraft.autosaveVersion=0;
+    try{ afmDraft.deviceInfo=(window.innerWidth<=900?"mobile":"desktop"); }catch(e){ afmDraft.deviceInfo="unbekannt"; }
+  }
+}
+function afmDraftHasContent(){
+  try{
+    if((afmDraft.rooms||[]).length) return true;
+    if(String(afmDraft.newName||"").trim()) return true;
+    if(afmDraft.customerId) return true;
+    const sd=afmDraft.serviceData||{};
+    if(String(sd.lfm||"").trim()||String(sd.volumen_m3||"").trim()||String(sd.raeume||"").trim()||String(sd.notizen||"").trim()||String(sd.unterschraenke||"").trim()) return true;
+  }catch(e){}
+  return false;
+}
+function afmSetSaveStatus(state, extra){
+  _afmSaveState=state;
+  const e=byId("afmSaveStatus"); if(!e) return;
+  const t=_afmLastSavedAt?new Date(_afmLastSavedAt).toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"}):"";
+  const map={
+    idle:    ["color:var(--muted)","Entwurf noch nicht gespeichert"],
+    pending: ["color:var(--muted)","Aufmaß wird gespeichert …"],
+    saving:  ["color:var(--muted)","Aufmaß wird gespeichert …"],
+    saved:   ["color:var(--green2)","✓ Aufmaß-Entwurf gespeichert"+(t?(" um "+t):"")+" · IndexedDB"],
+    restored:["color:var(--gold2)","↩ Wiederhergestellter Entwurf – Änderungen werden automatisch weitergespeichert"],
+    error:   ["color:#ff8070","⚠ Speichern fehlgeschlagen – bitte Seite nicht schließen"+(extra?(" ("+extra+")"):"")]
+  };
+  const m=map[state]||map.idle;
+  e.setAttribute("style","font-size:12px;font-weight:600;"+m[0]);
+  e.textContent=m[1];
+}
+/* afmDraft IST der Form-State (alle Handler mutieren ihn direkt) –
+   hier nur die Kopf-Felder nachziehen, falls ein Handler nicht feuerte */
+function collectAufmassFormState(){
+  try{ const c=byId("afmCustomer"); if(c) afmDraft.customerId=c.value; }catch(e){}
+  try{ const n=byId("afmNewName"); if(n) afmDraft.newName=n.value; }catch(e){}
+  return afmDraft;
+}
+/* Entwurf SOFORT sichern: erst kompakter localStorage-Fallback (synchron,
+   ohne Fotos), dann vollständig (inkl. Fotos) in IndexedDB. */
+function saveAufmassDraftNow(reason){
+  try{
+    if(_afmSaveTimer){ clearTimeout(_afmSaveTimer); _afmSaveTimer=null; }
+    collectAufmassFormState();
+    if(!afmDraftHasContent()) return Promise.resolve(false);
+    afmEnsureDraftMeta();
+    afmDraft.updatedAt=nowISO(); afmDraft.dirty=true;
+    afmDraft.autosaveVersion=(afmDraft.autosaveVersion||0)+1;
+    afmSetSaveStatus("saving");
+    try{
+      const lite=Object.assign({}, afmDraft, {rooms:(afmDraft.rooms||[]).map(r=>Object.assign({}, r, {photos:(r.photos||[]).map(p=>({id:p.id,fileName:p.fileName,liteOnly:true}))}))});
+      localStorage.setItem(AFM_DRAFT_LITE_KEY, JSON.stringify(lite));
+    }catch(e){ /* localStorage voll -> IndexedDB trägt */ }
+    const p = vvDbAvailable()
+      ? vvDbPut("measurementDrafts", afmDraft)   // IndexedDB klont synchron beim Aufruf
+      : Promise.reject(new Error("IndexedDB nicht verfügbar"));
+    return p.then(()=>{
+      _afmLastSavedAt=nowISO(); afmDraft.dirty=false;
+      afmSetSaveStatus("saved");
+      return true;
+    }).catch(err=>{
+      // Fallback hat ggf. gegriffen (ohne Fotos) – trotzdem sichtbar melden
+      console.warn("Aufmaß-Entwurf (IndexedDB):", err);
+      afmSetSaveStatus("error", String((err&&err.message)||err));
+      return false;
+    });
+  }catch(err){ afmSetSaveStatus("error", String((err&&err.message)||err)); return Promise.resolve(false); }
+}
+function scheduleAufmassAutosave(reason, fast){
+  afmSetSaveStatus("pending");
+  clearTimeout(_afmSaveTimer);
+  _afmSaveTimer=setTimeout(()=>{ _afmSaveTimer=null; saveAufmassDraftNow(reason||"input"); }, fast?100:600);
+}
+/* Notanker für Standby/Display-aus/Tab-Wechsel/Schließen: sofort speichern.
+   Der laufende Auto-Save hat den Stand idealerweise schon weggeschrieben –
+   das hier fängt die letzten Sekunden ab. */
+function afmEmergencySave(reason){
+  try{
+    if(currentSection!=="aufmass") return;
+    if(!afmDraftHasContent()) return;
+    saveAufmassDraftNow(reason);
+  }catch(e){}
+}
+try{
+  document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="hidden") afmEmergencySave("visibilitychange_hidden"); });
+  window.addEventListener("pagehide",()=>afmEmergencySave("pagehide"));
+  window.addEventListener("beforeunload",()=>afmEmergencySave("beforeunload"));
+  window.addEventListener("blur",()=>afmEmergencySave("window_blur"));
+  if("onfreeze" in document) document.addEventListener("freeze",()=>afmEmergencySave("freeze"));
+}catch(e){}
+
+/* ---- Wiederherstellung nach Reload/Standby ---- */
+async function afmListOpenDrafts(){
+  let drafts=[];
+  try{ if(vvDbAvailable()) drafts=await vvDbGetAll("measurementDrafts"); }catch(e){}
+  if(!drafts.length){
+    try{ const raw=localStorage.getItem(AFM_DRAFT_LITE_KEY); if(raw){ const d=JSON.parse(raw); if(d&&d.id) drafts=[d]; } }catch(e){}
+  }
+  return (drafts||[]).filter(d=>d&&d.status==="draft")
+    .sort((a,b)=>String(b.updatedAt||"").localeCompare(String(a.updatedAt||"")));
+}
+function restoreAufmassDraft(draft, asNew){
+  resetAfmDraft();
+  try{ afmDraft=Object.assign(afmDraft, JSON.parse(JSON.stringify(draft))); }catch(e){ afmDraft=Object.assign(afmDraft, draft); }
+  if(asNew){ afmDraft.id=null; afmEnsureDraftMeta(); }
+  afmDraft.status="draft";
+  _afmSaveState="restored";
+  showSection("aufmass");
+}
+async function afmResumeDraft(id, asNew){
+  let d=null;
+  try{ if(vvDbAvailable()) d=await vvDbGet("measurementDrafts", id); }catch(e){}
+  if(!d){ try{ const raw=localStorage.getItem(AFM_DRAFT_LITE_KEY); if(raw){ const l=JSON.parse(raw); if(l&&l.id===id) d=l; } }catch(e){} }
+  if(!d){ alert("Entwurf konnte nicht geladen werden."); return; }
+  restoreAufmassDraft(d, !!asNew);
+}
+async function afmDiscardDraft(id){
+  if(!confirm("Diesen Aufmaß-Entwurf wirklich verwerfen? Die eingetragenen Werte gehen verloren.")) return;
+  try{ if(vvDbAvailable()) await vvDbDelete("measurementDrafts", id); }catch(e){}
+  try{ const raw=localStorage.getItem(AFM_DRAFT_LITE_KEY); if(raw && (JSON.parse(raw)||{}).id===id) localStorage.removeItem(AFM_DRAFT_LITE_KEY); }catch(e){}
+  afmCheckDraftRecovery();
+}
+/* Beim Öffnen des Aufmaß-Moduls: offenen Entwurf anbieten (nie still verwerfen) */
+async function afmCheckDraftRecovery(){
+  const host=byId("afmDraftBanner"); if(!host) return;
+  if(afmDraftHasContent()){ host.innerHTML=""; return; }   // RAM-Entwurf aktiv -> kein Banner nötig
+  let drafts=[]; try{ drafts=await afmListOpenDrafts(); }catch(e){}
+  const d=drafts[0];
+  if(!d || !byId("afmDraftBanner")){ if(byId("afmDraftBanner")) byId("afmDraftBanner").innerHTML=""; return; }
+  const rooms=(d.rooms||[]).length;
+  const fotos=(d.rooms||[]).reduce((s,r)=>s+((r.photos||[]).length),0);
+  const liteHint=(d.rooms||[]).some(r=>(r.photos||[]).some(p=>p.liteOnly))?" (Fotos konnten nur teilweise gesichert werden)":"";
+  host.innerHTML='<div style="background:rgba(212,161,90,.1);border:1px solid var(--gold3);border-radius:var(--r2);padding:12px;margin-bottom:12px;font-size:13px">'+
+    '⚠️ <b>Ungespeicherter Aufmaß-Entwurf gefunden.</b> Zuletzt gespeichert: '+esc(d.updatedAt?fmtDT(d.updatedAt):"unbekannt")+
+    ' · '+rooms+' Raum/Räume · '+fotos+' Foto(s)'+esc(liteHint)+
+    (drafts.length>1?(' · +'+(drafts.length-1)+' weitere(r) Entwurf/Entwürfe'):'')+
+    '<div class="btn-row" style="margin-top:8px">'+
+    '<button class="btn sm primary" onclick="afmResumeDraft(\''+esc(d.id)+'\')">Entwurf fortsetzen</button>'+
+    '<button class="btn sm" onclick="afmResumeDraft(\''+esc(d.id)+'\',true)">Als neues Aufmaß übernehmen</button>'+
+    '<button class="btn sm ghost" onclick="afmDiscardDraft(\''+esc(d.id)+'\')">Entwurf verwerfen</button>'+
+    '</div></div>';
+}
+/* Nach erfolgreichem finalen Speichern: Entwurf austragen (erst wenn der
+   Cockpit-State sicher in der Datenbank ist – sonst bleibt er erhalten) */
+function afmFinalizeDraft(draftId){
+  if(!draftId) return;
+  vvDbSaveState(null,{reason:"aufmass_final"}).then(()=>{
+    try{ if(vvDbAvailable()) vvDbDelete("measurementDrafts", draftId).catch(()=>{}); }catch(e){}
+    try{ const raw=localStorage.getItem(AFM_DRAFT_LITE_KEY); if(raw && (JSON.parse(raw)||{}).id===draftId) localStorage.removeItem(AFM_DRAFT_LITE_KEY); }catch(e){}
+  }).catch(err=>{
+    console.warn("Aufmaß final:", err);
+    afmSetSaveStatus("error","Finales Speichern in der Datenbank fehlgeschlagen – der Entwurf bleibt erhalten.");
+  });
+}
+
 function addRoom(){
   afmDraft.rooms.push({id:uid(),name:"",length:"",width:"",areaAuto:0,areaOverride:"",
     skirtingLfm:"", bodenbelag:"Laminat schwimmend", altbelag:"", notes:"", photos:[]});
   renderAfmRooms();
+  scheduleAufmassAutosave("room_add", true);
 }
-function delRoom(idx){ afmDraft.rooms.splice(idx,1); renderAfmRooms(); }
+function delRoom(idx){ afmDraft.rooms.splice(idx,1); renderAfmRooms(); scheduleAufmassAutosave("room_del", true); }
 function updateRoomField(idx,f,v){
   if(afmDraft.rooms[idx]){
     afmDraft.rooms[idx][f]=v;
     if(f==="length"||f==="width") recalcRoomArea(idx);
     refreshAfmTotals();
+    scheduleAufmassAutosave("room_field");
   }
 }
-function updateServiceData(f,v){ afmDraft.serviceData[f]=v; }
-function updateGeraet(g,v){ afmDraft.serviceData.geraete[g]=parseInt(v)||0; }
+function updateServiceData(f,v){ afmDraft.serviceData[f]=v; scheduleAufmassAutosave("service_data"); }
+function updateGeraet(g,v){ afmDraft.serviceData.geraete[g]=parseInt(v)||0; scheduleAufmassAutosave("geraet"); }
 function recalcRoomArea(idx){
   const r=afmDraft.rooms[idx]; r.areaAuto=r2(parseNum(r.length)*parseNum(r.width));
   const el=byId(`r_auto_${idx}`); if(el) el.value=r.areaAuto.toFixed(2).replace(".",",");
@@ -2687,6 +2865,7 @@ function refreshAfmTotals(){
 }
 function changeServiceType(v){
   afmDraft.serviceType=v;
+  scheduleAufmassAutosave("service_type", true);
   const sp=byId("svcSpecific"); if(sp) sp.innerHTML=renderSvcSpecific();
   const rh=byId("roomsHeader");
   if(rh) rh.innerHTML=`<h3 style="margin:0">Räume / Bereiche <span class="svc-badge">${esc(v)}</span></h3><button class="btn sm primary" onclick="addRoom()">+ Bereich / Raum</button>`;
@@ -2849,11 +3028,13 @@ async function handleRoomPhotos(idx,files){
   // Foto-Zähler updaten
   const btn=box&&box.parentElement&&box.parentElement.querySelector(".cam-btns span");
   if(btn) btn.textContent=afmDraft.rooms[idx].photos.length+" Foto(s)";
+  saveAufmassDraftNow("photo_add");   // Fotos sofort sichern (große Änderung)
 }
 function delPhoto(ridx,pidx){
   afmDraft.rooms[ridx].photos.splice(pidx,1);
   const box=byId(`thumbs_${ridx}`);
   if(box){box.innerHTML=thumbsHTML(ridx);bindThumbClicks();}
+  saveAufmassDraftNow("photo_del");
 }
 
 function thumbsHTML(ridx){
@@ -2908,7 +3089,20 @@ function downloadCurrentPhoto(){
 }
 
 /* ── Aufmaß speichern ── */
+/* Aktuellen Entwurf bewusst verwerfen (Button) – entfernt auch den gespeicherten Draft */
+function afmDiscardCurrent(){
+  if(!confirm("Aufmaß verwerfen? Auch der automatisch gespeicherte Entwurf wird gelöscht.")) return;
+  const id=afmDraft.id;
+  try{ if(id && vvDbAvailable()) vvDbDelete("measurementDrafts", id).catch(()=>{}); }catch(e){}
+  try{ const raw=localStorage.getItem(AFM_DRAFT_LITE_KEY); if(raw && (JSON.parse(raw)||{}).id===id) localStorage.removeItem(AFM_DRAFT_LITE_KEY); }catch(e){}
+  resetAfmDraft(); _afmSaveState="idle"; _afmLastSavedAt=null;
+  showSection("aufmass");
+}
 function saveAfmass(){
+  // Finales Speichern ist NICHT mehr der erste Speicherpunkt:
+  // Entwurf wird vorab nochmal gesichert – schlägt das Finale fehl, bleibt er erhalten.
+  try{ saveAufmassDraftNow("final_pre"); }catch(e){}
+  const draftId=afmDraft.id;
   const selCid=val("afmCustomer"), newName=val("afmNewName");
   const svc=afmDraft.serviceType;
   if(svc==="Bodenverlegung"&&!afmDraft.rooms.length){alert("Bitte mindestens einen Raum anlegen.");return;}
@@ -2931,9 +3125,17 @@ function saveAfmass(){
   data.measurements.push(meas);
   addTimeline(c.id,"Aufmaß gespeichert", r2(ta)+" m² · "+r2(ts)+" lfm", {type:"measurement",id:meas.id});
   refreshCustomerStage(c.id);
-  saveAll(false); resetAfmDraft();
+  const ok=saveAll(false);
+  if(!ok){
+    // weder localStorage noch IndexedDB verfügbar: Messung zurücknehmen, Entwurf bleibt
+    data.measurements.pop();
+    alert("Finales Speichern fehlgeschlagen. Der Aufmaß-Entwurf bleibt erhalten – bitte Speicherplatz prüfen oder Backup exportieren.");
+    return;
+  }
+  afmFinalizeDraft(draftId);   // Entwurf erst austragen, wenn der State sicher in der Datenbank ist
+  resetAfmDraft(); _afmSaveState="idle"; _afmLastSavedAt=null;
   currentDetailId=c.id;
-  alert("Aufmaß gespeichert! Nächster Schritt: Materialberechnung erstellen.\n(Tipp: regelmäßig Backup exportieren.)");
+  alert("Aufmaß gespeichert! Nächster Schritt: Materialberechnung erstellen.");
   showSection("crm_detail");
 }
 
@@ -3067,7 +3269,11 @@ function renderSection(id){
 
 function afterRender(id){
   if(id==="nexus"){ nxDrawChat(); nxUpdatePanels(); try{ nxAiRenderPanel(); }catch(e){} try{ nxBrainRenderPanel(); }catch(e){} try{ if(window.speechSynthesis){ window.speechSynthesis.onvoiceschanged=nxUpdatePanels; window.speechSynthesis.getVoices(); } }catch(e){} }
-  if(id==="aufmass"){ renderAfmRooms(); bindThumbClicks(); }
+  if(id==="aufmass"){
+    renderAfmRooms(); bindThumbClicks(); refreshAfmTotals();
+    try{ afmSetSaveStatus(_afmSaveState==="restored"?"restored":(afmDraftHasContent()?_afmSaveState:"idle")); }catch(e){}
+    try{ afmCheckDraftRecovery(); }catch(e){}
+  }
   if(id==="settings"){ loadSettingsFields(); loadAiSettingsFields(); try{ vvAuthRenderSecurityPanel(); }catch(e){} }
   if(id==="backup"){ const rb=byId("impMode_"+_importMode); if(rb) rb.checked=true; try{ vvRenderDataPanel(); }catch(e){} }
   if(id==="agents"){ agSyncKey(); }
@@ -3408,11 +3614,15 @@ function renderAufmass(){
   const totalLabel=svc==="Küchenmontage"?"Küchenzeile (lfm)":svc==="Entrümpelung & Entsorgung"?"Volumen (m³)":"Gesamtfläche (m²)";
   const totalLabel2=svc==="Entrümpelung & Entsorgung"?"Räume":svc==="Küchenmontage"?"Bereiche":"Sockelleisten (lfm)";
   return `<div class="panel">
-    <h2>📐 Aufmaß-Tool</h2>
-    <p class="sub">Räume/Bereiche erfassen, Fotos aufnehmen → Backup exportieren → am PC importieren.</p>
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+      <h2 style="margin:0">📐 Aufmaß-Tool</h2>
+      <span id="afmSaveStatus" style="font-size:12px;color:var(--muted)">Entwurf noch nicht gespeichert</span>
+    </div>
+    <p class="sub">Jede Eingabe wird automatisch als Entwurf gespeichert – auch bei Handy-Standby oder Neuladen geht nichts verloren.</p>
+    <div id="afmDraftBanner"></div>
     <div class="fg c2" style="margin-bottom:12px">
-      <div><label class="lbl">Bestehender Kunde</label><select id="afmCustomer" onchange="afmDraft.customerId=this.value"><option value="">– neuer Kunde –</option>${custOpts}</select></div>
-      <div><label class="lbl">… oder neuer Kundenname</label><input id="afmNewName" value="${esc(afmDraft.newName||"")}" oninput="afmDraft.newName=this.value" placeholder="Name eintragen"></div>
+      <div><label class="lbl">Bestehender Kunde</label><select id="afmCustomer" onchange="afmDraft.customerId=this.value;scheduleAufmassAutosave('customer',true)"><option value="">– neuer Kunde –</option>${custOpts}</select></div>
+      <div><label class="lbl">… oder neuer Kundenname</label><input id="afmNewName" value="${esc(afmDraft.newName||"")}" oninput="afmDraft.newName=this.value;scheduleAufmassAutosave('newname')" placeholder="Name eintragen"></div>
     </div>
     <div style="margin-bottom:12px">
       <label class="lbl">Leistungsart</label>
@@ -3439,7 +3649,7 @@ function renderAufmass(){
       <div><span style="color:var(--muted);font-size:12px">${totalLabel2}</span><div style="font-size:26px;font-weight:900;color:#f4ede4" id="afmTotalSkirt">0,00</div></div>
     </div>
     <div class="btn-row">
-      <button class="btn ghost" onclick="if(confirm('Aufmaß verwerfen?')){resetAfmDraft();showSection('aufmass');}">Verwerfen</button>
+      <button class="btn ghost" onclick="afmDiscardCurrent()">Verwerfen</button>
       <button class="btn primary" onclick="saveAfmass()">✓ Aufmaß speichern</button>
     </div>
   </div>`;
