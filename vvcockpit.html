@@ -377,6 +377,16 @@ function val(id){ const e=document.getElementById(id); return e?e.value.trim():"
 function setVal(id,v){ const e=document.getElementById(id); if(e) e.value=v||""; }
 function byId(id){ return document.getElementById(id); }
 function parseNum(s){ const n=parseFloat(String(s).replace(",",".")); return isNaN(n)?0:n; }
+/* Beträge in deutscher UND englischer Schreibweise: 750 | 750,00 | 750.00 | 1.250,50 | 1.250.000 */
+function parseMoneyDe(s){
+  s=String(s==null?"":s).trim().replace(/[€\s]/g,"");
+  if(!s) return 0;
+  if(s.indexOf(",")>=0){ s=s.replace(/\./g,"").replace(",","."); }          // 1.250,50 -> 1250.50
+  else if((s.match(/\./g)||[]).length>1){ s=s.replace(/\./g,""); }          // 1.250.000 -> 1250000
+  const n=parseFloat(s); return isNaN(n)?0:n;
+}
+/* Zahl -> Eingabefeld-Format (deutsches Komma, ohne €) */
+function moneyInputDe(n){ n=Number(n); return isFinite(n)&&n!==0 ? n.toFixed(2).replace(".",",") : ""; }
 
 function normalizeData(){
   ["leads","customers","measurements","projects","mileage","offers","invoices",
@@ -2204,13 +2214,15 @@ function offerUnitCell(it){
   if(it.priceMode==="nicht_enthalten") return "nicht enthalten";
   if(it.priceMode==="auf_anfrage") return "auf Anfrage";
   if(it.priceMode==="inklusive_0") return "0,00 €";
+  if(it.priceMode==="gesamt"||it.calculationMode==="direct_total") return Number(it.unitPrice||0)>0?money(it.unitPrice):"–";
   return money(it.unitPrice||0);
 }
 function offerLineCell(it){
   if(it.priceMode==="nicht_enthalten") return "nicht enthalten";
   if(it.priceMode==="auf_anfrage") return "auf Anfrage";
   if(it.priceMode==="inklusive_0") return "0,00 €";
-  const lt=it.lineTotal!=null?it.lineTotal:(Number(it.qty||0)*Number(it.unitPrice||0));
+  const direct=(it.priceMode==="gesamt"||it.calculationMode==="direct_total");
+  const lt=it.lineTotal!=null?it.lineTotal:(direct?Number(it.directTotal||0):(Number(it.qty||0)*Number(it.unitPrice||0)));
   return money(lt);
 }
 const OFFER_TEMPLATE_CSS = `
@@ -2275,6 +2287,13 @@ function offerFooterHTML(s, lastNote){
 function renderOfferHTML(offer, customer){
   const s=getSettings();
   customer=customer||{name:offer.customerName||""};
+  // Manuelles Angebot (ohne Kundenkartei): Empfängerdaten aus dem Angebot selbst
+  if(offer.manualCustomer && offer.customerData && typeof offer.customerData==="object"){
+    const md=offer.customerData;
+    customer={ name:md.name||offer.customerName||"",
+      address:[md.street,md.zipCity].filter(Boolean).join(", "),
+      email:md.email||"", phone:md.phone||"" };
+  }
   const logo = s.logo || (typeof VV_DEFAULT_LOGO!=="undefined"?VV_DEFAULT_LOGO:"");
   const items=(offer.items||[]).filter(it=>it && it.visibleInOffer!==false);
   const total=Number(offer.total||0);
@@ -2472,13 +2491,15 @@ function invUnitCell(it){
   if(it.priceMode==="nicht_enthalten") return "nicht enthalten";
   if(it.priceMode==="auf_anfrage") return "auf Anfrage";
   if(it.priceMode==="inklusive_0") return "0,00 EUR";
+  if(it.priceMode==="gesamt"||it.calculationMode==="direct_total") return Number(it.unitPrice||0)>0?eur(it.unitPrice):"–";
   return eur(it.unitPrice||0);
 }
 function invLineCell(it){
   if(it.priceMode==="nicht_enthalten") return "nicht enthalten";
   if(it.priceMode==="auf_anfrage") return "auf Anfrage";
   if(it.priceMode==="inklusive_0") return "0,00 EUR";
-  const lt=it.lineTotal!=null?it.lineTotal:(Number(it.qty||0)*Number(it.unitPrice||0));
+  const direct=(it.priceMode==="gesamt"||it.calculationMode==="direct_total");
+  const lt=it.lineTotal!=null?it.lineTotal:(direct?Number(it.directTotal||0):(Number(it.qty||0)*Number(it.unitPrice||0)));
   return eur(lt);
 }
 /* Anrede dynamisch: Frau/Herr falls bekannt, sonst neutral */
@@ -3148,27 +3169,90 @@ function initItems(containerId, initial){
   const el=byId(containerId); if(!el) return;
   el.innerHTML="";
   (initial||[]).forEach((it,i)=>addItemRow(containerId,it));
+  updateItemsGrandTotal(containerId);
 }
+/* Berechnungsart je Position:
+   - "betrag"   = Menge × Einzelpreis (klassisch)
+   - "gesamt"   = Gesamtbetrag direkt eintragen (Menge/Preis optional)
+   - inklusive_0 / nicht_enthalten / auf_anfrage wie bisher.
+   Alte Positionen ohne den neuen Modus bleiben unverändert kompatibel. */
 function addItemRow(containerId, it){
   it=it||{description:"",qty:"",unit:"Pausch.",unitPrice:"",priceMode:"betrag"};
+  // Migration alter Daten: vorhandenes lineTotal ohne Menge/Preis -> als Direktbetrag interpretieren
+  let pm=it.priceMode||"betrag";
+  if(it.calculationMode==="direct_total") pm="gesamt";
+  const directVal = pm==="gesamt" ? (it.directTotal!=null?it.directTotal:(it.lineTotal!=null?it.lineTotal:"")) : "";
   const el=byId(containerId); if(!el) return;
-  const idx = el.children.length;
   const d=document.createElement("div"); d.className="item-row";
   d.innerHTML=`
     <div><label class="lbl">Leistung</label><input data-f="description" value="${esc(it.description||"")}" oninput="calcLineTotal(this)"></div>
+    <div><label class="lbl">Berechnung</label><select data-f="priceMode" onchange="calcLineTotal(this)">${[["betrag","Menge × Einzelpreis"],["gesamt","Gesamtbetrag direkt"],["inklusive_0","0,00 € (inklusive)"],["nicht_enthalten","nicht enthalten"],["auf_anfrage","auf Anfrage"]].map(([v,l])=>`<option value="${v}" ${pm===v?"selected":""}>${l}</option>`).join("")}</select></div>
     <div><label class="lbl">Menge</label><input data-f="qty" value="${esc(it.qty??"")}" inputmode="decimal" oninput="calcLineTotal(this)"></div>
     <div><label class="lbl">Einheit</label><input data-f="unit" value="${esc(it.unit||"Pausch.")}"></div>
-    <div><label class="lbl">Preis (€)</label><input data-f="unitPrice" value="${esc(it.unitPrice??"")}" inputmode="decimal" oninput="calcLineTotal(this)"></div>
-    <div><label class="lbl">Modus</label><select data-f="priceMode">${[["betrag","Betrag"],["inklusive_0","0,00 €"],["nicht_enthalten","nicht enthalten"],["auf_anfrage","auf Anfrage"]].map(([v,l])=>`<option value="${v}" ${it.priceMode===v?"selected":""}>${l}</option>`).join("")}</select></div>
-    <button type="button" class="btn red sm" style="align-self:flex-end;margin-bottom:2px" onclick="this.closest('.item-row').remove()">×</button>`;
+    <div><label class="lbl">Einzelpreis (€)</label><input data-f="unitPrice" value="${esc(it.unitPrice??"")}" inputmode="decimal" oninput="calcLineTotal(this)"></div>
+    <div><label class="lbl">Gesamt (€)</label><input data-f="directTotal" value="${esc(directVal===0?"0":(directVal||""))}" inputmode="decimal" placeholder="z. B. 750,00" oninput="calcLineTotal(this)"></div>
+    <div style="align-self:flex-end;min-width:92px;text-align:right"><label class="lbl">Summe</label><b class="item-sum" style="display:block;padding:6px 0">–</b></div>
+    <button type="button" class="btn sm ghost" title="Position duplizieren" style="align-self:flex-end;margin-bottom:2px" onclick="dupItemRow(this)">⧉</button>
+    <button type="button" class="btn red sm" style="align-self:flex-end;margin-bottom:2px" onclick="const c=this.closest('.item-row').parentElement.id;this.closest('.item-row').remove();updateItemsGrandTotal(c)">×</button>`;
   el.appendChild(d);
+  itemRowSync(d);
 }
-function calcLineTotal(inp){}
+function dupItemRow(btn){
+  const row=btn.closest(".item-row"); if(!row) return;
+  const cid=row.parentElement.id;
+  const g=f=>{ const e=row.querySelector(`[data-f="${f}"]`); return e?e.value:""; };
+  addItemRow(cid,{description:g("description"),qty:g("qty"),unit:g("unit"),unitPrice:g("unitPrice"),priceMode:g("priceMode"),directTotal:g("directTotal"),calculationMode:g("priceMode")==="gesamt"?"direct_total":"quantity_unit_price"});
+  updateItemsGrandTotal(cid);
+}
+/* Eine Positionszeile durchrechnen + UI-Zustand (Direktbetrag hervorheben) */
+function itemRowSync(row){
+  if(!row) return;
+  const q=f=>row.querySelector(`[data-f="${f}"]`);
+  const pm=(q("priceMode")&&q("priceMode").value)||"betrag";
+  const qtyEl=q("qty"), upEl=q("unitPrice"), dtEl=q("directTotal"), sumEl=row.querySelector(".item-sum");
+  const direct=pm==="gesamt";
+  const excluded=(pm==="nicht_enthalten"||pm==="auf_anfrage");
+  if(dtEl){
+    dtEl.readOnly=!direct;
+    dtEl.style.background=direct?"rgba(212,161,90,.14)":"transparent";
+    dtEl.style.borderColor=direct?"var(--gold)":"";
+    dtEl.style.opacity=excluded?".4":"1";
+    if(!direct){ // berechneten Wert anzeigen (nur Anzeige)
+      const t=pm==="betrag"?r2(parseMoneyDe(qtyEl&&qtyEl.value)*parseMoneyDe(upEl&&upEl.value)):0;
+      dtEl.value=excluded?"":moneyInputDe(t);
+    }
+  }
+  [qtyEl,upEl].forEach(e=>{ if(e){ e.style.opacity=(direct||excluded)?".5":"1"; e.placeholder=(direct?"optional":""); } });
+  let total=0, txt="–";
+  if(pm==="betrag"){ total=r2(parseMoneyDe(qtyEl&&qtyEl.value)*parseMoneyDe(upEl&&upEl.value)); txt=money(total); }
+  else if(pm==="gesamt"){ total=r2(parseMoneyDe(dtEl&&dtEl.value)); txt=money(total); }
+  else if(pm==="inklusive_0"){ txt="0,00 €"; }
+  if(sumEl) sumEl.textContent=txt;
+  return total;
+}
+function calcLineTotal(inp){
+  const row=inp&&inp.closest?inp.closest(".item-row"):null; if(!row) return;
+  itemRowSync(row);
+  updateItemsGrandTotal(row.parentElement&&row.parentElement.id);
+}
+/* Untere Gesamtsumme (Element-Id: <container>_grand) live aktualisieren */
+function updateItemsGrandTotal(containerId){
+  if(!containerId) return;
+  const el=byId(containerId+"_grand");
+  if(el){ el.textContent=money(sumItems(getItems(containerId))); }
+  if(containerId==="of_items"){ try{ offerDepPreview(); }catch(e){} }
+}
 function getItems(containerId){
   return [...byId(containerId).querySelectorAll(".item-row")].map(row=>{
     const g=f=>{ const el=row.querySelector(`[data-f="${f}"]`); return el?el.value:""; };
-    const qty=parseNum(g("qty")),up=parseNum(g("unitPrice")),pm=g("priceMode");
-    return {description:g("description"),qty:g("qty")?qty:"",unit:g("unit"),unitPrice:up,priceMode:pm||"betrag",lineTotal:r2(qty*up)};
+    const qty=parseMoneyDe(g("qty")), up=parseMoneyDe(g("unitPrice")), pm=g("priceMode")||"betrag";
+    const direct=(pm==="gesamt");
+    const dt=parseMoneyDe(g("directTotal"));
+    const lineTotal = direct ? r2(dt) : r2(qty*up);
+    return {description:g("description"), qty:g("qty")?qty:"", unit:g("unit"), unitPrice:up,
+      priceMode:pm, directTotal:direct?r2(dt):null,
+      calculationMode:direct?"direct_total":"quantity_unit_price",
+      lineTotal};
   });
 }
 function sumItems(items){ return r2(items.filter(it=>!["nicht_enthalten","auf_anfrage"].includes(it.priceMode)).reduce((s,it)=>s+Number(it.lineTotal||0),0)); }
@@ -3981,6 +4065,47 @@ function globalDocUpload(type,files){
   uploadCustomerDoc(cid,type,files); // öffnet danach die Kundenakte mit der Datei
 }
 
+/* Kundenzuordnung: Kartei-Kunde ODER komplett manuell (ohne Kundenkartei) */
+function offerCustModeFieldsHTML(o, custOpts){
+  o=o||{};
+  const mode=o.manualCustomer?"manual":"kartei";
+  const md=(o.customerData&&typeof o.customerData==="object")?o.customerData:{};
+  return `
+    <div class="fg c3">
+      <div><label class="lbl">Kundenzuordnung</label><select id="of_custmode" onchange="offerCustModeSync()">
+        <option value="kartei" ${mode==="kartei"?"selected":""}>Kunde aus Kundenkartei</option>
+        <option value="manual" ${mode==="manual"?"selected":""}>Angebot manuell erstellen (ohne Kundenkartei)</option>
+      </select></div>
+      <div id="of_custwrap" style="${mode==="manual"?"display:none":""}"><label class="lbl">Kunde</label><select id="of_cust"><option value="">– wählen –</option>${custOpts}</select></div>
+      <div><label class="lbl">Angebotsnummer</label><input id="of_number" value="${esc(o.number||"")}" placeholder="leer = automatisch (VV-${new Date().getFullYear()}-…)"></div>
+    </div>
+    <div id="of_manualfields" style="${mode==="manual"?"":"display:none"};border:1px dashed var(--gold3);border-radius:var(--r2);padding:10px;margin-bottom:10px">
+      <p style="color:var(--muted);font-size:12px;margin:0 0 8px">Manuelles Angebot: Der Kunde muss <b>nicht</b> in der Kundenkartei existieren.</p>
+      <div class="fg c3">
+        <div><label class="lbl">Kundenname / Auftraggeber</label><input id="of_mname" value="${esc(md.name||o.customerName||"")}" placeholder="z. B. Familie Janssen"></div>
+        <div><label class="lbl">Straße / Hausnummer (optional)</label><input id="of_mstreet" value="${esc(md.street||"")}"></div>
+        <div><label class="lbl">PLZ / Ort (optional)</label><input id="of_mzip" value="${esc(md.zipCity||"")}"></div>
+      </div>
+      <div class="fg c2">
+        <div><label class="lbl">E-Mail (optional)</label><input id="of_memail" value="${esc(md.email||"")}"></div>
+        <div><label class="lbl">Telefon (optional)</label><input id="of_mphone" value="${esc(md.phone||"")}"></div>
+      </div>
+    </div>`;
+}
+function offerCustModeSync(){
+  const manual=val("of_custmode")==="manual";
+  const w=byId("of_custwrap"), m=byId("of_manualfields");
+  if(w) w.style.display=manual?"none":"";
+  if(m) m.style.display=manual?"":"none";
+}
+/* Untere Gesamtsumme im Formular (live aus den Positionen) */
+function offerGrandTotalHTML(){
+  return `<div style="display:flex;justify-content:flex-end;margin-top:10px">
+    <div style="text-align:right;border-top:2px solid var(--gold3);padding-top:8px;min-width:260px">
+      <div style="font-size:18px;font-weight:900">Gesamtsumme: <span id="of_items_grand">0,00 €</span></div>
+      <div style="font-size:11.5px;color:var(--muted)">Gemäß § 19 UStG wird keine Umsatzsteuer berechnet.</div>
+    </div></div>`;
+}
 function openNewOfferForm(draft){
   _editingOfferId=null;
   const preCid=draft&&draft.customerId?draft.customerId:"";
@@ -3991,15 +4116,16 @@ function openNewOfferForm(draft){
     <input type="hidden" id="of_measurementId" value="${esc(draft?.measurementId||"")}">
     <input type="hidden" id="of_materialCalcId" value="${esc(draft?.materialCalcId||"")}">
     <input type="hidden" id="of_priceCalcId" value="${esc(draft?.priceCalcId||"")}">
-    <div class="fg c3">
-      <div><label class="lbl">Kunde</label><select id="of_cust"><option value="">– wählen –</option>${custOpts}</select></div>
+    ${offerCustModeFieldsHTML({}, custOpts)}
+    <div class="fg c2">
       <div><label class="lbl">Datum</label><input id="of_date" type="date" value="${today()}"></div>
       <div><label class="lbl">Status</label><select id="of_status">${["Entwurf","Gesendet","Angenommen","Abgelehnt"].map(s=>`<option>${s}</option>`).join("")}</select></div>
     </div>
-    <div><label class="lbl">Projekt / Bezeichnung</label><input id="of_project" placeholder="z. B. Bodenverlegung Wohnzimmer"></div>
+    <div><label class="lbl">Projekt / Bezeichnung / Betreff</label><input id="of_project" placeholder="z. B. Bodenverlegung Wohnzimmer"></div>
     <h3>Positionen</h3>
     <div id="of_items"></div>
-    <button class="btn sm" onclick="addItemRow('of_items')">+ Position</button>
+    <button class="btn sm" onclick="addItemRow('of_items');updateItemsGrandTotal('of_items')">+ Position</button>
+    ${offerGrandTotalHTML()}
     ${offerDepositFieldsHTML({})}
     ${offerDocFieldsHTML({})}
     <div><label class="lbl" style="margin-top:10px">Hinweise</label><textarea id="of_notes"></textarea></div>
@@ -4018,8 +4144,8 @@ function editOffer(id){
   const el=byId("offerFormArea"); if(!el) return;
   el.innerHTML=`<div class="panel" id="offerForm" style="margin-top:14px">
     <h3>Angebot ${esc(o.number)} bearbeiten</h3>
-    <div class="fg c3">
-      <div><label class="lbl">Kunde</label><select id="of_cust"><option value="">– wählen –</option>${custOpts}</select></div>
+    ${offerCustModeFieldsHTML(o, custOpts)}
+    <div class="fg c2">
       <div><label class="lbl">Datum</label><input id="of_date" type="date" value="${esc(o.date||today())}"></div>
       <div><label class="lbl">Status</label><select id="of_status">${["Entwurf","Gesendet","Angenommen","Abgelehnt"].map(s=>`<option ${o.status===s?"selected":""}>${s}</option>`).join("")}</select></div>
     </div>
@@ -4028,7 +4154,8 @@ function editOffer(id){
     <input type="hidden" id="of_materialCalcId" value="${esc(o.materialCalcId||"")}">
     <input type="hidden" id="of_priceCalcId" value="${esc(o.priceCalcId||"")}">
     <h3>Positionen</h3><div id="of_items"></div>
-    <button class="btn sm" onclick="addItemRow('of_items')">+ Position</button>
+    <button class="btn sm" onclick="addItemRow('of_items');updateItemsGrandTotal('of_items')">+ Position</button>
+    ${offerGrandTotalHTML()}
     ${offerDepositFieldsHTML(o)}
     ${offerDocFieldsHTML(o)}
     <div><label class="lbl" style="margin-top:10px">Hinweise</label><textarea id="of_notes">${esc(o.notes||"")}</textarea></div>
@@ -4037,14 +4164,32 @@ function editOffer(id){
   offerDepPreview();
 }
 function saveOffer(){
-  const id=_editingOfferId; const cid=val("of_cust"); const c=data.customers.find(x=>x.id===cid);
+  const id=_editingOfferId;
+  const manual=(val("of_custmode")==="manual");
+  let cid = manual ? "" : val("of_cust");
+  const c=data.customers.find(x=>x.id===cid);
   const items=getItems("of_items"); const total=sumItems(items);
+  // Validierung: sinnvoll, aber nicht zu hart
+  if(!items.length){ alert("Bitte mindestens eine Angebotsposition hinzufügen."); return; }
+  if(total<=0 && !confirm("Die Gesamtsumme beträgt 0,00 €. Trotzdem speichern?")) return;
+  let customerName="", customerData=null;
+  if(manual){
+    customerName=String(val("of_mname")||"").trim();
+    customerData={ name:customerName, street:String(val("of_mstreet")||"").trim(),
+      zipCity:String(val("of_mzip")||"").trim(), email:String(val("of_memail")||"").trim(),
+      phone:String(val("of_mphone")||"").trim() };
+    if(!customerName && !confirm("Angebot ohne Kundennamen speichern?")) return;
+  } else {
+    customerName=c?c.name:"";
+    if(!cid && !confirm("Dieses Angebot ist keinem Kunden aus der Kundenkartei zugeordnet. Trotzdem speichern?")) return;
+  }
   // Anzahlung berechnen
   const depMode=val("of_depmode")||"percent";
   const depPct=parseNum(val("of_deppct"));
   let depAmount = depMode==="amount" ? parseNum(val("of_depamount")) : r2(total*depPct/100);
   if(depAmount>total) depAmount=total;
-  const base={customerId:cid,customerName:c?c.name:"",date:val("of_date"),status:val("of_status"),
+  const base={customerId:cid||null,customerName,manualCustomer:manual,customerData:manual?customerData:null,
+    date:val("of_date"),status:val("of_status"),
     project:val("of_project"),notes:val("of_notes"),items,total,
     depositMode:depMode, depositPercent:depPct, depositAmount:r2(depAmount),
     depositDueDate:val("of_depdue"), restDueDate:val("of_restdue"), validityDays:parseNum(val("of_validity"))||30,
@@ -4055,9 +4200,10 @@ function saveOffer(){
     includeWiderrufForm: byId("of_widerrufform")?byId("of_widerrufform").checked:true,
     includeSignature: byId("of_signature")?byId("of_signature").checked:true,
     updatedAt:nowISO()};
+  const manualNumber=String(val("of_number")||"").trim();
   let oid;
-  if(id){ const ex=data.offers.find(o=>o.id===id)||{}; Object.assign(ex,base); oid=id; }
-  else { const no={id:uid(),number:nextOfferNumber(),depositPaid:0,createdAt:nowISO(),...base}; data.offers.push(no); oid=no.id;
+  if(id){ const ex=data.offers.find(o=>o.id===id)||{}; Object.assign(ex,base); if(manualNumber) ex.number=manualNumber; oid=id; }
+  else { const no={id:uid(),number:manualNumber||nextOfferNumber(),depositPaid:0,createdAt:nowISO(),...base}; data.offers.push(no); oid=no.id;
     if(cid) addTimeline(cid,"Angebot erstellt", no.number+" · "+money(total), {type:"offer",id:no.id}); }
   if(cid) refreshCustomerStage(cid);
   _editingOfferId=null; saveAll(false); showSection("angebote");
