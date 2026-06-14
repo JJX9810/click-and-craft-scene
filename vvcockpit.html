@@ -422,6 +422,8 @@ function normalizeData(){
   if(!data.openItemOverrides || typeof data.openItemOverrides!=="object" || Array.isArray(data.openItemOverrides)) data.openItemOverrides={};
   if(!data.counters || typeof data.counters!=="object" || Array.isArray(data.counters)) data.counters={};
   if(!data.meta || typeof data.meta!=="object" || Array.isArray(data.meta)) data.meta={};
+  // WhatsApp-Datenmodell pro Kunde sicherstellen (ohne Einwilligung zu erfinden)
+  if(typeof vvEnsureCustomerWhatsApp==="function"){ (data.customers||[]).forEach(c=>{ try{ vvEnsureCustomerWhatsApp(c); }catch(e){} }); }
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -1884,13 +1886,15 @@ const SETTINGS_DEFAULTS = {
   iban:"",
   legal:"Gemäß § 19 UStG wird keine Umsatzsteuer berechnet.",
   taxReserve:35,
-  defaultDepositPercent:40
+  defaultDepositPercent:40,
+  whatsappWorkerUrl:""   /* nur die öffentliche Worker-URL (kein Secret) – leer = manueller Fallback */
 };
 /* Zuordnung Einstellungsfeld → Settings-Schlüssel */
 const SETTINGS_FIELDMAP = {
   setCompany:"company", setOwner:"owner", setAddress:"address", setPhone:"phone",
   setMail:"email", setWeb:"web", setTax:"tax", setIban:"iban",
-  setLegal:"legal", setTaxReserve:"taxReserve", setDepositPct:"defaultDepositPercent"
+  setLegal:"legal", setTaxReserve:"taxReserve", setDepositPct:"defaultDepositPercent",
+  setWaWorker:"whatsappWorkerUrl"
 };
 
 /* getSettings():
@@ -3630,6 +3634,25 @@ function openCrmForm(c){
       <div><label class="lbl">Nächster Schritt</label><input id="cf_next" value="${esc(c.nextStep||"")}"></div>
     </div>
     <div><label class="lbl">Notiz</label><textarea id="cf_note">${esc(c.note||"")}</textarea></div>
+    ${(function(){ const w=(c.whatsapp&&typeof c.whatsapp==="object")?c.whatsapp:{};
+      const src=String(w.optInSource||"");
+      const opt=[["","– nicht dokumentiert –"],["schriftlich","schriftlich"],["mündlich","mündlich"],["Kundenanfrage über WhatsApp","Kundenanfrage über WhatsApp"],["bestehender Chat","bestehender Chat"],["sonstige","sonstige"]];
+      const pref=String(w.preferredChannel||"whatsapp");
+      const prefOpt=[["whatsapp","WhatsApp"],["email","E-Mail"],["telefon","Telefon"],["sms","SMS"]];
+      return `<div class="divider"></div><h3>🟢 WhatsApp / Kommunikation</h3>
+    <div class="fg c2">
+      <div><label class="lbl">WhatsApp-Nummer</label><input id="cf_wanum" value="${esc(w.number||c.phone||"")}" placeholder="z. B. 0151 23456789"></div>
+      <div><label class="lbl">WhatsApp-Kommunikation erlaubt</label><select id="cf_waenabled"><option value="nein" ${w.enabled?"":"selected"}>Nein</option><option value="ja" ${w.enabled?"selected":""}>Ja</option></select></div>
+    </div>
+    <div class="fg c3">
+      <div><label class="lbl">Einwilligung (Opt-in) erteilt</label><select id="cf_waoptin"><option value="nein" ${w.optIn?"":"selected"}>Nein</option><option value="ja" ${w.optIn?"selected":""}>Ja</option></select></div>
+      <div><label class="lbl">Datum der Einwilligung</label><input id="cf_waoptdate" type="date" value="${esc((w.optInDate||"").slice(0,10))}"></div>
+      <div><label class="lbl">Herkunft der Einwilligung</label><select id="cf_waoptsrc">${opt.map(([v,la])=>`<option value="${esc(v)}" ${src===v?"selected":""}>${esc(la)}</option>`).join("")}</select></div>
+    </div>
+    <div class="fg c2">
+      <div><label class="lbl">Bevorzugter Kanal</label><select id="cf_wapref">${prefOpt.map(([v,la])=>`<option value="${v}" ${pref===v?"selected":""}>${la}</option>`).join("")}</select></div>
+      <div style="align-self:end;color:var(--muted);font-size:11.5px">Ohne dokumentierte Einwilligung erfolgt <b>kein</b> automatischer WhatsApp-Versand. Der manuelle Versand (du sendest selbst) bleibt möglich.</div>
+    </div>`; })()}
     <div class="btn-row">
       ${c.id?`<button class="btn red" onclick="customerDeleteChoice('${c.id}')">Löschen / Archivieren</button>`:""}
       <button class="btn ghost" onclick="byId('crmForm').innerHTML=''">Abbrechen</button>
@@ -3697,8 +3720,26 @@ function saveCustomer(){
   const id=val("cf_id"); const name=val("cf_name");
   if(!name){alert("Name ist Pflicht.");return;}
   const fields={name,anrede:val("cf_anrede"),phone:val("cf_phone"),email:val("cf_email"),service:val("cf_service"),address:val("cf_address"),source:val("cf_source"),status:val("cf_status"),nextStep:val("cf_next"),note:val("cf_note"),updatedAt:nowISO()};
-  if(id){ Object.assign(data.customers.find(c=>c.id===id)||{},fields); }
-  else { const nc={id:uid(),createdAt:nowISO(),...fields}; data.customers.push(nc); addTimeline(nc.id,"Kunde angelegt",nc.name); }
+  // WhatsApp-/Einwilligungsdaten zusammenstellen (Einwilligung wird NUR übernommen, wenn ausdrücklich „Ja“)
+  const waNumRaw = val("cf_wanum");
+  const waOptIn  = (byId("cf_waoptin") && byId("cf_waoptin").value==="ja");
+  const buildWa = (prev)=>{
+    prev = (prev&&typeof prev==="object")?prev:{};
+    const optDate = val("cf_waoptdate");
+    return {
+      number: waNumRaw,
+      normalizedNumber: (typeof vvNormalizePhoneE164==="function" ? (vvNormalizePhoneE164(waNumRaw)||"") : ""),
+      enabled: (byId("cf_waenabled") && byId("cf_waenabled").value==="ja"),
+      optIn: waOptIn,
+      optInDate: waOptIn ? (optDate ? optDate+"T00:00:00.000Z" : (prev.optInDate||nowISO())) : null,
+      optInSource: waOptIn ? (val("cf_waoptsrc")||prev.optInSource||"") : (val("cf_waoptsrc")||""),
+      lastInboundAt: prev.lastInboundAt||null,
+      lastOutboundAt: prev.lastOutboundAt||null,
+      preferredChannel: (byId("cf_wapref") && byId("cf_wapref").value) || prev.preferredChannel || "whatsapp"
+    };
+  };
+  if(id){ const ex=data.customers.find(c=>c.id===id)||{}; const hadOptIn=ex.whatsapp&&ex.whatsapp.optIn; Object.assign(ex,fields); if(byId("cf_wanum")){ ex.whatsapp=buildWa(ex.whatsapp); if(ex.whatsapp.optIn && !hadOptIn){ try{ addTimeline(ex.id,"WhatsApp-Einwilligung dokumentiert", (ex.whatsapp.optInSource||"")); }catch(e){} } } }
+  else { const nc={id:uid(),createdAt:nowISO(),...fields}; if(byId("cf_wanum")) nc.whatsapp=buildWa(null); data.customers.push(nc); addTimeline(nc.id,"Kunde angelegt",nc.name); }
   saveAll(false); showSection("crm");
 }
 function deleteCustomer(id){ if(!confirm("Diesen Kunden wirklich löschen?"))return; data.customers=data.customers.filter(c=>c.id!==id); saveAll(false); showSection("crm"); }
@@ -6173,8 +6214,8 @@ async function callLocalAI(agentType, payload){
    Ollama erkennt NUR die Absicht (JSON). Die Ausführung passiert
    ausschließlich im Cockpit-Code. Ollama speichert/löscht NICHTS.
    ========================================================== */
-const NX_ALLOWED_INTENTS = ["navigate","open_items_summary","finance_summary","search_customer","create_customer_draft","create_booking_draft","create_offer_draft","create_invoice_draft","project_summary","marketing_draft","open_agent","system_action","stop_speaking","confirm_action","cancel_action","mark_open_item_paid_draft","delete_open_items_draft","publish_marketing_draft","unknown"];
-const NX_ALLOWED_TOOLS = ["navigateTo","getOpenPositionsSummary","getFinanceSummary","searchCustomer","createCustomerDraft","createBookingDraft","createOfferDraft","createInvoiceDraft","getProjectSummary","createMarketingDraft","publishMarketingDraft","openAgent","stopSpeaking","confirmPendingAction","cancelPendingAction","markOpenItemPaidDraft","deleteOpenItemsDraft","askClarifyingQuestion"];
+const NX_ALLOWED_INTENTS = ["navigate","open_items_summary","finance_summary","search_customer","create_customer_draft","create_booking_draft","create_offer_draft","create_invoice_draft","project_summary","marketing_draft","open_agent","system_action","stop_speaking","confirm_action","cancel_action","mark_open_item_paid_draft","delete_open_items_draft","publish_marketing_draft","create_offer_whatsapp_draft","create_invoice_whatsapp_draft","send_existing_offer_whatsapp_draft","send_existing_invoice_whatsapp_draft","prepare_whatsapp_document","confirm_whatsapp_send","cancel_whatsapp_send","whatsapp_customer_lookup","whatsapp_manual_fallback","whatsapp_delivery_status","unknown"];
+const NX_ALLOWED_TOOLS = ["navigateTo","getOpenPositionsSummary","getFinanceSummary","searchCustomer","createCustomerDraft","createBookingDraft","createOfferDraft","createInvoiceDraft","getProjectSummary","createMarketingDraft","publishMarketingDraft","openAgent","stopSpeaking","confirmPendingAction","cancelPendingAction","markOpenItemPaidDraft","deleteOpenItemsDraft","askClarifyingQuestion","resolveCustomerForDocument","resolveOfferForCustomer","resolveInvoiceForCustomer","createOfferDraftForWhatsApp","createInvoiceDraftForWhatsApp","sendExistingOfferWhatsApp","sendExistingInvoiceWhatsApp","renderDocumentPdf","prepareWhatsAppDocumentSend","confirmWhatsAppDocumentSend","cancelWhatsAppDocumentSend","openWhatsAppManualFallback","sendWhatsAppDocumentViaWorker","getWhatsAppDeliveryStatus","askWhatsAppClarifyingQuestion"];
 const NX_INTENT_CONF_MIN = 0.75;
 let _nxOllamaErrNotified = false;
 
@@ -6184,9 +6225,10 @@ Du entscheidest nur, welches erlaubte Cockpit-Tool verwendet werden soll.
 
 Antworte AUSSCHLIESSLICH mit gültigem JSON. Keine Markdown-Blöcke. Kein Text außerhalb des JSON. Kein Fließtext.
 
-Erlaubte intents: navigate, open_items_summary, finance_summary, search_customer, create_customer_draft, create_booking_draft, create_offer_draft, create_invoice_draft, project_summary, marketing_draft, open_agent, system_action, stop_speaking, confirm_action, cancel_action, mark_open_item_paid_draft, delete_open_items_draft, unknown.
+Erlaubte intents: navigate, open_items_summary, finance_summary, search_customer, create_customer_draft, create_booking_draft, create_offer_draft, create_invoice_draft, project_summary, marketing_draft, open_agent, system_action, stop_speaking, confirm_action, cancel_action, mark_open_item_paid_draft, delete_open_items_draft, create_offer_whatsapp_draft, create_invoice_whatsapp_draft, send_existing_offer_whatsapp_draft, send_existing_invoice_whatsapp_draft, prepare_whatsapp_document, confirm_whatsapp_send, cancel_whatsapp_send, whatsapp_customer_lookup, whatsapp_manual_fallback, whatsapp_delivery_status, unknown.
 
-Erlaubte tools (genau einen wählen): navigateTo, getOpenPositionsSummary, getFinanceSummary, searchCustomer, createCustomerDraft, createBookingDraft, createOfferDraft, createInvoiceDraft, getProjectSummary, createMarketingDraft, openAgent, stopSpeaking, confirmPendingAction, cancelPendingAction, markOpenItemPaidDraft, deleteOpenItemsDraft, askClarifyingQuestion.
+Erlaubte tools (genau einen wählen): navigateTo, getOpenPositionsSummary, getFinanceSummary, searchCustomer, createCustomerDraft, createBookingDraft, createOfferDraft, createInvoiceDraft, getProjectSummary, createMarketingDraft, openAgent, stopSpeaking, confirmPendingAction, cancelPendingAction, markOpenItemPaidDraft, deleteOpenItemsDraft, askClarifyingQuestion, resolveCustomerForDocument, resolveOfferForCustomer, resolveInvoiceForCustomer, createOfferDraftForWhatsApp, createInvoiceDraftForWhatsApp, sendExistingOfferWhatsApp, sendExistingInvoiceWhatsApp, renderDocumentPdf, prepareWhatsAppDocumentSend, confirmWhatsAppDocumentSend, cancelWhatsAppDocumentSend, openWhatsAppManualFallback, sendWhatsAppDocumentViaWorker, getWhatsAppDeliveryStatus, askWhatsAppClarifyingQuestion.
+KEINE anderen als die hier gelisteten Tools verwenden – unbekannte Tools werden nicht ausgeführt.
 
 Wichtiges Cockpit-Wissen (V&V-Begriffe):
 - "offene Positionen" bedeutet im V&V-Cockpit IMMER offene Posten, offene Forderungen, unbezahlte Rechnungen oder Außenstände (Buchhaltung, Seite "openitems") – NICHT offene Stellen/Jobs. Nur bei eindeutigem Personal-Kontext (Stellenanzeige, Bewerbung, einstellen) als Stelle interpretieren.
@@ -6195,6 +6237,7 @@ Wichtiges Cockpit-Wissen (V&V-Begriffe):
 - Will der Nutzer offene Posten LÖSCHEN/entfernen/wegmachen: intent=delete_open_items_draft, tool=askClarifyingQuestion, requiresConfirmation=true, requiresStrongConfirmation=true, clarifyingQuestion="Meinst du wirklich löschen oder nur als bezahlt/erledigt markieren? Löschen entfernt Datensätze dauerhaft."
 - Datenlöschung ist kritisch und braucht ausdrückliche Bestätigung. Massenlöschung ("alle", "sämtliche", "komplett") braucht starke Bestätigung ("Ja, endgültig löschen") -> requiresStrongConfirmation=true.
 - "zurücksetzen" ist sehr gefährlich -> nie direkt, immer Rückfrage. "veröffentlichen" ist extern -> nie ohne Bestätigung.
+- WhatsApp-Versand von Angebot/Rechnung: "erstelle für X ein Angebot und schick es per WhatsApp" -> intent=create_offer_whatsapp_draft, tool=createOfferDraftForWhatsApp; bei Rechnung create_invoice_whatsapp_draft/createInvoiceDraftForWhatsApp. "schick X das (zuletzt erstellte) Angebot/Rechnung per WhatsApp" oder "sende Rechnung 2026-004 an den Kunden" -> send_existing_offer_whatsapp_draft/sendExistingOfferWhatsApp bzw. send_existing_invoice_whatsapp_draft/sendExistingInvoiceWhatsApp. IMMER requiresConfirmation=true und requiresStrongConfirmation=true; entities.customerName, entities.documentType ("offer"/"invoice"), entities.documentId/Nummer falls genannt. NIEMALS Positionen/Preise/Telefonnummern erfinden. Der Versand passiert NIE allein durch die KI – nur lokale Bestätigung "Ja, per WhatsApp senden".
 - Nutze zusätzlich glossaryHints, pageHints, toolHints, safetyRules und matchedConcepts aus dem mitgesendeten KONTEXT-JSON. Wenn matchedConcepts einen Begriff enthält, übernimm dessen Intent/Tool/Seite, sofern der Befehl nichts anderes verlangt.
 
 Antwortformat (immer alle Felder):
@@ -6205,6 +6248,8 @@ User: "wer schuldet mir noch Geld" -> {"intent":"open_items_summary","tool":"get
 User: "öffne offene Positionen" -> {"intent":"navigate","tool":"navigateTo","confidence":0.95,"requiresConfirmation":false,"requiresStrongConfirmation":false,"entities":{"customerName":null,"amount":null,"date":null,"category":null,"service":null,"page":"openitems","target":"offene_posten","actionType":"open"},"spokenResponse":"Ich öffne die offenen Posten.","clarifyingQuestion":null}
 User: "lösche offene Positionen" -> {"intent":"delete_open_items_draft","tool":"askClarifyingQuestion","confidence":0.9,"requiresConfirmation":true,"requiresStrongConfirmation":true,"entities":{"customerName":null,"amount":null,"date":null,"category":null,"service":null,"page":"openitems","target":"offene_posten","actionType":"delete"},"spokenResponse":"","clarifyingQuestion":"Meinst du wirklich löschen oder nur als bezahlt/erledigt markieren? Löschen entfernt Datensätze dauerhaft."}
 User: "markiere die Rechnung von Müller als bezahlt" -> {"intent":"mark_open_item_paid_draft","tool":"markOpenItemPaidDraft","confidence":0.9,"requiresConfirmation":true,"requiresStrongConfirmation":false,"entities":{"customerName":"Müller","amount":null,"date":null,"category":null,"service":null,"page":"openitems","target":"offene_posten","actionType":"mark_paid"},"spokenResponse":"Ich bereite vor, den offenen Posten von Müller als bezahlt zu markieren.","clarifyingQuestion":null}
+User: "Nexus, erstelle für Katrin Söllinger ein Angebot und schicke es ihr per WhatsApp." -> {"intent":"create_offer_whatsapp_draft","tool":"createOfferDraftForWhatsApp","confidence":0.96,"requiresConfirmation":true,"requiresStrongConfirmation":true,"entities":{"customerName":"Katrin Söllinger","amount":null,"date":null,"category":null,"service":null,"page":"angebote","target":"angebot","actionType":"create_and_send","documentType":"offer","deliveryChannel":"whatsapp"},"spokenResponse":"Ich bereite das Angebot für Katrin Söllinger vor. Vor dem Versand zeige ich dir eine vollständige Vorschau.","clarifyingQuestion":null}
+User: "Nexus, sende die Rechnung 2026-004 an den Kunden per WhatsApp." -> {"intent":"send_existing_invoice_whatsapp_draft","tool":"sendExistingInvoiceWhatsApp","confidence":0.94,"requiresConfirmation":true,"requiresStrongConfirmation":true,"entities":{"customerName":null,"amount":null,"date":null,"category":null,"service":null,"page":"rechnungen","target":"rechnung","actionType":"send","documentType":"invoice","documentId":"2026-004","deliveryChannel":"whatsapp"},"spokenResponse":"Ich bereite die Rechnung 2026-004 für den WhatsApp-Versand vor und zeige dir vorher eine Vorschau.","clarifyingQuestion":null}
 
 Regeln:
 - Kritische Aktionen brauchen IMMER Bestätigung: Buchung speichern, Kunde anlegen, offenen Posten als bezahlt markieren, Rechnung/Angebot finalisieren, Daten löschen/importieren, Nachricht senden, veröffentlichen. Wähle dafür NUR ein Draft-Tool (createCustomerDraft, createBookingDraft, createOfferDraft, createInvoiceDraft, createMarketingDraft, markOpenItemPaidDraft, deleteOpenItemsDraft) und setze requiresConfirmation=true.
@@ -6385,6 +6430,25 @@ function executeIntentResult(ir, context){
     case "stopSpeaking": nxStopSpeaking(); return {handled:true, kind:"Aktion", text:"🔇 Ausgabe gestoppt."};
     case "confirmPendingAction": return {handled:true, kind:"Bestätigung", text: handleNexusCommand("ja", context)};
     case "cancelPendingAction": return {handled:true, kind:"Aktion", text: handleNexusCommand("nein", context)};
+    // WhatsApp-Dokumentversand: Vorbereitung/Versand laufen über die lokalen, sicheren Flows
+    case "createOfferDraftForWhatsApp":
+    case "createInvoiceDraftForWhatsApp":
+    case "sendExistingOfferWhatsApp":
+    case "sendExistingInvoiceWhatsApp":
+    case "resolveCustomerForDocument":
+    case "resolveOfferForCustomer":
+    case "resolveInvoiceForCustomer":
+    case "prepareWhatsAppDocumentSend":
+    case "renderDocumentPdf":
+    case "openWhatsAppManualFallback":
+    case "sendWhatsAppDocumentViaWorker":
+    case "getWhatsAppDeliveryStatus":
+    case "askWhatsAppClarifyingQuestion":
+      return nxWhatsAppFromIntent(ir, context);
+    case "confirmWhatsAppDocumentSend":
+      return {handled:true, kind:"Bestätigung", text:"Bitte bestätige den WhatsApp-Versand ausdrücklich mit „Ja, per WhatsApp senden“."};
+    case "cancelWhatsAppDocumentSend":
+      return {handled:true, kind:"Aktion", text: cancelWhatsAppDocumentSend()};
     default: return {handled:false};
   }
 }
@@ -8443,6 +8507,8 @@ function renderSettings(){
       <div><label class="lbl">Standard-Anzahlung %</label><input id="setDepositPct" inputmode="decimal" value="40"></div>
     </div>
     <div><label class="lbl">Kleinunternehmer-Hinweis (auf Rechnungen)</label><textarea id="setLegal">Gemäß § 19 UStG wird keine Umsatzsteuer berechnet.</textarea></div>
+    <div><label class="lbl">WhatsApp-Worker-URL (optional, nur öffentliche URL – kein Token)</label><input id="setWaWorker" placeholder="z. B. https://vv-whatsapp.<account>.workers.dev"></div>
+    <p style="color:var(--muted);font-size:11.5px;margin:4px 0 0">Leer lassen = manueller WhatsApp-Versand (Link + PDF). Mit gültiger Worker-URL wird automatischer Versand angeboten. Es werden hier <b>niemals</b> Meta-Zugangsdaten gespeichert.</p>
     <div class="btn-row"><button class="btn primary" onclick="saveSettings()">Speichern</button></div>
 
     <div class="divider"></div>
@@ -9462,6 +9528,545 @@ function nxHelpText(){
 }
 function nxCommitBooking(d){ return nxAddBooking({type:d.type, amount:d.amount, partner:d.partner, category:d.category, note:d.note, date:d.date}); }
 
+/* ==========================================================
+   WHATSAPP-DOKUMENTVERSAND (Angebot / Rechnung) – NEXUS
+   ----------------------------------------------------------
+   Sicherheit: Die KI erzeugt nur Intent + Dokumententwurf.
+   Der echte Versand passiert ausschließlich lokal über diese
+   kontrollierten Funktionen und nur nach starker, aktions-
+   spezifischer Bestätigung „Ja, per WhatsApp senden“.
+   Zwei Betriebsarten:
+     • manueller Fallback (sofort nutzbar: wa.me-Link + PDF-Download)
+     • Cloudflare-Worker (vorbereitet, nur wenn Worker-URL gesetzt)
+   Keine Meta-Zugangsdaten im Browser. Telefonnummern werden
+   in Debug-/Statusausgaben nur maskiert gezeigt.
+   ========================================================== */
+let _nxPendingWhatsAppSend = null;          // wartender Versand (siehe Spec)
+const NX_WA_TTL_MS = 10*60*1000;            // Pending läuft nach 10 Minuten ab
+
+function nxWaNow(){ return Date.now(); }
+function nxWaGenId(){ return "wa_"+Date.now().toString(36)+"_"+Math.random().toString(36).slice(2,8); }
+function nxSpeakSafe(t){ try{ if(typeof nxSpeak==="function") nxSpeak(t); }catch(e){} }
+function vvWaCockpitLocked(){ try{ return (typeof _vvAuthLocked!=="undefined" && _vvAuthLocked); }catch(e){ return false; } }
+
+/* ---- Telefonnummer: E.164-Normalisierung + Maskierung ---- */
+function vvNormalizePhoneE164(raw, defaultCC){
+  defaultCC = defaultCC || "49";
+  let s = String(raw==null?"":raw).trim();
+  if(!s) return null;
+  const hasPlus = /^\s*\+/.test(s);
+  let d = s.replace(/[^\d]/g,"");
+  if(!d) return null;
+  if(hasPlus){ /* bereits international */ }
+  else if(d.slice(0,2)==="00"){ d = d.slice(2); }
+  else if(d.charAt(0)==="0"){ d = defaultCC + d.replace(/^0+/,""); }
+  else if(d.slice(0,defaultCC.length)!==defaultCC){ d = defaultCC + d; }
+  if(d.length < 8 || d.length > 15) return null;   // E.164: max. 15 Stellen
+  return "+" + d;
+}
+function vvMaskPhone(e164){
+  const d = String(e164==null?"":e164).replace(/[^\d]/g,"");
+  if(d.length < 6) return d ? "+"+"*".repeat(d.length) : "(keine Nummer)";
+  return "+"+d.slice(0,2)+" "+d.slice(2,4)+"***"+d.slice(-4);
+}
+function vvWaLast4(e164){ const d=String(e164==null?"":e164).replace(/[^\d]/g,""); return d.slice(-4)||"????"; }
+
+/* ---- WhatsApp-Datenmodell am Kunden sicherstellen (ohne Einwilligung zu erfinden) ---- */
+function vvEnsureCustomerWhatsApp(c){
+  if(!c || typeof c!=="object") return null;
+  if(!c.whatsapp || typeof c.whatsapp!=="object" || Array.isArray(c.whatsapp)){
+    c.whatsapp = { number:"", normalizedNumber:"", enabled:false, optIn:false,
+      optInDate:null, optInSource:"", lastInboundAt:null, lastOutboundAt:null, preferredChannel:"whatsapp" };
+  }
+  if(!c.whatsapp.number && c.phone) c.whatsapp.number = c.phone;   // Komfort-Vorbelegung (keine Einwilligung!)
+  if(c.whatsapp.number){ const n=vvNormalizePhoneE164(c.whatsapp.number); c.whatsapp.normalizedNumber = n||""; }
+  return c.whatsapp;
+}
+
+/* ---- Worker-Konfiguration (nur öffentliche URL, keine Secrets) ---- */
+function getWhatsAppWorkerConfig(){
+  let url=""; try{ url=String(getSettings().whatsappWorkerUrl||"").trim(); }catch(e){}
+  return { configured: /^https:\/\/[^\s]+$/i.test(url), url };
+}
+
+/* ---- aktueller (maskierter) Bediener – keine Identität erfinden ---- */
+function vvCurrentActorMasked(){
+  try{
+    let e="";
+    if(typeof _vvAuthUserEmail!=="undefined" && _vvAuthUserEmail) e=String(_vvAuthUserEmail);
+    else if(typeof window!=="undefined" && window.__vvAccessEmail) e=String(window.__vvAccessEmail);
+    if(e && e.indexOf("@")>0){ const p=e.split("@"); return p[0].slice(0,2)+"***@"+p[1]; }
+  }catch(e){}
+  return "unbekannter angemeldeter Nutzer";
+}
+
+/* ---- Anrede / Standardnachricht ---- */
+function vvWaSalutation(c){
+  const an=String((c&&c.anrede)||"").trim();
+  const name=String((c&&c.name)||"").trim();
+  const last=name.split(/\s+/).slice(-1)[0]||name;
+  if(an==="Frau") return "Frau "+last;
+  if(an==="Herr") return "Herr "+last;
+  return name||"sehr geehrte Damen und Herren";
+}
+function vvWaDefaultMessage(type, c, number){
+  const s=getSettings(); const anrede=vvWaSalutation(c);
+  if(type==="invoice"){
+    return "Guten Tag "+anrede+",\n\nanbei erhalten Sie unsere Rechnung "+(number||"")+".\n\n"
+      +"Das Zahlungsziel und alle weiteren Angaben finden Sie im Dokument.\n\n"
+      +"Freundliche Grüße\n"+s.company+"\nZuverlässig. Ordentlich. Zügig.";
+  }
+  return "Guten Tag "+anrede+",\n\nanbei erhalten Sie wie besprochen unser Angebot "+(number||"")+".\n\n"
+    +"Bei Fragen oder Änderungswünschen können Sie sich gerne bei uns melden.\n\n"
+    +"Freundliche Grüße\n"+s.company+"\nZuverlässig. Ordentlich. Zügig.";
+}
+
+/* ---- Kunde eindeutig auflösen ---- */
+function resolveCustomerForDocument(query){
+  const q=String(query==null?"":query).trim();
+  const ql=q.toLowerCase();
+  const all=(data.customers||[]).filter(c=>!(c.archived||c.deletedAt));
+  if(!q) return {status:"none", matches:[]};
+  const byId=all.find(c=>String(c.id).toLowerCase()===ql);
+  if(byId) return {status:"one", customer:byId, matches:[byId]};
+  const qd=q.replace(/[^\d]/g,"");
+  let matches=all.filter(c=>{
+    const name=String(c.name||"").toLowerCase();
+    const firm=String(c.company||c.firma||"").toLowerCase();
+    const phone=String(c.phone||"").replace(/[^\d]/g,"");
+    const wphone=String((c.whatsapp&&c.whatsapp.number)||"").replace(/[^\d]/g,"");
+    return name===ql || name.includes(ql) || (firm&&firm.includes(ql)) || (qd.length>=5 && (phone.includes(qd)||wphone.includes(qd)));
+  });
+  if(matches.length===0){
+    const parts=ql.split(/\s+/).filter(Boolean);
+    if(parts.length) matches=all.filter(c=>{ const name=String(c.name||"").toLowerCase(); return parts.every(p=>name.includes(p)); });
+  }
+  if(matches.length===0) return {status:"none", matches:[]};
+  const exact=matches.filter(c=>String(c.name||"").toLowerCase()===ql);
+  if(exact.length===1) return {status:"one", customer:exact[0], matches:exact};
+  if(matches.length===1) return {status:"one", customer:matches[0], matches};
+  return {status:"many", matches};
+}
+function resolveOfferForCustomer(customerId, ref){
+  return vvWaResolveDoc("offer", customerId, ref);
+}
+function resolveInvoiceForCustomer(customerId, ref){
+  return vvWaResolveDoc("invoice", customerId, ref);
+}
+function vvWaResolveDoc(type, customerId, ref){
+  const coll = type==="invoice" ? (data.invoices||[]) : (data.offers||[]);
+  const r = String(ref==null?"":ref).toLowerCase().replace(/\s+/g,"");
+  if(r){
+    let byNum=coll.filter(d=>String(d.number||"").toLowerCase().replace(/\s+/g,"").includes(r));
+    if(customerId) { const inCust=byNum.filter(d=>d.customerId===customerId); if(inCust.length) byNum=inCust; }
+    if(byNum.length===1) return {status:"one", doc:byNum[0]};
+    if(byNum.length>1) return {status:"many", matches:byNum};
+  }
+  let list=customerId?coll.filter(d=>d.customerId===customerId):coll.slice();
+  if(!list.length) return {status:"none", matches:[]};
+  list=list.slice().sort((a,b)=>String(b.createdAt||b.date||"").localeCompare(String(a.createdAt||a.date||"")));
+  return {status:"one", doc:list[0], multiple:list.length>1, matches:list};
+}
+function vvWaFindDoc(p){
+  if(!p) return null;
+  if(p.documentType==="invoice") return (data.invoices||[]).find(i=>i.id===p.documentId);
+  return (data.offers||[]).find(o=>o.id===p.documentId);
+}
+
+/* ---- Dokument als versandfertige Datei rendern ----
+   Hinweis: Das Cockpit erzeugt das Dokument als HTML-Druckansicht (Print-to-PDF).
+   Eine echte PDF-Datei entsteht beim „Als PDF speichern“ in der Druckansicht. Der
+   Blob hier ist die HTML-Repräsentation; der Worker/Mensch nutzt die echte PDF. */
+function renderDocumentPdf(type, doc, customer){
+  const html = (type==="invoice")
+    ? renderDocHTML("RECHNUNG", doc, customer)
+    : renderOfferHTML(doc, customer);
+  const blob = new Blob([html], {type:"text/html;charset=utf-8"});
+  const base = (type==="invoice"?"Rechnung_":"Angebot_") + String(doc.number||"Dokument").replace(/[^\w\-]+/g,"-");
+  return { html, blob, fileName: base };
+}
+
+/* ---- Versand vorbereiten (Pending-State + Vorschau) ---- */
+function prepareWhatsAppDocumentSend(opts){
+  opts=opts||{};
+  const c=opts.customer, type=opts.documentType, doc=opts.doc;
+  if(!c||!doc) return null;
+  const wa=vvEnsureCustomerWhatsApp(c);
+  const rawPhone = (wa&&wa.number) || c.phone || "";
+  const normalized = vvNormalizePhoneE164(rawPhone);
+  const amount = Number(doc.total!=null?doc.total:(doc.finalTotal!=null?doc.finalTotal:0));
+  const number = doc.number || "";
+  const fileName = (type==="invoice"?"Rechnung_":"Angebot_") + String(number||"Dokument").replace(/[^\w\-]+/g,"-") + ".pdf";
+  const cfg=getWhatsAppWorkerConfig();
+  const pending={
+    id:nxWaGenId(), createdAt:nowISO(),
+    expiresAt:new Date(nxWaNow()+NX_WA_TTL_MS).toISOString(), expiresAtMs:nxWaNow()+NX_WA_TTL_MS,
+    customerId:c.id||"", customerName:c.name||"",
+    rawPhone, normalizedPhone:normalized||"",
+    maskedPhone: normalized?vvMaskPhone(normalized):"(keine gültige Nummer)",
+    documentType:type, documentId:doc.id||"", documentNumber:number, documentFileName:fileName,
+    documentBlobRef:null, amount, messageText:vvWaDefaultMessage(type,c,number),
+    mode: cfg.configured ? "cloud_api" : "manual",
+    optInConfirmed: !!(wa&&wa.optIn), requiresStrongConfirmation:true,
+    idempotencyId:nxWaGenId(), status:"preview", actor:vvCurrentActorMasked(),
+    _confirmedOnce:false
+  };
+  _nxPendingWhatsAppSend=pending;
+  // Versandprotokoll: „vorbereitet“
+  vvWaLogDelivery(pending, {status:"prepared", mode:pending.mode});
+  vvWaTimeline(pending, "Dokument vorbereitet");
+  return pending;
+}
+
+/* ---- Versandprotokoll am Dokument + Kundenverlauf ---- */
+function vvWaLogDelivery(p, patch){
+  const doc=vvWaFindDoc(p); if(!doc) return;
+  const base = doc.whatsappDelivery || { requestedAt:p.createdAt, confirmedAt:null, sentAt:null,
+    customerId:p.customerId, maskedRecipient:p.maskedPhone, mode:p.mode, messageId:null,
+    status:null, lastStatusAt:null, errorCode:null, errorMessage:null };
+  Object.assign(base, patch||{}, { maskedRecipient:p.maskedPhone, lastStatusAt:nowISO() });
+  if((patch&&patch.status==="accepted")||(patch&&patch.status==="manual_handoff_opened")) base.confirmedAt = base.confirmedAt||nowISO();
+  doc.whatsappDelivery=base;
+  try{ saveAll(false); }catch(e){}
+}
+function vvWaTimeline(p, label){
+  if(!p||!p.customerId) return;
+  try{ addTimeline(p.customerId, "WhatsApp: "+label,
+    (p.documentType==="invoice"?"Rechnung ":"Angebot ")+(p.documentNumber||"")+" · an "+p.maskedPhone+" · "+(p.actor||""),
+    {type:(p.documentType==="invoice"?"invoice":"offer"), id:p.documentId}); }catch(e){}
+}
+
+/* ---- Pending-Gültigkeit ---- */
+function nxWaPendingValid(){
+  if(!_nxPendingWhatsAppSend) return false;
+  if(_nxPendingWhatsAppSend.expiresAtMs && nxWaNow()>_nxPendingWhatsAppSend.expiresAtMs){ _nxPendingWhatsAppSend=null; return false; }
+  if(vvWaCockpitLocked()) return false;   // bei Sperre pausiert (nicht löschen)
+  return true;
+}
+
+/* ---- Abbruch ---- */
+function cancelWhatsAppDocumentSend(){
+  if(_nxPendingWhatsAppSend){ _nxPendingWhatsAppSend.status="cancelled"; }
+  _nxPendingWhatsAppSend=null;
+  try{ vvWaCloseModal(); }catch(e){}
+  return "WhatsApp-Versand abgebrochen. Es wurde nichts gesendet.";
+}
+function confirmWhatsAppDocumentSend(){ return nxWaExecuteConfirmedSend(); }
+
+/* ---- starke Bestätigung erkennen ---- */
+function nxWaIsStrongConfirm(l){
+  const s=String(l||"").toLowerCase().replace(/[.!?]+$/,"").replace(/\s+/g," ").trim();
+  return /^ja,?\s*per\s*whats\s*app\s*(senden|schicken|verschicken)$/.test(s);
+}
+
+/* ---- Fehlertexte ---- */
+function vvWaErrText(code){
+  const m={ worker_not_configured:"Worker nicht eingerichtet", no_optin:"keine dokumentierte Einwilligung",
+    no_phone:"keine gültige Telefonnummer", rate_limited:"zu viele Anfragen (HTTP 429)",
+    network:"Netzwerk-/Verbindungsfehler", already_sending:"Versand läuft bereits",
+    no_pending:"kein vorbereiteter Versand", token_missing:"Access-Token fehlt am Worker",
+    template_missing:"kein passendes WhatsApp-Template", upload_failed:"PDF-Upload fehlgeschlagen" };
+  if(code && /^http_/.test(code)) return "Serverfehler "+code.slice(5);
+  return m[code]||(code?String(code):"unbekannter Fehler");
+}
+
+/* ---- PDF/Dokument herunterladen + Druckansicht öffnen ---- */
+function vvWaDownloadDocument(p){
+  const c=(data.customers||[]).find(x=>x.id===p.customerId)||{name:p.customerName};
+  const doc=vvWaFindDoc(p); if(!doc) return false;
+  const r=renderDocumentPdf(p.documentType, doc, c);
+  try{ openDoc(r.html); }catch(e){}                 // Druckansicht: dort „Als PDF speichern“
+  try{
+    const url=URL.createObjectURL(r.blob);
+    const a=document.createElement("a"); a.href=url; a.download=r.fileName+".html"; a.style.display="none";
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(()=>{ try{URL.revokeObjectURL(url);}catch(e){} }, 4000);
+  }catch(e){}
+  return true;
+}
+
+/* ---- Manueller WhatsApp-Fallback (sofort nutzbar) ---- */
+function openWhatsAppManualFallback(pending){
+  const p=pending||_nxPendingWhatsAppSend;
+  if(!p) return "Kein vorbereiteter WhatsApp-Versand vorhanden.";
+  if(!p.normalizedPhone) return "Für diesen Kunden ist keine gültige Telefonnummer hinterlegt. Bitte zuerst die WhatsApp-Nummer in der Kundenkartei eintragen.";
+  vvWaDownloadDocument(p);
+  const num=p.normalizedPhone.replace(/[^\d]/g,"");
+  const link="https://wa.me/"+num+"?text="+encodeURIComponent(p.messageText);
+  try{ window.open(link,"_blank"); }catch(e){}
+  p.status="manual_handoff_opened";
+  vvWaLogDelivery(p, {mode:"manual", status:"manual_handoff_opened", sentAt:null});
+  vvWaTimeline(p, "manuell geöffnet (Versand durch Nutzer)");
+  const hint="WhatsApp wurde mit Empfänger und Nachricht geöffnet. Bitte füge die heruntergeladene PDF manuell an und kontrolliere die Nachricht vor dem Senden. Es wurde noch nichts automatisch angehängt oder versendet.";
+  try{ vvWaModalResult(hint); }catch(e){}
+  _nxPendingWhatsAppSend=null;   // Handoff abgeschlossen – verhindert versehentliche Doppelaktion
+  return hint;
+}
+
+/* ---- Automatischer Versand über Cloudflare-Worker (vorbereitet) ---- */
+async function sendWhatsAppDocumentViaWorker(pending){
+  const p=pending||_nxPendingWhatsAppSend;
+  if(!p) return {ok:false, error:"no_pending"};
+  const cfg=getWhatsAppWorkerConfig();
+  if(!cfg.configured) return {ok:false, error:"worker_not_configured"};
+  if(!p.optInConfirmed) return {ok:false, error:"no_optin"};
+  if(!p.normalizedPhone) return {ok:false, error:"no_phone"};
+  if(p._sending || p.status==="accepted" || p.status==="sent") return {ok:false, error:"already_sending"};
+  p._sending=true; p.status="uploading";
+  const c=(data.customers||[]).find(x=>x.id===p.customerId)||{name:p.customerName};
+  const doc=vvWaFindDoc(p);
+  const r=renderDocumentPdf(p.documentType, doc, c);
+  const fd=new FormData();
+  fd.append("file", r.blob, p.documentFileName);
+  fd.append("customerId", p.customerId);
+  fd.append("normalizedPhone", p.normalizedPhone);
+  fd.append("documentType", p.documentType);
+  fd.append("documentNumber", p.documentNumber);
+  fd.append("fileName", p.documentFileName);
+  fd.append("messageText", p.messageText);
+  fd.append("idempotencyId", p.idempotencyId);
+  fd.append("optInConfirmed", p.optInConfirmed?"1":"0");
+  try{
+    const res=await fetch(cfg.url.replace(/\/+$/,"")+"/api/whatsapp/send-document", {method:"POST", body:fd, credentials:"include"});
+    if(res.status===429){ p._sending=false; p.status="failed"; vvWaLogDelivery(p,{status:"failed",errorCode:"429",errorMessage:"rate_limited"}); return {ok:false, error:"rate_limited"}; }
+    if(!res.ok){ p._sending=false; p.status="failed"; let det=""; try{ det=(await res.json()).error||""; }catch(e){} vvWaLogDelivery(p,{status:"failed",errorCode:String(res.status),errorMessage:det||("http_"+res.status)}); return {ok:false, error:"http_"+res.status, detail:det}; }
+    let body={}; try{ body=await res.json(); }catch(e){}
+    p._sending=false; p.status="accepted";
+    vvWaLogDelivery(p, {mode:"cloud_api", status:"accepted", messageId:body.messageId||null, sentAt:nowISO()});
+    vvWaTimeline(p, "an WhatsApp übergeben (Nachrichten-ID gespeichert)");
+    return {ok:true, messageId:body.messageId||null};
+  }catch(e){
+    p._sending=false; p.status="failed";
+    vvWaLogDelivery(p,{status:"failed",errorCode:"network",errorMessage:"fetch_failed"});
+    return {ok:false, error:"network"};
+  }
+}
+
+/* ---- Lieferstatus abrufen (optional, später) ---- */
+async function getWhatsAppDeliveryStatus(messageId){
+  const cfg=getWhatsAppWorkerConfig();
+  if(!cfg.configured) return {ok:false, error:"worker_not_configured"};
+  if(!messageId) return {ok:false, error:"no_message_id"};
+  try{
+    const res=await fetch(cfg.url.replace(/\/+$/,"")+"/api/whatsapp/status?id="+encodeURIComponent(messageId), {credentials:"include"});
+    if(!res.ok) return {ok:false, error:"http_"+res.status};
+    return {ok:true, status:(await res.json())};
+  }catch(e){ return {ok:false, error:"network"}; }
+}
+
+/* ---- Bestätigten Versand ausführen (manuell oder Worker) ---- */
+function nxWaExecuteConfirmedSend(){
+  const p=_nxPendingWhatsAppSend;
+  if(!p) return "Es wartet aktuell kein WhatsApp-Versand.";
+  if(vvWaCockpitLocked()) return "Das Cockpit ist gesperrt. Der Versand ist pausiert – bitte erst entsperren.";
+  if(p._confirmedOnce) return "Dieser Versand wurde bereits bestätigt und ausgeführt.";
+  p._confirmedOnce=true; p.confirmedAt=nowISO();
+  vvWaLogDelivery(p, {status:"awaiting_confirmation", confirmedAt:p.confirmedAt});
+  vvWaTimeline(p, "Versand bestätigt");
+  const cfg=getWhatsAppWorkerConfig();
+  if(!cfg.configured){
+    // kein Worker -> manueller Fallback (öffnet WhatsApp + lädt Dokument)
+    return openWhatsAppManualFallback(p);
+  }
+  if(!p.optInConfirmed){
+    p._confirmedOnce=false;  // erneuter Versuch (z. B. nach Einwilligung) möglich
+    return "Für diesen Kunden ist keine WhatsApp-Einwilligung dokumentiert. Der automatische Versand wurde nicht ausgeführt. Du kannst den manuellen Versand nutzen oder die Einwilligung in der Kundenkartei dokumentieren.";
+  }
+  sendWhatsAppDocumentViaWorker(p).then(res=>{
+    if(res.ok){
+      vvWaModalResult("✓ Das Dokument wurde von WhatsApp angenommen. Nachrichten-ID gespeichert. (Noch keine Zustellbestätigung.)");
+      nxSpeakSafe("Das Dokument wurde von WhatsApp angenommen. Nachrichten-ID gespeichert.");
+    } else {
+      vvWaModalResult("⚠ Automatischer Versand nicht möglich: "+vvWaErrText(res.error)+". Bitte den manuellen Versand nutzen.");
+    }
+    _nxPendingWhatsAppSend=null;
+  });
+  return "Versand wird ausgeführt … Das Ergebnis erscheint im Versand-Fenster.";
+}
+
+/* ==========================================================
+   VORSCHAU-MODAL „WhatsApp-Versand vorbereiten“
+   ========================================================== */
+function vvWaCloseModal(){ const m=byId("vvWaModal"); if(m) m.remove(); }
+function vvWaModalResult(text){
+  const el=byId("vvWaModalHint");
+  if(el){ el.innerHTML="<b>"+esc(text)+"</b>"; }
+}
+function vvWaModalSetHint(text){ vvWaModalResult(text); }
+function vvWaMsgInput(el){ if(_nxPendingWhatsAppSend && el) _nxPendingWhatsAppSend.messageText=el.value; }
+function vvWaOpenModal(p){
+  p=p||_nxPendingWhatsAppSend; if(!p) return;
+  vvWaCloseModal();
+  const cfg=getWhatsAppWorkerConfig();
+  const consent = p.optInConfirmed
+    ? "✓ WhatsApp-Einwilligung dokumentiert"
+    : "⚠ Keine dokumentierte WhatsApp-Einwilligung (automatischer Versand gesperrt)";
+  const modeTxt = cfg.configured ? "Automatisch über WhatsApp-Business-API (Cloudflare-Worker)" : "Manueller Versand (WhatsApp öffnen + PDF anhängen)";
+  const row=(k,v)=>`<div style="display:flex;justify-content:space-between;gap:12px;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.06)"><span style="color:#9aa3ad">${esc(k)}</span><span style="font-weight:700;text-align:right">${esc(v)}</span></div>`;
+  const wrap=document.createElement("div");
+  wrap.id="vvWaModal";
+  wrap.style.cssText="position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;padding:16px";
+  wrap.innerHTML=`
+   <div style="background:#16100d;border:1px solid #3a2e22;border-radius:14px;max-width:560px;width:100%;max-height:92vh;overflow:auto;box-shadow:0 12px 48px rgba(0,0,0,.5)">
+     <div style="padding:14px 18px;border-bottom:1px solid #3a2e22;display:flex;align-items:center;gap:8px">
+       <span style="font-size:20px">🟢</span><b style="font-size:16px;color:#f3e7d6">WhatsApp-Versand vorbereiten</b>
+     </div>
+     <div style="padding:14px 18px;font-size:13px;color:#e7dccb">
+       ${row("Empfänger", p.customerName||"–")}
+       ${row("Telefonnummer (maskiert)", p.maskedPhone)}
+       ${row("Dokumentart", p.documentType==="invoice"?"Rechnung":"Angebot")}
+       ${row("Dokumentnummer", p.documentNumber||"–")}
+       ${row("Betrag", (typeof money==="function")?money(p.amount):String(p.amount))}
+       ${row("PDF-Dateiname", p.documentFileName)}
+       ${row("Versandart", modeTxt)}
+       <div style="margin:8px 0;padding:8px 10px;border-radius:8px;background:${p.optInConfirmed?'rgba(94,156,114,.15)':'rgba(176,80,60,.18)'};color:${p.optInConfirmed?'#bfe6c8':'#f0c4b8'};font-weight:700">${esc(consent)}</div>
+       <label class="lbl" style="display:block;margin:6px 0 4px;color:#cdbfa9">Nachrichtentext (vor Versand editierbar)</label>
+       <textarea id="vvWaMsg" style="width:100%;min-height:120px;background:#0f0b08;color:#f0e7d8;border:1px solid #3a2e22;border-radius:8px;padding:8px;font-size:13px" oninput="vvWaMsgInput(this)">${esc(p.messageText)}</textarea>
+       <div id="vvWaModalHint" style="margin-top:10px;font-size:12px;color:#cdbfa9">Vor dem automatischen Versand ist die ausdrückliche Bestätigung nötig: <b>„Ja, per WhatsApp senden“</b>.</div>
+     </div>
+     <div style="padding:12px 18px;border-top:1px solid #3a2e22;display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end">
+       <button class="btn sm ghost" onclick="vvWaModalEditDoc()">Dokument bearbeiten</button>
+       <button class="btn sm ghost" onclick="vvWaModalDownload()">PDF herunterladen</button>
+       <button class="btn sm" onclick="vvWaModalManual()">WhatsApp manuell öffnen</button>
+       <button class="btn sm green" onclick="vvWaModalAutoSend()" ${cfg.configured?'':'disabled title="Keine Worker-URL hinterlegt – manuellen Versand nutzen" style="opacity:.5;cursor:not-allowed"'}>Automatisch senden</button>
+       <button class="btn sm red" onclick="vvWaModalCancel()">Abbrechen</button>
+     </div>
+   </div>`;
+  document.body.appendChild(wrap);
+  wrap.addEventListener("click", e=>{ if(e.target===wrap) vvWaCloseModal(); });
+}
+function vvWaModalEditDoc(){
+  const p=_nxPendingWhatsAppSend; if(!p) return;
+  vvWaCloseModal();
+  try{
+    if(p.documentType==="invoice"){
+      const inv=(data.invoices||[]).find(i=>i.id===p.documentId);
+      navigateTo("rechnungen");
+      if(inv && typeof openNewInvoiceForm==="function") setTimeout(()=>{ try{ openNewInvoiceForm(inv); }catch(e){} },80);
+    } else {
+      navigateTo("angebote");
+      if(typeof editOffer==="function") setTimeout(()=>{ try{ editOffer(p.documentId); }catch(e){} },80);
+    }
+  }catch(e){}
+}
+function vvWaModalDownload(){ const p=_nxPendingWhatsAppSend; if(p){ vvWaDownloadDocument(p); vvWaModalResult("Druckansicht geöffnet – dort „Als PDF speichern“. Eine HTML-Kopie wurde ebenfalls heruntergeladen."); } }
+function vvWaModalManual(){ openWhatsAppManualFallback(_nxPendingWhatsAppSend); }
+function vvWaModalCancel(){ cancelWhatsAppDocumentSend(); }
+function vvWaModalAutoSend(){
+  const p=_nxPendingWhatsAppSend; if(!p) return;
+  if(!getWhatsAppWorkerConfig().configured){ vvWaModalResult("Kein Worker hinterlegt – bitte „WhatsApp manuell öffnen“ nutzen."); return; }
+  // Button-Klick ist die starke, aktionsspezifische Bestätigung – Sicherheitsabfrage zusätzlich:
+  if(!confirm('WhatsApp automatisch senden?\n\nBitte bestätige den Versand an '+p.maskedPhone+'.')) return;
+  vvWaModalResult(nxWaExecuteConfirmedSend());
+}
+
+/* ==========================================================
+   NEXUS-Einstieg: Befehlserkennung + Pending-Handling
+   ========================================================== */
+function vvWaExtractDocNumber(raw){
+  const m2=String(raw).match(/\b(VV[-\s]?\d{4}[-\s]?\d{1,5}|\d{4}[-\s]?\d{2,5})\b/i);
+  if(m2) return m2[1].replace(/\s+/g,"-");
+  return "";
+}
+function vvWaExtractCustomerQuery(raw){
+  const strip=(q)=>{
+    q=String(q||"").replace(/\b(ein|eine|einen|das|die|der|den|dem|ihr|ihm|ihre|seine|sein|per|via|über|ueber|whatsapp|whats|app|angebot|angebote|rechnung|rechnungen|kostenvoranschlag|dokument|senden|schicken|verschicken|zuletzt|erstellte|erstellten|erstelltes|erstellt|neueste|neuestes|letzte|letztes|kunden|kunde)\b.*$/i,"").trim();
+    return q.replace(/[.,;:!?]+$/,"").trim();
+  };
+  // 1) nach Präposition/Anrede: „für/an/kunde/frau/herr <Name>“
+  let m=String(raw).match(/\b(?:für|fuer|an|kunde|kundin|frau|herr)\s+([A-Za-zÄÖÜäöüß.\-]+(?:\s+[A-Za-zÄÖÜäöüß.\-]+){0,2})/i);
+  if(m){ const q=strip(m[1]); if(q) return q; }
+  // 2) Name direkt nach dem Sende-Verb: „schick/sende <GroßName> …“ (Artikel/Dok-Wörter ignorieren)
+  m=String(raw).match(/\b(?:schicke?|schickst|sende|senden|verschicke?n?|übermittle?|uebermittle?)\s+([A-ZÄÖÜ][A-Za-zÄÖÜäöüß.\-]+(?:\s+[A-ZÄÖÜ][A-Za-zÄÖÜäöüß.\-]+){0,2})/);
+  if(m){ const q=strip(m[1]); if(q) return q; }
+  return "";
+}
+function vvWaCustomerNeedsList(matches){
+  return matches.slice(0,6).map((c,i)=>(i+1)+". "+c.name+(c.phone?(" ("+vvMaskPhone(vvNormalizePhoneE164(c.phone)||c.phone)+")"):"")).join("\n");
+}
+/* Liefert string (behandelt) oder null (nicht zuständig) */
+function nxWhatsAppDetectCommand(raw, l, context){
+  const mentionsWa = /(whats\s?app|wa\.me|per wa\b)/.test(l);
+  if(!mentionsWa) return null;
+  _nxLastKind="Aktion";
+  const isInvoice = /(rechnung|rechnungen)/.test(l);
+  const isOffer   = /(angebot|angebote|kostenvoranschlag)/.test(l);
+  // „erstelle/erzeuge/lege an …“ = neu; aber NICHT „zuletzt erstellte“ (Partizip)
+  const createNew = ( /\b(erstelle|erstellen|erzeuge|erzeugen|anlegen)\b/.test(l)
+      || /\bneues?\s+(angebot|rechnung)\b/.test(l)
+      || /\bmach(e)?\s+(ein|eine|mir|ihr|ihm)\b/.test(l) ) && (isOffer||isInvoice);
+  const type = isInvoice ? "invoice" : "offer";
+  const custQ = vvWaExtractCustomerQuery(raw);
+  const docNo = vvWaExtractDocNumber(raw);
+
+  // 1) Kunde auflösen (außer rein dokumentnummernbasiert ohne Kunde)
+  let customer=null;
+  if(custQ){
+    const rc=resolveCustomerForDocument(custQ);
+    if(rc.status==="none") return "Ich finde keinen Kunden mit „"+custQ+"“. Soll ich einen neuen Kundenentwurf anlegen? (sage z. B. „neuer Kunde "+custQ+"“)";
+    if(rc.status==="many") return "Mehrere Kunden passen zu „"+custQ+"“:\n"+vvWaCustomerNeedsList(rc.matches)+"\nBitte präzisiere den Namen.";
+    customer=rc.customer;
+  }
+
+  // 2) Neues Dokument erstellen + danach senden -> Formular öffnen (keine Positionen/Preise erfinden)
+  if(createNew){
+    if(!customer) return "Für welches/welchen Kunden soll ich das "+(isInvoice?"die Rechnung":"das Angebot")+" erstellen? Bitte Name nennen.";
+    window._vvWaAfterSave={ type, customerId:customer.id, channel:"whatsapp" };
+    if(isInvoice){ try{ navigateTo("rechnungen"); }catch(e){} return "Ich öffne den Rechnungs-Entwurf für "+customer.name+". Bitte trage die abrechenbaren Leistungen/Positionen ein (ich erfinde keine Beträge), finalisiere die Rechnung und sage danach: „schick die Rechnung "+ (isInvoice?"":"")+"per WhatsApp“. Vor dem Versand zeige ich eine Vorschau."; }
+    window._offerPrefillCustomer=customer.id; try{ navigateTo("angebote"); }catch(e){}
+    return "Ich öffne den Angebots-Entwurf für "+customer.name+". Bitte ergänze Leistung, Menge und Preis (ich erfinde nichts). Nach dem Speichern sage: „schick das Angebot per WhatsApp“ – dann bereite ich den Versand mit Vorschau vor.";
+  }
+
+  // 3) Bestehendes Dokument senden
+  const rd = type==="invoice" ? resolveInvoiceForCustomer(customer?customer.id:"", docNo) : resolveOfferForCustomer(customer?customer.id:"", docNo);
+  if(rd.status==="none") return customer
+    ? ("Für "+customer.name+" finde ich "+(type==="invoice"?"keine Rechnung":"kein Angebot")+". Soll ich "+(type==="invoice"?"eine Rechnung":"ein Angebot")+" erstellen?")
+    : ("Ich finde "+(type==="invoice"?"keine passende Rechnung":"kein passendes Angebot")+(docNo?(" mit Nummer „"+docNo+"“"):"")+".");
+  if(rd.status==="many") return "Mehrere "+(type==="invoice"?"Rechnungen":"Angebote")+" passen"+(docNo?(" zu „"+docNo+"“"):"")+":\n"+rd.matches.slice(0,6).map((d,i)=>(i+1)+". "+(d.number||"?")+" · "+money(d.total||0)+(d.customerName?(" · "+d.customerName):"")).join("\n")+"\nBitte nenne die genaue Nummer.";
+  const doc=rd.doc;
+  if(!customer){ customer=(data.customers||[]).find(c=>c.id===doc.customerId)||{id:doc.customerId,name:doc.customerName||"",phone:""}; }
+  if(!customer || !customer.id){
+    // manuelles Dokument ohne Kundenkartei: Empfänger ggf. aus Dokumentdaten
+    customer = customer || {name:doc.customerName||"", phone:""};
+  }
+  const p=prepareWhatsAppDocumentSend({customer, documentType:type, doc});
+  if(!p) return "Der Versand konnte nicht vorbereitet werden.";
+  if(!p.normalizedPhone){
+    vvWaOpenModal(p);
+    return "Für "+(p.customerName||"den Kunden")+" ist keine gültige WhatsApp-Nummer hinterlegt. Bitte trage sie in der Kundenkartei ein. (Vorschau ist geöffnet.)";
+  }
+  vvWaOpenModal(p);
+  const cfg=getWhatsAppWorkerConfig();
+  const verb = cfg.configured ? "Soll ich es jetzt per WhatsApp senden?" : "Ich kann WhatsApp mit Empfänger und Nachricht öffnen (PDF hängst du manuell an).";
+  return "Das "+(type==="invoice"?"die Rechnung":"Angebot")+" "+(p.documentNumber||"")+" über "+money(p.amount)+" für "+(p.customerName||"den Kunden")+" ist vorbereitet. Es würde an die WhatsApp-Nummer mit der Endung "+vvWaLast4(p.normalizedPhone)+" gesendet. "+verb+"\n\nFür den automatischen Versand bitte exakt bestätigen: „Ja, per WhatsApp senden“."
+    + (p.optInConfirmed?"":"\nHinweis: Für diesen Kunden ist keine WhatsApp-Einwilligung dokumentiert – automatischer Versand ist dann gesperrt, manueller Versand bleibt möglich.");
+}
+/* Pending-Bestätigung/Abbruch zuerst behandeln; liefert string oder null */
+function nxWhatsAppHandlePending(raw, l){
+  if(!nxWaPendingValid()){
+    if(nxWaIsStrongConfirm(l)) return "Es wartet aktuell kein WhatsApp-Versand. Bitte zuerst ein Angebot oder eine Rechnung für den Versand vorbereiten.";
+    return null;
+  }
+  if(/^(abbrechen|abbruch|nicht senden|doch nicht|verwerfen)\b/.test(l) || /\bnicht per whatsapp\b/.test(l)) return cancelWhatsAppDocumentSend();
+  if(nxWaIsStrongConfirm(l)) return nxWaExecuteConfirmedSend();
+  if(/^(ja|jap|jawohl|ok|okay|mach|mach das|weiter|passt|senden|schick|schicke|jo)\b/.test(l))
+    return "Für den WhatsApp-Versand brauche ich eine ausdrückliche Bestätigung. Bitte schreibe exakt: „Ja, per WhatsApp senden“ – oder „abbrechen“.";
+  return null;   // andere Befehle normal weiterlaufen lassen
+}
+/* AI-geroutete Intents auf die WhatsApp-Flows abbilden */
+function nxWhatsAppFromIntent(ir, context){
+  const e=(ir&&ir.entities)||{};
+  const tool=ir&&ir.tool;
+  if(tool==="confirmWhatsAppDocumentSend") return {handled:true, kind:"Bestätigung", text:"Bitte bestätige den Versand ausdrücklich mit „Ja, per WhatsApp senden“."};
+  if(tool==="cancelWhatsAppDocumentSend") return {handled:true, kind:"Aktion", text: cancelWhatsAppDocumentSend()};
+  // Befehl rekonstruieren und an die lokale Erkennung geben (sicher, deterministisch)
+  const name=e.customerName||""; const dt=(e.documentType==="invoice"||tool==="createInvoiceDraftForWhatsApp"||tool==="sendExistingInvoiceWhatsApp")?"Rechnung":"Angebot";
+  const verb=(tool==="createOfferDraftForWhatsApp"||tool==="createInvoiceDraftForWhatsApp")?"erstelle":"schicke";
+  const synth=(ir&&ir.userText)? ir.userText : (verb+" für "+name+" "+(dt==="Rechnung"?"eine Rechnung":"ein Angebot")+" per WhatsApp");
+  const out=nxWhatsAppDetectCommand(synth, String(synth).toLowerCase(), context);
+  return {handled:true, kind:"Aktion", text: out || (ir&&ir.spokenResponse) || "Ich bereite den WhatsApp-Versand vor."};
+}
+
 function handleNexusCommand(commandText, context){
   context=context||{};
   const raw=String(commandText||"").trim(); if(!raw) return "";
@@ -9472,6 +10077,12 @@ function handleNexusCommand(commandText, context){
 
   // 0) geführter Dialog (z. B. neuer Kunde)
   if(_nxFlow){ return nxFlowStep(raw,l); }
+
+  // 0b) wartender WhatsApp-Versand: starke Bestätigung / Abbruch zuerst
+  {
+    const waP = nxWhatsAppHandlePending(raw, l);
+    if(waP!=null){ _nxLastKind="Bestätigung"; return waP; }
+  }
 
   // 1) offene Bestätigungen (bezahlt / Buchung) haben Vorrang
   if(_nxPendingPaid){
@@ -9513,6 +10124,12 @@ function handleNexusCommand(commandText, context){
     const nm=(mc&&mc[1]?mc[1].trim().replace(/^kunde\s+/i,""):"");
     if(nm && nm.length>=2){ _nxFlow={type:"newCustomer",step:"phone",data:{name:nm}}; return "Neuer Kunde „"+nm+"“. Telefonnummer? (oder „überspringen“)"; }
     _nxFlow={type:"newCustomer",step:"name",data:{}}; return "Neuer Kunde – wie heißt der Kunde? (oder „abbrechen“)";
+  }
+
+  // 4b) WhatsApp-Dokumentversand (Angebot/Rechnung vorbereiten/öffnen)
+  {
+    const waCmd = nxWhatsAppDetectCommand(raw, l, context);
+    if(waCmd!=null) return waCmd;
   }
 
   // 5) Buchung -> Entwurf + Bestätigung (kritisch)
@@ -10580,6 +11197,55 @@ document.addEventListener("DOMContentLoaded",()=>{
 // BEGIN NEXUS_BRAIN_DEFAULT
 window.NEXUS_BRAIN_DEFAULT = {"version":1,"updatedAt":"2026-06-10T12:30:50.010Z","glossary":[{"term":"offene Positionen","meaning":"Im V&V Cockpit bedeutet „offene Positionen“ standardmäßig offene Posten, offene Forderungen, unbezahlte Rechnungen oder Außenstände im Buchhaltungsbereich.","canonicalIntent":"open_items_summary","canonicalTool":"getOpenPositionsSummary","page":"openitems","aliases":["offene positionen","offene posten","offene rechnungen","außenstände","aussenstände","aussenstaende","unbezahlte rechnungen","offene forderungen","offene beträge","offene betraege","zahlung offen","wer schuldet mir geld","wer schuldet mir noch geld","schuldet mir geld","wer muss noch zahlen","kunden schulden geld","wer hat noch nicht bezahlt","welche rechnungen sind offen","welche kunden müssen noch zahlen"],"notMeant":["offene Stellen","Jobangebote","Personalpositionen","freie Arbeitsplätze"],"dangerousWhenCombinedWith":["löschen","entfernen","zurücksetzen","bereinigen","wegmachen","alles löschen","alle löschen","endgültig"],"clarificationRule":"Wenn der Nutzer offene Positionen löschen will, darf NEXUS niemals sofort löschen. Pflicht-Rückfrage: „Meinst du wirklich löschen oder nur als bezahlt/erledigt markieren? Löschen entfernt Datensätze dauerhaft.“ Bei Massenlöschung starke Bestätigung („Ja, endgültig löschen“) – normales „ja“ reicht nicht. Nur bei eindeutigem Personal-/HR-Kontext darf „Positionen“ als Stelle/Job verstanden werden."},{"term":"Buchhaltung","meaning":"Einnahmen, Ausgaben, Belege, Rechnungen, offene Posten, Steuerübersicht.","canonicalIntent":"navigate","canonicalTool":"navigateTo","page":"bookkeeping","aliases":["buchhaltung","finanzen","einnahmen","ausgaben","kasse","buchungen","belegübersicht","geldübersicht"],"notMeant":[],"dangerousWhenCombinedWith":[],"clarificationRule":null},{"term":"Kundenkartei","meaning":"Kundendaten, Kundennotizen, Projekte, Kommunikation, Angebote/Rechnungen pro Kunde.","canonicalIntent":"navigate","canonicalTool":"navigateTo","page":"akte","aliases":["kundenkartei","kundenakte","kundendaten","kundenübersicht","kundenliste"],"notMeant":[],"dangerousWhenCombinedWith":[],"clarificationRule":null},{"term":"Rechnung","meaning":"Offizielle Zahlungsanforderung an Kunden.","canonicalIntent":"navigate","canonicalTool":"navigateTo","page":"rechnungen","aliases":["rechnung","rechnungen","zahlungsanforderung","kundenrechnung"],"notMeant":[],"dangerousWhenCombinedWith":[],"clarificationRule":null},{"term":"Angebot","meaning":"Kostenvoranschlag / Angebot für Kunden, noch nicht Rechnung.","canonicalIntent":"navigate","canonicalTool":"navigateTo","page":"angebote","aliases":["angebot","angebote","kostenvoranschlag","preisangebot","kundenangebot"],"notMeant":[],"dangerousWhenCombinedWith":[],"clarificationRule":null},{"term":"Baustelle / Projekt / Auftrag","meaning":"Kundenauftrag bzw. Baustellenplanung.","canonicalIntent":"project_summary","canonicalTool":"getProjectSummary","page":"projekte","aliases":["baustelle","baustellen","projekt","projekte","auftrag","aufträge","auftraege","baustellenplaner"],"notMeant":[],"dangerousWhenCombinedWith":[],"clarificationRule":null},{"term":"bezahlt","meaning":"Eine offene Rechnung / ein offener Posten soll als bezahlt markiert werden, nicht gelöscht.","canonicalIntent":"mark_open_item_paid_draft","canonicalTool":"markOpenItemPaidDraft","page":"openitems","aliases":["als bezahlt markieren","bezahlt markieren","auf bezahlt setzen","als bezahlt","auf bezahlt","ist bezahlt","wurde bezahlt","hat bezahlt"],"notMeant":[],"dangerousWhenCombinedWith":[],"clarificationRule":"Bestätigung nötig (Ja/Nein), niemals löschen."},{"term":"löschen","meaning":"Kritische Aktion, niemals sofort ausführen – immer Bestätigung nötig, bei Massenlöschung starke Bestätigung.","canonicalIntent":null,"canonicalTool":null,"page":null,"aliases":["löschen","loeschen","entfernen"],"notMeant":[],"dangerousWhenCombinedWith":[],"clarificationRule":null},{"term":"zurücksetzen","meaning":"Kritische Aktion, sehr gefährlich, immer Extra-Bestätigung.","canonicalIntent":null,"canonicalTool":null,"page":null,"aliases":["zurücksetzen","zuruecksetzen","reset"],"notMeant":[],"dangerousWhenCombinedWith":[],"clarificationRule":null},{"term":"veröffentlichen","meaning":"Externe Aktion (Post, Anzeige, Google-Beitrag, Social-Media-Inhalt). Niemals ohne ausdrückliche Bestätigung veröffentlichen.","canonicalIntent":null,"canonicalTool":null,"page":null,"aliases":["veröffentlichen","veroeffentlichen","posten","publizieren"],"notMeant":[],"dangerousWhenCombinedWith":[],"clarificationRule":null},{"term":"Steuer-Rücklage","meaning":"Bei V&V werden intern 35 % jeder Einnahme als Steuer-Rücklage geplant.","canonicalIntent":null,"canonicalTool":null,"page":"bookkeeping","aliases":["steuerrücklage","steuer-rücklage","steuerruecklage","rücklage","ruecklage"],"notMeant":[],"dangerousWhenCombinedWith":[],"clarificationRule":null},{"term":"Kleinunternehmer","meaning":"V&V arbeitet mit Kleinunternehmerregelung nach §19 UStG. Rechnungen weisen keine Umsatzsteuer aus.","canonicalIntent":null,"canonicalTool":null,"page":null,"aliases":["kleinunternehmer","kleinunternehmerregelung","§19","paragraph 19","umsatzsteuer"],"notMeant":[],"dangerousWhenCombinedWith":[],"clarificationRule":null}],"pages":{"dashboard":{"label":"Dashboard","aliases":["start","übersicht","uebersicht","dashboard","home","startseite"]},"crm":{"label":"Kunden-CRM","aliases":["kunden crm","kundenliste","crm","kunden"]},"akte":{"label":"Kundenkartei","aliases":["kundenkartei","kundenakte","kundendaten","akte"]},"aufmass":{"label":"Aufmaß-Tool","aliases":["aufmaß","aufmass","maß nehmen","mass nehmen","aufmaß tool"]},"angebote":{"label":"Angebote","aliases":["angebote","angebot","kostenvoranschläge","kostenvoranschlaege","kostenvoranschlag"]},"rechnungen":{"label":"Rechnungen","aliases":["rechnungen","rechnung"]},"openitems":{"label":"Offene Posten","aliases":["offene posten","offene positionen","außenstände","aussenstände","aussenstaende","wer schuldet mir geld","offene rechnungen","offene forderungen"]},"bookkeeping":{"label":"Buchhaltung","aliases":["buchhaltung","einnahmen","ausgaben","finanzen","buchungen","bank","csv","bank sync","kontoauszug"]},"belegscanner":{"label":"Belegscanner","aliases":["belege","belegscanner","beleg scannen"]},"projekte":{"label":"Baustellenplaner","aliases":["baustellen","projekte","aufträge","auftraege","auftrag","baustellenplaner"]},"mkagents":{"label":"Marketing / KI","aliases":["marketing","content","werbung","anzeigen"]},"personal":{"label":"Personalwesen","aliases":["personal","personalwesen","mitarbeiter","stellen"]},"nexus":{"label":"NEXUS Deck","aliases":["nexus","command deck","ki deck","nexus deck"]},"settings":{"label":"Firmendaten","aliases":["firmendaten","einstellungen","settings"]}},"tools":{"navigateTo":{"label":"Seite öffnen","description":"Öffnet eine Cockpit-Seite.","safe":true,"requiresConfirmation":false,"requiresStrongConfirmation":false,"params":["page"],"page":null},"getOpenPositionsSummary":{"label":"Offene Posten anzeigen","description":"Zeigt offene Posten, unbezahlte Rechnungen und Außenstände.","safe":true,"requiresConfirmation":false,"requiresStrongConfirmation":false,"params":[],"page":"openitems"},"getFinanceSummary":{"label":"Finanzübersicht","description":"Zeigt Einnahmen/Ausgaben/Gewinn aus der Buchhaltung.","safe":true,"requiresConfirmation":false,"requiresStrongConfirmation":false,"params":[],"page":"bookkeeping"},"searchCustomer":{"label":"Kunde suchen","description":"Sucht Kunden in der Kundenkartei.","safe":true,"requiresConfirmation":false,"requiresStrongConfirmation":false,"params":["customerName"],"page":null},"getProjectSummary":{"label":"Baustellen anzeigen","description":"Zeigt Baustellen/Projekte.","safe":true,"requiresConfirmation":false,"requiresStrongConfirmation":false,"params":[],"page":"projekte"},"createCustomerDraft":{"label":"Kundenentwurf erstellen","description":"Bereitet einen neuen Kunden als Entwurf vor.","safe":false,"requiresConfirmation":true,"requiresStrongConfirmation":false,"params":[],"page":null},"createBookingDraft":{"label":"Buchungsentwurf erstellen","description":"Bereitet Einnahme oder Ausgabe als Entwurf vor.","safe":false,"requiresConfirmation":true,"requiresStrongConfirmation":false,"params":[],"page":null},"createOfferDraft":{"label":"Angebotsentwurf erstellen","description":"Bereitet ein Angebot als Entwurf vor.","safe":false,"requiresConfirmation":true,"requiresStrongConfirmation":false,"params":[],"page":null},"createInvoiceDraft":{"label":"Rechnungsentwurf erstellen","description":"Bereitet eine Rechnung als Entwurf vor.","safe":false,"requiresConfirmation":true,"requiresStrongConfirmation":false,"params":[],"page":null},"markOpenItemPaidDraft":{"label":"Offenen Posten als bezahlt markieren","description":"Bereitet vor, einen offenen Posten als bezahlt zu markieren.","safe":false,"requiresConfirmation":true,"requiresStrongConfirmation":false,"params":[],"page":null},"deleteOpenItemsDraft":{"label":"Offene Posten löschen vorbereiten","description":"Bereitet das Löschen offener Posten vor.","safe":false,"requiresConfirmation":true,"requiresStrongConfirmation":true,"params":[],"page":null},"createMarketingDraft":{"label":"Marketingentwurf erstellen","description":"Bereitet Anzeigen, Posts oder Beiträge vor.","safe":false,"requiresConfirmation":true,"requiresStrongConfirmation":false,"params":[],"page":null},"publishMarketingDraft":{"label":"Marketing veröffentlichen","description":"Veröffentlicht vorbereitete Inhalte extern.","safe":false,"requiresConfirmation":true,"requiresStrongConfirmation":true,"params":[],"page":null},"openAgent":{"label":"KI-Mitarbeiter öffnen","description":"Öffnet einen KI-Mitarbeiter.","safe":true,"requiresConfirmation":false,"requiresStrongConfirmation":false,"params":[],"page":null},"stopSpeaking":{"label":"Sprachausgabe stoppen","description":"Stoppt die Sprachausgabe.","safe":true,"requiresConfirmation":false,"requiresStrongConfirmation":false,"params":[],"page":null},"confirmPendingAction":{"label":"Aktion bestätigen","description":"Bestätigt die wartende Aktion (lokal).","safe":true,"requiresConfirmation":false,"requiresStrongConfirmation":false,"params":[],"page":null},"cancelPendingAction":{"label":"Aktion abbrechen","description":"Bricht die wartende Aktion ab (lokal).","safe":true,"requiresConfirmation":false,"requiresStrongConfirmation":false,"params":[],"page":null},"askClarifyingQuestion":{"label":"Rückfrage stellen","description":"Stellt eine Rückfrage, wenn der Befehl unklar oder riskant ist.","safe":true,"requiresConfirmation":false,"requiresStrongConfirmation":false,"params":[],"page":null}},"safetyRules":["„Offene Positionen“ bedeutet im Cockpit offene Posten / unbezahlte Rechnungen (Buchhaltung) – nicht offene Stellen.","Löschen ist kritisch und braucht immer eine Bestätigung.","Bei offenen Posten immer zwischen „löschen“ und „als bezahlt markieren“ unterscheiden.","Massenlöschung braucht die starke Bestätigung „Ja, endgültig löschen“ – ein normales „ja“ reicht nicht.","„Zurücksetzen“ ist sehr gefährlich und braucht eine Extra-Bestätigung.","Externe Veröffentlichungen (Anzeigen, Posts, Nachrichten) passieren niemals ohne ausdrückliche Bestätigung („Ja, veröffentlichen“).","Keine Daten erfinden.","Kritische Aktionen nur als Entwurf – ausgeführt wird erst nach Ja/Nein-Bestätigung im Cockpit.","Ohne wartende Aktion führen „ja“ und „nein“ nichts aus.","Rechnungen weisen nach §19 UStG keine Umsatzsteuer aus – niemals Umsatzsteuer erfinden.","Keine Kundenakten, Rechnungslisten oder privaten Daten an KI-Provider senden – nur Zähler, Begriffe und Tool-/Seitenhinweise.","API-Keys stehen nie im Gehirn, nie im Backup, nie in Logs."],"businessKnowledge":{"stammdaten":{"name":"Verlegt & Verschraubt Handwerkerservice","typ":"Handwerksservice","inhaber":"Justus Brosch","region":"Wilhelmshaven und Umgebung","claim":"Z.O.Z – Drei Werte. Ein Versprechen. Zuverlässig. Ordentlich. Zügig."},"hauptleistungen":["Bodenverlegung","Küchenmontage","Entrümpelung & Entsorgung"],"bodenverlegung":["Laminat","Klickvinyl","Klebevinyl","PVC","Teppich","Sockelleisten","Altbelag entfernen","Untergrund prüfen/vorbereiten"],"kuechenmontage":["Küchenaufbau","Anpassungen","Arbeitsplatte","Spüle","Unterbau-Geschirrspüler","Wasseranschluss im erlaubten Rahmen"],"grenzen":["keine Elektroarbeiten","keine Starkstrom-/Herdanschlüsse","keine unzulässigen meisterpflichtigen Tätigkeiten","Geräteanschluss nur als Zusatz bei Küchenmontage","Umzugshilfe nur ohne eigenen Transport, falls relevant"],"recht_und_steuern":["Einzelunternehmen","Kleinunternehmerregelung §19 UStG","keine Umsatzsteuer ausweisen","kein Handelsregistereintrag","HWK-Register eingetragen","intern werden 35 % jeder Einnahme als Steuer-Rücklage geplant"],"preisregel":{"hinweis verwenden":"„verbindliches Angebot nach Fotos, Aufmaß oder Besichtigung“."},"name":"Verlegt & Verschraubt Handwerkerservice","type":"Handwerksservice","owner":"Justus Brosch","region":"Wilhelmshaven und Umgebung","claim":"Z.O.Z – Drei Werte. Ein Versprechen. Zuverlässig. Ordentlich. Zügig.","mainServices":["Bodenverlegung","Küchenmontage","Entrümpelung & Entsorgung"]},"examples":[{"user":"Nexus wer schuldet mir noch Geld","json":{"intent":"open_items_summary","tool":"getOpenPositionsSummary","confidence":0.95,"requiresConfirmation":false,"requiresStrongConfirmation":false,"entities":{"customerName":null,"amount":null,"date":null,"category":null,"service":null,"page":"openitems","target":"offene_posten","actionType":"summary"},"spokenResponse":"Ich öffne die offenen Posten.","clarifyingQuestion":null}},{"user":"Nexus öffne offene Positionen","json":{"intent":"navigate","tool":"navigateTo","confidence":0.95,"requiresConfirmation":false,"requiresStrongConfirmation":false,"entities":{"customerName":null,"amount":null,"date":null,"category":null,"service":null,"page":"openitems","target":"offene_posten","actionType":"open"},"spokenResponse":"Ich öffne die offenen Posten.","clarifyingQuestion":null}},{"user":"Nexus lösche offene Positionen","json":{"intent":"delete_open_items_draft","tool":"askClarifyingQuestion","confidence":0.9,"requiresConfirmation":true,"requiresStrongConfirmation":true,"entities":{"customerName":null,"amount":null,"date":null,"category":null,"service":null,"page":"openitems","target":"offene_posten","actionType":"delete"},"spokenResponse":"","clarifyingQuestion":"Meinst du wirklich löschen oder nur als bezahlt/erledigt markieren? Löschen entfernt Datensätze dauerhaft."}},{"user":"Nexus markiere Müller als bezahlt","json":{"intent":"mark_open_item_paid_draft","tool":"markOpenItemPaidDraft","confidence":0.9,"requiresConfirmation":true,"requiresStrongConfirmation":false,"entities":{"customerName":"Müller","amount":null,"date":null,"category":null,"service":null,"page":"openitems","target":"offene_posten","actionType":"mark_paid"},"spokenResponse":"Ich bereite vor, den offenen Posten von Müller als bezahlt zu markieren.","clarifyingQuestion":null}},{"user":"Nexus lösche alle offenen Posten","json":{"intent":"delete_open_items_draft","tool":"askClarifyingQuestion","confidence":0.95,"requiresConfirmation":true,"requiresStrongConfirmation":true,"entities":{"customerName":null,"amount":null,"date":null,"category":null,"service":null,"page":"openitems","target":"offene_posten","actionType":"mass_delete"},"spokenResponse":"","clarifyingQuestion":"Das ist eine Massenlöschung. Meinst du wirklich endgültig löschen? Normales Ja reicht dafür nicht. Antworte mit: Ja, endgültig löschen."}},{"user":"Nexus neue Einnahme 500 Euro von Müller","json":{"intent":"create_booking_draft","tool":"createBookingDraft","confidence":0.92,"requiresConfirmation":true,"requiresStrongConfirmation":false,"entities":{"customerName":"Müller","amount":500,"date":null,"category":"Kundenzahlung","service":null,"page":"bookkeeping","target":"buchung","actionType":"create"},"spokenResponse":"Einnahme über 500 Euro von Müller – bitte bestätigen.","clarifyingQuestion":null}}],"docs":[{"file":"00_INDEX.md","title":"NEXUS-Gehirn – Index","summary":"Das NEXUS-Gehirn ist die lokale Wissensbasis des V&V-Cockpits. Es liegt als Markdown-Vault (Obsidian-kompatibel) in diesem Ordner und wird mit `node tools/build-nexus-brain.js` zu einer kompakten JSON-/JS-Wissensbasis exportiert, die direkt"},{"file":"06_Buchhaltung_und_offene_Posten.md","title":"Buchhaltung und offene Posten","summary":"Ein offener Posten ist eine Forderung, die noch nicht (vollständig) bezahlt wurde – typischerweise eine gestellte Rechnung oder ein vereinbarter Betrag. „Offene Positionen“, „Außenstände“, „offene Forderungen“ und „unbezahlte Rechnungen“ me"},{"file":"07_Kunden_und_Auftraege.md","title":"Kunden und Aufträge","summary":"- Zentrale Akte pro Kunde: Stammdaten (Name, Telefon, E-Mail, Adresse), Notizen, Zeitleiste, Status. - „Kundenkartei“ (Seite `akte`) = Detailansicht; „Kunden-CRM“ (Seite `crm`) = Liste/Pipeline. - Neue Kunden legt NEXUS nur als geführten En"},{"file":"08_Marketing_und_Content.md","title":"Marketing und Content","summary":"- Kleinanzeigen (eBay Kleinanzeigen / kleinanzeigen.de) - Facebook - Instagram - Google (Unternehmensprofil / Beiträge)"},{"file":"09_Agentenrollen.md","title":"Agentenrollen","summary":"NEXUS ist der Intent-Router und Koordinator. Die Fach-Agenten im Cockpit (Bereich „KI-Mitarbeiter“ / „Marketing & KI-Agenten“) haben klare Rollen:"},{"file":"11_Lernspeicher_und_Erinnerungen.md","title":"Lernspeicher und Erinnerungen","summary":"- Im Chat: „Mit X meine ich Y“ oder „Merke dir: X bedeutet Y“ → NEXUS fragt „Soll ich mir merken, dass X Y bedeutet?“ → nach „ja“ dauerhaft gespeichert. - Im Deck: Tab „Begriffe & Synonyme“ → Formular „Neuen Begriff beibringen“. - Gespeiche"}]};
 // END NEXUS_BRAIN_DEFAULT
+/* WhatsApp-Dokumentversand: Gehirn ergänzen (Tools/Glossar/Beispiel/Regel) – nicht-destruktiv.
+   Hinweis: Der Markdown-Vault NEXUS_BRAIN/ sollte bei Gelegenheit per
+   tools/build-nexus-brain.js entsprechend neu erzeugt werden. */
+(function vvWaAugmentBrain(){
+  try{
+    const b=window.NEXUS_BRAIN_DEFAULT; if(!b||typeof b!=="object") return;
+    b.tools=b.tools||{};
+    const D=(label,description,strong)=>({label,description,safe:false,requiresConfirmation:true,requiresStrongConfirmation:!!strong,params:[],page:null});
+    const S=(label,description,params,page)=>({label,description,safe:true,requiresConfirmation:false,requiresStrongConfirmation:false,params:params||[],page:page||null});
+    const waTools={
+      resolveCustomerForDocument:S("Kunde auflösen","Findet den Kunden für ein Dokument (Name/Firma/ID/Telefon).",["customerName"],null),
+      resolveOfferForCustomer:S("Angebot finden","Findet ein bestehendes Angebot eines Kunden.",["customerName"],"angebote"),
+      resolveInvoiceForCustomer:S("Rechnung finden","Findet eine bestehende Rechnung eines Kunden.",["customerName"],"rechnungen"),
+      createOfferDraftForWhatsApp:D("Angebot für WhatsApp vorbereiten","Erstellt/öffnet einen Angebotsentwurf für den WhatsApp-Versand.",true),
+      createInvoiceDraftForWhatsApp:D("Rechnung für WhatsApp vorbereiten","Erstellt/öffnet einen Rechnungsentwurf für den WhatsApp-Versand.",true),
+      sendExistingOfferWhatsApp:D("Angebot per WhatsApp senden","Bereitet den WhatsApp-Versand eines bestehenden Angebots vor (Vorschau + starke Bestätigung).",true),
+      sendExistingInvoiceWhatsApp:D("Rechnung per WhatsApp senden","Bereitet den WhatsApp-Versand einer bestehenden Rechnung vor (Vorschau + starke Bestätigung).",true),
+      renderDocumentPdf:S("Dokument-PDF erzeugen","Rendert Angebot/Rechnung als Druck-/PDF-Ansicht.",[],null),
+      prepareWhatsAppDocumentSend:D("WhatsApp-Versand vorbereiten","Erzeugt die Versand-Vorschau (Empfänger, Betrag, Nachricht).",true),
+      confirmWhatsAppDocumentSend:D("WhatsApp-Versand bestätigen","Führt den Versand nach starker Bestätigung aus.",true),
+      cancelWhatsAppDocumentSend:S("WhatsApp-Versand abbrechen","Bricht den vorbereiteten Versand ab.",[],null),
+      openWhatsAppManualFallback:D("WhatsApp manuell öffnen","Öffnet WhatsApp mit Empfänger/Text und lädt das Dokument (manueller Versand).",false),
+      sendWhatsAppDocumentViaWorker:D("WhatsApp automatisch senden","Sendet das PDF über den Cloudflare-Worker (nur mit Worker-URL + starker Bestätigung).",true),
+      getWhatsAppDeliveryStatus:S("WhatsApp-Status abfragen","Fragt den Zustellstatus einer gesendeten Nachricht ab.",[],null),
+      askWhatsAppClarifyingQuestion:S("WhatsApp-Rückfrage","Stellt eine Rückfrage, wenn Kunde/Dokument/Nummer/Einwilligung unklar sind.",[],null)
+    };
+    Object.keys(waTools).forEach(k=>{ if(!b.tools[k]) b.tools[k]=waTools[k]; });
+    b.glossary=b.glossary||[];
+    if(!b.glossary.some(g=>String(g.term).toLowerCase()==="per whatsapp schicken")){
+      b.glossary.push({term:"per WhatsApp schicken",
+        meaning:"Ein bestehendes oder neu erzeugtes Angebot bzw. eine Rechnung als PDF an die in der Kundenkartei gespeicherte WhatsApp-Nummer senden. Versand nur nach Vorschau und ausdrücklicher Bestätigung „Ja, per WhatsApp senden“.",
+        canonicalIntent:"send_existing_offer_whatsapp_draft",canonicalTool:"sendExistingOfferWhatsApp",page:"angebote",
+        aliases:["per whatsapp schicken","über whatsapp senden","per whatsapp senden","whatsapp schicken","an den kunden schicken","ihr das angebot schicken","ihm die rechnung schicken","dokument über whatsapp","rechnung versenden","angebot versenden","schick per whatsapp","öffne whatsapp"],
+        notMeant:["WhatsApp-Statusmeldung","privater Chat ohne Dokument"],
+        dangerousWhenCombinedWith:["senden","versenden","schicken"],
+        clarificationRule:"Kunde muss eindeutig sein, Telefonnummer gültig, Dokumentdaten dürfen nicht erfunden werden. Vor Versand immer Vorschau. Automatischer Versand nur mit dokumentierter Einwilligung und starker Bestätigung „Ja, per WhatsApp senden“. Bei mehreren Kunden/Dokumenten Rückfrage."});
+    }
+    b.examples=b.examples||[];
+    if(!b.examples.some(e=>/whatsapp/i.test(JSON.stringify(e)))){
+      b.examples.push({user:"Nexus, erstelle für Katrin Söllinger ein Angebot und schicke es ihr per WhatsApp.",
+        json:{intent:"create_offer_whatsapp_draft",tool:"createOfferDraftForWhatsApp",confidence:0.96,requiresConfirmation:true,requiresStrongConfirmation:true,
+          entities:{customerName:"Katrin Söllinger",documentType:"offer",deliveryChannel:"whatsapp",documentId:null,projectId:null,page:"angebote",target:"angebot",actionType:"create_and_send"},
+          spokenResponse:"Ich bereite das Angebot für Katrin Söllinger vor. Vor dem Versand zeige ich dir eine vollständige Vorschau.",clarifyingQuestion:null}});
+    }
+    b.safetyRules=b.safetyRules||[];
+    if(!b.safetyRules.some(r=>/per whatsapp senden/i.test(r)))
+      b.safetyRules.push("WhatsApp-Versand (Angebot/Rechnung) passiert nie allein durch die KI: erst Vorschau, dann ausdrückliche Bestätigung „Ja, per WhatsApp senden“. Ohne dokumentierte Einwilligung kein automatischer Versand. Telefonnummern in Ausgaben nur maskiert.");
+  }catch(e){}
+})();
 </script>
 
 <!-- LIGHTBOX -->

@@ -1,0 +1,15 @@
+{
+  "name": "vv-whatsapp-worker",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Optionaler Cloudflare Worker fuer den automatischen WhatsApp-Versand von V&V-Angeboten/-Rechnungen (Meta WhatsApp Business API). Nicht automatisch deployen.",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "devDependencies": {
+    "wrangler": "^3.0.0"
+  }
+}

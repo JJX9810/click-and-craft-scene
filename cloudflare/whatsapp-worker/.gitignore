@@ -1,0 +1,6 @@
+# Niemals echte Konfiguration/Secrets committen
+wrangler.toml
+.dev.vars
+.wrangler/
+node_modules/
+*.log

@@ -1,0 +1,38 @@
+# V&V WhatsApp-Worker – Beispiel-Konfiguration
+# Kopiere diese Datei nach `wrangler.toml` und passe Werte an.
+# WICHTIG: Niemals echte Secrets in diese Datei oder ins Repo schreiben!
+# Secrets werden ausschließlich über `wrangler secret put <NAME>` gesetzt.
+
+name = "vv-whatsapp-worker"
+main = "src/index.js"
+compatibility_date = "2025-09-24"
+
+# Öffentliche, NICHT geheime Variable: erlaubte Cockpit-Origin (CORS/Origin-Check)
+[vars]
+ALLOWED_ORIGIN = "https://vv-cockpit.pages.dev"
+
+# Optionale KV-Bindings für Idempotenz, Status und Rate-Limit.
+# Erst anlegen: `wrangler kv:namespace create IDEMPOTENCY` usw., dann IDs eintragen.
+# [[kv_namespaces]]
+# binding = "IDEMPOTENCY"
+# id = "<kv-id>"
+#
+# [[kv_namespaces]]
+# binding = "STATUS"
+# id = "<kv-id>"
+#
+# [[kv_namespaces]]
+# binding = "RATE"
+# id = "<kv-id>"
+
+# ---------------------------------------------------------------------------
+# SECRETS – NICHT hier eintragen, sondern per CLI setzen:
+#
+#   wrangler secret put WHATSAPP_ACCESS_TOKEN
+#   wrangler secret put WHATSAPP_PHONE_NUMBER_ID
+#   wrangler secret put WHATSAPP_BUSINESS_ACCOUNT_ID
+#   wrangler secret put WHATSAPP_APP_SECRET
+#   wrangler secret put WHATSAPP_WEBHOOK_VERIFY_TOKEN
+#   wrangler secret put WHATSAPP_TEMPLATE_OFFER       # z. B. vv_angebot_dokument
+#   wrangler secret put WHATSAPP_TEMPLATE_INVOICE     # z. B. vv_rechnung_dokument
+# ---------------------------------------------------------------------------
