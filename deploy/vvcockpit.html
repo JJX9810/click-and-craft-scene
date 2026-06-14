@@ -6449,7 +6449,11 @@ function executeIntentResult(ir, context){
       return {handled:true, kind:"Bestätigung", text:"Bitte bestätige den WhatsApp-Versand ausdrücklich mit „Ja, per WhatsApp senden“."};
     case "cancelWhatsAppDocumentSend":
       return {handled:true, kind:"Aktion", text: cancelWhatsAppDocumentSend()};
-    default: return {handled:false};
+    default:
+      // Erkanntes, aber (noch) nicht angebundenes Tool: ehrliche Rückmeldung statt falscher Erfolg
+      if(ir.tool && typeof NEXUS_TOOLS!=="undefined" && NEXUS_TOOLS[ir.tool] && NEXUS_TOOLS[ir.tool].connected===false)
+        return {handled:true, kind:"Info", text: nxNotConnectedMsg()};
+      return {handled:false};
   }
 }
 
@@ -7053,8 +7057,17 @@ const NEXUS_PAGES = {
   projekte:    { label:"Baustellenplaner", aliases:["baustellen","projekte","aufträge","auftraege","auftrag","baustellenplaner"] },
   mkagents:    { label:"Marketing / KI",   aliases:["marketing","content","werbung","anzeigen"] },
   personal:    { label:"Personalwesen",    aliases:["personal","personalwesen","mitarbeiter","stellen"] },
+  calculator:  { label:"Preisrechner",     aliases:["preisrechner","kalkulation","rechner","preis berechnen"] },
+  materialcalc:{ label:"Materialrechner",  aliases:["materialrechner","materialmenge"] },
+  materials:   { label:"Material & Werkzeug", aliases:["material","werkzeug","materialliste"] },
+  agents:      { label:"KI-Mitarbeiter",   aliases:["ki-mitarbeiter","ki mitarbeiter","agenten","ki team","ki-team"] },
+  leads:       { label:"Anfragen",         aliases:["anfragen","leads","kundenanfragen","interessenten"] },
+  mileage:     { label:"Fahrtenbuch",      aliases:["fahrtenbuch","kilometer","fahrten"] },
+  recurring:   { label:"Fixkosten",        aliases:["fixkosten","abo","abos","daueraufträge"] },
+  backup:      { label:"Datenspeicher / Backup", aliases:["backup","sicherung","datenspeicher","snapshots","datensicherung"] },
+  checkliste:  { label:"Anleitung / Checkliste", aliases:["anleitung","checkliste","guide","hilfe"] },
   nexus:       { label:"NEXUS Deck",       aliases:["nexus","command deck","ki deck","nexus deck"] },
-  settings:    { label:"Firmendaten",      aliases:["firmendaten","einstellungen","settings"] }
+  settings:    { label:"Firmendaten",      aliases:["firmendaten","einstellungen","settings","sicherheit","sicherheitseinstellungen"] }
 };
 
 /* ---- Tool-Registry: was NEXUS darf, was Bestätigung braucht ---- */
@@ -7078,6 +7091,220 @@ const NEXUS_TOOLS = {
   cancelPendingAction:     { label:"Aktion abbrechen", description:"Bricht die wartende Aktion ab (lokal).", safe:true, connected:true },
   askClarifyingQuestion:   { label:"Rückfrage stellen", description:"Stellt eine Rückfrage, wenn etwas unklar oder riskant ist.", safe:true, connected:true }
 };
+
+/* ==========================================================
+   NEXUS SPRACHSTEUERUNG – zentrale Registries
+   (additiv; bestehende Brain-/Pending-/Provider-Logik bleibt unberührt)
+   ========================================================== */
+
+/* ---- Synonymgruppen (Sprachvarianten) ---- */
+const NEXUS_SYNONYMS = {
+  navigation:["öffne","oeffne","öffnen","zeige","zeig","zeig mir","zeige mir","geh zu","geh mal zu","gehe zu","bring mich zu","bring mich","wechsle zu","wechsel zu","navigiere zu","navigier zu","navigiere","spring zu","ruf auf","starte","wechsle in"],
+  create:["erstelle","erstellen","erstell","lege an","leg an","anlegen","bereite vor","mach einen entwurf","erzeuge","erzeugen","bau mir","baue","mach mir"],
+  send:["schicke","schick","sende","senden","übermittle","uebermittle","teile","verschicke","verschick","lass zukommen"],
+  search:["suche","such","finde","find","zeig mir","zeige mir","wo ist","öffne"],
+  delete:["lösche","loesche","lösch","entferne","entfern","mach weg","mache weg","bereinige","räume auf","raeume auf","nimm raus"],
+  open_items:["offene positionen","offene posten","offene rechnungen","außenstände","aussenstände","aussenstaende","unbezahlte rechnungen","offene forderungen","offene beträge","offene betraege","wer schuldet mir geld","wer muss noch zahlen"],
+  customer:["kunde","kundin","auftraggeber","interessent","ansprechpartner","firma"],
+  invoice:["rechnung","abrechnung","zahlungsanforderung","kundenrechnung"],
+  offer:["angebot","kostenvoranschlag","preisangebot","kundenangebot"]
+};
+
+/* ---- Starke Bestätigungsphrasen je kritischer Aktion ---- */
+const NEXUS_STRONG_CONFIRMATIONS = {
+  finalize_offer:   "ja, angebot finalisieren",
+  finalize_invoice: "ja, rechnung finalisieren",
+  cancel_invoice:   "ja, rechnung stornieren",
+  whatsapp_send:    "ja, per whatsapp senden",
+  email_send:       "ja, e-mail senden",
+  publish:          "ja, veröffentlichen",
+  backup_import:    "ja, backup importieren",
+  snapshot_restore: "ja, snapshot wiederherstellen",
+  delete_final:     "ja, endgültig löschen"
+};
+function nxNormalizeConfirmPhrase(s){ return String(s==null?"":s).toLowerCase().replace(/[.!?,]+/g," ").replace(/\bwhats\s*app\b/g,"whatsapp").replace(/\be\s*-?\s*mail\b/g,"e-mail").replace(/\s+/g," ").trim(); }
+function nxStrongConfirmationMatches(input, requiredPhrase){
+  const a=nxNormalizeConfirmPhrase(input), b=nxNormalizeConfirmPhrase(requiredPhrase);
+  return !!b && a===b;
+}
+
+/* ---- Generische Pending-Action-Registry (für neue/zukünftige Flows) ---- */
+const NX_PENDING_ACTIONS = {};
+function nxPaGenId(){ return "pa_"+Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
+function nxRegisterPendingAction(a){
+  a=a||{}; const id=a.id||nxPaGenId(); const ttl=a.ttlMs||(10*60*1000);
+  NX_PENDING_ACTIONS[id]={ id, type:a.type||"", createdAt:nowISO(),
+    expiresAt:new Date(Date.now()+ttl).toISOString(), expiresAtMs:Date.now()+ttl,
+    safetyLevel:a.safetyLevel||"confirm", requiredConfirmationPhrase:a.requiredConfirmationPhrase||"",
+    payload:a.payload||{}, preview:a.preview||{}, status:"awaiting_confirmation", _done:false };
+  return NX_PENDING_ACTIONS[id];
+}
+function nxPurgePendingActions(){ const n=Date.now(); Object.keys(NX_PENDING_ACTIONS).forEach(k=>{ const a=NX_PENDING_ACTIONS[k]; if(!a||a._done||(a.expiresAtMs&&n>a.expiresAtMs)) delete NX_PENDING_ACTIONS[k]; }); }
+function nxActivePendingActions(){ nxPurgePendingActions(); if(typeof vvWaCockpitLocked==="function" && vvWaCockpitLocked()) return []; return Object.keys(NX_PENDING_ACTIONS).map(k=>NX_PENDING_ACTIONS[k]); }
+function nxClearPendingAction(id){ if(id&&NX_PENDING_ACTIONS[id]) delete NX_PENDING_ACTIONS[id]; }
+function nxMatchPendingByPhrase(input){ const acts=nxActivePendingActions(); for(let i=0;i<acts.length;i++){ const a=acts[i]; if(a.requiredConfirmationPhrase && !a._done && nxStrongConfirmationMatches(input,a.requiredConfirmationPhrase)) return a; } return null; }
+
+/* ---- Entity-Normalisierung: Beträge (Ziffern + deutsche Zahlwörter) ---- */
+const NX_NUM_WORDS={null:0,"null":0,ein:1,eine:1,eins:1,zwei:2,drei:3,vier:4,fünf:5,fuenf:5,sechs:6,sieben:7,acht:8,neun:9,zehn:10,elf:11,zwölf:12,zwoelf:12,dreizehn:13,vierzehn:14,fünfzehn:15,fuenfzehn:15,sechzehn:16,siebzehn:17,achtzehn:18,neunzehn:19,zwanzig:20,dreißig:30,dreissig:30,vierzig:40,fünfzig:50,fuenfzig:50,sechzig:60,siebzig:70,achtzig:80,neunzig:90};
+function nxWordsToNumberDe(str){
+  let s=String(str||"").toLowerCase().replace(/\s+/g,"").replace(/euro|€/g,"");
+  if(!s) return null;
+  if(/^\d+([.,]\d+)?$/.test(s)) return parseFloat(s.replace(",","."));
+  let total=0, rest=s, matchedAny=false;
+  const take=(word,val)=>{ if(rest.indexOf(word)>=0){ matchedAny=true; return val; } return 0; };
+  // tausender
+  let th=0; const thM=rest.match(/^(.*?)tausend(.*)$/); if(thM){ const pre=thM[1]; th=(pre?(nxWordsToNumberDe(pre)||1):1)*1000; rest=thM[2]; matchedAny=true; }
+  // hunderter
+  let hu=0; const huM=rest.match(/^(.*?)hundert(.*)$/); if(huM){ const pre=huM[1]; hu=(pre?(nxWordsToNumberDe(pre)||1):1)*100; rest=huM[2]; matchedAny=true; }
+  let small=0;
+  const undM=rest.split("und");
+  undM.forEach(part=>{ if(!part) return; if(NX_NUM_WORDS[part]!=null){ small+=NX_NUM_WORDS[part]; matchedAny=true; }
+    else { Object.keys(NX_NUM_WORDS).forEach(w=>{ if(w.length>2 && part===w){ small+=NX_NUM_WORDS[w]; matchedAny=true; } }); } });
+  total=th+hu+small;
+  return matchedAny? total : null;
+}
+function nxNormalizeAmount(text){
+  const t=String(text||"");
+  const m=t.match(/(\d{1,3}(?:[.\s]\d{3})+(?:,\d+)?|\d+(?:[.,]\d+)?)\s*(?:€|eur|euro)?/i);
+  if(m){ let s=m[1].replace(/\s/g,""); if(s.indexOf(",")>=0){ s=s.replace(/\./g,"").replace(",","."); } else if((s.match(/\./g)||[]).length>1){ s=s.replace(/\./g,""); } const n=parseFloat(s); if(isFinite(n)) return n; }
+  return nxWordsToNumberDe(t);
+}
+/* ---- Entity-Normalisierung: relative Datumsangaben ---- */
+function nxNormalizeRelativeDate(text, base){
+  const t=String(text||"").toLowerCase(); const d=base?new Date(base):new Date();
+  const iso=x=>x.toISOString().slice(0,10);
+  if(/übermorgen|uebermorgen/.test(t)){ d.setDate(d.getDate()+2); return iso(d); }
+  if(/\bmorgen\b/.test(t)){ d.setDate(d.getDate()+1); return iso(d); }
+  if(/\bgestern\b/.test(t)){ d.setDate(d.getDate()-1); return iso(d); }
+  if(/\bheute\b/.test(t)){ return iso(d); }
+  let m=t.match(/in\s+(\d+)\s+tag/); if(m){ d.setDate(d.getDate()+parseInt(m[1],10)); return iso(d); }
+  m=t.match(/in\s+(\d+)\s+woche/); if(m){ d.setDate(d.getDate()+parseInt(m[1],10)*7); return iso(d); }
+  const wd={sonntag:0,montag:1,dienstag:2,mittwoch:3,donnerstag:4,freitag:5,samstag:6,sonnabend:6};
+  m=t.match(/(?:nächsten|naechsten|kommenden|am)\s+(sonntag|montag|dienstag|mittwoch|donnerstag|freitag|samstag|sonnabend)/);
+  if(m){ const target=wd[m[1]]; let diff=(target-d.getDay()+7)%7; if(diff===0) diff=7; d.setDate(d.getDate()+diff); return iso(d); }
+  m=t.match(/(\d{1,2})\.(\d{1,2})\.(\d{2,4})/); if(m){ let y=m[3]; if(y.length===2) y="20"+y; return y+"-"+String(m[2]).padStart(2,"0")+"-"+String(m[1]).padStart(2,"0"); }
+  return null;
+}
+
+/* ---- Intent-Registry (Katalog; speist UI, Tests und Doku) ---- */
+const NEXUS_INTENTS = {};
+function nxDefIntent(d){
+  NEXUS_INTENTS[d.id]=Object.assign({
+    id:"", description:"", category:"system", aliases:[], examples:[], tool:"",
+    safetyLevel:"safe", requiredEntities:[], optionalEntities:[], allowedPages:[],
+    requiresUnlockedCockpit:true, implemented:true, page:null
+  }, d);
+}
+/* Navigation: ein Intent je Cockpit-Seite (alle verbunden) */
+Object.keys(NEXUS_PAGES).forEach(function(pid){
+  const p=NEXUS_PAGES[pid];
+  nxDefIntent({ id:"nav_"+pid, category:"navigation", tool:"navigateTo", safetyLevel:"safe",
+    description:"Öffnet: "+p.label, page:pid, allowedPages:[pid],
+    aliases:(p.aliases||[]).concat(["öffne "+p.label.toLowerCase(),"geh zu "+p.label.toLowerCase()]),
+    examples:["Nexus, öffne "+p.label.toLowerCase()+".","Nexus, geh mal zu "+((p.aliases||[])[0]||p.label.toLowerCase())+"."] });
+});
+/* Funktionale Intents (implemented ehrlich gesetzt) */
+[
+  // — Suche & Dashboard —
+  {id:"global_search", category:"suche", tool:"searchCustomer", safetyLevel:"safe", implemented:true, description:"Globale Suche nach Kunde/Beleg/Nummer.", optionalEntities:["customerName","documentNumber"], examples:["Nexus, finde Katrin Söllinger.","Nexus, suche nach Rechnungsnummer …"]},
+  {id:"dashboard_summary", category:"dashboard", tool:"getFinanceSummary", safetyLevel:"safe", implemented:true, description:"Tagesübersicht / wichtigste Kennzahlen.", examples:["Nexus, gib mir eine Tagesübersicht.","Nexus, was ist heute wichtig?"]},
+  // — Kunden —
+  {id:"customer_open", category:"kunden", tool:"searchCustomer", safetyLevel:"safe", implemented:true, description:"Kundenakte öffnen.", requiredEntities:["customerName"], examples:["Nexus, öffne die Akte von [Kunde]."]},
+  {id:"customer_create_draft", category:"kunden", tool:"createCustomerDraft", safetyLevel:"confirm", implemented:true, description:"Neuen Kunden als Entwurf anlegen.", optionalEntities:["customerName"], examples:["Nexus, lege einen neuen Kunden an.","Nexus, erstelle einen Kundenentwurf für [Name]."]},
+  {id:"customer_add_note", category:"kunden", tool:"createCustomerDraft", safetyLevel:"confirm", implemented:false, description:"Notiz beim Kunden ergänzen.", requiredEntities:["customerName","messageText"], examples:["Nexus, notiere bei [Kunde]: …"]},
+  {id:"customer_set_whatsapp_consent", category:"kunden", tool:"createCustomerDraft", safetyLevel:"confirm", implemented:false, description:"WhatsApp-Einwilligung dokumentieren.", requiredEntities:["customerName"], examples:["Nexus, dokumentiere die WhatsApp-Einwilligung von [Kunde]."]},
+  // — Leads —
+  {id:"leads_list", category:"leads", tool:"navigateTo", safetyLevel:"safe", implemented:true, page:"leads", description:"Anfragen/Leads anzeigen.", examples:["Nexus, zeig mir alle neuen Anfragen."]},
+  {id:"lead_to_customer", category:"leads", tool:"createCustomerDraft", safetyLevel:"confirm", implemented:false, description:"Aus Anfrage einen Kundenentwurf erstellen.", examples:["Nexus, erstelle aus der Anfrage einen Kundenentwurf."]},
+  // — Projekte —
+  {id:"projects_list", category:"projekte", tool:"getProjectSummary", safetyLevel:"safe", implemented:true, page:"projekte", description:"Projekte/Baustellen anzeigen.", examples:["Nexus, zeig mir alle laufenden Projekte."]},
+  {id:"project_status_change", category:"projekte", tool:"createBookingDraft", safetyLevel:"confirm", implemented:false, description:"Projektstatus ändern.", examples:["Nexus, markiere das Projekt als abgeschlossen."]},
+  // — Aufmaß —
+  {id:"aufmass_open", category:"aufmass", tool:"navigateTo", safetyLevel:"safe", implemented:true, page:"aufmass", description:"Aufmaß-Tool öffnen.", examples:["Nexus, öffne das Aufmaß von [Kunde]."]},
+  {id:"aufmass_value_entry", category:"aufmass", tool:"createBookingDraft", safetyLevel:"confirm", implemented:false, description:"Messwerte per Sprache eintragen.", examples:["Nexus, trage eine Länge von [Wert] Metern ein."]},
+  // — Angebote —
+  {id:"offers_list", category:"angebote", tool:"navigateTo", safetyLevel:"safe", implemented:true, page:"angebote", description:"Angebote anzeigen.", examples:["Nexus, zeig mir offene Angebote."]},
+  {id:"offer_create_draft", category:"angebote", tool:"createOfferDraft", safetyLevel:"confirm", implemented:true, description:"Angebotsentwurf erstellen.", optionalEntities:["customerName"], examples:["Nexus, erstelle ein Angebot für [Kunde]."]},
+  {id:"offer_finalize", category:"angebote", tool:"createOfferDraft", safetyLevel:"strong_confirm", implemented:false, description:"Angebot finalisieren (starke Bestätigung).", examples:["Ja, Angebot finalisieren."]},
+  {id:"offer_send_whatsapp", category:"angebote", tool:"sendExistingOfferWhatsApp", safetyLevel:"strong_confirm", implemented:true, description:"Angebot per WhatsApp senden.", requiredEntities:["customerName"], examples:["Nexus, schick [Kunde] das letzte Angebot per WhatsApp."]},
+  // — Rechnungen —
+  {id:"invoices_list", category:"rechnungen", tool:"navigateTo", safetyLevel:"safe", implemented:true, page:"rechnungen", description:"Rechnungen anzeigen.", examples:["Nexus, zeig mir offene Rechnungen."]},
+  {id:"invoice_from_offer", category:"rechnungen", tool:"createInvoiceDraft", safetyLevel:"confirm", implemented:true, description:"Rechnung aus Angebot erstellen.", optionalEntities:["documentNumber"], examples:["Nexus, erstelle aus Angebot [Nummer] eine Rechnung."]},
+  {id:"invoice_finalize", category:"rechnungen", tool:"createInvoiceDraft", safetyLevel:"strong_confirm", implemented:false, description:"Rechnung finalisieren (starke Bestätigung).", examples:["Ja, Rechnung finalisieren."]},
+  {id:"invoice_cancel", category:"rechnungen", tool:"createInvoiceDraft", safetyLevel:"strong_confirm", implemented:false, description:"Rechnung stornieren (starke Bestätigung).", examples:["Ja, Rechnung stornieren."]},
+  {id:"invoice_send_whatsapp", category:"rechnungen", tool:"sendExistingInvoiceWhatsApp", safetyLevel:"strong_confirm", implemented:true, description:"Rechnung per WhatsApp senden.", optionalEntities:["documentNumber"], examples:["Nexus, schick Rechnung [Nummer] per WhatsApp."]},
+  // — Offene Posten —
+  {id:"open_items_summary", category:"offene_posten", tool:"getOpenPositionsSummary", safetyLevel:"safe", implemented:true, page:"openitems", description:"Offene Posten / Außenstände anzeigen.", examples:["Nexus, wer schuldet mir noch Geld?","Nexus, öffne offene Positionen."]},
+  {id:"open_item_mark_paid", category:"offene_posten", tool:"markOpenItemPaidDraft", safetyLevel:"confirm", implemented:true, description:"Offenen Posten als bezahlt markieren.", requiredEntities:["customerName"], examples:["Nexus, markiere die Rechnung von [Kunde] als bezahlt."]},
+  {id:"open_items_delete", category:"offene_posten", tool:"deleteOpenItemsDraft", safetyLevel:"strong_confirm", implemented:false, description:"Offene Posten löschen (Sicherheitsdialog).", examples:["Nexus, lösche alle offenen Posten."]},
+  // — Buchhaltung —
+  {id:"finance_summary", category:"buchhaltung", tool:"getFinanceSummary", safetyLevel:"safe", implemented:true, page:"bookkeeping", description:"Finanzübersicht.", examples:["Nexus, gib mir eine Finanzübersicht."]},
+  {id:"booking_income", category:"buchhaltung", tool:"createBookingDraft", safetyLevel:"confirm", implemented:true, description:"Einnahme erfassen.", requiredEntities:["amount"], optionalEntities:["customerName"], examples:["Nexus, erfasse eine Einnahme von [Betrag] von [Kunde]."]},
+  {id:"booking_expense", category:"buchhaltung", tool:"createBookingDraft", safetyLevel:"confirm", implemented:true, description:"Ausgabe erfassen.", requiredEntities:["amount"], examples:["Nexus, erfasse eine Ausgabe von [Betrag] für [Zweck]."]},
+  // — Steuer / Rücklagen —
+  {id:"tax_reserve_calc", category:"steuer", tool:"getFinanceSummary", safetyLevel:"safe", implemented:true, description:"35 % Steuer-Rücklage berechnen.", requiredEntities:["amount"], examples:["Nexus, berechne 35 Prozent Steuer-Rücklage."]},
+  // — Belege & Bank —
+  {id:"receipt_scan", category:"belege_bank", tool:"navigateTo", safetyLevel:"safe", implemented:true, page:"belegscanner", description:"Belegscanner öffnen.", examples:["Nexus, öffne den Belegscanner."]},
+  {id:"bank_import", category:"belege_bank", tool:"navigateTo", safetyLevel:"strong_confirm", implemented:false, description:"Kontoauszug importieren (Vorschau + Bestätigung).", examples:["Nexus, importiere den Kontoauszug."]},
+  // — Termine —
+  {id:"calendar_today", category:"termine", tool:"navigateTo", safetyLevel:"safe", implemented:false, description:"Heutige Termine anzeigen.", examples:["Nexus, zeig mir die heutigen Termine."]},
+  {id:"calendar_create", category:"termine", tool:"createBookingDraft", safetyLevel:"confirm", implemented:false, description:"Termin anlegen.", requiredEntities:["date"], examples:["Nexus, plane eine Besichtigung am [Datum] um [Uhrzeit]."]},
+  // — Preisrechner —
+  {id:"price_calc_open", category:"preisrechner", tool:"navigateTo", safetyLevel:"safe", implemented:true, page:"calculator", description:"Preisrechner öffnen.", examples:["Nexus, öffne den Preisrechner."]},
+  {id:"price_calc_floor", category:"preisrechner", tool:"createOfferDraft", safetyLevel:"safe", implemented:false, description:"Bodenverlegung kalkulieren.", requiredEntities:["quantity"], examples:["Nexus, berechne die Bodenverlegung für [Fläche] Quadratmeter."]},
+  // — WhatsApp —
+  {id:"whatsapp_open_manual", category:"whatsapp", tool:"openWhatsAppManualFallback", safetyLevel:"confirm", implemented:true, description:"WhatsApp manuell öffnen (Link + PDF).", requiredEntities:["customerName"], examples:["Nexus, öffne WhatsApp mit dem Angebot für [Kunde]."]},
+  {id:"whatsapp_create_offer_send", category:"whatsapp", tool:"createOfferDraftForWhatsApp", safetyLevel:"strong_confirm", implemented:true, description:"Angebot erstellen und per WhatsApp senden.", requiredEntities:["customerName"], examples:["Nexus, erstelle für [Kunde] ein Angebot und schicke es per WhatsApp."]},
+  // — E-Mail —
+  {id:"email_send_document", category:"email", tool:"createMarketingDraft", safetyLevel:"strong_confirm", implemented:false, description:"Dokument per E-Mail senden.", requiredEntities:["customerName"], examples:["Nexus, schicke das Angebot per E-Mail."]},
+  // — Marketing —
+  {id:"marketing_draft", category:"marketing", tool:"createMarketingDraft", safetyLevel:"confirm", implemented:true, description:"Marketing-/Content-Entwurf erstellen.", examples:["Nexus, erstelle einen Facebook-Beitrag."]},
+  {id:"marketing_publish", category:"marketing", tool:"publishMarketingDraft", safetyLevel:"strong_confirm", implemented:false, description:"Inhalt veröffentlichen (starke Bestätigung).", examples:["Ja, veröffentlichen."]},
+  // — Agenten —
+  {id:"agent_open", category:"agenten", tool:"openAgent", safetyLevel:"safe", implemented:true, page:"agents", description:"KI-Mitarbeiter öffnen.", examples:["Nexus, öffne den Marketing-Agenten."]},
+  // — NEXUS-Gehirn —
+  {id:"brain_define", category:"gehirn", tool:"askClarifyingQuestion", safetyLevel:"safe", implemented:true, description:"Begriff erklären / im Gehirn suchen.", examples:["Nexus, was bedeutet [Begriff]?"]},
+  {id:"brain_learn", category:"gehirn", tool:"askClarifyingQuestion", safetyLevel:"confirm", implemented:true, description:"Neue Bedeutung lernen.", examples:["Nexus, merke dir: [Begriff] bedeutet [Bedeutung]."]},
+  // — Provider —
+  {id:"provider_status", category:"provider", tool:"navigateTo", safetyLevel:"safe", implemented:true, description:"KI-Provider-Status anzeigen.", examples:["Nexus, welcher KI-Anbieter ist aktiv?"]},
+  // — Datenspeicher / Backup —
+  {id:"data_save_now", category:"datenspeicher", tool:"navigateTo", safetyLevel:"safe", implemented:true, description:"Jetzt speichern.", examples:["Nexus, speichere jetzt alle Daten."]},
+  {id:"backup_export", category:"datenspeicher", tool:"navigateTo", safetyLevel:"safe", implemented:true, description:"Backup exportieren.", examples:["Nexus, exportiere ein Backup."]},
+  {id:"snapshot_create", category:"datenspeicher", tool:"navigateTo", safetyLevel:"confirm", implemented:true, description:"Snapshot erstellen.", examples:["Nexus, erstelle einen Snapshot."]},
+  {id:"backup_import", category:"datenspeicher", tool:"navigateTo", safetyLevel:"strong_confirm", implemented:false, description:"Backup importieren (starke Bestätigung).", examples:["Ja, Backup importieren."]},
+  {id:"snapshot_restore", category:"datenspeicher", tool:"navigateTo", safetyLevel:"strong_confirm", implemented:false, description:"Snapshot wiederherstellen (starke Bestätigung).", examples:["Ja, Snapshot wiederherstellen."]},
+  // — Sicherheit —
+  {id:"security_lock", category:"sicherheit", tool:"navigateTo", safetyLevel:"confirm", implemented:true, description:"Cockpit sperren.", examples:["Nexus, sperre das Cockpit."]},
+  {id:"security_status", category:"sicherheit", tool:"navigateTo", safetyLevel:"safe", implemented:true, page:"settings", description:"Sicherheitsstatus anzeigen.", examples:["Nexus, zeig mir den Sicherheitsstatus."]},
+  // — Sprache / Mikrofon —
+  {id:"voice_start", category:"sprache", tool:"navigateTo", safetyLevel:"safe", implemented:true, description:"Sprachmodus aktivieren.", examples:["Nexus, aktiviere den Sprachmodus."]},
+  {id:"voice_stop_speaking", category:"sprache", tool:"stopSpeaking", safetyLevel:"safe", implemented:true, description:"Sprachausgabe stoppen.", examples:["Nexus, stoppe die Sprachausgabe."]},
+  // — System —
+  {id:"system_status", category:"system", tool:"navigateTo", safetyLevel:"safe", implemented:true, description:"Systemstatus / Diagnose.", examples:["Nexus, prüfe das Cockpit."]},
+  {id:"system_help", category:"system", tool:"askClarifyingQuestion", safetyLevel:"safe", implemented:true, description:"Verfügbare Befehle anzeigen.", examples:["Nexus, was kann ich sagen?"]}
+].forEach(nxDefIntent);
+
+const NEXUS_COMMAND_CATEGORIES=[
+  ["navigation","Navigation"],["suche","Suche"],["dashboard","Dashboard"],["kunden","Kunden"],
+  ["leads","Anfragen"],["projekte","Projekte"],["aufmass","Aufmaß"],["angebote","Angebote"],
+  ["rechnungen","Rechnungen"],["offene_posten","Offene Posten"],["buchhaltung","Buchhaltung"],
+  ["steuer","Steuer/Rücklagen"],["belege_bank","Belege & Bank"],["termine","Termine"],
+  ["preisrechner","Preisrechner"],["whatsapp","WhatsApp"],["email","E-Mail"],["marketing","Marketing"],
+  ["agenten","Agenten"],["gehirn","NEXUS-Gehirn"],["provider","KI-Provider"],["datenspeicher","Datenspeicher"],
+  ["sicherheit","Sicherheit"],["sprache","Sprache"],["system","System"]
+];
+function nxSafetyLabel(lvl){ return lvl==="strong_confirm"?"🔴 starke Bestätigung":(lvl==="confirm"?"🟡 Bestätigung":"🟢 sicher"); }
+function nxIntentImplemented(id){ const it=NEXUS_INTENTS[id]; return it?it.implemented!==false:true; }
+function nxNotConnectedMsg(){ return "Ich habe den Befehl verstanden, aber diese Aktion ist noch nicht vollständig mit dem Cockpit verbunden."; }
+function nxIntentStats(){ const ids=Object.keys(NEXUS_INTENTS); return { total:ids.length, connected:ids.filter(nxIntentImplemented).length, planned:ids.filter(i=>!nxIntentImplemented(i)).length }; }
+
+/* ---- Lokale Navigationserkennung (alle Synonyme, ohne KI) ---- */
+function nxIsNavigationCommand(l){
+  l=String(l||"");
+  if(/\b(erstell\w*|erzeug\w*|lege? an|anlegen|buche|trag\w* ein|schick\w*|send\w*|verschick\w*|lösch\w*|loesch\w*|entfern\w*|markier\w*|bezahl\w*|finalisier\w*|stornier\w*|veröffentlich\w*|veroeffentlich\w*|importier\w*|wiederherstell\w*|mail\w*|whatsapp)\b/.test(l)) return false;
+  return /^(\s*)(öffne|oeffne|zeige?|zeig mir|geh(e)?( mal)?( zu| zur| zum| in| ins)?|bring mich( zu| zur| zum| in| ins)?|wechsl?e?( zu| in| ins)|navigier\w*( zu)?|spring( zu| in)|starte|ruf)\b/.test(l);
+}
+
 
 /* ---- Sicherheitsregeln (werden auch an die KI-Provider gesendet) ---- */
 const NX_BRAIN_RULES = [
@@ -7407,6 +7634,11 @@ function preResolveNexusCommand(commandText, context){
     if(brain.suggestedTool==="getProjectSummary"){ _nxLastKind="Abfrage"; nxBrainDebugNote({executedTool:"getProjectSummary (lokal)"}); return {handled:true, text:nxProjectSummaryText(null)}; }
     if(brain.suggestedPage && /(öffne|oeffne|zeig|geh\b)/.test(l)){ _nxLastKind="Navigation"; navigateTo(brain.suggestedPage); nxBrainDebugNote({executedTool:"navigateTo (lokal)"}); return {handled:true, text:"Öffne im Cockpit: "+nxSecName(brain.suggestedPage)+"."}; }
   }
+  // Klare Navigation IMMER lokal (alle Synonyme: „geh zu / bring mich zu / wechsle zu / navigiere zu …“)
+  if(typeof nxIsNavigationCommand==="function" && nxIsNavigationCommand(l) && !brain.dangerous){
+    const sec=nxNavTarget(l);
+    if(sec){ _nxLastKind="Navigation"; navigateTo(sec); nxBrainDebugNote({executedTool:"navigateTo (lokal, Synonym)"}); return {handled:true, text:"Öffne im Cockpit: "+nxSecName(sec)+"."}; }
+  }
   return {handled:false, brain};
 }
 
@@ -7575,7 +7807,8 @@ function nxBrainDebugHTML(){
 function nxBrainRenderPanel(){
   const host=byId("nxBrainBody"); if(!host) return;
   const body =
-    _nxBrainUi.tab==="seiten"    ? nxBrainPagesHTML()
+    _nxBrainUi.tab==="kommandos" ? nxCommandsCatalogHTML()
+  : _nxBrainUi.tab==="seiten"    ? nxBrainPagesHTML()
   : _nxBrainUi.tab==="tools"     ? nxBrainToolsHTML()
   : _nxBrainUi.tab==="regeln"    ? nxBrainRulesHTML()
   : _nxBrainUi.tab==="beispiele" ? nxBrainExamplesHTML()
@@ -7584,6 +7817,7 @@ function nxBrainRenderPanel(){
   : nxBrainGlossaryHTML();
   host.innerHTML=
     '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">'+
+    nxBrainTabBtn("kommandos","🎙 Sprachbefehle")+
     nxBrainTabBtn("begriffe","Begriffe & Synonyme")+nxBrainTabBtn("seiten","Cockpit-Seiten")+
     nxBrainTabBtn("tools","Werkzeuge / Tools")+nxBrainTabBtn("regeln","Sicherheitsregeln")+
     nxBrainTabBtn("beispiele","Beispielbefehle")+nxBrainTabBtn("memo","Erinnerungen")+
@@ -7602,6 +7836,61 @@ function nxBrainDeleteEntry(term){ if(confirm("Gelernten Begriff „"+term+"“ 
 function nxBrainAddNote(){ addNexusBrainNote(val("nxBrainNoteInput")||""); nxBrainRenderPanel(); }
 function nxBrainDelNote(i){ deleteNexusBrainNote(i); nxBrainRenderPanel(); }
 function nxBrainTryExample(text){ const e=byId("nxInput"); if(e){ e.value=text; e.focus(); } }
+
+/* ==========================================================
+   Sprachbefehle / NEXUS-Kommandos – durchsuchbarer Katalog
+   ========================================================== */
+const _nxCmdUi={ cat:"alle", q:"", lastTest:null };
+function nxCmdCat(c){ _nxCmdUi.cat=c; nxBrainRenderPanel(); }
+function nxCmdSearchInput(v){ _nxCmdUi.q=String(v||""); clearTimeout(_nxCmdUi._t); _nxCmdUi._t=setTimeout(()=>{ nxBrainRenderPanel(); const i=byId("nxCmdSearch"); if(i){ i.focus(); try{ i.setSelectionRange(i.value.length,i.value.length); }catch(e){} } },220); }
+function nxCatalogInsert(id){ const it=NEXUS_INTENTS[id]; if(!it) return; const ex=(it.examples||[])[0]||("Nexus, "+it.description); nxBrainTryExample(ex); }
+function nxCatalogTest(id){
+  const it=NEXUS_INTENTS[id]; if(!it){ return; }
+  const ex=(it.examples||[])[0]||"";
+  let brain={}; try{ brain=nxBrainAnalyze(String(ex).replace(/^nexus[, ]*/i,"")); }catch(e){}
+  _nxCmdUi.lastTest={ id, example:ex, tool:it.tool||"–", safety:it.safetyLevel, connected:it.implemented!==false,
+    matched:(brain&&brain.concept)||"–", suggestedTool:(brain&&brain.suggestedTool)||"–" };
+  nxBrainRenderPanel();
+}
+function nxCommandsCatalogHTML(){
+  const st=nxIntentStats();
+  const q=String(_nxCmdUi.q||"").toLowerCase().trim();
+  const cat=_nxCmdUi.cat||"alle";
+  const chips=['<button class="nx-btn'+(cat==="alle"?" on":"")+'" onclick="nxCmdCat(\'alle\')">Alle</button>']
+    .concat(NEXUS_COMMAND_CATEGORIES.map(c=>'<button class="nx-btn'+(cat===c[0]?" on":"")+'" onclick="nxCmdCat(\''+c[0]+'\')">'+esc(c[1])+'</button>')).join("");
+  const ids=Object.keys(NEXUS_INTENTS).filter(id=>{
+    const it=NEXUS_INTENTS[id];
+    if(cat!=="alle" && it.category!==cat) return false;
+    if(!q) return true;
+    const hay=(id+" "+(it.description||"")+" "+(it.aliases||[]).join(" ")+" "+(it.examples||[]).join(" ")+" "+(it.tool||"")).toLowerCase();
+    return hay.indexOf(q)>=0;
+  });
+  const catLabel={}; NEXUS_COMMAND_CATEGORIES.forEach(c=>catLabel[c[0]]=c[1]);
+  const lt=_nxCmdUi.lastTest;
+  const testBox = lt ? ('<div style="background:rgba(212,161,90,.08);border:1px solid var(--gold3);border-radius:8px;padding:8px 10px;margin:6px 0;font-size:12px">'
+    +'<b>Test:</b> '+esc(lt.example)+'<br>Intent: <b>'+esc(lt.id)+'</b> · Tool: <b>'+esc(lt.tool)+'</b> · '+esc(nxSafetyLabel(lt.safety))
+    +' · '+(lt.connected?'<span style="color:var(--green2)">verbunden</span>':'<span style="color:var(--gold2)">geplant</span>')
+    +'<br>Lokale Erkennung: Begriff „'+esc(lt.matched)+'“ · Tool-Vorschlag '+esc(lt.suggestedTool)
+    +'<div class="nx-muted" style="margin-top:3px">Dry-Run – es wurde nichts ausgeführt.</div></div>') : "";
+  const rows=ids.map(id=>{
+    const it=NEXUS_INTENTS[id];
+    const conn=it.implemented!==false?'<span style="color:var(--green2)">● verbunden</span>':'<span style="color:var(--gold2)">○ geplant</span>';
+    const ex=(it.examples||[])[0]||"";
+    return '<div class="nx-row" style="flex-direction:column;align-items:stretch;gap:3px;border-bottom:1px solid rgba(255,255,255,.06);padding:7px 0">'
+      +'<div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap"><span><b>'+esc(it.description||id)+'</b> <span class="nx-muted">('+esc(id)+')</span></span>'
+      +'<span class="nx-muted" style="white-space:nowrap">'+esc(nxSafetyLabel(it.safetyLevel))+'</span></div>'
+      +'<div class="nx-muted" style="font-size:11.5px">Kategorie: '+esc(catLabel[it.category]||it.category)+' · Tool: '+esc(it.tool||"–")+' · '+conn+'</div>'
+      +(ex?'<div style="font-size:12px;color:#cdbfa9">„'+esc(ex)+'“</div>':"")
+      +'<div style="display:flex;gap:6px;margin-top:3px"><button class="nx-btn" style="padding:3px 8px;font-size:11px" onclick="nxCatalogInsert(\''+id+'\')">In Eingabe übernehmen</button>'
+      +'<button class="nx-btn" style="padding:3px 8px;font-size:11px" onclick="nxCatalogTest(\''+id+'\')">Testen</button></div></div>';
+  }).join("");
+  return '<div class="nx-ai">'
+    +'<div class="nx-muted" style="margin-bottom:6px">'+st.total+' Kommandos · '+st.connected+' verbunden · '+st.planned+' geplant. Sprich/schreibe natürliche Varianten – die Beispiele sind nur Anhaltspunkte.</div>'
+    +'<input id="nxCmdSearch" placeholder="🔍 Kommando suchen …" value="'+esc(_nxCmdUi.q||"")+'" oninput="nxCmdSearchInput(this.value)" style="margin-bottom:6px">'
+    +'<div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px">'+chips+'</div>'
+    +testBox
+    +(rows||'<div class="nx-muted">Keine Treffer.</div>')+'</div>';
+}
 
 /* Orchestrierung: lokal-zuerst (Bestätigung/Stop), dann Provider-Kette laut
    Routing (Gemini/Groq direkt, optional Ollama lokal), dann lokale Befehlslogik. */
