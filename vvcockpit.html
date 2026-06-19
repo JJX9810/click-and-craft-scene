@@ -973,7 +973,7 @@ function vvSupabaseValidateUrl(url){
 function vvSupabaseValidateKey(key){
   key=String(key||"").trim();
   // neue Publishable-Keys: sb_publishable_…  | Legacy-anon-Key: JWT (eyJ….….…)
-  return /^sb_publishable_[A-Za-z0-9]{6,}$/.test(key) || /^eyJ[A-Za-z0-9_=-]{8,}\.[A-Za-z0-9_=-]{8,}\.[A-Za-z0-9_=-]{8,}$/.test(key);
+  return /^sb_publishable_[A-Za-z0-9_-]{6,}$/.test(key) || /^eyJ[A-Za-z0-9_=-]{8,}\.[A-Za-z0-9_=-]{8,}\.[A-Za-z0-9_=-]{8,}$/.test(key);
 }
 function vvSupabaseIsConfigured(){ const c=vvSupabaseGetConfig(); return !!(c.url && c.publishableKey && vvSupabaseValidateUrl(c.url) && vvSupabaseValidateKey(c.publishableKey)); }
 
