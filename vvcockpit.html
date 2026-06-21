@@ -729,6 +729,8 @@ function scheduleVvAutoSave(reason){
   vvAutoSaveTimer=setTimeout(()=>{ vvDbSaveState(null,{reason:reason||"change"}).catch(e=>console.warn("AutoSave:",e)); }, 800);
   // Cloud-Sync (Phase 1, opt-in): lokale Änderung vormerken + ggf. verzögerten Sync planen
   try{ if(typeof vvSupabaseMarkDirty==="function") vvSupabaseMarkDirty(); }catch(e){}
+  // D1 zentraler State-Sync (Phase 1): Änderung als „dirty“ markieren und verzögert hochladen
+  try{ if(typeof vvD1MarkDirty==="function") vvD1MarkDirty(); }catch(e){}
 }
 function vvDbNoteSaved(target){
   _vvLastSaveInfo={at:nowISO(), target, error:null};
@@ -838,6 +840,157 @@ async function vvBootLoad(){
     ? ("Cockpit-Daten automatisch geladen ("+source+").")
     : "Keine gespeicherten Daten gefunden. Du kannst ein Backup importieren (Bereich „Backup“).";
   return loaded;
+}
+
+/* ==========================================================
+   D1 ZENTRALER STATE-SYNC (Phase 1)
+   ----------------------------------------------------------
+   PC und Handy laden/speichern automatisch denselben Stand über
+   Cloudflare Pages Functions (/api/state) + D1 (Binding DB).
+   IndexedDB bleibt lokaler Cache. Kein blindes Überschreiben:
+   Revision + 409-Konflikt. Keine Secrets (Client schickt nur den
+   bereits secret-/blob-bereinigten State via vvSupabasePrepareCloudState).
+   ========================================================== */
+const VV_D1_REV_KEY = "VV_D1_REVISION";
+let _vvD1Rev = (function(){ const n=parseInt(localStorage.getItem(VV_D1_REV_KEY)||"0",10); return isFinite(n)?n:0; })();
+let _vvD1Enabled=false, _vvD1Dirty=false, _vvD1Saving=false, _vvD1SaveTimer=null, _vvD1PollTimer=null, _vvD1Applying=false;
+
+function vvD1ApiAvailable(){ try{ return typeof location!=="undefined" && /^https?:$/.test(location.protocol); }catch(e){ return false; } }
+function vvD1Online(){ try{ return !(typeof navigator!=="undefined" && navigator && navigator.onLine===false); }catch(e){ return true; } }
+function vvD1Locked(){ try{ return (typeof _vvAuthLocked!=="undefined" && _vvAuthLocked); }catch(e){ return false; } }
+
+/* kleiner, unaufdringlicher Status unten rechts */
+function vvD1Badge(){
+  let el=byId("vvD1Status");
+  if(!el){
+    el=document.createElement("div"); el.id="vvD1Status";
+    el.style.cssText="position:fixed;right:10px;bottom:10px;z-index:9998;font-size:12px;font-weight:800;"
+      +"padding:5px 10px;border-radius:8px;background:rgba(20,16,13,.92);border:1px solid #3a2e22;color:#e7dccb;"
+      +"box-shadow:0 4px 16px rgba(0,0,0,.35);max-width:70vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis";
+    el.title="Cloud-Synchronisation (D1)";
+    el.addEventListener("click", vvD1OnBadgeClick);
+    (document.body||document.documentElement).appendChild(el);
+  }
+  return el;
+}
+const VV_D1_STATUS={
+  synced:{t:"✓ Synchronisiert", c:"#7bd49a", cur:"default"},
+  saving:{t:"⏳ Speichert …", c:"#e0c074", cur:"default"},
+  offline:{t:"☁︎ Offline – wird später gespeichert", c:"#9aa3ad", cur:"default"},
+  error:{t:"⚠ Fehler beim Speichern", c:"#ff9c8a", cur:"pointer"},
+  conflict:{t:"⚠ Neuere Version vorhanden – tippen zum Neuladen", c:"#e0c074", cur:"pointer"},
+  loading:{t:"⏳ Lade …", c:"#9aa3ad", cur:"default"}
+};
+let _vvD1Status="";
+function vvD1SetStatus(state){
+  _vvD1Status=state;
+  const def=VV_D1_STATUS[state]; if(!def) return;
+  try{ const el=vvD1Badge(); el.textContent=def.t; el.style.color=def.c; el.style.cursor=def.cur; el.style.display=def.t?"block":"none"; }catch(e){}
+}
+function vvD1OnBadgeClick(){
+  if(_vvD1Status==="conflict"){
+    if(confirm("Neuere Cloud-Version laden?\n\nNoch nicht hochgeladene lokale Änderungen gehen dabei verloren.")) vvD1PullNow(true);
+  } else if(_vvD1Status==="error"){
+    vvD1FlushSave();
+  }
+}
+
+/* große, nur lokal vorgehaltene Felder (Fotos/PDF = {__omitted:true}) aus lokalem Stand bewahren */
+function vvD1MergeOmitted(cloud, local){
+  if(Array.isArray(cloud)) return cloud.map((v,i)=>vvD1MergeOmitted(v, Array.isArray(local)?local[i]:undefined));
+  if(cloud && typeof cloud==="object"){
+    if(cloud.__omitted===true){
+      return (local!==undefined && local!==null && !(local && local.__omitted)) ? local : null;
+    }
+    const out={};
+    for(const k of Object.keys(cloud)) out[k]=vvD1MergeOmitted(cloud[k], (local&&typeof local==="object")?local[k]:undefined);
+    return out;
+  }
+  return cloud;
+}
+
+/* Cloud-State in den laufenden Betrieb übernehmen (nur Geschäftsdaten = data) */
+function vvD1ApplyCloudState(cloudState, rev){
+  try{
+    _vvD1Applying=true;
+    const cloudData=(cloudState && cloudState.data && typeof cloudState.data==="object") ? cloudState.data : null;
+    if(cloudData){
+      const merged=vvD1MergeOmitted(cloudData, (typeof data!=="undefined"&&data)?data:{});
+      data=merged;
+      try{ normalizeData(); }catch(e){}
+      try{ migrateOldData(data); }catch(e){}
+      try{ migrateOpenItemsCleanup(); }catch(e){}
+      try{ vvDbSaveState(null,{reason:"d1_pull"}); }catch(e){}   // lokalen Cache aktualisieren
+      try{ updateBadges(); updateKPIs(); }catch(e){}
+      try{ if(typeof currentSection!=="undefined" && currentSection && typeof showSection==="function" && !vvD1Locked()) showSection(currentSection); }catch(e){}
+    }
+    _vvD1Rev=Number(rev)||0; try{ localStorage.setItem(VV_D1_REV_KEY, String(_vvD1Rev)); }catch(e){}
+    _vvD1Dirty=false;
+  }catch(e){ console.warn("vvD1ApplyCloudState:", e); }
+  finally{ _vvD1Applying=false; }
+}
+
+/* aktuellen Cloud-Stand prüfen / ggf. übernehmen */
+async function vvD1PullNow(force){
+  if(!_vvD1Enabled) return;
+  if(vvD1Locked()) return;
+  if(!vvD1Online()){ vvD1SetStatus("offline"); return; }
+  try{
+    const res=await fetch("/api/state", { headers:{ "accept":"application/json" }, cache:"no-store" });
+    if(!res.ok) throw new Error("http "+res.status);
+    const body=await res.json();
+    if(!body || body.ok===false) throw new Error("api");
+    const cloudRev=Number(body.revision||0);
+    if(cloudRev>_vvD1Rev){
+      if(_vvD1Dirty && !force){ vvD1SetStatus("conflict"); return; }   // lokale ungesicherte Änderungen schützen
+      vvD1ApplyCloudState(body.state||{}, cloudRev);
+      vvD1SetStatus("synced");
+    } else if(!_vvD1Dirty && !_vvD1Saving){
+      vvD1SetStatus("synced");
+    }
+  }catch(e){ vvD1SetStatus( vvD1Online()?"error":"offline" ); }
+}
+
+/* lokale Änderung -> verzögert hochladen */
+function vvD1MarkDirty(){ if(!_vvD1Enabled || _vvD1Applying) return; _vvD1Dirty=true; vvD1ScheduleSave(); }
+function vvD1ScheduleSave(){ clearTimeout(_vvD1SaveTimer); _vvD1SaveTimer=setTimeout(()=>{ vvD1FlushSave(); }, 3000); }
+async function vvD1FlushSave(){
+  if(!_vvD1Enabled || !_vvD1Dirty) return;
+  if(vvD1Locked()) return;
+  if(!vvD1Online()){ vvD1SetStatus("offline"); return; }
+  if(_vvD1Saving) return;                    // kein paralleler Save; dirty bleibt
+  _vvD1Saving=true; vvD1SetStatus("saving");
+  try{
+    let payloadState={};
+    try{ payloadState=(typeof vvSupabasePrepareCloudState==="function") ? vvSupabasePrepareCloudState().state : vvBuildCockpitState(); }
+    catch(e){ payloadState=vvBuildCockpitState(); }
+    const res=await fetch("/api/state", { method:"POST", headers:{ "content-type":"application/json" }, body:JSON.stringify({ revision:_vvD1Rev, state:payloadState }) });
+    if(res.status===409){ vvD1SetStatus("conflict"); _vvD1Saving=false; return; }   // Cloud neuer – nicht überschreiben
+    if(res.status===413){ vvD1SetStatus("error"); _vvD1Saving=false; _vvD1Dirty=false; console.warn("D1: State zu groß für Cloud-Speicherung."); return; }
+    if(!res.ok){ vvD1SetStatus("error"); _vvD1Saving=false; return; }
+    const body=await res.json();
+    if(body && body.ok){ _vvD1Rev=Number(body.revision||(_vvD1Rev+1)); try{ localStorage.setItem(VV_D1_REV_KEY,String(_vvD1Rev)); }catch(e){} _vvD1Dirty=false; vvD1SetStatus("synced"); }
+    else vvD1SetStatus("error");
+  }catch(e){ vvD1SetStatus( vvD1Online()?"error":"offline" ); }
+  finally{ _vvD1Saving=false; if(_vvD1Dirty && vvD1Online() && !vvD1Locked()) vvD1ScheduleSave(); }
+}
+
+function vvD1StartPolling(){
+  clearInterval(_vvD1PollTimer);
+  _vvD1PollTimer=setInterval(()=>{ if(document.hidden) return; vvD1PullNow(false); }, 5000);
+}
+async function vvD1Init(){
+  if(_vvD1Enabled) return;
+  if(!vvD1ApiAvailable()){ return; }   // z. B. file:// – kein Server, Sync inaktiv
+  _vvD1Enabled=true;
+  vvD1SetStatus(vvD1Online()?"loading":"offline");
+  await vvD1PullNow(false);            // Start: Cloud laden, bei neuerer Revision lokalen Cache aktualisieren
+  vvD1StartPolling();
+  try{
+    window.addEventListener("online", ()=>{ vvD1PullNow(false); if(_vvD1Dirty) vvD1FlushSave(); });
+    window.addEventListener("offline", ()=>{ vvD1SetStatus("offline"); });
+    document.addEventListener("visibilitychange", ()=>{ if(!document.hidden) vvD1PullNow(false); });
+  }catch(e){}
 }
 
 /* ---- UI: Bereich „Datenspeicher“ (in der Backup-Seite) ---- */
@@ -1376,7 +1529,23 @@ function vvSupabasePanelHTML(){
     +'<p class="nx-muted" style="font-size:11px;margin-top:8px">🔒 Passwort wird nie gespeichert. Project URL, Key, Workspace-ID liegen getrennt vom Geschäftsdaten-State und sind nicht im Backup. Fotos/PDFs bleiben in Phase 1 nur lokal. IndexedDB bleibt Hauptspeicher.</p>'
   +'</div>';
 }
-function vvSupabaseRenderPanel(){ const host=byId("vvSupabaseHost"); if(host) host.innerHTML=vvSupabasePanelHTML(); }
+/* Phase 1 (D1): Die manuelle Supabase-Oberfläche wird nur AUSGEBLENDET, nicht gelöscht.
+   Die alten Funktionen (vvSupabase*) bleiben im Code erhalten und können reaktiviert werden,
+   indem unten wieder vvSupabasePanelHTML() gerendert wird. */
+let _vvSupabaseUiHidden = true;
+function vvSupabaseRenderPanel(){
+  const host=byId("vvSupabaseHost"); if(!host) return;
+  if(_vvSupabaseUiHidden){
+    host.innerHTML='<div class="panel" style="border-color:var(--line)">'
+      +'<h3>☁️ Cloud-Synchronisation</h3>'
+      +'<p style="color:var(--muted);font-size:13px;margin:0">Die Synchronisation läuft jetzt <b>automatisch</b> über die zentrale Cloud-Datenbank (Cloudflare D1). '
+      +'PC und Handy teilen denselben Stand. Der aktuelle Sync-Status wird unten rechts angezeigt.</p>'
+      +'<p style="color:var(--muted);font-size:11.5px;margin:6px 0 0">Die frühere manuelle Synchronisations-Oberfläche ist deaktiviert (nicht gelöscht).</p>'
+      +'</div>';
+    return;
+  }
+  host.innerHTML=vvSupabasePanelHTML();
+}
 function vvSupaUiMsg(t, ok){ const e=byId("sb_msg"); if(e){ e.style.color=ok?"var(--green2)":(ok===false?"#ff8070":"var(--muted)"); e.textContent=t; } }
 function vvSupaUiExtra(html){ const e=byId("sb_extra"); if(e) e.innerHTML=html||""; }
 function vvSupaUiSaveConfig(){
@@ -12126,6 +12295,7 @@ document.addEventListener("DOMContentLoaded",()=>{
       if(postBootDone) return; postBootDone=true;
       try{ nxInjectGlobal(); }catch(e){} // globaler Mic-Chip + Antwort-Overlay (Zuhören erst nach Klick)
       try{ nxTryLoadLocalConfig(); }catch(e){} // optionale lokale Startkonfiguration (nur über http, nie überschreibend)
+      try{ vvD1Init(); }catch(e){} // zentraler D1-State-Sync (PC ↔ Handy), nur auf http(s)
       // Live Bank-Table wenn section aktiv
       const obs=new MutationObserver(()=>{ if(currentSection==="bookkeeping") renderBkTable(); });
       obs.observe(byId("main"),{childList:true});
