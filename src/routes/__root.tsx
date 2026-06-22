@@ -160,7 +160,8 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isHome = pathname === "/";
-  const isAdminArea = pathname.startsWith("/admin") || pathname.startsWith("/login");
+  const isAdminArea =
+    pathname.startsWith("/admin") || pathname.startsWith("/login") || pathname.startsWith("/cockpit");
 
   if (isAdminArea) {
     return (
