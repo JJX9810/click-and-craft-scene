@@ -5,23 +5,41 @@
 ## 1. Status der Backup-Datei
 
 **Datei:** `vv-cockpit-backup-2026-06-22-2018.json`
-**Auffindbar in dieser Umgebung:** **Nein** (systemweite Suche, Git-Historie, Repo-Scan — nicht vorhanden).
+**Quelle inzwischen analysiert:** Das echte Alt-Cockpit wurde als ZIP bereitgestellt → siehe
+`06-altcockpit-ist-analyse.md`. Damit ist die **exakte Struktur** dieser Backup-Datei **bekannt**
+(erzeugt von `doExport()`; Name `vv-cockpit-backup-YYYY-MM-DD-HHMM.json` = Export vom 22.06.2026, 20:18 Uhr).
 
-Deshalb folgt **keine erfundene Datensatzanalyse**. Stattdessen:
-- **Teil A:** strukturelle Erwartungsanalyse (was so ein Export mit hoher Sicherheit enthält — abgeleitet aus
-  der von Ihnen beschriebenen Alt-Architektur und der realen Preislogik im Repo).
-- **Teil B:** ein **maschinelles Analyse-Framework**, das ich auf die echte Datei anwende, sobald sie vorliegt.
-- **Teil C:** der **Migrationsplan** (robust gegen die noch unbekannte konkrete Struktur).
+**Noch ausstehend:** die **Datensätze** selbst. Die ZIP enthält den App-Code, nicht die Geschäftsdaten.
+Für die datensatzgenaue Migration brauche ich **eine** dieser Quellen:
+- die Backup-JSON `vv-cockpit-backup-2026-06-22-2018.json` (von `doExport()`), **oder**
+- den D1-Cloud-Stand über `GET /api/export-state` (lädt `vv-cockpit-state.json`), **oder**
+- einen IndexedDB-Snapshot aus der laufenden App.
 
-> **So liefern Sie die Datei:** in `migration/legacy-backup/` committen **oder** Inhalt in den Chat einfügen.
-> Dann erstelle ich ein datensatzgenaues Inventar (Zählung je Entität, Feldliste, Dubletten, Widersprüche).
+> Datei nach `migration/legacy-backup/` committen oder Inhalt einfügen; dann liefere ich Inventar
+> (Zählung je Entität), Dubletten-/Widerspruchsbericht und das finale Feld-Mapping.
+
+**Bekannte exakte Backup-Struktur** (aus dem Code verifiziert):
+```jsonc
+{
+  "version": "VV_COCKPIT_2026",
+  "exportedAt": "<ISO>",
+  "keyNote": "… API-Keys und Login-Geheimnisse werden nicht exportiert.",
+  "data":     { /* 22+3 Collections, s. Datei 06 §3 */ },
+  "settings": { /* Firmendaten, OHNE api/keys */ },
+  "nexusBrainUser": { /* NEXUS-Gehirn */ }
+}
+```
+API-Keys/Login-Geheimnisse sind **nicht** enthalten (gut). **Fotos/Dokumente können als Base64** in
+`data.documents`/`data.measurements` stecken → bei Migration nach Storage auslagern.
 
 ---
 
-## Teil A — Strukturelle Erwartungsanalyse (Hypothese, zu verifizieren)
+## Teil A — Struktur (durch Code-Analyse BESTÄTIGT)
 
-Ein Voll-State-Export aus einer Single-HTML/IndexedDB-App ist fast immer **ein großes verschachteltes JSON-Objekt**
-mit Top-Level-Schlüsseln pro „Sammlung" plus eingebetteten Binärdaten. Erwartete Form:
+> Die folgende Form ist **nicht mehr Hypothese**, sondern aus dem echten Alt-Cockpit verifiziert
+> (Details: `06-altcockpit-ist-analyse.md`). Maßgeblich ist `backup.data.<collection>`.
+> Die ursprüngliche Skizze unten bleibt als grobe Orientierung; die **verbindlichen** Schlüssel/Felder
+> stehen in Datei 06 §3–§8.
 
 ```jsonc
 {
@@ -109,16 +127,31 @@ Sobald die Datei vorliegt, laufe ich diese Schritte (read-only, kein Auto-Import
 7. **Verifikation (manuell):** Stichproben Kunde/Rechnung/Foto; Summen-Abgleich (Anzahl, Umsatz, offene Summe);
    Differenzbericht mit Justus durchgehen → Freigabe → Promotion ins Live-Schema.
 
-### Beispiel-Mapping (zu konkretisieren, sobald echte Felder bekannt)
-| Alt (vermutet) | Neu | Transformation |
+### Feld-Mapping (aus dem echten Code `migrateOldData()` abgeleitet — verbindlich)
+Das Alt-Cockpit besitzt bereits eine interne Migration `migrateOldData(d)`; deren reale Mappings sind die
+Grundlage für V2 (`backup.data.<collection>` → V2-Tabelle):
+
+| Alt (real) | Neu | Transformation |
 |---|---|---|
-| `customers[].name` | `customers.display_name` | trim; ggf. in Vor-/Nachname splitten |
-| `customers[].adresse` | `customers.street/zip/city` | Objekt/Freitext zerlegen |
-| `invoices[].positionen[]` | `invoice_items` (n Zeilen) | je Position eine Zeile; Beträge → `numeric(12,2)` |
-| `invoices[].bezahlt` (bool) | abgeleitet aus `payments` | **nicht** als Wahrheit übernehmen |
-| `files[].data` (base64) | Storage-Objekt + `files`-Zeile | dekodieren, hashen, hochladen |
-| `settings.preise` | `price_rules` | mit `Kostenrechner.tsx` abgleichen, Differenzen melden |
-| `nexus.apiKeys` | — | **verwerfen + rotieren** |
+| `customers[].name` | `customers.display_name` | trim; ggf. Vor-/Nachname splitten |
+| `customers[].contact` | `customers.phone` | Feld-Rename (`contact`→`phone`) |
+| `customers[].place` | `customers.city`/`street` | `place`→`address` zerlegen |
+| `customers[].next` / `.currentStage` | `projects.next_step`/Status | `next`/`currentStage`→`nextStep` |
+| `customers[].status` | `customers.status` | `active`→`aktiv`, `done`→`abgeschlossen`, `problem`→`aktiv` |
+| `customers[].created` | `customers.created_at` | `created`→`createdAt` |
+| verschachtelte `customers[].measurements/offers/invoices` | Top-Level + `customer_id` | flach ziehen, `customerId`/`customerName` setzen |
+| `measurements[].totalPerimeter` | `measurements.total_skirting` | `totalPerimeter`→`totalSkirting` |
+| `offers[].no` | `offers.offer_no` | `no`→`number`; `customer`→`customerName` |
+| `offers[]/invoices[].positionen[]` | `offer_items`/`invoice_items` | je Position eine Zeile; Beträge → `numeric(12,2)` |
+| `invoices[]` „bezahlt" | abgeleitet aus `payments` | **nicht** als Wahrheit übernehmen |
+| `documents[].data` / Base64 in `measurements` | Storage + `files`-Zeile | dekodieren, hashen, hochladen |
+| `settings` (Firmendaten, `taxReserve`, `defaultDepositPercent`, `legal`) | `settings` | 1:1 (s. Datei 06 §4); `tax`/`iban` nachtragen |
+| `FLOOR_PRICES`/`REMOVAL_PRICES` | `price_rules` | mit `Kostenrechner.tsx` abgleichen (Differenzen: Anfahrt 35 vs 30 km, Spachtel 8 vs 19 €) |
+| `counters` (Nummernkreise) | `settings` + Postgres-Sequenz | höchsten Wert übernehmen, Sequenz fortsetzen |
+| `openItemOverrides` | — | ❌ **verwerfen** (Anti-Pattern) |
+| `nexusBrainUser` | `nexus_memory` (kuratiert) | nur unkritische Inhalte; **keine** Keys |
+| `staff` | `profiles` | Justus/Justin |
+| `mileage` / `materials` / `recurring` | `mileage_log`/`materials`/`recurring` | V1.1/V2 (s. Datei 02 Addendum) |
 
 ### Altlasten, die NICHT 1:1 übernommen werden (kritisch markiert)
 - 🚩 **`offeneposten` als Quelle** — nur Referenz, neu berechnen.

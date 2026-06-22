@@ -277,3 +277,52 @@ settings (Singleton) ; price_rules (Preisliste) ; nexus_memory ; audit_log (appe
 - **Pflicht:** `table_name`, `record_id`, `action`, `changed_by`, `changed_at`.
 - **Sicherheit:** **append-only** (kein UPDATE/DELETE, auch nicht Admin); per Trigger gefüllt für
   `invoices`, `payments`, `bookings`, `expenses`, `settings`, `price_rules`, `user_roles`.
+
+---
+
+## 5. Addendum: Abgleich mit dem echten Alt-Datenmodell
+
+Das echte Alt-`data`-Objekt hat **22 Collections** (s. `06-altcockpit-ist-analyse.md` §3). Die Kerntabellen
+oben decken den MVP ab. Zusätzlich aus dem Altbestand abgeleitet:
+
+### Neue Tabellen (über die Pflichtliste hinaus)
+- **`mileage_log`** (aus `mileage`) — Fahrtenbuch: `date`, `from`, `to`, `km`, `purpose`, `project_id?`,
+  `rate numeric`, Audit. EÜR-relevant. **V1.1**.
+- **`materials`** (aus `materials`/`materialCalcs`) — Materialkatalog/-positionen: `name`, `unit`, `unit_price`,
+  `supplier?`, `project_id?` (Verbrauch), Audit. **V1.1**.
+- **`recurring`** (aus `recurring`) — wiederkehrende Posten/Rechnungen: `template jsonb`, `interval`,
+  `next_run`, `active`. **V2**.
+- **`activities`** (aus `timeline`) — Kommunikations-/Aktivitäts-Timeline je Kunde/Projekt:
+  `owner_type`, `owner_id`, `kind`, `note`, `at`. **V1.1**.
+- **Content-/Marketing-Tabellen** (aus `marketingAssets`, `marketingCampaigns`, `contentDrafts`,
+  `publishLog`, `approvalRequests`) — NEXUS-/Content-Pipeline. **V2** (eigenes Modul).
+
+### Mapping-Übersicht (alt → V2)
+| Alt-Collection | V2 | Phase |
+|---|---|---|
+| `leads` | `customers.stage='lead'` | V1 |
+| `customers` | `customers` | V1 |
+| `measurements` + Räume | `measurements` + `measurement_rooms` | V1 |
+| `projects` | `projects` | V1 |
+| `offers` | `offers` + `offer_items` | V1 |
+| `invoices` | `invoices` + `invoice_items` | V1 |
+| `payments` (inkl. Bank-CSV) | `payments` | V1 |
+| `openItems` | `open_items` (**View**) | V1 |
+| `bookings` | `bookings` | V1.1 |
+| `documents` (Base64!) | `files` + Storage | V1 |
+| `staff` | `profiles` | V1 |
+| `counters` | `settings` + Sequenz | V1 |
+| `mileage` | `mileage_log` | V1.1 |
+| `materials`/`materialCalcs` | `materials` | V1.1 |
+| `timeline` | `activities` | V1.1 |
+| `recurring` | `recurring` | V2 |
+| `marketing*`/`contentDrafts`/`publishLog`/`approvalRequests` | Content-Modul | V2 |
+| `priceCalculations` | Angebotsentwürfe/`calculations` | V2 |
+| `nexusBrainUser` | `nexus_memory` | V2 |
+| `openItemOverrides` | ❌ **gestrichen** (Anti-Pattern) | — |
+
+### Settings/Preise-Seed (real)
+`settings` mit den echten Werten seeden (Datei 06 §4): §19-Hinweis, `tax_reserve_pct=0.35`,
+`default_deposit_pct=0.40`; `tax_number`/`iban` sind im Alt-System **leer** → nachtragen.
+`price_rules` aus `FLOOR_PRICES`/`REMOVAL_PRICES` (Datei 06 §5); **Differenzen zur Website klären**
+(Anfahrt 35↔30 km, Spachtel 8↔19 €/m²) → **eine** verbindliche Preisliste.

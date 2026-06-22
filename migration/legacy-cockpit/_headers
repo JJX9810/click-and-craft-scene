@@ -1,0 +1,19 @@
+# Cloudflare Pages Header für das V&V Cockpit (privates internes Tool)
+#
+# Supabase Cloud-Sync (Phase 1): connect-src erlaubt die Supabase-REST-/Auth-Origin.
+#   - Aktuell als Wildcard https://*.supabase.co eingetragen, damit die Project URL
+#     im Cockpit frei hinterlegt werden kann.
+#   - SICHERHEITSHINWEIS: Eine Wildcard erlaubt Verbindungen zu JEDEM *.supabase.co
+#     Projekt. Sobald die konkrete Projekt-URL feststeht, sollte sie hier durch die
+#     EXAKTE Origin ersetzt werden, z. B.:  https://<projektref>.supabase.co
+#   - Phase 1 nutzt KEIN Realtime. Bei späterem Realtime zusätzlich die passende
+#     wss://<projektref>.supabase.co Origin ergänzen.
+/*
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: no-referrer
+  X-Robots-Tag: noindex, nofollow, noarchive
+  Cache-Control: no-store
+  Permissions-Policy: microphone=(self), camera=(), geolocation=(), payment=()
+  Cross-Origin-Opener-Policy: same-origin
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob: data:; connect-src 'self' https://generativelanguage.googleapis.com https://api.groq.com https://api.openai.com https://api.anthropic.com https://*.workers.dev https://*.supabase.co; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'

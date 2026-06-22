@@ -15,26 +15,27 @@
 | `03-module-ui-navigation.md` | Die 11 Module, Mobile-First-UI, Seitenstruktur/Navigation |
 | `04-sicherheit-rollen-backup-test.md` | Sicherheitskonzept, Rollen/Rechte, Backup/Restore, Testplan, Risiken |
 | `05-mvp-roadmap-bauprompt.md` | MVP V1, V1-Scope, Roadmap, **fertiger Claude-Bauprompt** |
+| `06-altcockpit-ist-analyse.md` | **Ist-Analyse des echten Alt-Cockpits** (Datenmodell, Sync-Fehlerursachen, NEXUS, Backup-Format) — Funktionsvorlage |
 
 ---
 
-## 1. Wichtigster ehrlicher Befund vorab: Das Backup-File fehlt
+## 1. Stand der Quellenlage (aktualisiert nach Upload des Alt-Cockpits)
 
-Die genannte Datei **`vv-cockpit-backup-2026-06-22-2018.json` ist in dieser Arbeitsumgebung nicht vorhanden** —
-nicht im Git-Repository, nicht im Dateisystem, nicht in der Git-Historie.
+Das **echte Alt-Cockpit** wurde als ZIP bereitgestellt und vollständig analysiert
+(`vvcockpit.html`, ~1 MB, 12.400 Zeilen + Cloudflare Pages Functions). Ergebnis: **`06-altcockpit-ist-analyse.md`**.
+Damit ist die **exakte Struktur** der Backup-Datei `vv-cockpit-backup-2026-06-22-2018.json` **bekannt**
+(erzeugt von der Funktion `doExport()`; der Dateiname = Export vom 22.06.2026, 20:18 Uhr).
 
-Ich habe das geprüft (Dateisuche systemweit, `git log --all`, Repo-Scan). Ergebnis: nicht auffindbar.
+**Noch ausstehend für die Datenmigration:** die **Datensätze** selbst. Die ZIP enthält den **App-Code**,
+nicht die Geschäftsdaten (die lebten zur Laufzeit in IndexedDB bzw. der D1-Cloud). Ich liefere daher
+**keine erfundene** Inhaltsanalyse („47 Kunden…"). Für das datensatzgenaue Inventar brauche ich **eine** Quelle:
 
-**Konsequenz:** Ich liefere **keine erfundene** Inhaltsanalyse („47 Kunden, 12 Rechnungen…"), denn das wäre geraten.
-Stattdessen enthält `01-backup-analyse-und-migration.md`:
-- eine **strukturelle Erwartungsanalyse** auf Basis der von Ihnen beschriebenen Alt-Architektur
-  (Single-HTML + IndexedDB + Voll-State-JSON-Export) und der real existierenden Preislogik im Repo,
-- ein **präzises Migrations- und Klassifizierungs-Framework**, das auf jede konkrete JSON-Struktur passt,
-- eine **klare Anleitung**, wie Sie mir die Datei geben, damit ich eine echte, datensatzgenaue Analyse mache.
+1. die Backup-JSON `vv-cockpit-backup-2026-06-22-2018.json` (aus „Backup exportieren"), **oder**
+2. den D1-Cloud-Stand über `GET /api/export-state` (lädt `vv-cockpit-state.json`), **oder**
+3. einen IndexedDB-Snapshot.
 
-**So geben Sie mir die Datei (eine Option reicht):**
-1. Datei in den Repo-Ordner `migration/legacy-backup/` legen und committen — dann analysiere ich sie exakt.
-2. Oder den JSON-Inhalt direkt in den Chat einfügen (bei sehr großen Base64-Fotos vorher die Bilder herausnehmen).
+→ Datei nach `migration/legacy-backup/` committen oder Inhalt einfügen (bei großen Base64-Fotos vorher
+herausnehmen). **Das Feld-Mapping liegt dank Code-Analyse bereits fertig vor** (Datei 01 + 06).
 
 ---
 
