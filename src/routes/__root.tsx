@@ -15,6 +15,7 @@ import { Footer } from "@/components/site/Footer";
 import { Toaster } from "@/components/ui/sonner";
 import { AttributionTracker } from "@/components/AttributionTracker";
 import { AnalyticsTracker } from "@/components/AnalyticsTracker";
+import { jsonLdScript, organizationNode, websiteNode } from "@/lib/schema";
 
 
 function NotFoundComponent() {
@@ -135,6 +136,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: appCss,
       },
     ],
+    scripts: [jsonLdScript([organizationNode, websiteNode])],
   }),
   shellComponent: RootShell,
   component: RootComponent,

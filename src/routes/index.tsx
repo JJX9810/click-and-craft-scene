@@ -35,10 +35,8 @@ import {
   breadcrumbNode,
   
   jsonLdScript,
-  organizationNode,
   serviceEntities,
   webPageNode,
-  websiteNode,
 } from "@/lib/schema";
 import { QuickAnswer, FactBox, InternalLinks } from "@/components/site/InfoBlocks";
 
@@ -85,8 +83,6 @@ export const Route = createFileRoute("/")({
     ],
     scripts: [
       jsonLdScript([
-        organizationNode,
-        websiteNode,
         ...serviceEntities,
         webPageNode({
           url: "https://verlegt-verschraubt.de/",

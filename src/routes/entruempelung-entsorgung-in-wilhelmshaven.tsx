@@ -5,7 +5,7 @@ import {
 } from "@/components/ui/accordion";
 import { ArrowRight } from "lucide-react";
 import {
-  breadcrumbNode, faqPageNode, jsonLdScript, serviceNode, webPageNode, SERVICE_IDS,
+  breadcrumbNode, jsonLdScript, serviceNode, webPageNode, SERVICE_IDS,
 } from "@/lib/schema";
 import { QuickAnswer, FactBox, LimitsBox, InternalLinks } from "@/components/site/InfoBlocks";
 import { PreisrechnerCTA } from "@/components/site/PreisrechnerCTA";
@@ -49,7 +49,6 @@ export const Route = createFileRoute("/entruempelung-entsorgung-in-wilhelmshaven
           { name: "Startseite", url: "https://verlegt-verschraubt.de/" },
           { name: "Entrümpelung & Entsorgung", url: EN_URL },
         ]),
-        faqPageNode(faqs),
       ]),
     ],
   }),
