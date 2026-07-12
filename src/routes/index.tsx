@@ -217,12 +217,15 @@ function Index() {
               <Button
                 asChild
                 size="lg"
-                className="group h-12 rounded-full bg-accent px-7 text-accent-foreground shadow-lg shadow-accent/20 hover:bg-accent/90"
+                className="h-12 rounded-full bg-[#25D366] px-7 text-white shadow-lg shadow-[#25D366]/25 hover:bg-[#25D366]/90"
               >
-                <Link to="/kontakt">
-                  Projekt anfragen
-                  <ArrowRight className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                </Link>
+                <a
+                  href="https://wa.me/491634799286?text=Hallo%2C%20ich%20habe%20ein%20Projekt%3A%20"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <MessageSquare className="mr-1 h-4 w-4" /> WhatsApp schreiben
+                </a>
               </Button>
               <Button
                 asChild
@@ -233,6 +236,16 @@ function Index() {
                 <a href="tel:+491634799286">
                   <Phone className="mr-1 h-4 w-4" /> Direkt anrufen
                 </a>
+              </Button>
+              <Button
+                asChild
+                size="lg"
+                className="group h-12 rounded-full bg-accent px-7 text-accent-foreground shadow-lg shadow-accent/20 hover:bg-accent/90"
+              >
+                <Link to="/kontakt">
+                  Projekt anfragen
+                  <ArrowRight className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                </Link>
               </Button>
               <Button
                 asChild
