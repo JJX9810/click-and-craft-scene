@@ -18,7 +18,6 @@ export const Route = createFileRoute("/login")({
 
 function LoginPage() {
   const navigate = useNavigate();
-  const [mode, setMode] = useState<"login" | "signup">("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -38,19 +37,9 @@ function LoginPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      if (mode === "login") {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-        toast.success("Eingeloggt");
-      } else {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: { emailRedirectTo: window.location.origin + "/admin" },
-        });
-        if (error) throw error;
-        toast.success("Konto angelegt – du wirst eingeloggt …");
-      }
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+      toast.success("Eingeloggt");
     } catch (err: any) {
       toast.error(err?.message ?? "Fehler beim Anmelden");
     } finally {
@@ -62,9 +51,7 @@ function LoginPage() {
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="w-full max-w-sm rounded-lg border bg-card p-6 shadow-sm">
         <h1 className="text-xl font-semibold">Admin-Bereich</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {mode === "login" ? "Bitte einloggen." : "Erste Registrierung wird zum Admin."}
-        </p>
+        <p className="mt-1 text-sm text-muted-foreground">Bitte einloggen.</p>
         <form onSubmit={submit} className="mt-6 space-y-4">
           <div>
             <Label htmlFor="email">E-Mail</Label>
@@ -72,19 +59,12 @@ function LoginPage() {
           </div>
           <div>
             <Label htmlFor="password">Passwort</Label>
-            <Input id="password" type="password" autoComplete={mode === "login" ? "current-password" : "new-password"} required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} />
+            <Input id="password" type="password" autoComplete="current-password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} />
           </div>
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Bitte warten …" : mode === "login" ? "Einloggen" : "Konto anlegen"}
+            {loading ? "Bitte warten …" : "Einloggen"}
           </Button>
         </form>
-        <button
-          type="button"
-          onClick={() => setMode((m) => (m === "login" ? "signup" : "login"))}
-          className="mt-4 w-full text-center text-xs text-muted-foreground hover:text-foreground"
-        >
-          {mode === "login" ? "Noch kein Konto? Registrieren" : "Bereits registriert? Einloggen"}
-        </button>
         <div className="mt-6 text-center text-xs text-muted-foreground">
           <Link to="/" className="hover:underline">← zur Website</Link>
         </div>

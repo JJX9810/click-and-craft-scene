@@ -879,6 +879,9 @@ export function Kostenrechner() {
             ) : (
               <p className="mt-3 text-2xl font-semibold sm:text-3xl">Individuelles Angebot nach Besichtigung</p>
             )}
+            <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
+              Alle angezeigten Preise sind Endpreise. Der genaue Preis hängt von Fläche, Untergrund und Aufwand ab – Sie erhalten vorab eine ehrliche Einschätzung.
+            </p>
           </div>
 
           <div className="rounded-2xl border border-border/70 bg-background/40 p-5 sm:p-6">
