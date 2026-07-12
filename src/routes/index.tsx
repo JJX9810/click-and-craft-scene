@@ -317,7 +317,9 @@ function Index() {
             für Bodenverlegung, Küchenmontage sowie Entrümpelung und Entsorgung.
             Das Unternehmen unterstützt Privatkunden in Wilhelmshaven und Umgebung
             bei sauberen Innenarbeiten mit klarer Absprache, ordentlicher
-            Ausführung und zügiger Umsetzung.
+            Ausführung und zügiger Umsetzung. Umfasst ein Projekt weitere Gewerke,
+            koordiniert Verlegt &amp; Verschraubt geprüfte Partnerbetriebe aus dem
+            eigenen Netzwerk – Kunden behalten dabei durchgehend einen Ansprechpartner.
           </QuickAnswer>
           <FactBox />
         </div>
