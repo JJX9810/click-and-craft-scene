@@ -7,15 +7,15 @@ export const Route = createFileRoute("/handwerkerservice-sande")({
   head: () => ({
     meta: [
       { title: "Handwerkerservice Sande – Boden, Küche, Entrümpelung" },
-      { name: "description", content: "Bodenverlegung, Küchenmontage und Entrümpelung in Sande – schnell aus Wilhelmshaven erreichbar." },
+      { name: "description", content: "Bodenverlegung, Küchenmontage & Entrümpelung in Sande – ehrliche Preise, Rückmeldung noch am selben Tag. Auf Wunsch Koordination weiterer Gewerke über geprüfte Partner." },
       { property: "og:title", content: "Handwerkerservice in Sande" },
-      { property: "og:description", content: "Boden, Küche, Entrümpelung in Sande." },
+      { property: "og:description", content: "Bodenverlegung, Küchenmontage & Entrümpelung in Sande – ehrliche Preise, Rückmeldung noch am selben Tag. Auf Wunsch Koordination weiterer Gewerke über geprüfte Partner." },
       { property: "og:url", content: "https://verlegt-verschraubt.de/handwerkerservice-sande" },
       { property: "og:image", content: "https://verlegt-verschraubt.de/hero-flooring.png" },
       { property: "og:image:alt", content: "Handwerkerservice in Sande für Bodenverlegung, Küchenmontage und Entrümpelung" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Handwerkerservice in Sande" },
-      { name: "twitter:description", content: "Boden, Küche, Entrümpelung in Sande." },
+      { name: "twitter:description", content: "Bodenverlegung, Küchenmontage & Entrümpelung in Sande – ehrliche Preise, Rückmeldung noch am selben Tag. Auf Wunsch Koordination weiterer Gewerke über geprüfte Partner." },
       { name: "twitter:image", content: "https://verlegt-verschraubt.de/hero-flooring.png" },
       { name: "twitter:image:alt", content: "Handwerkerservice in Sande für Bodenverlegung, Küchenmontage und Entrümpelung" },
     ],
