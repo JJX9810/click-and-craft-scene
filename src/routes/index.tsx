@@ -99,7 +99,6 @@ export const Route = createFileRoute("/")({
         breadcrumbNode([
           { name: "Startseite", url: "https://verlegt-verschraubt.de/" },
         ]),
-        faqPageNode(faqs),
       ]),
     ],
   }),
@@ -130,7 +129,7 @@ const services = [
 ];
 
 const reasons = [
-  { icon: Target, title: "Klare Spezialisierung", desc: "Fokus auf Boden, Küche und Entrümpelung – kein Bauchladen." },
+  { icon: Target, title: "Klare Spezialisierung", desc: "Selbst machen wir nur, was wir wirklich können: Boden, Küche, Entrümpelung. Alles Weitere koordinieren wir über geprüfte Partner – statt es halb zu machen." },
   { icon: Sparkles, title: "Saubere Ausführung", desc: "Ordentliche Kanten, ordentliche Übergaben, ordentliche Räume." },
   { icon: MessageSquare, title: "Direkte Kommunikation", desc: "Sie sprechen direkt mit dem Inhaber. Kurze Wege." },
   { icon: ShieldCheck, title: "Realistische Einschätzung", desc: "Ehrlich vorab. Keine Überraschungen auf der Rechnung." },
@@ -211,7 +210,8 @@ function Index() {
             </h1>
             <p className="mt-6 max-w-lg text-base leading-relaxed text-muted-foreground sm:text-lg">
               Verlegt &amp; Verschraubt unterstützt Privatkunden bei sauberen
-              Innenarbeiten – zuverlässig, ordentlich und zügig.
+              Innenarbeiten – zuverlässig, ordentlich und zügig. Auf Wunsch
+              koordinieren wir weitere Gewerke über geprüfte Partnerbetriebe.
             </p>
             <div className="mt-10 flex flex-wrap gap-3">
               <Button
