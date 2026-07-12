@@ -52,7 +52,7 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Handwerkerservice Wilhelmshaven: Bodenverlegung, Küchenmontage und Entrümpelung. Z.O.Z. – zuverlässig, ordentlich, zügig.",
+          "Bodenverlegung, Küchenmontage & Entrümpelung in Wilhelmshaven – auf Wunsch Koordination weiterer Gewerke über geprüfte Partner. Ehrliche Preise, Rückmeldung noch am selben Tag.",
       },
       {
         property: "og:title",
@@ -61,14 +61,14 @@ export const Route = createFileRoute("/")({
       {
         property: "og:description",
         content:
-          "Z.O.Z. – Zuverlässig. Ordentlich. Zügig. Bodenverlegung, Küchenmontage und Entrümpelung in Wilhelmshaven & Umgebung.",
+          "Bodenverlegung, Küchenmontage & Entrümpelung in Wilhelmshaven – auf Wunsch Koordination weiterer Gewerke über geprüfte Partner. Ehrliche Preise, Rückmeldung noch am selben Tag.",
       },
       { property: "og:url", content: "https://verlegt-verschraubt.de/" },
       { property: "og:image", content: "https://verlegt-verschraubt.de/hero-flooring.png" },
       { property: "og:image:alt", content: "Bodenleger verlegt Laminat in Holzoptik – Verlegt & Verschraubt Wilhelmshaven" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Verlegt & Verschraubt – Handwerkerservice Wilhelmshaven" },
-      { name: "twitter:description", content: "Z.O.Z. – Zuverlässig. Ordentlich. Zügig. Bodenverlegung, Küchenmontage und Entrümpelung in Wilhelmshaven & Umgebung." },
+      { name: "twitter:description", content: "Bodenverlegung, Küchenmontage & Entrümpelung in Wilhelmshaven – auf Wunsch Koordination weiterer Gewerke über geprüfte Partner. Ehrliche Preise, Rückmeldung noch am selben Tag." },
       { name: "twitter:image", content: "https://verlegt-verschraubt.de/hero-flooring.png" },
       { name: "twitter:image:alt", content: "Bodenleger verlegt Laminat in Holzoptik – Verlegt & Verschraubt Wilhelmshaven" },
     ],
