@@ -50,9 +50,13 @@ export const Route = createFileRoute("/kuechenmontage-in-wilhelmshaven")({
         serviceNode({
           url: KM_URL,
           id: SERVICE_IDS.kuechenmontage,
-          name: "Küchenmontage in Wilhelmshaven",
+          name: "Küchenmontage",
           description: "Küchenaufbau, Restmontage und Anpassung – von der Front über die Arbeitsplatte bis zur Spüle und Armatur. Wasseranschluss an bestehende Eckventile.",
-          serviceType: "Küchenmontage",
+          serviceType: "Küchenmontage und Küchenservice",
+          areaServed: KM_AREA_SERVED,
+          offers: [
+            offerNode({ name: "Küchenmontage", price: KUECHE_MONTAGE_PRICE, unitText: "lfm" }),
+          ],
         }),
         breadcrumbNode([
           { name: "Startseite", url: "https://verlegt-verschraubt.de/" },
