@@ -169,6 +169,20 @@ function Page() {
 
       <PreisrechnerCTA variant="entruempelung" />
 
+      <Section eyebrow="Netzwerk" title="Nach der Räumung soll renoviert werden?" bordered>
+        <p className="max-w-3xl text-base leading-relaxed text-muted-foreground">
+          Über unser Partnernetzwerk koordinieren wir die nächsten Schritte –
+          vom neuen Boden bis zur Küchenmontage, bei Bedarf mit geprüften
+          Fachbetrieben. Sie behalten einen Ansprechpartner für das gesamte
+          Projekt.
+        </p>
+        <div className="mt-6">
+          <Link to="/partner" className="inline-flex items-center text-sm font-medium text-accent hover:underline">
+            Mehr zum Netzwerk <ArrowRight className="ml-1 h-4 w-4" />
+          </Link>
+        </div>
+      </Section>
+
       <CtaBlock
         title="Entrümpelung in Wilhelmshaven anfragen"
         text="Schicken Sie Fotos der Räume und ein paar Eckdaten – wir geben eine ehrliche Einschätzung."
