@@ -674,10 +674,18 @@ function Index() {
               Ersteinschätzung, in der Regel innerhalb von 24 Stunden.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Button asChild size="lg" className="h-12 rounded-full bg-accent px-7 text-accent-foreground hover:bg-accent/90">
-                <Link to="/kontakt">
-                  Anfrage senden <ArrowRight className="ml-1 h-4 w-4" />
-                </Link>
+              <Button
+                asChild
+                size="lg"
+                className="h-12 rounded-full bg-[#25D366] px-7 text-white shadow-lg shadow-[#25D366]/25 hover:bg-[#25D366]/90"
+              >
+                <a
+                  href="https://wa.me/491634799286?text=Hallo%2C%20ich%20habe%20ein%20Projekt%3A%20"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <MessageSquare className="mr-1 h-4 w-4" /> WhatsApp schreiben
+                </a>
               </Button>
               <Button
                 asChild
@@ -685,7 +693,14 @@ function Index() {
                 variant="outline"
                 className="h-12 rounded-full border-border bg-transparent px-7 hover:bg-card"
               >
-                <a href="https://wa.me/491634799286" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+                <a href="tel:+491634799286">
+                  <Phone className="mr-1 h-4 w-4" /> Direkt anrufen
+                </a>
+              </Button>
+              <Button asChild size="lg" className="h-12 rounded-full bg-accent px-7 text-accent-foreground hover:bg-accent/90">
+                <Link to="/kontakt">
+                  Anfrage senden <ArrowRight className="ml-1 h-4 w-4" />
+                </Link>
               </Button>
             </div>
           </div>
