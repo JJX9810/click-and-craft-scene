@@ -404,7 +404,7 @@ function Page() {
       {/* PRÜFKRITERIEN */}
       <Section
         eyebrow="Prüfkriterien"
-        title="„Geprüft" ist bei uns keine Floskel."
+        title={`„Geprüft" ist bei uns keine Floskel.`}
         bordered
       >
         <p className="max-w-3xl text-base leading-relaxed text-muted-foreground">
