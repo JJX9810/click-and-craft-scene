@@ -11,8 +11,26 @@ import {
 } from "@/lib/schema";
 import { QuickAnswer, FactBox, LimitsBox, InternalLinks } from "@/components/site/InfoBlocks";
 import { PreisrechnerCTA } from "@/components/site/PreisrechnerCTA";
+import { BODEN_VARIANTEN, SOCKEL_PRICE, SPACHTELN_PRICE } from "@/lib/pricing";
 
 const PAGE_URL = "https://verlegt-verschraubt.de/bodenverlegung-wilhelmshaven";
+
+const BODEN_AREA_SERVED = [
+  "Wilhelmshaven", "Schortens", "Sande", "Jever", "Varel", "Wangerland", "Wittmund", "Friesland",
+];
+
+// Preise aus zentraler Quelle (src/lib/pricing.ts) referenzieren – so bleibt
+// das JSON-LD automatisch synchron mit dem Kostenrechner.
+const priceOf = (key: string): number => {
+  const v = BODEN_VARIANTEN.find((b) => b.key === key);
+  if (!v || v.price === null) throw new Error(`Missing price for ${key}`);
+  return v.price;
+};
+const PRICE_LAMINAT_SCHWIMMEND = priceOf("laminat_schwimmend");
+const PRICE_VINYL_SCHWIMMEND = priceOf("vinyl_schwimmend");
+const PRICE_VINYL_VERKLEBT = priceOf("vinyl_verklebt");
+const PRICE_PVC_SCHWIMMEND = priceOf("pvc_schwimmend");
+const PRICE_PVC_VERKLEBT = priceOf("pvc_verklebt");
 
 export const Route = createFileRoute("/bodenverlegung-wilhelmshaven")({
   component: Page,
