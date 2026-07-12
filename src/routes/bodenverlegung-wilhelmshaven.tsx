@@ -7,12 +7,30 @@ import { ArrowRight } from "lucide-react";
 import { ProjectCard } from "@/components/site/ProjectCard";
 import { projects } from "@/data/projects";
 import {
-  breadcrumbNode, jsonLdScript, serviceNode, webPageNode, SERVICE_IDS,
+  breadcrumbNode, jsonLdScript, offerNode, serviceNode, webPageNode, SERVICE_IDS,
 } from "@/lib/schema";
 import { QuickAnswer, FactBox, LimitsBox, InternalLinks } from "@/components/site/InfoBlocks";
 import { PreisrechnerCTA } from "@/components/site/PreisrechnerCTA";
+import { BODEN_VARIANTEN, SOCKEL_PRICE, SPACHTELN_PRICE } from "@/lib/pricing";
 
 const PAGE_URL = "https://verlegt-verschraubt.de/bodenverlegung-wilhelmshaven";
+
+const BODEN_AREA_SERVED = [
+  "Wilhelmshaven", "Schortens", "Sande", "Jever", "Varel", "Wangerland", "Wittmund", "Friesland",
+];
+
+// Preise aus zentraler Quelle (src/lib/pricing.ts) referenzieren – so bleibt
+// das JSON-LD automatisch synchron mit dem Kostenrechner.
+const priceOf = (key: string): number => {
+  const v = BODEN_VARIANTEN.find((b) => b.key === key);
+  if (!v || v.price === null) throw new Error(`Missing price for ${key}`);
+  return v.price;
+};
+const PRICE_LAMINAT_SCHWIMMEND = priceOf("laminat_schwimmend");
+const PRICE_VINYL_SCHWIMMEND = priceOf("vinyl_schwimmend");
+const PRICE_VINYL_VERKLEBT = priceOf("vinyl_verklebt");
+const PRICE_PVC_SCHWIMMEND = priceOf("pvc_schwimmend");
+const PRICE_PVC_VERKLEBT = priceOf("pvc_verklebt");
 
 export const Route = createFileRoute("/bodenverlegung-wilhelmshaven")({
   component: Page,
@@ -43,9 +61,19 @@ export const Route = createFileRoute("/bodenverlegung-wilhelmshaven")({
         serviceNode({
           url: PAGE_URL,
           id: SERVICE_IDS.bodenverlegung,
-          name: "Bodenverlegung in Wilhelmshaven",
+          name: "Bodenverlegung",
           description: "Verlegung von Vinyl, Designboden, Laminat, PVC und Teppich inklusive Untergrundprüfung, Altbelag entfernen, Treppenverkleidung sowie Sockelleisten und Übergängen.",
-          serviceType: "Bodenverlegung",
+          serviceType: "Bodenverlegung (Vinyl, Laminat, PVC, Teppich)",
+          areaServed: BODEN_AREA_SERVED,
+          offers: [
+            offerNode({ name: "Laminat schwimmend verlegen", price: PRICE_LAMINAT_SCHWIMMEND, unitText: "m²" }),
+            offerNode({ name: "Vinyl schwimmend verlegen", price: PRICE_VINYL_SCHWIMMEND, unitText: "m²" }),
+            offerNode({ name: "Vinyl verklebt verlegen", price: PRICE_VINYL_VERKLEBT, unitText: "m²" }),
+            offerNode({ name: "PVC schwimmend verlegen", price: PRICE_PVC_SCHWIMMEND, unitText: "m²" }),
+            offerNode({ name: "PVC verklebt verlegen", price: PRICE_PVC_VERKLEBT, unitText: "m²" }),
+            offerNode({ name: "Sockelleisten montieren", price: SOCKEL_PRICE, unitText: "lfm" }),
+            offerNode({ name: "Spachteln inkl. Grundierung", price: SPACHTELN_PRICE, unitText: "m²" }),
+          ],
         }),
         breadcrumbNode([
           { name: "Startseite", url: "https://verlegt-verschraubt.de/" },

@@ -20,6 +20,27 @@ import { toast } from "sonner";
 import { buildAttributionLines } from "@/lib/attribution";
 import { trackEvent } from "@/lib/tracking";
 import { upsertCalcSession, submitCalculation } from "@/lib/admin-tracking";
+import {
+  BODEN_VARIANTEN,
+  ALT_PRICE_SCHWIMMEND,
+  ALT_PRICE_VERKLEBT,
+  SOCKEL_PRICE,
+  SOCKEL_GEHRUNG_PRICE,
+  DAEMMUNG_PRICE,
+  SPACHTELN_PRICE,
+  ALT_TEPPICH_LOSE_PRICE,
+  ALT_TEPPICH_LOSE_MIN,
+  ALT_TEPPICH_VERKLEBT_PRICE,
+  ALT_TEPPICH_VERKLEBT_MIN,
+  MATERIALSERVICE_RATE,
+  MATERIALSERVICE_MIN,
+  ANFAHRT_FREI_KM,
+  ANFAHRT_PRO_KM,
+  KUECHE_MONTAGE_PRICE,
+  KUECHE_DEMONTAGE_PRICE,
+  KUECHE_ARBEITSPLATTE_PRICE,
+  KUECHE_ENTSORGUNG_PAUSCHAL,
+} from "@/lib/pricing";
 
 // Mapping URL-Parameter `?leistung=...` → interne Service-Keys
 const LEISTUNG_PARAM_MAP: Record<string, Service> = {
@@ -40,40 +61,8 @@ const LEISTUNG_PARAM_MAP: Record<string, Service> = {
 
 type Service = "boden" | "kueche" | "ent" | "sonst";
 
-// Boden-Preise: feste €/m² pro Variante. null = auf Anfrage.
-const BODEN_VARIANTEN: { key: string; label: string; price: number | null }[] = [
-  { key: "laminat_schwimmend", label: "Laminat schwimmend", price: 16 },
-  { key: "pvc_schwimmend", label: "PVC schwimmend", price: 12 },
-  { key: "pvc_verklebt", label: "PVC verklebt", price: 15 },
-  { key: "vinyl_schwimmend", label: "Vinyl schwimmend", price: 18 },
-  { key: "vinyl_verklebt", label: "Vinyl verklebt", price: 22 },
-  { key: "linoleum_verklebt", label: "Linoleum verklebt", price: null },
-  { key: "teppich_lose", label: "Teppich lose verlegt / lose verklebt", price: 10 },
-  { key: "teppich_vollflaechig", label: "Teppich vollflächig verklebt", price: 12 },
-];
-
-// === Interne Berechnungswerte – NICHT im Frontend sichtbar rendern ===
-const ALT_PRICE_SCHWIMMEND = 4; // €/m²
-const ALT_PRICE_VERKLEBT = 7; // €/m² – verklebter Altbelag (Boden, nicht Teppich)
-const SOCKEL_PRICE = 5; // €/lfm – normale Montage
-const SOCKEL_GEHRUNG_PRICE = 7; // €/lfm – auf Gehrung gesägt
-const DAEMMUNG_PRICE = 1.5; // €/m²
-const SPACHTELN_PRICE = 19; // €/m² – inkl. Grundierung
-
-const ALT_TEPPICH_LOSE_PRICE = 7; // €/m²
-const ALT_TEPPICH_LOSE_MIN = 120; // €
-const ALT_TEPPICH_VERKLEBT_PRICE = 12; // €/m²
-const ALT_TEPPICH_VERKLEBT_MIN = 180; // €
-const MATERIALSERVICE_RATE = 0.15;
-const MATERIALSERVICE_MIN = 150; // €
-const ANFAHRT_FREI_KM = 30;
-const ANFAHRT_PRO_KM = 0.7;
-
-// Küchenmontage (interne Preise)
-const KUECHE_MONTAGE_PRICE = 189; // €/lfm
-const KUECHE_DEMONTAGE_PRICE = 100; // €/lfm
-const KUECHE_ARBEITSPLATTE_PRICE = 119; // €/lfm
-const KUECHE_ENTSORGUNG_PAUSCHAL = 350; // €
+// Preiskonstanten stammen aus src/lib/pricing.ts (siehe Import oben) –
+// dort einheitliche Quelle für Rechner und JSON-LD Service-Schemata.
 
 
 const DRINGLICHKEIT_OPTIONS = [

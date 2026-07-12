@@ -7,10 +7,15 @@ import { ArrowRight } from "lucide-react";
 import { ProjectCard } from "@/components/site/ProjectCard";
 import { projects } from "@/data/projects";
 import {
-  breadcrumbNode, jsonLdScript, serviceNode, webPageNode, SERVICE_IDS,
+  breadcrumbNode, jsonLdScript, offerNode, serviceNode, webPageNode, SERVICE_IDS,
 } from "@/lib/schema";
 import { QuickAnswer, FactBox, LimitsBox, InternalLinks } from "@/components/site/InfoBlocks";
 import { PreisrechnerCTA } from "@/components/site/PreisrechnerCTA";
+import { KUECHE_MONTAGE_PRICE } from "@/lib/pricing";
+
+const KM_AREA_SERVED = [
+  "Wilhelmshaven", "Schortens", "Sande", "Jever", "Varel", "Wangerland", "Wittmund", "Friesland",
+];
 
 const KM_URL = "https://verlegt-verschraubt.de/kuechenmontage-in-wilhelmshaven";
 
@@ -45,9 +50,13 @@ export const Route = createFileRoute("/kuechenmontage-in-wilhelmshaven")({
         serviceNode({
           url: KM_URL,
           id: SERVICE_IDS.kuechenmontage,
-          name: "Küchenmontage in Wilhelmshaven",
+          name: "Küchenmontage",
           description: "Küchenaufbau, Restmontage und Anpassung – von der Front über die Arbeitsplatte bis zur Spüle und Armatur. Wasseranschluss an bestehende Eckventile.",
-          serviceType: "Küchenmontage",
+          serviceType: "Küchenmontage und Küchenservice",
+          areaServed: KM_AREA_SERVED,
+          offers: [
+            offerNode({ name: "Küchenmontage", price: KUECHE_MONTAGE_PRICE, unitText: "lfm" }),
+          ],
         }),
         breadcrumbNode([
           { name: "Startseite", url: "https://verlegt-verschraubt.de/" },

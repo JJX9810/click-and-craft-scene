@@ -191,18 +191,39 @@ export function breadcrumbNode(items: BreadcrumbItem[]) {
   };
 }
 
+export interface OfferInput {
+  name: string;
+  price: number;
+  unitText: string; // z. B. "m²", "lfm"
+  priceCurrency?: string;
+}
+export function offerNode({ name, price, unitText, priceCurrency = "EUR" }: OfferInput) {
+  return {
+    "@type": "Offer",
+    name,
+    priceSpecification: {
+      "@type": "UnitPriceSpecification",
+      price,
+      priceCurrency,
+      unitText,
+    },
+  };
+}
+
 export interface ServiceInput {
   url: string; name: string; description: string; serviceType: string;
   areaServed?: string | string[];
   id?: string;
+  offers?: ReturnType<typeof offerNode>[];
 }
-export function serviceNode({ url, name, description, serviceType, areaServed, id }: ServiceInput) {
+export function serviceNode({ url, name, description, serviceType, areaServed, id, offers }: ServiceInput) {
   return {
     "@type": "Service",
     "@id": id ?? `${url}#service`,
     name, description, serviceType, url,
     provider: { "@id": ORG_ID },
     areaServed: areaServed ?? AREA_SERVED,
+    ...(offers && offers.length ? { offers } : {}),
   };
 }
 

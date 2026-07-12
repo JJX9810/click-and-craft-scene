@@ -41,9 +41,12 @@ export const Route = createFileRoute("/entruempelung-entsorgung-in-wilhelmshaven
         serviceNode({
           url: EN_URL,
           id: SERVICE_IDS.entruempelung,
-          name: "Entrümpelung & Entsorgung in Wilhelmshaven",
-          description: "Wohnungs-, Keller- und Dachbodenentrümpelung, Möbel- und Sperrmüllentsorgung sowie Räumung vor Renovierung in Wilhelmshaven und Umgebung.",
+          name: "Entrümpelung & Entsorgung",
+          description: "Wohnungs-, Keller- und Dachbodenentrümpelung, Möbel- und Sperrmüllentsorgung sowie Räumung vor Renovierung in Wilhelmshaven und Umgebung. Preis nach Besichtigung.",
           serviceType: "Entrümpelung und Entsorgung",
+          areaServed: [
+            "Wilhelmshaven", "Schortens", "Sande", "Jever", "Varel", "Wangerland", "Wittmund", "Friesland",
+          ],
         }),
         breadcrumbNode([
           { name: "Startseite", url: "https://verlegt-verschraubt.de/" },
