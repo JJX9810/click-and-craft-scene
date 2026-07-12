@@ -30,7 +30,7 @@ const nav: NavItem[] = [
       { label: "Wangerland", to: "/handwerkerservice-wangerland" },
       { label: "Wittmund", to: "/handwerkerservice-wittmund" },
       { label: "Wir unterstützen", to: "/wir-unterstuetzen" },
-      { label: "Partner", to: "/partner" },
+      { label: "Netzwerk", to: "/partner" },
       { label: "Impressum", to: "/impressum" },
       { label: "Datenschutz", to: "/datenschutz" },
     ],

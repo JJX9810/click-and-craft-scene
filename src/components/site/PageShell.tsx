@@ -1,6 +1,9 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, Phone, ChevronRight } from "lucide-react";
+import { ArrowRight, Phone, ChevronRight, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+
+const WA_HREF =
+  "https://wa.me/491634799286?text=Hallo%2C%20ich%20habe%20ein%20Projekt%3A%20";
 
 export function PageHero({
   eyebrow,
