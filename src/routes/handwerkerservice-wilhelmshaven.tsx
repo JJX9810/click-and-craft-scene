@@ -1,4 +1,4 @@
-import { breadcrumbNode, faqPageNode, jsonLdScript, ortFaqItems, serviceNode, webPageNode } from "@/lib/schema";
+import { breadcrumbNode, jsonLdScript, serviceNode, webPageNode } from "@/lib/schema";
 import { createFileRoute } from "@tanstack/react-router";
 import { OrtsSeite } from "@/components/site/OrtsSeite";
 
@@ -47,7 +47,6 @@ export const Route = createFileRoute("/handwerkerservice-wilhelmshaven")({
           { name: "Startseite", url: "https://verlegt-verschraubt.de/" },
           { name: 'Handwerkerservice in Wilhelmshaven', url: "https://verlegt-verschraubt.de/handwerkerservice-wilhelmshaven" },
         ]),
-        faqPageNode(ortFaqItems("Wilhelmshaven")),
       ]),
     ],
   }),

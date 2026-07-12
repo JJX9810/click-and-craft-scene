@@ -23,13 +23,13 @@ export const Route = createFileRoute("/partner")({
   component: Page,
   head: () => ({
     meta: [
-      { title: "Partnernetzwerk – Renovierung aus einer Hand | Verlegt & Verschraubt" },
+      { title: "Renovierung aus einer Hand in Wilhelmshaven – ein Ansprechpartner | Verlegt & Verschraubt" },
       {
         name: "description",
         content:
           "Ein Ansprechpartner statt zehn Handwerker: Verlegt & Verschraubt koordiniert Ihr Renovierungsprojekt mit eigenen Leistungen und geprüften Partnerbetrieben.",
       },
-      { property: "og:title", content: "Partnernetzwerk – Ein Ansprechpartner statt zehn Handwerker" },
+      { property: "og:title", content: "Renovierung aus einer Hand in Wilhelmshaven – ein Ansprechpartner" },
       {
         property: "og:description",
         content:
@@ -39,7 +39,7 @@ export const Route = createFileRoute("/partner")({
       { property: "og:image", content: "https://verlegt-verschraubt.de/hero-flooring.png" },
       { property: "og:image:alt", content: "Partner und Kooperationen von Verlegt & Verschraubt aus Wilhelmshaven" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Partnernetzwerk – Verlegt & Verschraubt" },
+      { name: "twitter:title", content: "Renovierung aus einer Hand in Wilhelmshaven – ein Ansprechpartner" },
       { name: "twitter:description", content: "Renovierung aus einer Hand – koordiniert von uns, umgesetzt von uns und geprüften Partnern." },
       { name: "twitter:image", content: "https://verlegt-verschraubt.de/hero-flooring.png" },
     ],
@@ -48,7 +48,7 @@ export const Route = createFileRoute("/partner")({
       jsonLdScript([
         webPageNode({
           url: "https://verlegt-verschraubt.de/partner",
-          name: "Partnernetzwerk – Verlegt & Verschraubt",
+          name: "Renovierung aus einer Hand in Wilhelmshaven – ein Ansprechpartner | Verlegt & Verschraubt",
           description:
             "Ein Ansprechpartner für Ihre Renovierung: eigene Leistungen und geprüfte Partnerbetriebe – koordiniert von Verlegt & Verschraubt.",
         }),
