@@ -41,9 +41,13 @@ const faqGroups = [
     ],
   },
   {
-    title: "Grenzen / Fachbetriebe",
+    title: "Netzwerk & Fachbetriebe",
     items: [
-      { q: "Wann ist ein Fachbetrieb nötig?", a: "Bei Elektro-, Sanitär- und tragenden Arbeiten. Wir sagen ehrlich, wenn die Aufgabe besser bei Fachbetrieben liegt." },
+      {
+        q: "Übernehmen Sie auch Arbeiten außerhalb Ihrer Fachbereiche?",
+        a: "Was wir selbst können, machen wir selbst: Bodenverlegung, Küchenmontage, Entrümpelung und Entsorgung. Was nicht unser Fachbereich ist – etwa Elektroinstallation oder Sanitär – übernehmen geprüfte Partnerbetriebe aus unserem Netzwerk, koordiniert von uns. Sie behalten dabei durchgehend einen Ansprechpartner: uns. So müssen Sie nicht mehrere Handwerker suchen, vergleichen und koordinieren. Mehr dazu auf unserer Netzwerk-Seite: https://verlegt-verschraubt.de/partner",
+      },
+      { q: "Wann ist ein Fachbetrieb nötig?", a: "Bei Elektro-, Sanitär- und tragenden Arbeiten. Wir sagen ehrlich, wenn die Aufgabe besser bei Fachbetrieben liegt – und holen bei Bedarf einen geprüften Partnerbetrieb aus unserem Netzwerk dazu." },
     ],
   },
 ];

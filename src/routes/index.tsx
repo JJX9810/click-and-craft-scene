@@ -33,7 +33,7 @@ import { SawdustParticles } from "@/components/site/SawdustParticles";
 import {
   HOME_WEBPAGE_ID,
   breadcrumbNode,
-  faqPageNode,
+  
   jsonLdScript,
   organizationNode,
   serviceEntities,
@@ -52,7 +52,7 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Handwerkerservice Wilhelmshaven: Bodenverlegung, Küchenmontage und Entrümpelung. Z.O.Z. – zuverlässig, ordentlich, zügig.",
+          "Bodenverlegung, Küchenmontage & Entrümpelung in Wilhelmshaven – auf Wunsch Koordination weiterer Gewerke über geprüfte Partner. Ehrliche Preise, Rückmeldung noch am selben Tag.",
       },
       {
         property: "og:title",
@@ -61,14 +61,14 @@ export const Route = createFileRoute("/")({
       {
         property: "og:description",
         content:
-          "Z.O.Z. – Zuverlässig. Ordentlich. Zügig. Bodenverlegung, Küchenmontage und Entrümpelung in Wilhelmshaven & Umgebung.",
+          "Bodenverlegung, Küchenmontage & Entrümpelung in Wilhelmshaven – auf Wunsch Koordination weiterer Gewerke über geprüfte Partner. Ehrliche Preise, Rückmeldung noch am selben Tag.",
       },
       { property: "og:url", content: "https://verlegt-verschraubt.de/" },
       { property: "og:image", content: "https://verlegt-verschraubt.de/hero-flooring.png" },
       { property: "og:image:alt", content: "Bodenleger verlegt Laminat in Holzoptik – Verlegt & Verschraubt Wilhelmshaven" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Verlegt & Verschraubt – Handwerkerservice Wilhelmshaven" },
-      { name: "twitter:description", content: "Z.O.Z. – Zuverlässig. Ordentlich. Zügig. Bodenverlegung, Küchenmontage und Entrümpelung in Wilhelmshaven & Umgebung." },
+      { name: "twitter:description", content: "Bodenverlegung, Küchenmontage & Entrümpelung in Wilhelmshaven – auf Wunsch Koordination weiterer Gewerke über geprüfte Partner. Ehrliche Preise, Rückmeldung noch am selben Tag." },
       { name: "twitter:image", content: "https://verlegt-verschraubt.de/hero-flooring.png" },
       { name: "twitter:image:alt", content: "Bodenleger verlegt Laminat in Holzoptik – Verlegt & Verschraubt Wilhelmshaven" },
     ],
@@ -99,7 +99,6 @@ export const Route = createFileRoute("/")({
         breadcrumbNode([
           { name: "Startseite", url: "https://verlegt-verschraubt.de/" },
         ]),
-        faqPageNode(faqs),
       ]),
     ],
   }),
@@ -130,7 +129,7 @@ const services = [
 ];
 
 const reasons = [
-  { icon: Target, title: "Klare Spezialisierung", desc: "Fokus auf Boden, Küche und Entrümpelung – kein Bauchladen." },
+  { icon: Target, title: "Klare Spezialisierung", desc: "Selbst machen wir nur, was wir wirklich können: Boden, Küche, Entrümpelung. Alles Weitere koordinieren wir über geprüfte Partner – statt es halb zu machen." },
   { icon: Sparkles, title: "Saubere Ausführung", desc: "Ordentliche Kanten, ordentliche Übergaben, ordentliche Räume." },
   { icon: MessageSquare, title: "Direkte Kommunikation", desc: "Sie sprechen direkt mit dem Inhaber. Kurze Wege." },
   { icon: ShieldCheck, title: "Realistische Einschätzung", desc: "Ehrlich vorab. Keine Überraschungen auf der Rechnung." },
@@ -211,18 +210,22 @@ function Index() {
             </h1>
             <p className="mt-6 max-w-lg text-base leading-relaxed text-muted-foreground sm:text-lg">
               Verlegt &amp; Verschraubt unterstützt Privatkunden bei sauberen
-              Innenarbeiten – zuverlässig, ordentlich und zügig.
+              Innenarbeiten – zuverlässig, ordentlich und zügig. Auf Wunsch
+              koordinieren wir weitere Gewerke über geprüfte Partnerbetriebe.
             </p>
             <div className="mt-10 flex flex-wrap gap-3">
               <Button
                 asChild
                 size="lg"
-                className="group h-12 rounded-full bg-accent px-7 text-accent-foreground shadow-lg shadow-accent/20 hover:bg-accent/90"
+                className="h-12 rounded-full bg-[#25D366] px-7 text-white shadow-lg shadow-[#25D366]/25 hover:bg-[#25D366]/90"
               >
-                <Link to="/kontakt">
-                  Projekt anfragen
-                  <ArrowRight className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                </Link>
+                <a
+                  href="https://wa.me/491634799286?text=Hallo%2C%20ich%20habe%20ein%20Projekt%3A%20"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <MessageSquare className="mr-1 h-4 w-4" /> WhatsApp schreiben
+                </a>
               </Button>
               <Button
                 asChild
@@ -233,6 +236,16 @@ function Index() {
                 <a href="tel:+491634799286">
                   <Phone className="mr-1 h-4 w-4" /> Direkt anrufen
                 </a>
+              </Button>
+              <Button
+                asChild
+                size="lg"
+                className="group h-12 rounded-full bg-accent px-7 text-accent-foreground shadow-lg shadow-accent/20 hover:bg-accent/90"
+              >
+                <Link to="/kontakt">
+                  Projekt anfragen
+                  <ArrowRight className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                </Link>
               </Button>
               <Button
                 asChild
@@ -304,7 +317,9 @@ function Index() {
             für Bodenverlegung, Küchenmontage sowie Entrümpelung und Entsorgung.
             Das Unternehmen unterstützt Privatkunden in Wilhelmshaven und Umgebung
             bei sauberen Innenarbeiten mit klarer Absprache, ordentlicher
-            Ausführung und zügiger Umsetzung.
+            Ausführung und zügiger Umsetzung. Umfasst ein Projekt weitere Gewerke,
+            koordiniert Verlegt &amp; Verschraubt geprüfte Partnerbetriebe aus dem
+            eigenen Netzwerk – Kunden behalten dabei durchgehend einen Ansprechpartner.
           </QuickAnswer>
           <FactBox />
         </div>
@@ -414,6 +429,72 @@ function Index() {
                 </div>
               </article>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* NETZWERK */}
+      <section className="relative">
+        <div className="mx-auto max-w-7xl px-6 py-24">
+          <div className="max-w-2xl">
+            <p className="text-xs uppercase tracking-[0.28em] text-accent">Partnernetzwerk</p>
+            <h2 className="mt-3 text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
+              Ein Ansprechpartner statt zehn Handwerker.
+            </h2>
+          </div>
+          <div className="mt-8 grid gap-8 lg:grid-cols-[1.4fr_1fr] lg:items-start">
+            <div className="max-w-2xl space-y-4 text-base leading-relaxed text-muted-foreground">
+              <p>
+                Renovierung heißt für die meisten: mehrere Betriebe suchen, Angebote
+                vergleichen, Termine jonglieren – und hoffen, dass alles ineinandergreift.
+                Bei uns heißt es: ein Anruf.
+              </p>
+              <p>
+                Boden, Küche und Entrümpelung machen wir selbst. Braucht Ihr Projekt mehr
+                – etwa Elektrik, Sanitär oder Malerarbeiten – holen wir geprüfte
+                Partnerbetriebe aus unserem Netzwerk dazu und steuern den gesamten Ablauf.
+              </p>
+            </div>
+            <ul className="grid gap-3 text-sm sm:grid-cols-3 lg:grid-cols-1">
+              {[
+                "Ein Ansprechpartner",
+                "Ein Plan",
+                "Eine saubere Übergabe",
+              ].map((t) => (
+                <li
+                  key={t}
+                  className="flex items-center gap-3 rounded-2xl border border-border/70 bg-card/50 px-4 py-3 backdrop-blur"
+                >
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-accent/15 text-accent">
+                    <CheckCircle2 className="h-4 w-4" />
+                  </span>
+                  <span className="font-medium">{t}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <p className="mt-8 max-w-2xl text-sm leading-relaxed text-muted-foreground">
+            Gemeinsam mit JS Küchenduo setzen wir Projekte auch überregional um.
+            Rückmeldung in der Regel noch am selben Tag.
+          </p>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Button
+              asChild
+              size="lg"
+              className="h-12 rounded-full bg-accent px-7 text-accent-foreground hover:bg-accent/90"
+            >
+              <Link to="/partner">
+                So funktioniert unser Netzwerk <ArrowRight className="ml-1 h-4 w-4" />
+              </Link>
+            </Button>
+            <Button
+              asChild
+              size="lg"
+              variant="outline"
+              className="h-12 rounded-full border-border bg-transparent px-7 hover:bg-card"
+            >
+              <Link to="/kontakt">Projekt anfragen</Link>
+            </Button>
           </div>
         </div>
       </section>
@@ -593,10 +674,18 @@ function Index() {
               Ersteinschätzung, in der Regel innerhalb von 24 Stunden.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Button asChild size="lg" className="h-12 rounded-full bg-accent px-7 text-accent-foreground hover:bg-accent/90">
-                <Link to="/kontakt">
-                  Anfrage senden <ArrowRight className="ml-1 h-4 w-4" />
-                </Link>
+              <Button
+                asChild
+                size="lg"
+                className="h-12 rounded-full bg-[#25D366] px-7 text-white shadow-lg shadow-[#25D366]/25 hover:bg-[#25D366]/90"
+              >
+                <a
+                  href="https://wa.me/491634799286?text=Hallo%2C%20ich%20habe%20ein%20Projekt%3A%20"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <MessageSquare className="mr-1 h-4 w-4" /> WhatsApp schreiben
+                </a>
               </Button>
               <Button
                 asChild
@@ -604,7 +693,14 @@ function Index() {
                 variant="outline"
                 className="h-12 rounded-full border-border bg-transparent px-7 hover:bg-card"
               >
-                <a href="https://wa.me/491634799286" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+                <a href="tel:+491634799286">
+                  <Phone className="mr-1 h-4 w-4" /> Direkt anrufen
+                </a>
+              </Button>
+              <Button asChild size="lg" className="h-12 rounded-full bg-accent px-7 text-accent-foreground hover:bg-accent/90">
+                <Link to="/kontakt">
+                  Anfrage senden <ArrowRight className="ml-1 h-4 w-4" />
+                </Link>
               </Button>
             </div>
           </div>

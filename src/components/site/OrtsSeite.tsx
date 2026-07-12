@@ -67,6 +67,13 @@ export function OrtsSeite({
             aus dieser Region heraus bedient – ohne erfundene Filiale vor Ort und ohne
             Versprechen, die wir nicht halten können.
           </p>
+          <p className="mt-4 max-w-3xl text-sm leading-relaxed text-muted-foreground">
+            Auch in {ort} koordinieren wir auf Wunsch weitere Gewerke über unser{" "}
+            <Link to="/partner" className="text-accent hover:underline">
+              Partnernetzwerk
+            </Link>{" "}
+            – Sie behalten einen Ansprechpartner für das gesamte Projekt.
+          </p>
         </Section>
       )}
 

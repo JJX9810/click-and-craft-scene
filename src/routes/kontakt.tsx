@@ -317,20 +317,12 @@ function Page() {
 
             <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
               <Button
-                type="submit"
-                size="lg"
-                className="h-12 rounded-full bg-accent px-7 text-accent-foreground hover:bg-accent/90"
-              >
-                <Mail className="mr-2 h-4 w-4" /> Per E-Mail vorbereiten
-              </Button>
-              <Button
                 type="button"
                 size="lg"
-                variant="outline"
                 onClick={() => handle("whatsapp")}
-                className="h-12 rounded-full border-border bg-transparent px-7 hover:bg-card"
+                className="h-12 rounded-full bg-[#25D366] px-7 text-white shadow-lg shadow-[#25D366]/25 hover:bg-[#25D366]/90"
               >
-                <MessageCircle className="mr-2 h-4 w-4" /> Per WhatsApp vorbereiten
+                <MessageCircle className="mr-2 h-4 w-4" /> WhatsApp schreiben
               </Button>
               <Button
                 asChild
@@ -342,6 +334,13 @@ function Page() {
                 <a href={TEL_HREF}>
                   <Phone className="mr-2 h-4 w-4" /> Direkt anrufen
                 </a>
+              </Button>
+              <Button
+                type="submit"
+                size="lg"
+                className="h-12 rounded-full bg-accent px-7 text-accent-foreground hover:bg-accent/90"
+              >
+                <Mail className="mr-2 h-4 w-4" /> Per E-Mail vorbereiten
               </Button>
             </div>
 

@@ -44,7 +44,24 @@ const AREA_SERVED = [
   "Varel",
   "Wangerland",
   "Wittmund",
+  "Friesland",
   "Wilhelmshaven und Umgebung",
+];
+
+const OPENING_HOURS = [
+  {
+    "@type": "OpeningHoursSpecification",
+    dayOfWeek: [
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+    ],
+    opens: "08:00",
+    closes: "19:00",
+  },
 ];
 
 const OFFER_CATALOG = {
@@ -90,6 +107,7 @@ export const organizationNode = {
     "Küchenaufbau",
   ],
   hasOfferCatalog: OFFER_CATALOG,
+  openingHoursSpecification: OPENING_HOURS,
 };
 
 // Backwards-compat-Alias – verweist auf dieselbe Entität.

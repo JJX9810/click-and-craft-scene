@@ -1,6 +1,9 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, Phone, ChevronRight } from "lucide-react";
+import { ArrowRight, Phone, ChevronRight, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+
+const WA_HREF =
+  "https://wa.me/491634799286?text=Hallo%2C%20ich%20habe%20ein%20Projekt%3A%20";
 
 export function PageHero({
   eyebrow,
@@ -47,11 +50,11 @@ export function PageHero({
           <Button
             asChild
             size="lg"
-            className="h-12 rounded-full bg-accent px-7 text-accent-foreground hover:bg-accent/90"
+            className="h-12 rounded-full bg-[#25D366] px-7 text-white shadow-lg shadow-[#25D366]/25 hover:bg-[#25D366]/90"
           >
-            <Link to="/kontakt">
-              Projekt anfragen <ArrowRight className="ml-1 h-4 w-4" />
-            </Link>
+            <a href={WA_HREF} target="_blank" rel="noopener noreferrer">
+              <MessageCircle className="mr-1 h-4 w-4" /> WhatsApp schreiben
+            </a>
           </Button>
           <Button
             asChild
@@ -62,6 +65,15 @@ export function PageHero({
             <a href="tel:+491634799286">
               <Phone className="mr-1 h-4 w-4" /> 0163 4799286
             </a>
+          </Button>
+          <Button
+            asChild
+            size="lg"
+            className="h-12 rounded-full bg-accent px-7 text-accent-foreground hover:bg-accent/90"
+          >
+            <Link to="/kontakt">
+              Projekt anfragen <ArrowRight className="ml-1 h-4 w-4" />
+            </Link>
           </Button>
         </div>
       </div>
@@ -129,11 +141,11 @@ export function CtaBlock({
           <Button
             asChild
             size="lg"
-            className="h-12 rounded-full bg-accent px-7 text-accent-foreground hover:bg-accent/90"
+            className="h-12 rounded-full bg-[#25D366] px-7 text-white shadow-lg shadow-[#25D366]/25 hover:bg-[#25D366]/90"
           >
-            <Link to="/kontakt">
-              Anfrage starten <ArrowRight className="ml-1 h-4 w-4" />
-            </Link>
+            <a href={WA_HREF} target="_blank" rel="noopener noreferrer">
+              <MessageCircle className="mr-1 h-4 w-4" /> WhatsApp schreiben
+            </a>
           </Button>
           <Button
             asChild
@@ -144,6 +156,15 @@ export function CtaBlock({
             <a href="tel:+491634799286">
               <Phone className="mr-1 h-4 w-4" /> Direkt anrufen
             </a>
+          </Button>
+          <Button
+            asChild
+            size="lg"
+            className="h-12 rounded-full bg-accent px-7 text-accent-foreground hover:bg-accent/90"
+          >
+            <Link to="/kontakt">
+              Anfrage starten <ArrowRight className="ml-1 h-4 w-4" />
+            </Link>
           </Button>
         </div>
       </div>
