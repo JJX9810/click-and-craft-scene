@@ -43,9 +43,19 @@ export const Route = createFileRoute("/bodenverlegung-wilhelmshaven")({
         serviceNode({
           url: PAGE_URL,
           id: SERVICE_IDS.bodenverlegung,
-          name: "Bodenverlegung in Wilhelmshaven",
+          name: "Bodenverlegung",
           description: "Verlegung von Vinyl, Designboden, Laminat, PVC und Teppich inklusive Untergrundprüfung, Altbelag entfernen, Treppenverkleidung sowie Sockelleisten und Übergängen.",
-          serviceType: "Bodenverlegung",
+          serviceType: "Bodenverlegung (Vinyl, Laminat, PVC, Teppich)",
+          areaServed: BODEN_AREA_SERVED,
+          offers: [
+            offerNode({ name: "Laminat schwimmend verlegen", price: PRICE_LAMINAT_SCHWIMMEND, unitText: "m²" }),
+            offerNode({ name: "Vinyl schwimmend verlegen", price: PRICE_VINYL_SCHWIMMEND, unitText: "m²" }),
+            offerNode({ name: "Vinyl verklebt verlegen", price: PRICE_VINYL_VERKLEBT, unitText: "m²" }),
+            offerNode({ name: "PVC schwimmend verlegen", price: PRICE_PVC_SCHWIMMEND, unitText: "m²" }),
+            offerNode({ name: "PVC verklebt verlegen", price: PRICE_PVC_VERKLEBT, unitText: "m²" }),
+            offerNode({ name: "Sockelleisten montieren", price: SOCKEL_PRICE, unitText: "lfm" }),
+            offerNode({ name: "Spachteln inkl. Grundierung", price: SPACHTELN_PRICE, unitText: "m²" }),
+          ],
         }),
         breadcrumbNode([
           { name: "Startseite", url: "https://verlegt-verschraubt.de/" },
