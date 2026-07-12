@@ -7,15 +7,15 @@ export const Route = createFileRoute("/handwerkerservice-jever")({
   head: () => ({
     meta: [
       { title: "Handwerkerservice Jever – Boden, Küche, Entrümpelung" },
-      { name: "description", content: "Bodenverlegung, Küchenmontage und Entrümpelung in Jever – aus Wilhelmshaven mit kurzer Anfahrt." },
+      { name: "description", content: "Bodenverlegung, Küchenmontage & Entrümpelung in Jever – ehrliche Preise, Rückmeldung noch am selben Tag. Auf Wunsch Koordination weiterer Gewerke über geprüfte Partner." },
       { property: "og:title", content: "Handwerkerservice in Jever" },
-      { property: "og:description", content: "Boden, Küche, Entrümpelung in Jever." },
+      { property: "og:description", content: "Bodenverlegung, Küchenmontage & Entrümpelung in Jever – ehrliche Preise, Rückmeldung noch am selben Tag. Auf Wunsch Koordination weiterer Gewerke über geprüfte Partner." },
       { property: "og:url", content: "https://verlegt-verschraubt.de/handwerkerservice-jever" },
       { property: "og:image", content: "https://verlegt-verschraubt.de/hero-flooring.png" },
       { property: "og:image:alt", content: "Handwerkerservice in Jever für Bodenverlegung, Küchenmontage und Entrümpelung" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Handwerkerservice in Jever" },
-      { name: "twitter:description", content: "Boden, Küche, Entrümpelung in Jever." },
+      { name: "twitter:description", content: "Bodenverlegung, Küchenmontage & Entrümpelung in Jever – ehrliche Preise, Rückmeldung noch am selben Tag. Auf Wunsch Koordination weiterer Gewerke über geprüfte Partner." },
       { name: "twitter:image", content: "https://verlegt-verschraubt.de/hero-flooring.png" },
       { name: "twitter:image:alt", content: "Handwerkerservice in Jever für Bodenverlegung, Küchenmontage und Entrümpelung" },
     ],
