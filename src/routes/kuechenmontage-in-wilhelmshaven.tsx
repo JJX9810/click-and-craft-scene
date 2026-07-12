@@ -16,8 +16,6 @@ import { KUECHE_MONTAGE_PRICE } from "@/lib/pricing";
 const KM_AREA_SERVED = [
   "Wilhelmshaven", "Schortens", "Sande", "Jever", "Varel", "Wangerland", "Wittmund", "Friesland",
 ];
-import { QuickAnswer, FactBox, LimitsBox, InternalLinks } from "@/components/site/InfoBlocks";
-import { PreisrechnerCTA } from "@/components/site/PreisrechnerCTA";
 
 const KM_URL = "https://verlegt-verschraubt.de/kuechenmontage-in-wilhelmshaven";
 
