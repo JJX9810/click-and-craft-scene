@@ -20,6 +20,27 @@ import { toast } from "sonner";
 import { buildAttributionLines } from "@/lib/attribution";
 import { trackEvent } from "@/lib/tracking";
 import { upsertCalcSession, submitCalculation } from "@/lib/admin-tracking";
+import {
+  BODEN_VARIANTEN,
+  ALT_PRICE_SCHWIMMEND,
+  ALT_PRICE_VERKLEBT,
+  SOCKEL_PRICE,
+  SOCKEL_GEHRUNG_PRICE,
+  DAEMMUNG_PRICE,
+  SPACHTELN_PRICE,
+  ALT_TEPPICH_LOSE_PRICE,
+  ALT_TEPPICH_LOSE_MIN,
+  ALT_TEPPICH_VERKLEBT_PRICE,
+  ALT_TEPPICH_VERKLEBT_MIN,
+  MATERIALSERVICE_RATE,
+  MATERIALSERVICE_MIN,
+  ANFAHRT_FREI_KM,
+  ANFAHRT_PRO_KM,
+  KUECHE_MONTAGE_PRICE,
+  KUECHE_DEMONTAGE_PRICE,
+  KUECHE_ARBEITSPLATTE_PRICE,
+  KUECHE_ENTSORGUNG_PAUSCHAL,
+} from "@/lib/pricing";
 
 // Mapping URL-Parameter `?leistung=...` → interne Service-Keys
 const LEISTUNG_PARAM_MAP: Record<string, Service> = {
