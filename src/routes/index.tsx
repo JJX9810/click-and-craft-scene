@@ -31,7 +31,6 @@ import { EinsatzgebietMap } from "@/components/site/EinsatzgebietMap";
 import { Kostenrechner } from "@/components/site/Kostenrechner";
 import { OnlinePresenceSection } from "@/components/site/OnlinePresenceSection";
 import { SawdustParticles } from "@/components/site/SawdustParticles";
-import { PlankHero } from "@/components/site/PlankHero";
 import {
   HOME_WEBPAGE_ID,
   breadcrumbNode,
@@ -259,8 +258,25 @@ function Index() {
           </div>
 
           <div className="relative">
-            <div className="relative w-full overflow-hidden rounded-3xl border border-border/60 bg-card/20 shadow-2xl">
-              <PlankHero />
+            <div className="relative w-full overflow-hidden rounded-3xl border border-border/60 shadow-2xl">
+              <BeforeAfterSlider
+                before="/projects/teppichboden-schortens-01-vorher.webp"
+                after="/projects/teppichboden-schortens-02-nachher.webp"
+                alt="Vorher-Nachher-Vergleich aus Schortens: Untergrund mit alten Kleberesten, danach frisch verlegter grauer Teppichboden"
+                aspect="16/9"
+              />
+              <div className="flex items-center justify-between gap-3 border-t border-border/60 bg-card/60 px-5 py-3 backdrop-blur">
+                <p className="text-xs text-muted-foreground sm:text-sm">
+                  Ziehen Sie den Regler – echtes Projekt aus Schortens.
+                </p>
+                <Link
+                  to="/showroom/$slug"
+                  params={{ slug: "renovierung-aus-einer-hand-schortens" }}
+                  className="shrink-0 text-xs font-medium text-accent hover:underline sm:text-sm"
+                >
+                  Zum Projekt →
+                </Link>
+              </div>
             </div>
           </div>
         </div>
@@ -337,17 +353,6 @@ function Index() {
             <Button asChild variant="outline" className="rounded-full border-border bg-transparent">
               <Link to="/showroom">Zum gesamten Showroom <ArrowRight className="ml-1 h-4 w-4" /></Link>
             </Button>
-          </div>
-          <div className="mx-auto mt-12 max-w-4xl">
-            <BeforeAfterSlider
-              before="/projects/teppichboden-schortens-01-vorher.webp"
-              after="/projects/teppichboden-schortens-02-nachher.webp"
-              alt="Vorher-Nachher-Vergleich aus Schortens: Untergrund mit alten Kleberesten, danach frisch verlegter grauer Teppichboden"
-              aspect="3/2"
-            />
-            <p className="mt-3 text-center text-sm text-muted-foreground">
-              Ziehen Sie den Regler – echtes Projekt aus Schortens.
-            </p>
           </div>
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {featuredProjects.slice(0, 3).map((p) => (
