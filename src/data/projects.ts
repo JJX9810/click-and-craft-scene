@@ -27,6 +27,8 @@ export type Project = {
   media: ProjectMedia[];
   featured?: boolean;
   detail?: boolean;
+  /** Echtes Vorher-/Nachher-Bildpaar für den Slider. Nur setzen, wenn beide Bilder aus demselben Blickwinkel entstanden sind. */
+  beforeAfter?: { before: string; after: string; alt: string };
 };
 
 const BASE = "https://verlegt-verschraubt.de/wp-content/uploads/2026/05";
