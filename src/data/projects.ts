@@ -27,6 +27,8 @@ export type Project = {
   media: ProjectMedia[];
   featured?: boolean;
   detail?: boolean;
+  /** Echtes Vorher-/Nachher-Bildpaar für den Slider. Nur setzen, wenn beide Bilder aus demselben Blickwinkel entstanden sind. */
+  beforeAfter?: { before: string; after: string; alt: string };
 };
 
 const BASE = "https://verlegt-verschraubt.de/wp-content/uploads/2026/05";
@@ -52,6 +54,12 @@ export const projects: Project[] = [
     coverAlt: "Vinylboden in Holzoptik im Wohnzimmer in Coldewei, Wilhelmshaven",
     featured: true,
     detail: true,
+    beforeAfter: {
+      before: "/projects/coldewei-01-vorher-flur.webp",
+      after: "/projects/coldewei-03-vinyl-flur.webp",
+      alt: "Flur in Coldewei, Wilhelmshaven – Vorher mit altem Belag, Nachher mit Vinyl in Holzoptik",
+    },
+    
     media: [
       {
         type: "image",

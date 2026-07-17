@@ -12,6 +12,7 @@ import {
 import appCss from "../styles.css?url";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
+import { MobileContactBar } from "@/components/site/MobileContactBar";
 import { Toaster } from "@/components/ui/sonner";
 import { AttributionTracker } from "@/components/AttributionTracker";
 import { AnalyticsTracker } from "@/components/AnalyticsTracker";
@@ -162,6 +163,7 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isHome = pathname === "/";
+  const hideMobileBar = pathname.startsWith("/impressum") || pathname.startsWith("/datenschutz");
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -181,6 +183,8 @@ function RootComponent() {
           <Outlet />
         </main>
         <Footer />
+        {!hideMobileBar && <div aria-hidden className="h-20 md:hidden" />}
+        {!hideMobileBar && <MobileContactBar />}
         <Toaster />
         <AttributionTracker />
         <AnalyticsTracker />
