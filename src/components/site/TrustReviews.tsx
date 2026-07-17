@@ -6,6 +6,12 @@ import { Button } from "@/components/ui/button";
 // identisch zu /referenzen – nicht erfunden, nur Auszüge).
 export const realReviews = [
   {
+    name: "Familie Kolb",
+    src: "Google",
+    cat: "Boden, Küche & Umzugskoordination in Schortens",
+    text: "Was ursprünglich nur mit der Bodenverlegung und der Küchenmontage begann, entwickelte sich zu einer vollständigen Organisation unseres Umzugs. Herr Brosch kümmerte sich um einen Umzugspartner, einen Elektriker und einen Maler und koordinierte alle beteiligten Gewerke – und das alles innerhalb von nur drei Wochen. So viel Einsatz, Zuverlässigkeit und Eigeninitiative haben wir bisher noch bei keinem Handwerksunternehmen erlebt.",
+  },
+  {
     name: "Pass Pass2",
     src: "Google",
     cat: "Küchenmontage",
