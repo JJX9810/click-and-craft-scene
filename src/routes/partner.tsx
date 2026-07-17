@@ -1,4 +1,4 @@
-import { breadcrumbNode, jsonLdScript, webPageNode } from "@/lib/schema";
+import { breadcrumbNode, jsonLdScript, webPageNode, serviceNode } from "@/lib/schema";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PageHero, Section } from "@/components/site/PageShell";
 import {
