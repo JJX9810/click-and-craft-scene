@@ -167,11 +167,8 @@
 
 @media (prefers-reduced-motion: reduce) {
   .animate-hero-float,
-  .animate-marquee,
-  .animate-aurora-shift,
-  .animate-shimmer,
   .animate-fade-up { animation: none; }
-  .tile-shader::after { animation: none; }
+  .reveal-on-scroll { opacity: 1; transform: none; transition: none; }
 }
 
 .dark {
