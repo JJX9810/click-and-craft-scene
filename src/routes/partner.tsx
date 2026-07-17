@@ -92,13 +92,13 @@ const steps = [
   },
 ];
 
-const ownServices = [
-  "Bodenverlegung (Vinyl, Laminat, PVC, Teppich)",
-  "Küchenmontage & Küchenservice",
-  "Küchenfolierung",
-  "Entrümpelung & Entsorgung",
-  "Sockelleisten & Silikonarbeiten",
-  "kleinere Renovierungs- und Anpassungsarbeiten",
+const ownServices: { label: string; to?: string }[] = [
+  { label: "Bodenleger & Bodenverlegung (Vinyl, Laminat, PVC, Teppich)", to: "/bodenverlegung-wilhelmshaven" },
+  { label: "Küchenmonteur & Küchenmontage", to: "/kuechenmontage-in-wilhelmshaven" },
+  { label: "Küchenfolierung" },
+  { label: "Entrümpelung & Haushaltsauflösung", to: "/entruempelung-entsorgung-in-wilhelmshaven" },
+  { label: "Sockelleisten & Silikonarbeiten" },
+  { label: "kleinere Renovierungs- und Anpassungsarbeiten" },
 ];
 
 const partnerServices = [
