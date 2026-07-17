@@ -23,13 +23,13 @@ export const Route = createFileRoute("/partner")({
   component: Page,
   head: () => ({
     meta: [
-      { title: "Renovierung aus einer Hand in Wilhelmshaven – ein Ansprechpartner | Verlegt & Verschraubt" },
+      { title: "Renovierung aus einer Hand in Wilhelmshaven" },
       {
         name: "description",
         content:
-          "Ein Ansprechpartner statt zehn Handwerker: Verlegt & Verschraubt koordiniert Ihr Renovierungsprojekt mit eigenen Leistungen und geprüften Partnerbetrieben.",
+          "Renovierung in Wilhelmshaven aus einer Hand: eigene Gewerke plus geprüfte Partnerbetriebe – koordiniert von Verlegt & Verschraubt. Ein Ansprechpartner statt zehn Handwerker.",
       },
-      { property: "og:title", content: "Renovierung aus einer Hand in Wilhelmshaven – ein Ansprechpartner" },
+      { property: "og:title", content: "Renovierung aus einer Hand in Wilhelmshaven" },
       {
         property: "og:description",
         content:
@@ -39,7 +39,7 @@ export const Route = createFileRoute("/partner")({
       { property: "og:image", content: "https://verlegt-verschraubt.de/og-image.jpg" },
       { property: "og:image:alt", content: "Partner und Kooperationen von Verlegt & Verschraubt aus Wilhelmshaven" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Renovierung aus einer Hand in Wilhelmshaven – ein Ansprechpartner" },
+      { name: "twitter:title", content: "Renovierung aus einer Hand in Wilhelmshaven" },
       { name: "twitter:description", content: "Renovierung aus einer Hand – koordiniert von uns, umgesetzt von uns und geprüften Partnern." },
       { name: "twitter:image", content: "https://verlegt-verschraubt.de/og-image.jpg" },
     ],
@@ -48,9 +48,17 @@ export const Route = createFileRoute("/partner")({
       jsonLdScript([
         webPageNode({
           url: "https://verlegt-verschraubt.de/partner",
-          name: "Renovierung aus einer Hand in Wilhelmshaven – ein Ansprechpartner | Verlegt & Verschraubt",
+          name: "Renovierung aus einer Hand in Wilhelmshaven",
           description:
             "Ein Ansprechpartner für Ihre Renovierung: eigene Leistungen und geprüfte Partnerbetriebe – koordiniert von Verlegt & Verschraubt.",
+          about: { "@id": "https://verlegt-verschraubt.de/partner#service" },
+        }),
+        serviceNode({
+          url: "https://verlegt-verschraubt.de/partner",
+          name: "Renovierung aus einer Hand",
+          description:
+            "Koordinierte Renovierung in Wilhelmshaven und Umgebung: eigene Gewerke (Bodenverlegung, Küchenmontage, Entrümpelung) plus geprüfte Partnerbetriebe für weitere Gewerke – mit einem Ansprechpartner für das gesamte Projekt.",
+          serviceType: ["Renovierung aus einer Hand", "Handwerkskoordination"],
         }),
         breadcrumbNode([
           { name: "Startseite", url: "https://verlegt-verschraubt.de/" },
