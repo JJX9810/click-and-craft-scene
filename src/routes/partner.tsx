@@ -1,4 +1,4 @@
-import { breadcrumbNode, jsonLdScript, webPageNode } from "@/lib/schema";
+import { breadcrumbNode, jsonLdScript, webPageNode, serviceNode } from "@/lib/schema";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PageHero, Section } from "@/components/site/PageShell";
 import {
@@ -23,13 +23,13 @@ export const Route = createFileRoute("/partner")({
   component: Page,
   head: () => ({
     meta: [
-      { title: "Renovierung aus einer Hand in Wilhelmshaven – ein Ansprechpartner | Verlegt & Verschraubt" },
+      { title: "Renovierung aus einer Hand in Wilhelmshaven" },
       {
         name: "description",
         content:
-          "Ein Ansprechpartner statt zehn Handwerker: Verlegt & Verschraubt koordiniert Ihr Renovierungsprojekt mit eigenen Leistungen und geprüften Partnerbetrieben.",
+          "Renovierung in Wilhelmshaven aus einer Hand: eigene Gewerke plus geprüfte Partnerbetriebe – koordiniert von Verlegt & Verschraubt. Ein Ansprechpartner statt zehn Handwerker.",
       },
-      { property: "og:title", content: "Renovierung aus einer Hand in Wilhelmshaven – ein Ansprechpartner" },
+      { property: "og:title", content: "Renovierung aus einer Hand in Wilhelmshaven" },
       {
         property: "og:description",
         content:
@@ -39,7 +39,7 @@ export const Route = createFileRoute("/partner")({
       { property: "og:image", content: "https://verlegt-verschraubt.de/og-image.jpg" },
       { property: "og:image:alt", content: "Partner und Kooperationen von Verlegt & Verschraubt aus Wilhelmshaven" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Renovierung aus einer Hand in Wilhelmshaven – ein Ansprechpartner" },
+      { name: "twitter:title", content: "Renovierung aus einer Hand in Wilhelmshaven" },
       { name: "twitter:description", content: "Renovierung aus einer Hand – koordiniert von uns, umgesetzt von uns und geprüften Partnern." },
       { name: "twitter:image", content: "https://verlegt-verschraubt.de/og-image.jpg" },
     ],
@@ -48,9 +48,17 @@ export const Route = createFileRoute("/partner")({
       jsonLdScript([
         webPageNode({
           url: "https://verlegt-verschraubt.de/partner",
-          name: "Renovierung aus einer Hand in Wilhelmshaven – ein Ansprechpartner | Verlegt & Verschraubt",
+          name: "Renovierung aus einer Hand in Wilhelmshaven",
           description:
             "Ein Ansprechpartner für Ihre Renovierung: eigene Leistungen und geprüfte Partnerbetriebe – koordiniert von Verlegt & Verschraubt.",
+          about: { "@id": "https://verlegt-verschraubt.de/partner#service" },
+        }),
+        serviceNode({
+          url: "https://verlegt-verschraubt.de/partner",
+          name: "Renovierung aus einer Hand",
+          description:
+            "Koordinierte Renovierung in Wilhelmshaven und Umgebung: eigene Gewerke (Bodenverlegung, Küchenmontage, Entrümpelung) plus geprüfte Partnerbetriebe für weitere Gewerke – mit einem Ansprechpartner für das gesamte Projekt.",
+          serviceType: ["Renovierung aus einer Hand", "Handwerkskoordination"],
         }),
         breadcrumbNode([
           { name: "Startseite", url: "https://verlegt-verschraubt.de/" },
@@ -84,13 +92,13 @@ const steps = [
   },
 ];
 
-const ownServices = [
-  "Bodenverlegung (Vinyl, Laminat, PVC, Teppich)",
-  "Küchenmontage & Küchenservice",
-  "Küchenfolierung",
-  "Entrümpelung & Entsorgung",
-  "Sockelleisten & Silikonarbeiten",
-  "kleinere Renovierungs- und Anpassungsarbeiten",
+const ownServices: { label: string; to?: string }[] = [
+  { label: "Bodenleger & Bodenverlegung (Vinyl, Laminat, PVC, Teppich)", to: "/bodenverlegung-wilhelmshaven" },
+  { label: "Küchenmonteur & Küchenmontage", to: "/kuechenmontage-in-wilhelmshaven" },
+  { label: "Küchenfolierung" },
+  { label: "Entrümpelung & Haushaltsauflösung", to: "/entruempelung-entsorgung-in-wilhelmshaven" },
+  { label: "Sockelleisten & Silikonarbeiten" },
+  { label: "kleinere Renovierungs- und Anpassungsarbeiten" },
 ];
 
 const partnerServices = [
@@ -279,7 +287,7 @@ function Page() {
             Partnernetzwerk
           </p>
           <h1 className="mt-3 max-w-3xl text-balance text-4xl font-semibold leading-[1.08] tracking-tight sm:text-5xl">
-            Ein Ansprechpartner statt zehn Handwerker.
+            Ein Ansprechpartner statt zehn Handwerker – Ihre Renovierung in Wilhelmshaven aus einer Hand.
           </h1>
           <p className="mt-5 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
             Sie schildern uns Ihr Projekt einmal. Wir übernehmen Planung,
@@ -293,7 +301,7 @@ function Page() {
       {/* WARUM ES UNS GIBT */}
       <Section
         eyebrow="Warum es uns gibt"
-        title="Renovierung aus einer Hand – so funktioniert es bei uns."
+        title="Renovierung in Wilhelmshaven – so funktioniert es aus einer Hand."
       >
         <div className="max-w-3xl space-y-5 text-base leading-relaxed text-muted-foreground">
           <p>
@@ -375,9 +383,17 @@ function Page() {
             </p>
             <ul className="mt-5 space-y-3 text-sm text-muted-foreground">
               {ownServices.map((s) => (
-                <li key={s} className="flex items-start gap-3">
+                <li key={s.label} className="flex items-start gap-3">
                   <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
-                  <span>{s}</span>
+                  <span>
+                    {s.to ? (
+                      <Link to={s.to} className="text-accent hover:underline">
+                        {s.label}
+                      </Link>
+                    ) : (
+                      s.label
+                    )}
+                  </span>
                 </li>
               ))}
             </ul>
@@ -430,7 +446,44 @@ function Page() {
       </Section>
 
       {/* PARTNER-VORSTELLUNG */}
+      {/* FAQ */}
+      <Section eyebrow="FAQ" title="Häufige Fragen zur Renovierung aus einer Hand" bordered>
+        <div className="max-w-3xl space-y-3">
+          {[
+            {
+              q: "Seid ihr ein Generalunternehmer?",
+              a: "Nein. Wir treten nicht als Generalunternehmer auf. Unsere eigenen Gewerke – Boden, Küche, Entrümpelung – führen wir selbst aus. Für weitere Gewerke vermitteln und koordinieren wir geprüfte Partnerbetriebe, die ihre Leistungen eigenverantwortlich erbringen. Sie haben dabei durchgehend einen Ansprechpartner: uns.",
+            },
+            {
+              q: "Was kostet eine Renovierung aus einer Hand?",
+              a: "Für unsere eigenen Leistungen gibt der Kostenrechner eine erste Orientierung. Partnerleistungen kalkulieren die jeweiligen Fachbetriebe. Verbindliche Preise gibt es erst nach Prüfung von Fotos, Maßen bzw. einer Besichtigung – ehrlich und ohne Überraschungen.",
+            },
+            {
+              q: "Welche Gewerke deckt das Netzwerk aktuell ab?",
+              a: "Selbst übernehmen wir Bodenverlegung, Küchenmontage, Küchenfolierung sowie Entrümpelung und Entsorgung. Über Partner laufen aktuell vor allem Küchen- und Umbauprojekte gemeinsam mit JS Küchenduo. Weitere Gewerke wie Elektro, Sanitär und Malerarbeiten ergänzen wir nur mit bestätigten, geprüften Partnern – solange sagen wir offen, was noch nicht abgedeckt ist.",
+            },
+            {
+              q: "Arbeitet ihr auch außerhalb von Wilhelmshaven?",
+              a: "Ja. Unser Kerngebiet ist Wilhelmshaven mit Schortens, Sande, Jever, Varel, Wangerland und Wittmund. Gemeinsam mit JS Küchenduo (Zentrale West, Raum Ruhrgebiet/Rheinland) prüfen wir auch überregionale Projekte – individuell nach Umfang und Terminlage.",
+            },
+          ].map((f) => (
+            <details
+              key={f.q}
+              className="group rounded-xl border border-border/70 bg-card/40 p-5 backdrop-blur"
+            >
+              <summary className="cursor-pointer list-none text-base font-medium text-foreground marker:hidden">
+                {f.q}
+              </summary>
+              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                {f.a}
+              </p>
+            </details>
+          ))}
+        </div>
+      </Section>
+
       <Section eyebrow="Unser Partner" title="Mit wem wir gerne zusammenarbeiten.">
+
         <PartnerCard />
       </Section>
 
