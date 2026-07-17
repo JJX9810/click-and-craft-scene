@@ -1,10 +1,14 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { PageHero, Section, CtaBlock, Bullet } from "@/components/site/PageShell";
+import { Section, CtaBlock, Bullet } from "@/components/site/PageShell";
 import { ProjectCard } from "@/components/site/ProjectCard";
 import { BeforeAfterSlider } from "@/components/site/BeforeAfterSlider";
+import { Button } from "@/components/ui/button";
 import { getProject, projects, type ProjectMedia } from "@/data/projects";
-import { ArrowRight, MapPin } from "lucide-react";
+import { ArrowRight, ChevronRight, MapPin, MessageCircle, Phone, Star } from "lucide-react";
 import { breadcrumbNode, jsonLdScript, webPageNode } from "@/lib/schema";
+
+const WA_HREF =
+  "https://wa.me/491634799286?text=Hallo%2C%20ich%20habe%20ein%20Projekt%3A%20";
 
 export const Route = createFileRoute("/showroom/$slug")({
   component: ProjectDetail,
