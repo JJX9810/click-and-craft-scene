@@ -1,0 +1,74 @@
+name: Deploy zu IONOS Webspace
+
+# Baut die statische Website (ionos-export) und lädt sie per SFTP auf den
+# bestehenden IONOS-Webspace. Läuft bei jedem Push auf main sowie manuell
+# über den "Run workflow"-Button (Actions-Tab).
+#
+# Benötigte Repository-Secrets (Settings → Secrets and variables → Actions):
+#   SFTP_HOST      z. B. access-xxxxxxx.webspace-host.com
+#   SFTP_USER      SFTP-/SSH-Benutzername aus dem IONOS-Konto
+#   SFTP_PASSWORD  zugehöriges Passwort
+# Optionales Secret:
+#   SFTP_REMOTE_DIR  Zielordner auf dem Webspace (Standard: ".")
+#
+# Hinweis: Es wird bewusst OHNE --delete gespiegelt (nichts wird auf dem
+# Server gelöscht). Alte Dateien bleiben liegen, stören aber nicht.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-ionos
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Code auschecken
+        uses: actions/checkout@v4
+
+      - name: Node 22 einrichten
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: ionos-export/package-lock.json
+
+      - name: Abhängigkeiten installieren
+        working-directory: ionos-export
+        run: npm ci
+
+      - name: Website bauen (33 Seiten prerendern)
+        working-directory: ionos-export
+        run: npm run build
+
+      - name: Build prüfen
+        run: |
+          test -f ionos-export/dist/index.html
+          test -f ionos-export/dist/.htaccess
+          test -f ionos-export/dist/sitemap.xml
+          echo "Seiten im Build: $(find ionos-export/dist -name index.html | wc -l)"
+
+      - name: lftp installieren
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq lftp
+
+      - name: Per SFTP auf IONOS hochladen
+        env:
+          SFTP_HOST: ${{ secrets.SFTP_HOST }}
+          SFTP_USER: ${{ secrets.SFTP_USER }}
+          SFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
+          SFTP_REMOTE_DIR: ${{ secrets.SFTP_REMOTE_DIR }}
+        run: |
+          REMOTE_DIR="${SFTP_REMOTE_DIR:-.}"
+          lftp -u "$SFTP_USER","$SFTP_PASSWORD" "sftp://$SFTP_HOST" -e "
+            set sftp:auto-confirm yes;
+            set net:max-retries 2;
+            set net:timeout 30;
+            mirror -R --parallel=4 --verbose ionos-export/dist/ \"$REMOTE_DIR\";
+            quit"
+
+      - name: Fertig
+        run: echo "Deployment abgeschlossen – https://verlegt-verschraubt.de"
