@@ -20,9 +20,9 @@ const ORG_JSONLD = {
   name: "Verlegt & Verschraubt Handwerkerservice",
   description:
     "Bodenverlegung, Küchenmontage, Entrümpelung und kleine Reparaturen in Wilhelmshaven & Umgebung.",
-  url: "https://www.verlegt-verschraubt.de/",
-  image: "https://www.verlegt-verschraubt.de/logo.png",
-  logo: "https://www.verlegt-verschraubt.de/logo.png",
+  url: "https://verlegt-verschraubt.de/",
+  image: "https://verlegt-verschraubt.de/logo.png",
+  logo: "https://verlegt-verschraubt.de/logo.png",
   telephone: "+49 163 4799286",
   email: "justus.brosch@verlegt-verschraubt.de",
   areaServed: "Wilhelmshaven und Umgebung",
