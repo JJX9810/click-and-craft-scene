@@ -276,20 +276,11 @@ function ProjectDetail() {
         )}
 
         {gallery.length > 0 && (
-          <>
-            {gallery[0] && (
-              <div className="mt-12">
-                <MediaItem m={gallery[0]} eager />
-              </div>
-            )}
-            {gallery.length > 1 && (
-              <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                {gallery.slice(1).map((m, i) => (
-                  <MediaItem key={m.src + i} m={m} />
-                ))}
-              </div>
-            )}
-          </>
+          <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {gallery.map((m, i) => (
+              <MediaItem key={m.src + i} m={m} eager={i === 0} />
+            ))}
+          </div>
         )}
 
 
