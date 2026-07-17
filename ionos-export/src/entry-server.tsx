@@ -2,6 +2,8 @@ import { renderToString } from "react-dom/server";
 import { StaticRouter } from "react-router-dom/server";
 import { App } from "./App";
 
+export { getPrerenderPaths } from "./route-registry";
+
 export function render(url: string) {
   const helmetContext: any = {};
   const html = renderToString(

@@ -24,12 +24,15 @@ if (!fs.existsSync(serverEntryPath)) {
   console.error(`[prerender] Missing ${serverEntryPath}. Run 'npm run build:server' first.`);
   process.exit(1);
 }
-const { render } = await import(pathToFileURL(serverEntryPath).href);
+const serverEntry = await import(pathToFileURL(serverEntryPath).href);
+const { render } = serverEntry;
 
 // --- registry import ---
 const registryPath = path.join(serverDir, "route-registry.js");
 let getPrerenderPaths;
-if (fs.existsSync(registryPath)) {
+if (typeof serverEntry.getPrerenderPaths === "function") {
+  ({ getPrerenderPaths } = serverEntry);
+} else if (fs.existsSync(registryPath)) {
   ({ getPrerenderPaths } = await import(pathToFileURL(registryPath).href));
 } else {
   // Fallback statische Liste, falls registry nicht im SSR-Bundle separat liegt
@@ -74,7 +77,10 @@ for (const p of paths) {
   let out = template
     .replace("<!--app-html-->", html)
     .replace("<!--app-head-->", head);
-  if (htmlAttrs) out = out.replace("<html lang=\"de\">", `<html lang="de" ${htmlAttrs}>`);
+  if (htmlAttrs) {
+    const attrs = htmlAttrs.includes('lang=') ? htmlAttrs : `lang="de" ${htmlAttrs}`;
+    out = out.replace('<html lang="de">', `<html ${attrs}>`);
+  }
 
   const targetDir = p === "/" ? distDir : path.join(distDir, p);
   fs.mkdirSync(targetDir, { recursive: true });
