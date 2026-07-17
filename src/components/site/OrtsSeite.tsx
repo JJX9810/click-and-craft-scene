@@ -95,16 +95,16 @@ export function OrtsSeite({
       </Section>
 
       <Section eyebrow="Ablauf" title={`So läuft eine Anfrage in ${ort}`}>
-        <ol className="grid gap-6 md:grid-cols-4">
+        <ol className="grid gap-x-10 md:grid-cols-2">
           {[
             { t: "Fotos oder Beschreibung senden", d: "Kurz schildern, worum es geht – Fotos helfen enorm." },
             { t: "Ort und Leistungswunsch nennen", d: `Stichwort ${ort} und gewünschte Leistung mitschicken.` },
             { t: "Erste Einschätzung erhalten", d: "Wir melden uns mit Rückfragen und einer ehrlichen Einschätzung." },
             { t: "Termin oder Vor-Ort-Besichtigung", d: "Bei Bedarf vereinbaren wir einen Vor-Ort-Termin." },
           ].map((step, i) => (
-            <li key={step.t} className="rounded-2xl border border-border/70 bg-card/40 p-6">
-              <p className="text-[11px] uppercase tracking-[0.25em] text-muted-foreground">Schritt {i + 1}</p>
-              <h3 className="mt-1 text-base font-semibold">{step.t}</h3>
+            <li key={step.t} className="border-t border-border/60 py-6">
+              <p className="font-display text-sm font-semibold text-accent tabular-nums">Schritt {String(i + 1).padStart(2, "0")}</p>
+              <h3 className="mt-2 font-display text-lg font-semibold tracking-tight">{step.t}</h3>
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{step.d}</p>
             </li>
           ))}
