@@ -77,6 +77,7 @@ const scope = [
 ];
 
 const faqs = [
+  { q: "Was kostet ein Küchenmonteur in Wilhelmshaven?", a: `Zur Orientierung: Die Küchenmontage kostet ${KUECHE_MONTAGE_PRICE} €/lfm (Arbeitslohn). Der Gesamtpreis hängt von Küchenlänge, Umfang (Komplett- oder Restmontage) und Arbeitsplatte ab. Verbindlich wird der Preis erst nach Prüfung von Fotos und Maßen – eine erste Einschätzung liefert der Preisrechner.` },
   { q: "Montiert ihr Küchen nach einem Umzug?", a: "Ja. Wir bauen bestehende Küchen ab, transportieren sie und bauen sie im neuen Zuhause sauber wieder auf." },
   { q: "Schließt ihr Herd oder Starkstrom an?", a: "Nein. Elektroinstallationen übernehmen Fachbetriebe. Bei Bedarf stimmen wir uns ab." },
   { q: "Macht ihr Sanitäranschlüsse?", a: "Wasseranschlüsse an bestehende Eckventile inklusive Spüle und Armatur ja, neue Sanitäranlagen nein." },
