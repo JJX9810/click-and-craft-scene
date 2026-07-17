@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, Phone, ChevronRight, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -40,7 +41,7 @@ export function PageHero({
           </nav>
         )}
         <p className="text-xs uppercase tracking-[0.28em] text-accent">{eyebrow}</p>
-        <h1 className="mt-3 max-w-3xl text-balance text-4xl font-semibold leading-[1.08] tracking-tight sm:text-5xl">
+        <h1 className="mt-3 max-w-3xl text-balance text-[2.5rem] font-semibold leading-[1.05] tracking-tight sm:text-5xl lg:text-6xl">
           {title}
         </h1>
         <p className="mt-5 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
@@ -92,8 +93,46 @@ export function Section({
   children: React.ReactNode;
   bordered?: boolean;
 }) {
+  const ref = useRef<HTMLElement | null>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    if (typeof window === "undefined" || !("IntersectionObserver" in window)) {
+      setVisible(true);
+      return;
+    }
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    if (mq.matches) {
+      setVisible(true);
+      return;
+    }
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) {
+            setVisible(true);
+            io.disconnect();
+            break;
+          }
+        }
+      },
+      { threshold: 0.15 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
   return (
-    <section className={bordered ? "border-y border-border/60 bg-background/40" : ""}>
+    <section
+      ref={ref}
+      className={
+        (bordered ? "border-y border-border/60 bg-background/40 " : "") +
+        "reveal-on-scroll" +
+        (visible ? " is-visible" : "")
+      }
+    >
       <div className="mx-auto max-w-7xl px-6 py-20">
         {(eyebrow || title) && (
           <div className="max-w-2xl">
