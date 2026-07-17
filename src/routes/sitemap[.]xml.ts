@@ -3,7 +3,6 @@ import type {} from "@tanstack/react-start";
 import { projects } from "@/data/projects";
 
 const BASE_URL = "https://verlegt-verschraubt.de";
-const LAST_MOD = "2026-05-25";
 
 interface SitemapEntry {
   path: string;
@@ -15,6 +14,12 @@ export const Route = createFileRoute("/sitemap.xml")({
   server: {
     handlers: {
       GET: async () => {
+        // lastmod wird bei jedem Request auf das heutige Datum gesetzt.
+        // Da die Sitemap dynamisch aus dem aktuellen Code erzeugt wird, ist
+        // das heutige Datum ein robuster Proxy für „zuletzt geändert“ – wir
+        // pflegen so kein Release-Datum manuell und riskieren keine veralteten
+        // Werte wie beim vorherigen hartcodierten LAST_MOD.
+        const LAST_MOD = new Date().toISOString().slice(0, 10);
         const staticPaths: SitemapEntry[] = [
           { path: "/", changefreq: "weekly", priority: "1.0" },
           { path: "/bodenverlegung-wilhelmshaven", changefreq: "monthly", priority: "0.9" },

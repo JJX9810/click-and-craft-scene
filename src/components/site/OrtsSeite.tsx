@@ -39,7 +39,7 @@ export function OrtsSeite({
     ? (projectSlugs.map((s) => projects.find((p) => p.slug === s)).filter(Boolean) as Project[])
     : projects.filter((p) => p.ort.toLowerCase().includes(ort.toLowerCase()));
   const services = [
-    { icon: Layers, title: `Bodenverlegung in ${ort}`, desc: "Vinyl, Laminat, PVC und Teppich – sauber verlegt.", to: "/bodenverlegung-wilhelmshaven" },
+    { icon: Layers, title: `Bodenleger in ${ort}`, desc: "Vinyl, Laminat, PVC und Teppich – sauber verlegt.", to: "/bodenverlegung-wilhelmshaven" },
     { icon: Wrench, title: `Küchenmontage in ${ort}`, desc: "Aufbau nach Umzug, Restmontage, Arbeitsplatten.", to: "/kuechenmontage-in-wilhelmshaven" },
     { icon: Trash2, title: `Entrümpelung in ${ort}`, desc: "Wohnung, Keller, Dachboden – planbar und besenrein.", to: "/entruempelung-entsorgung-in-wilhelmshaven" },
   ];
@@ -175,7 +175,7 @@ export function OrtsSeite({
       <Section eyebrow="Weiterlesen" title="Passende Leistungen & nächste Schritte">
         <InternalLinks
           links={[
-            { to: "/bodenverlegung-wilhelmshaven", label: `Bodenverlegung für ${ort} ansehen` },
+            { to: "/bodenverlegung-wilhelmshaven", label: `Bodenleger für ${ort} ansehen` },
             { to: "/kuechenmontage-in-wilhelmshaven", label: `Küchenmontage für ${ort} anfragen` },
             { to: "/entruempelung-entsorgung-in-wilhelmshaven", label: `Entrümpelung für ${ort} planen` },
             { to: "/preise", label: "Kosten grob einschätzen" },

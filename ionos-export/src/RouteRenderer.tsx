@@ -5,7 +5,7 @@ import { matchRoute } from "./route-registry";
 import { LoaderDataProvider, NotFoundError, type RouteRecord } from "./tanstack-shim";
 import { NotFound } from "./NotFound";
 
-const SITE_URL = "https://www.verlegt-verschraubt.de";
+const SITE_URL = "https://verlegt-verschraubt.de";
 
 type HeadResult = {
   meta?: Array<Record<string, any>>;

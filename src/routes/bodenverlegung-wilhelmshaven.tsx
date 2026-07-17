@@ -36,17 +36,17 @@ export const Route = createFileRoute("/bodenverlegung-wilhelmshaven")({
   component: Page,
   head: () => ({
     meta: [
-      { title: "Bodenverlegung in Wilhelmshaven – Vinyl, Laminat, PVC, Teppich" },
-      { name: "description", content: "Bodenverlegung in Wilhelmshaven & Umgebung: Vinyl, Laminat, PVC und Teppich. Sauber verlegt, mit Untergrundprüfung und Sockelleisten." },
-      { property: "og:title", content: "Bodenverlegung in Wilhelmshaven & Umgebung" },
+      { title: "Bodenleger Wilhelmshaven – Laminat, Vinyl & Teppich" },
+      { name: "description", content: "Ihr Bodenleger in Wilhelmshaven: Laminat, Vinyl, PVC & Teppich fachgerecht verlegt – inkl. Untergrund & Sockelleisten. Jetzt Fotos senden, ehrliche Einschätzung am selben Tag." },
+      { property: "og:title", content: "Bodenleger Wilhelmshaven – Verlegt & Verschraubt" },
       { property: "og:description", content: "Vinyl, Laminat, PVC und Teppich – fachgerecht verlegt von Verlegt & Verschraubt." },
       { property: "og:url", content: PAGE_URL },
-      { property: "og:image", content: "https://verlegt-verschraubt.de/hero-flooring.png" },
+      { property: "og:image", content: "https://verlegt-verschraubt.de/og-image.jpg" },
       { property: "og:image:alt", content: "Bodenverlegung in Wilhelmshaven mit Vinyl, Laminat, Teppich und sauberen Abschlüssen" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Bodenverlegung in Wilhelmshaven & Umgebung" },
+      { name: "twitter:title", content: "Bodenleger Wilhelmshaven – Verlegt & Verschraubt" },
       { name: "twitter:description", content: "Vinyl, Laminat, PVC und Teppich – fachgerecht verlegt von Verlegt & Verschraubt." },
-      { name: "twitter:image", content: "https://verlegt-verschraubt.de/hero-flooring.png" },
+      { name: "twitter:image", content: "https://verlegt-verschraubt.de/og-image.jpg" },
       { name: "twitter:image:alt", content: "Bodenverlegung in Wilhelmshaven mit Vinyl, Laminat, Teppich und sauberen Abschlüssen" },
     ],
     links: [{ rel: "canonical", href: PAGE_URL }],
@@ -63,7 +63,7 @@ export const Route = createFileRoute("/bodenverlegung-wilhelmshaven")({
           id: SERVICE_IDS.bodenverlegung,
           name: "Bodenverlegung",
           description: "Verlegung von Vinyl, Designboden, Laminat, PVC und Teppich inklusive Untergrundprüfung, Altbelag entfernen, Treppenverkleidung sowie Sockelleisten und Übergängen.",
-          serviceType: "Bodenverlegung (Vinyl, Laminat, PVC, Teppich)",
+          serviceType: ["Bodenverlegung", "Bodenleger", "Fußbodenverlegung"],
           areaServed: BODEN_AREA_SERVED,
           offers: [
             offerNode({ name: "Laminat schwimmend verlegen", price: PRICE_LAMINAT_SCHWIMMEND, unitText: "m²" }),
@@ -100,7 +100,7 @@ const faqs = [
   { q: "Wie wird der Untergrund geprüft?", a: "Wir prüfen Ebenheit, Restfeuchte und Tragfähigkeit. Bei Bedarf gleichen wir Unebenheiten aus oder empfehlen die passende Vorbereitung." },
   { q: "Müssen die Räume leer sein?", a: "Idealerweise ja. Auf Wunsch übernehmen wir Möbelumstellung im überschaubaren Rahmen oder organisieren das gemeinsam." },
   { q: "Entfernt ihr den Altbelag?", a: "Ja. Altbelag entfernen, entsorgen und Untergrund vorbereiten gehört zum Leistungsumfang." },
-  { q: "Was kostet Bodenverlegung in Wilhelmshaven?", a: "Der Preis hängt von Bodenart, m², Vorbereitung und Zubehör ab. Im Preisrechner bekommen Sie eine erste Orientierung." },
+  { q: "Was kostet ein Bodenleger in Wilhelmshaven?", a: `Der Preis hängt von Bodenart, m², Vorbereitung und Zubehör ab. Zur Orientierung: Laminat schwimmend ab ${priceOf("laminat_schwimmend")} €/m², Vinyl schwimmend ab ${priceOf("vinyl_schwimmend")} €/m², PVC schwimmend ab ${priceOf("pvc_schwimmend")} €/m² (Arbeitslohn). Verbindlich wird der Preis erst nach Prüfung von Fotos und Maßen – eine erste Einschätzung liefert der Preisrechner.` },
 ];
 
 function Page() {
@@ -108,18 +108,18 @@ function Page() {
     <>
       <PageHero
         eyebrow="Leistung"
-        title="Bodenverlegung in Wilhelmshaven & Umgebung"
-        intro="Vinyl, Laminat, PVC, Teppich, Treppen und Sockelleisten – sauber verlegt, mit ordentlichen Kanten und stimmigem Verlegebild. Für Privatkunden in Wilhelmshaven, Schortens, Sande, Jever, Varel und Wangerland."
+        title="Ihr Bodenleger in Wilhelmshaven – Bodenverlegung von Laminat, Vinyl, PVC & Teppich"
+        intro="Als Bodenleger aus Wilhelmshaven verlegen wir Vinyl, Laminat, PVC, Teppich, Treppen und Sockelleisten – sauber, mit ordentlichen Kanten und stimmigem Verlegebild. Für Privatkunden in Wilhelmshaven, Schortens, Sande, Jever, Varel, Wangerland und Wittmund."
         breadcrumbs={[{ label: "Leistungen" }, { label: "Bodenverlegung" }]}
       />
 
       <Section eyebrow="Kurzfassung" title="Bodenverlegung in Wilhelmshaven">
         <div className="grid gap-6 lg:grid-cols-2">
           <QuickAnswer>
-            Verlegt &amp; Verschraubt übernimmt Bodenverlegung in Wilhelmshaven
-            und Umgebung. Dazu gehören Vinyl, Laminat, PVC, Teppich,
-            Untergrundprüfung, Zuschnitt, Verlegung und auf Wunsch
-            Sockelleisten.
+            Verlegt &amp; Verschraubt ist Ihr Bodenleger für Wilhelmshaven und
+            Umgebung und übernimmt die Bodenverlegung. Dazu gehören Vinyl,
+            Laminat, PVC, Teppich, Untergrundprüfung, Zuschnitt, Verlegung und
+            auf Wunsch Sockelleisten.
           </QuickAnswer>
           <FactBox />
         </div>
@@ -243,6 +243,25 @@ function Page() {
       </Section>
 
       <PreisrechnerCTA variant="bodenverlegung" />
+
+      <Section eyebrow="Region" title="Bodenleger für Wilhelmshaven und Umgebung" bordered>
+        <p className="max-w-3xl text-base leading-relaxed text-muted-foreground">
+          Verlegt &amp; Verschraubt arbeitet als Bodenleger in{" "}
+          <Link to="/handwerkerservice-wilhelmshaven" className="text-accent hover:underline">Wilhelmshaven</Link>,{" "}
+          <Link to="/handwerkerservice-schortens" className="text-accent hover:underline">Schortens</Link>,{" "}
+          <Link to="/handwerkerservice-sande" className="text-accent hover:underline">Sande</Link>,{" "}
+          <Link to="/handwerkerservice-jever" className="text-accent hover:underline">Jever</Link>,{" "}
+          <Link to="/handwerkerservice-varel" className="text-accent hover:underline">Varel</Link>,{" "}
+          <Link to="/handwerkerservice-wangerland" className="text-accent hover:underline">Wangerland</Link> und{" "}
+          <Link to="/handwerkerservice-wittmund" className="text-accent hover:underline">Wittmund</Link>. Wir
+          übernehmen Bodenlegearbeiten für Privatkunden aus der ganzen Region – vom
+          Wohnzimmer in der Südstadt bis zur Ferienwohnung an der Küste. Die
+          Fußbodenverlegung planen wir jeweils mit Blick auf Untergrund, gewünschten
+          Belag und saubere Abschlüsse. Sie erhalten aus Wilhelmshaven heraus eine
+          ehrliche Einschätzung, kurze Wege und einen festen Ansprechpartner für das
+          gesamte Projekt.
+        </p>
+      </Section>
 
       <Section eyebrow="Netzwerk" title="Ihr Projekt umfasst mehr als den Boden?" bordered>
         <p className="max-w-3xl text-base leading-relaxed text-muted-foreground">

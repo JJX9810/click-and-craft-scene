@@ -39,7 +39,7 @@ export function Footer() {
           <div>
             <p className="text-xs uppercase tracking-[0.25em] text-accent">Leistungen</p>
             <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
-              <li><Link to="/bodenverlegung-wilhelmshaven" className="hover:text-foreground">Bodenverlegung</Link></li>
+              <li><Link to="/bodenverlegung-wilhelmshaven" className="hover:text-foreground">Bodenleger &amp; Bodenverlegung</Link></li>
               <li><Link to="/kuechenmontage-in-wilhelmshaven" className="hover:text-foreground">Küchenmontage</Link></li>
               <li><Link to="/entruempelung-entsorgung-in-wilhelmshaven" className="hover:text-foreground">Entrümpelung & Entsorgung</Link></li>
               <li><Link to="/preise" className="hover:text-foreground">Preise</Link></li>

@@ -16,7 +16,7 @@ const root = path.resolve(__dirname, "..");
 const distDir = path.join(root, "dist");
 const serverDir = path.join(root, "dist-server");
 
-const SITE = "https://www.verlegt-verschraubt.de";
+const SITE = "https://verlegt-verschraubt.de";
 
 // --- entry-server importieren (ESM) ---
 const serverEntryPath = path.join(serverDir, "entry-server.js");
@@ -54,6 +54,7 @@ if (fs.existsSync(registryPath)) {
     "/handwerkerservice-jever",
     "/handwerkerservice-varel",
     "/handwerkerservice-wangerland",
+    "/handwerkerservice-wittmund",
   ];
 }
 
@@ -107,7 +108,7 @@ fs.writeFileSync(
   `# IONOS / Apache config für Verlegt & Verschraubt (statischer Build)\n` +
   `Options -MultiViews\nRewriteEngine On\n\n` +
   `# 1) HTTP → HTTPS\nRewriteCond %{HTTPS} !=on\nRewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]\n\n` +
-  `# 2) non-www → www (Hauptdomain ist www.verlegt-verschraubt.de)\nRewriteCond %{HTTP_HOST} ^verlegt-verschraubt\\.de [NC]\nRewriteRule ^ https://www.verlegt-verschraubt.de%{REQUEST_URI} [L,R=301]\n\n` +
+  `# 2) www → non-www (Hauptdomain ist verlegt-verschraubt.de ohne www)\nRewriteCond %{HTTP_HOST} ^www\\.verlegt-verschraubt\\.de [NC]\nRewriteRule ^ https://verlegt-verschraubt.de%{REQUEST_URI} [L,R=301]\n\n` +
   `# 3) Wenn URL ohne Trailing Slash auf einen Ordner mit index.html zeigt → diese ausliefern\nRewriteCond %{REQUEST_FILENAME} !-f\nRewriteCond %{REQUEST_FILENAME} !-d\nRewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI}/index.html -f\nRewriteRule ^(.*)$ /$1/index.html [L]\n\n` +
   `# 4) SPA-Fallback: alles andere ohne Datei → /index.html (Client-Routing übernimmt)\nRewriteCond %{REQUEST_FILENAME} !-f\nRewriteCond %{REQUEST_FILENAME} !-d\nRewriteRule . /index.html [L]\n\n` +
   `# Cache-Header für Assets\n<IfModule mod_expires.c>\n  ExpiresActive On\n  ExpiresByType image/png "access plus 1 year"\n  ExpiresByType image/jpeg "access plus 1 year"\n  ExpiresByType image/webp "access plus 1 year"\n  ExpiresByType image/svg+xml "access plus 1 year"\n  ExpiresByType text/css "access plus 1 month"\n  ExpiresByType application/javascript "access plus 1 month"\n  ExpiresByType font/woff2 "access plus 1 year"\n</IfModule>\n\n` +

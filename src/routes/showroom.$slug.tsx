@@ -16,7 +16,7 @@ export const Route = createFileRoute("/showroom/$slug")({
     const p = loaderData?.project;
     if (!p) return {};
     const url = `https://verlegt-verschraubt.de/showroom/${p.slug}`;
-    const ogImage = "https://verlegt-verschraubt.de/hero-flooring.png";
+    const ogImage = "https://verlegt-verschraubt.de/og-image.jpg";
     const firstLocal = p.media.find(
       (m) => m.type === "image" && typeof m.src === "string" && m.src.startsWith("/projects/"),
     );

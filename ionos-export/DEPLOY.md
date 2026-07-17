@@ -8,7 +8,7 @@ Dieser Ordner ist ein **eigenständiger statischer Build** der Website für IONO
 - Ein Vite-Alias mappt `@tanstack/react-router` auf einen kleinen Shim (`src/tanstack-shim.tsx`), der intern `react-router-dom` + `react-helmet-async` nutzt – so kompilieren die existierenden Route-Dateien unverändert.
 - Beim Build wird **jede wichtige Route zu einer eigenen `index.html` prerendert**, inklusive Title, Description, Open-Graph-Tags, Canonical, JSON-LD und sichtbarem HTML-Inhalt.
 - Das Kontaktformular läuft ohne Backend: **mailto:**, **WhatsApp** und **tel:**-Buttons. CTAs: Anrufen / WhatsApp / E-Mail / Projekt mit Bildern und Maßen.
-- Die kanonische Hauptdomain ist **`https://www.verlegt-verschraubt.de`**. Non-www → 301 auf www, HTTP → HTTPS, beides via `.htaccess`.
+- Die kanonische Hauptdomain ist **`https://verlegt-verschraubt.de`** (OHNE www). www → 301 auf non-www, HTTP → HTTPS, beides via `.htaccess`.
 
 ## Build erzeugen
 
@@ -57,7 +57,7 @@ dist/
 npm run preview
 ```
 
-Öffnet `http://localhost:4173`. Alle Routen sollten direkt funktionieren – auch nach Reload (durch die einzelnen `index.html`-Dateien). Quelltext im Browser prüfen: jede Seite hat ihren eigenen `<title>`, `<meta name="description">`, OG-Tags und `<link rel="canonical">` mit `https://www.verlegt-verschraubt.de/...`.
+Öffnet `http://localhost:4173`. Alle Routen sollten direkt funktionieren – auch nach Reload (durch die einzelnen `index.html`-Dateien). Quelltext im Browser prüfen: jede Seite hat ihren eigenen `<title>`, `<meta name="description">`, OG-Tags und `<link rel="canonical">` mit `https://verlegt-verschraubt.de/...`.
 
 ## Upload zu IONOS
 
@@ -93,7 +93,7 @@ npm run preview
 
 ## DNS-Einträge bei IONOS
 
-Hauptdomain ist **www.verlegt-verschraubt.de** (Canonical). Im IONOS DNS-Manager:
+Hauptdomain ist **verlegt-verschraubt.de** (OHNE www, Canonical). Im IONOS DNS-Manager:
 
 | Typ | Name | Wert | TTL |
 |---|---|---|---|
@@ -113,15 +113,15 @@ Bei Deploy Now zeigt IONOS die exakten Werte direkt im Projekt an — einfach 1:
 
 ## Funktionstest nach Upload
 
-1. **HTTPS + www-Redirect:** Aufrufen von `http://verlegt-verschraubt.de` → muss landen bei `https://www.verlegt-verschraubt.de/`.
-2. **Direkter Aufruf einer Unterseite per URL:** `https://www.verlegt-verschraubt.de/bodenverlegung-wilhelmshaven` → muss sofort die Seite zeigen, nicht 404.
+1. **HTTPS + non-www-Redirect:** Aufrufen von `http://www.verlegt-verschraubt.de` → muss landen bei `https://verlegt-verschraubt.de/`.
+2. **Direkter Aufruf einer Unterseite per URL:** `https://verlegt-verschraubt.de/bodenverlegung-wilhelmshaven` → muss sofort die Seite zeigen, nicht 404.
 3. **Reload auf Unterseite:** Auf `/showroom` F5 drücken → Seite bleibt da.
 4. **SEO-Quelltext:** Rechtsklick → Seitenquelltext anzeigen. Im `<head>` müssen Title und Description **dieser konkreten Seite** stehen (nicht der Startseite).
-5. **Canonicals:** `<link rel="canonical" href="https://www.verlegt-verschraubt.de/...">` auf jeder Seite passend zur URL.
-6. **robots.txt:** `https://www.verlegt-verschraubt.de/robots.txt` zeigt Sitemap-Verweis.
-7. **sitemap.xml:** `https://www.verlegt-verschraubt.de/sitemap.xml` listet alle Seiten.
+5. **Canonicals:** `<link rel="canonical" href="https://verlegt-verschraubt.de/...">` auf jeder Seite passend zur URL.
+6. **robots.txt:** `https://verlegt-verschraubt.de/robots.txt` zeigt Sitemap-Verweis.
+7. **sitemap.xml:** `https://verlegt-verschraubt.de/sitemap.xml` listet alle Seiten.
 8. **Kontaktformular:** Auf `/kontakt` Felder ausfüllen → „Per E-Mail senden" öffnet Mail-Programm mit vorbefüllter Anfrage. „Per WhatsApp" öffnet WhatsApp Web/App.
-9. **In Search Console**: neue Sitemap einreichen unter `https://www.verlegt-verschraubt.de/sitemap.xml`.
+9. **In Search Console**: neue Sitemap einreichen unter `https://verlegt-verschraubt.de/sitemap.xml`.
 
 ## Wenn später ein echtes Kontaktformular gewünscht ist
 

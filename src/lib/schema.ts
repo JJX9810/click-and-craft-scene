@@ -86,7 +86,7 @@ export const organizationNode = {
     "Verlegt & Verschraubt Handwerkerservice unterstützt Privatkunden bei Bodenverlegung, Küchenmontage sowie Entrümpelung & Entsorgung in Wilhelmshaven und Umgebung.",
   url: `${SITE_URL}/`,
   logo: `${SITE_URL}/logo.png`,
-  image: `${SITE_URL}/hero-flooring.png`,
+  image: `${SITE_URL}/og-image.jpg`,
   email: "justus.brosch@verlegt-verschraubt.de",
   telephone: "+491634799286",
   priceRange: "€€",
@@ -211,7 +211,7 @@ export function offerNode({ name, price, unitText, priceCurrency = "EUR" }: Offe
 }
 
 export interface ServiceInput {
-  url: string; name: string; description: string; serviceType: string;
+  url: string; name: string; description: string; serviceType: string | string[];
   areaServed?: string | string[];
   id?: string;
   offers?: ReturnType<typeof offerNode>[];
