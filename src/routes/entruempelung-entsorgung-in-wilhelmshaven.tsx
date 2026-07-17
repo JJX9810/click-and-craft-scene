@@ -58,6 +58,7 @@ export const Route = createFileRoute("/entruempelung-entsorgung-in-wilhelmshaven
 });
 
 const types = [
+  { t: "Haushaltsauflösung & Wohnungsauflösung", d: "Komplette Auflösung von Haushalten – etwa nach Umzug, Auszug oder im Nachlassfall. Diskret, planbar, mit besenreiner Übergabe." },
   { t: "Wohnungsentrümpelung", d: "Komplette oder teilweise Räumung – planbar und diskret." },
   { t: "Kellerentrümpelung", d: "Aufgeräumte Übergabe inklusive enger Zugänge und Treppen." },
   { t: "Dachbodenentrümpelung", d: "Sicheres Abtragen und Trennen, auch bei viel Material." },
@@ -67,7 +68,8 @@ const types = [
 ];
 
 const faqs = [
-  { q: "Übernehmt ihr Entrümpelung in Sande oder Schortens?", a: "Ja. Wir arbeiten in Wilhelmshaven, Schortens, Sande, Jever, Varel und Wangerland. Andere Orte gerne auf Anfrage." },
+  { q: "Übernehmt ihr auch komplette Haushaltsauflösungen?", a: "Ja. Wir lösen Haushalte und Wohnungen in Wilhelmshaven und Umgebung vollständig auf – planbar, diskret und mit besenreiner Übergabe. Sie entscheiden vorab, was behalten, verschenkt oder entsorgt werden soll." },
+  { q: "Übernehmt ihr Entrümpelung in Sande oder Schortens?", a: "Ja. Wir arbeiten in Wilhelmshaven, Schortens, Sande, Jever, Varel, Wangerland und Wittmund. Andere Orte gerne auf Anfrage." },
   { q: "Wie wird der Aufwand eingeschätzt?", a: "Mit Fotos der Räume und kurzer Beschreibung von Volumen, Etage, Aufzug und Zufahrt können wir den Aufwand gut einschätzen." },
   { q: "Was passiert mit Gefahrstoffen?", a: "Gefahrstoffe wie Asbest, Chemikalien oder Öle dürfen nicht regulär entsorgt werden. Wir prüfen vorab und stimmen den richtigen Weg ab." },
   { q: "Kann ich brauchbare Sachen behalten?", a: "Ja. Sie entscheiden, was bleibt, was eingelagert wird und was entsorgt werden soll." },
@@ -78,9 +80,9 @@ function Page() {
     <>
       <PageHero
         eyebrow="Leistung"
-        title="Entrümpelung & Entsorgung in Wilhelmshaven"
-        intro="Wohnungen, Keller, Dachböden und ganze Häuser räumen wir zuverlässig und besenrein – inklusive fachgerechter Entsorgung von Möbeln und Sperrmüll. Auch als Räumung vor Renovierung möglich."
-        breadcrumbs={[{ label: "Leistungen" }, { label: "Entrümpelung & Entsorgung" }]}
+        title="Entrümpelung, Haushaltsauflösung & Entsorgung in Wilhelmshaven"
+        intro="Wohnungen, Keller, Dachböden und ganze Haushalte räumen wir zuverlässig und besenrein – von der einzelnen Kellerentrümpelung bis zur kompletten Haushaltsauflösung, inklusive fachgerechter Entsorgung von Möbeln und Sperrmüll."
+        breadcrumbs={[{ label: "Leistungen" }, { label: "Entrümpelung & Haushaltsauflösung" }]}
       />
 
       <Section eyebrow="Kurzfassung" title="Entrümpelung in Wilhelmshaven">
@@ -88,7 +90,9 @@ function Page() {
           <QuickAnswer>
             Verlegt &amp; Verschraubt übernimmt Entrümpelung und Entsorgung in
             Wilhelmshaven und Umgebung. Wohnungen, Keller, Dachböden, Möbel und
-            Sperrmüll werden planbar, diskret und besenrein geräumt.
+            Sperrmüll werden planbar, diskret und besenrein geräumt. Auch
+            komplette Haushaltsauflösungen und Wohnungsauflösungen übernehmen
+            wir – planbar und diskret.
           </QuickAnswer>
           <FactBox />
         </div>
@@ -106,6 +110,21 @@ function Page() {
           ))}
         </div>
       </Section>
+
+      <Section eyebrow="Haushaltsauflösung" title="Haushaltsauflösung in Wilhelmshaven" bordered>
+        <p className="max-w-3xl text-base leading-relaxed text-muted-foreground">
+          Eine Haushaltsauflösung steht oft in besonderen Lebenssituationen an –
+          nach einem Umzug, einem Auszug ins Pflegeheim oder im Nachlassfall.
+          Verlegt &amp; Verschraubt räumt Wohnungen und Häuser in Wilhelmshaven
+          und Umgebung vollständig, trennt Verwertbares von Entsorgung nach
+          Absprache mit den Angehörigen bzw. Auftraggebern und übergibt
+          besenrein – auf Wunsch termingerecht zur Wohnungsübergabe an den
+          Vermieter. Auch eine reine Wohnungsauflösung ohne Nachlass läuft
+          nach demselben ruhigen Ablauf: Sie sagen, was bleibt und was gehen
+          darf, wir kümmern uns um Transport und fachgerechte Entsorgung.
+        </p>
+      </Section>
+
 
       <Section eyebrow="Sonderfälle" title="Was vorab geprüft werden muss" bordered>
         <ul className="grid gap-3 text-sm text-muted-foreground sm:grid-cols-2">
