@@ -25,15 +25,15 @@ export const Route = createFileRoute("/kuechenmontage-in-wilhelmshaven")({
   component: Page,
   head: () => ({
     meta: [
-      { title: "Küchenmontage in Wilhelmshaven – Aufbau, Restmontage, Arbeitsplatte" },
-      { name: "description", content: "Küchenmontage in Wilhelmshaven & Umgebung: Aufbau nach Umzug, Restmontage, Arbeitsplatten, Spüle und Armatur. Saubere Ausführung von Verlegt & Verschraubt." },
-      { property: "og:title", content: "Küchenmontage in Wilhelmshaven & Umgebung" },
+      { title: "Küchenmonteur & Küchenmontage in Wilhelmshaven" },
+      { name: "description", content: "Ihr Küchenmonteur in Wilhelmshaven: Küchenaufbau nach Umzug, Restmontage, Arbeitsplatten, Spüle & Armatur. Saubere Ausführung – Fotos senden, Einschätzung erhalten." },
+      { property: "og:title", content: "Küchenmonteur Wilhelmshaven – Verlegt & Verschraubt" },
       { property: "og:description", content: "Aufbau, Restmontage und Anpassung Ihrer Küche – sauber und zuverlässig." },
       { property: "og:url", content: KM_URL },
       { property: "og:image", content: "https://verlegt-verschraubt.de/projects/kueche-wilhelmshaven-01.webp" },
       { property: "og:image:alt", content: "Küchenmontage in Wilhelmshaven und Umgebung durch Verlegt & Verschraubt" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Küchenmontage in Wilhelmshaven & Umgebung" },
+      { name: "twitter:title", content: "Küchenmonteur Wilhelmshaven – Verlegt & Verschraubt" },
       { name: "twitter:description", content: "Aufbau, Restmontage und Anpassung Ihrer Küche – sauber und zuverlässig." },
       { name: "twitter:image", content: "https://verlegt-verschraubt.de/projects/kueche-wilhelmshaven-01.webp" },
       { name: "twitter:image:alt", content: "Küchenmontage in Wilhelmshaven und Umgebung durch Verlegt & Verschraubt" },
@@ -52,7 +52,7 @@ export const Route = createFileRoute("/kuechenmontage-in-wilhelmshaven")({
           id: SERVICE_IDS.kuechenmontage,
           name: "Küchenmontage",
           description: "Küchenaufbau, Restmontage und Anpassung – von der Front über die Arbeitsplatte bis zur Spüle und Armatur. Wasseranschluss an bestehende Eckventile.",
-          serviceType: "Küchenmontage und Küchenservice",
+          serviceType: ["Küchenmontage", "Küchenmonteur", "Küchenaufbau"],
           areaServed: KM_AREA_SERVED,
           offers: [
             offerNode({ name: "Küchenmontage", price: KUECHE_MONTAGE_PRICE, unitText: "lfm" }),
@@ -77,6 +77,7 @@ const scope = [
 ];
 
 const faqs = [
+  { q: "Was kostet ein Küchenmonteur in Wilhelmshaven?", a: `Zur Orientierung: Die Küchenmontage kostet ${KUECHE_MONTAGE_PRICE} €/lfm (Arbeitslohn). Der Gesamtpreis hängt von Küchenlänge, Umfang (Komplett- oder Restmontage) und Arbeitsplatte ab. Verbindlich wird der Preis erst nach Prüfung von Fotos und Maßen – eine erste Einschätzung liefert der Preisrechner.` },
   { q: "Montiert ihr Küchen nach einem Umzug?", a: "Ja. Wir bauen bestehende Küchen ab, transportieren sie und bauen sie im neuen Zuhause sauber wieder auf." },
   { q: "Schließt ihr Herd oder Starkstrom an?", a: "Nein. Elektroinstallationen übernehmen Fachbetriebe. Bei Bedarf stimmen wir uns ab." },
   { q: "Macht ihr Sanitäranschlüsse?", a: "Wasseranschlüsse an bestehende Eckventile inklusive Spüle und Armatur ja, neue Sanitäranlagen nein." },
@@ -88,18 +89,18 @@ function Page() {
     <>
       <PageHero
         eyebrow="Leistung"
-        title="Küchenmontage in Wilhelmshaven & Umgebung"
-        intro="Aufbau nach Umzug, Restmontage, neue Module, Arbeitsplatten und Anschluss von Spüle und Armatur. Saubere Ausführung mit ordentlichen Übergängen und einer dokumentierten Übergabe."
+        title="Ihr Küchenmonteur in Wilhelmshaven – Küchenmontage & Aufbau nach Umzug"
+        intro="Als Küchenmonteur aus Wilhelmshaven übernehmen wir Aufbau nach Umzug, Restmontage, neue Module, Arbeitsplatten sowie den Anschluss von Spüle und Armatur. Saubere Ausführung mit ordentlichen Übergängen und einer dokumentierten Übergabe."
         breadcrumbs={[{ label: "Leistungen" }, { label: "Küchenmontage" }]}
       />
 
       <Section eyebrow="Kurzfassung" title="Küchenmontage in Wilhelmshaven">
         <div className="grid gap-6 lg:grid-cols-2">
           <QuickAnswer>
-            Verlegt &amp; Verschraubt übernimmt Küchenmontage in Wilhelmshaven
-            und Umgebung. Dazu gehören Aufbau nach Umzug, Restmontage,
-            Küchenmodule, Arbeitsplatten sowie Spüle und Armatur an vorhandenen
-            Anschlüssen.
+            Verlegt &amp; Verschraubt ist Ihr Küchenmonteur für Wilhelmshaven
+            und Umgebung und übernimmt die Küchenmontage. Dazu gehören Aufbau
+            nach Umzug, Restmontage, Küchenmodule, Arbeitsplatten sowie Spüle
+            und Armatur an vorhandenen Anschlüssen.
           </QuickAnswer>
           <FactBox />
         </div>
@@ -199,6 +200,25 @@ function Page() {
 
 
       <PreisrechnerCTA variant="kuechenmontage" />
+
+      <Section eyebrow="Region" title="Küchenmonteur für Wilhelmshaven und Umgebung" bordered>
+        <p className="max-w-3xl text-base leading-relaxed text-muted-foreground">
+          Verlegt &amp; Verschraubt arbeitet als Küchenmonteur in{" "}
+          <Link to="/handwerkerservice-wilhelmshaven" className="text-accent hover:underline">Wilhelmshaven</Link>,{" "}
+          <Link to="/handwerkerservice-schortens" className="text-accent hover:underline">Schortens</Link>,{" "}
+          <Link to="/handwerkerservice-sande" className="text-accent hover:underline">Sande</Link>,{" "}
+          <Link to="/handwerkerservice-jever" className="text-accent hover:underline">Jever</Link>,{" "}
+          <Link to="/handwerkerservice-varel" className="text-accent hover:underline">Varel</Link>,{" "}
+          <Link to="/handwerkerservice-wangerland" className="text-accent hover:underline">Wangerland</Link> und{" "}
+          <Link to="/handwerkerservice-wittmund" className="text-accent hover:underline">Wittmund</Link>. Wenn
+          Sie in der Region Ihre Küche aufbauen lassen möchten, übernehmen wir
+          den kompletten Küchenaufbau nach Umzug ebenso wie die Restmontage,
+          das Einpassen der Arbeitsplatte und den Anschluss von Spüle und
+          Armatur an vorhandene Eckventile. Elektro- und Sanitärarbeiten, die
+          außerhalb unseres zulässigen Rahmens liegen, laufen bei Bedarf über
+          geprüfte Fachbetriebe – wir stimmen uns dazu direkt mit Ihnen ab.
+        </p>
+      </Section>
 
       <Section eyebrow="Netzwerk" title="Ihr Projekt umfasst mehr als die Küche?" bordered>
         <p className="max-w-3xl text-base leading-relaxed text-muted-foreground">
