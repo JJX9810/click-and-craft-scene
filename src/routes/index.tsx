@@ -329,7 +329,7 @@ function Index() {
           </div>
           <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {reviews.map((r) => (
-              <article key={r.name} className="tile-shader rounded-2xl border border-border/70 bg-card/50 p-5 backdrop-blur">
+              <article key={r.name} className="rounded-2xl border border-border/70 bg-card/50 p-5 backdrop-blur">
                 <div className="flex items-center gap-1 text-accent" role="img" aria-label="5 von 5 Sternen">
                   {Array.from({ length: 5 }).map((_, i) => (
                     <Star key={i} aria-hidden="true" className="h-3.5 w-3.5 fill-current" />
@@ -389,7 +389,7 @@ function Index() {
             {services.map((s) => (
               <article
                 key={s.title}
-                className="tile-shader group relative overflow-hidden rounded-2xl border border-border/70 bg-card/50 p-7 backdrop-blur transition-all hover:-translate-y-1 hover:border-accent/60 hover:shadow-xl hover:shadow-accent/10"
+                className="group relative overflow-hidden rounded-2xl border border-border/70 bg-card/50 p-7 backdrop-blur transition-all hover:-translate-y-1 hover:border-accent/60 hover:shadow-xl hover:shadow-accent/10"
               >
                 <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-accent/15 text-accent">
                   <s.icon className="h-5 w-5" />
@@ -498,7 +498,7 @@ function Index() {
           </div>
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {reasons.map((r, i) => (
-              <div key={r.title} className="tile-shader group rounded-2xl border border-border/70 bg-card/40 p-6 transition-colors hover:border-accent/50">
+              <div key={r.title} className="group rounded-2xl border border-border/70 bg-card/40 p-6 transition-colors hover:border-accent/50">
                 <div className="flex items-center justify-between">
                   <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent/15 text-accent">
                     <r.icon className="h-5 w-5" />

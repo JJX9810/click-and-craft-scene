@@ -104,7 +104,7 @@ export function OnlinePresenceSection() {
           {active.map((p) => (
             <article
               key={p.name}
-              className="tile-shader group relative overflow-hidden rounded-2xl border border-border/70 bg-card/50 p-6 backdrop-blur transition hover:border-accent/50 hover:shadow-[0_24px_60px_-30px_rgba(201,168,76,0.35)]"
+              className="group relative overflow-hidden rounded-2xl border border-border/70 bg-card/50 p-6 backdrop-blur transition hover:border-accent/50 hover:shadow-[0_24px_60px_-30px_rgba(201,168,76,0.35)]"
             >
               <div className="flex items-center gap-4">
                 <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-accent/15 text-xs font-semibold uppercase tracking-wider text-accent">
