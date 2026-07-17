@@ -437,6 +437,109 @@ export const projects: Project[] = [
       },
     ],
   },
+  {
+    slug: "teppichboden-schortens",
+    title: "Teppichboden verlegt in Schortens",
+    ort: "Schortens",
+    category: "Bodenverlegung",
+    services: ["Teppichboden verlegen", "Altbelag entfernen", "Untergrund vorbereiten"],
+    description:
+      "In Schortens wurde ein Wohnraum mit neuem Teppichboden ausgestattet. Der alte Belag wurde entfernt, der Untergrund geprüft und der graue Teppich anschließend sauber und faltenfrei verlegt – bis in die Ecken und bündig an die Sockelleisten.",
+    cover: "/projects/teppichboden-schortens-02-nachher.webp",
+    coverAlt: "Neu verlegter grauer Teppichboden in einem Wohnraum in Schortens",
+    featured: true,
+    detail: true,
+    beforeAfter: [
+      {
+        before: "/projects/teppichboden-schortens-01-vorher.webp",
+        after: "/projects/teppichboden-schortens-02-nachher.webp",
+        alt: "Vorher-Nachher-Vergleich aus Schortens: Untergrund mit alten Kleberesten, danach frisch verlegter grauer Teppichboden",
+      },
+    ],
+    media: [
+      {
+        type: "image",
+        src: "/projects/teppichboden-schortens-01-vorher.webp",
+        alt: "Vorher: Untergrund mit alten Kleberesten vor der Teppichverlegung in Schortens",
+        caption: "Ausgangszustand: Altbelag entfernt, Untergrund mit Kleberesten vor der Vorbereitung.",
+        longDescription:
+          "Vorher-Aufnahme aus dem Wohnraum in Schortens: Der alte Bodenbelag wurde bereits aufgenommen, auf dem Estrich sind noch Kleber- und Spachtelreste sichtbar. Diese Aufnahme dokumentiert den Ausgangszustand vor der Untergrundvorbereitung und der neuen Teppichverlegung – aus demselben Blickwinkel wie das Nachher-Bild.",
+        phase: "Vorher",
+      },
+      {
+        type: "image",
+        src: "/projects/teppichboden-schortens-02-nachher.webp",
+        alt: "Frisch verlegter grauer Teppichboden im Wohnraum in Schortens",
+        caption: "Nachher: grauer Teppichboden, sauber und faltenfrei bis an die Sockelleisten verlegt.",
+        longDescription:
+          "Nachher-Aufnahme aus demselben Blickwinkel: Der neue graue Teppichboden wurde flächig verlegt, sauber an Wänden und Sockelleisten eingepasst und macht den Raum sofort wohnlich und ruhig. Das Bildpaar eignet sich als direkter Vorher-Nachher-Vergleich.",
+        phase: "Nachher",
+      },
+    ],
+  },
+  {
+    slug: "laminatverlegung-bremerhaven",
+    title: "Laminatverlegung in Bremerhaven",
+    ort: "Bremerhaven",
+    category: "Bodenverlegung",
+    services: ["Laminat verlegen", "Altbelag entfernen", "Untergrund vorbereiten"],
+    description:
+      "In einem Dachgeschoss in Bremerhaven wurde der alte Teppichboden samt Kleberesten entfernt und Laminat in dunkler Holzoptik verlegt – im Zimmer und auf dem Treppenpodest. Ein überregionales Referenzprojekt, das den kompletten Ablauf von der Altbelag-Entfernung bis zum fertigen Boden zeigt.",
+    cover: "/projects/laminat-bremerhaven-03-nachher.webp",
+    coverAlt: "Laminat in dunkler Holzoptik in einem Dachgeschosszimmer in Bremerhaven",
+    featured: false,
+    detail: true,
+    beforeAfter: [
+      {
+        before: "/projects/laminat-bremerhaven-01-vorher.webp",
+        after: "/projects/laminat-bremerhaven-03-nachher.webp",
+        alt: "Vorher-Nachher-Vergleich aus Bremerhaven: Untergrund mit Teppich- und Kleberesten, danach fertig verlegtes Laminat in dunkler Holzoptik",
+      },
+      {
+        before: "/projects/laminat-bremerhaven-02-vorher.webp",
+        after: "/projects/laminat-bremerhaven-04-nachher-treppe.webp",
+        alt: "Vorher-Nachher-Vergleich vom Treppenpodest in Bremerhaven: roher Untergrund, danach neu verlegtes Laminat",
+      },
+    ],
+    media: [
+      {
+        type: "image",
+        src: "/projects/laminat-bremerhaven-01-vorher.webp",
+        alt: "Vorher: aufgenommener Teppich und Klebereste auf dem Untergrund in Bremerhaven",
+        caption: "Ausgangszustand im Dachgeschosszimmer: Altbelag aufgenommen, Klebereste noch auf dem Estrich.",
+        longDescription:
+          "Vorher-Aufnahme aus Bremerhaven: Der alte Teppichboden wurde bereits aufgerollt, auf dem Untergrund sind großflächig Kleber- und Vliesreste sichtbar. Vor der Laminatverlegung wurde der Untergrund gereinigt und vorbereitet – die Basis für ein ebenes, langlebiges Ergebnis.",
+        phase: "Vorher",
+      },
+      {
+        type: "image",
+        src: "/projects/laminat-bremerhaven-02-vorher.webp",
+        alt: "Vorher: Treppenpodest mit rohem Untergrund vor der Laminatverlegung in Bremerhaven",
+        caption: "Treppenpodest im Dachgeschoss vor der Verlegung – Untergrund freigelegt und vorbereitet.",
+        longDescription:
+          "Zweite Vorher-Aufnahme: Das Treppenpodest im Dachgeschoss mit freigelegtem, vorbereitetem Untergrund rund um das Holzgeländer. Die Aufnahme entstand aus demselben Blickwinkel wie das spätere Nachher-Bild und dokumentiert den Zustand vor der Laminatverlegung.",
+        phase: "Vorher",
+      },
+      {
+        type: "image",
+        src: "/projects/laminat-bremerhaven-03-nachher.webp",
+        alt: "Fertig verlegtes Laminat in dunkler Holzoptik im Dachgeschosszimmer in Bremerhaven",
+        caption: "Nachher: Laminat in dunkler Holzoptik mit Schriftdekor, sauber bis unter die Fensterbank verlegt.",
+        longDescription:
+          "Nachher-Aufnahme aus dem Dachgeschosszimmer in Bremerhaven: Das Laminat in dunkler Holzoptik mit dezentem Schriftdekor wurde gleichmäßig verlegt und sauber an Dachschräge, Heizungsrohren und Fensterbereich angepasst. Der Raum wirkt deutlich wohnlicher und hochwertiger.",
+        phase: "Nachher",
+      },
+      {
+        type: "image",
+        src: "/projects/laminat-bremerhaven-04-nachher-treppe.webp",
+        alt: "Treppenpodest mit neu verlegtem Laminat in Bremerhaven",
+        caption: "Nachher: das Treppenpodest mit durchgehend verlegtem Laminat rund um das Geländer.",
+        longDescription:
+          "Nachher-Aufnahme des Treppenpodests: Das Laminat läuft durchgehend über das Podest und wurde exakt an Geländer, Türzargen und Treppenabgang eingeschnitten. Zusammen mit der Vorher-Aufnahme aus gleichem Blickwinkel ergibt sich ein direkter Vergleich.",
+        phase: "Nachher",
+      },
+    ],
+  },
 ];
 
 export const featuredProjects = projects.filter((p) => p.featured);
