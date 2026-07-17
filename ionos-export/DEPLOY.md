@@ -93,7 +93,7 @@ npm run preview
 
 ## DNS-Einträge bei IONOS
 
-Hauptdomain ist **www.verlegt-verschraubt.de** (Canonical). Im IONOS DNS-Manager:
+Hauptdomain ist **verlegt-verschraubt.de** (OHNE www, Canonical). Im IONOS DNS-Manager:
 
 | Typ | Name | Wert | TTL |
 |---|---|---|---|
