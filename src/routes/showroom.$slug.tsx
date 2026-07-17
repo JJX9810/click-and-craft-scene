@@ -115,6 +115,10 @@ function ProjectDetail() {
   const { project } = Route.useLoaderData() as { project: NonNullable<ReturnType<typeof getProject>> };
   const related = projects.filter((p) => p.slug !== project.slug && p.category === project.category).slice(0, 3);
 
+  const pairSrcs = new Set((project.beforeAfter ?? []).flatMap((p) => [p.before, p.after]));
+  const gallery = project.media.filter((m) => !pairSrcs.has(m.src));
+
+
   const serviceLinkMap: Record<string, string> = {
     Bodenverlegung: "/bodenverlegung-wilhelmshaven",
     Treppenbelag: "/bodenverlegung-wilhelmshaven",
