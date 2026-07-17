@@ -371,13 +371,13 @@ function Index() {
           </div>
           <div className="mx-auto mt-12 max-w-4xl">
             <BeforeAfterSlider
-              before="/projects/coldewei-01-vorher-flur.webp"
-              after="/projects/coldewei-03-vinyl-flur.webp"
-              alt="Bodenverlegung in Coldewei, Wilhelmshaven – Vorher mit altem Belag, Nachher mit Vinyl in Holzoptik"
+              before="/projects/teppichboden-schortens-01-vorher.webp"
+              after="/projects/teppichboden-schortens-02-nachher.webp"
+              alt="Vorher-Nachher-Vergleich aus Schortens: Untergrund mit alten Kleberesten, danach frisch verlegter grauer Teppichboden"
               aspect="3/2"
             />
             <p className="mt-3 text-center text-sm text-muted-foreground">
-              Ziehen Sie den Regler – echtes Projekt aus Coldewei, Wilhelmshaven.
+              Ziehen Sie den Regler – echtes Projekt aus Schortens.
             </p>
           </div>
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
