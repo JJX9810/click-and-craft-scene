@@ -175,7 +175,7 @@ export function OrtsSeite({
       <Section eyebrow="Weiterlesen" title="Passende Leistungen & nächste Schritte">
         <InternalLinks
           links={[
-            { to: "/bodenverlegung-wilhelmshaven", label: `Bodenverlegung für ${ort} ansehen` },
+            { to: "/bodenverlegung-wilhelmshaven", label: `Bodenleger für ${ort} ansehen` },
             { to: "/kuechenmontage-in-wilhelmshaven", label: `Küchenmontage für ${ort} anfragen` },
             { to: "/entruempelung-entsorgung-in-wilhelmshaven", label: `Entrümpelung für ${ort} planen` },
             { to: "/preise", label: "Kosten grob einschätzen" },
