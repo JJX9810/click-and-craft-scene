@@ -93,8 +93,46 @@ export function Section({
   children: React.ReactNode;
   bordered?: boolean;
 }) {
+  const ref = useRef<HTMLElement | null>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    if (typeof window === "undefined" || !("IntersectionObserver" in window)) {
+      setVisible(true);
+      return;
+    }
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    if (mq.matches) {
+      setVisible(true);
+      return;
+    }
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) {
+            setVisible(true);
+            io.disconnect();
+            break;
+          }
+        }
+      },
+      { threshold: 0.15 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
   return (
-    <section className={bordered ? "border-y border-border/60 bg-background/40" : ""}>
+    <section
+      ref={ref}
+      className={
+        (bordered ? "border-y border-border/60 bg-background/40 " : "") +
+        "reveal-on-scroll" +
+        (visible ? " is-visible" : "")
+      }
+    >
       <div className="mx-auto max-w-7xl px-6 py-20">
         {(eyebrow || title) && (
           <div className="max-w-2xl">
