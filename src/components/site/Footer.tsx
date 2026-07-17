@@ -40,7 +40,7 @@ export function Footer() {
             <p className="text-xs uppercase tracking-[0.25em] text-accent">Leistungen</p>
             <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
               <li><Link to="/bodenverlegung-wilhelmshaven" className="hover:text-foreground">Bodenleger &amp; Bodenverlegung</Link></li>
-              <li><Link to="/kuechenmontage-in-wilhelmshaven" className="hover:text-foreground">Küchenmontage</Link></li>
+              <li><Link to="/kuechenmontage-in-wilhelmshaven" className="hover:text-foreground">Küchenmonteur & Küchenmontage</Link></li>
               <li><Link to="/entruempelung-entsorgung-in-wilhelmshaven" className="hover:text-foreground">Entrümpelung & Haushaltsauflösung</Link></li>
               <li><Link to="/preise" className="hover:text-foreground">Preise</Link></li>
               <li><Link to="/wunschtermin" className="hover:text-foreground">Wunschtermin</Link></li>
