@@ -1,6 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { PageHero, Section, CtaBlock, Bullet } from "@/components/site/PageShell";
 import { ProjectCard } from "@/components/site/ProjectCard";
+import { BeforeAfterSlider } from "@/components/site/BeforeAfterSlider";
 import { getProject, projects, type ProjectMedia } from "@/data/projects";
 import { ArrowRight, MapPin } from "lucide-react";
 import { breadcrumbNode, jsonLdScript, webPageNode } from "@/lib/schema";
