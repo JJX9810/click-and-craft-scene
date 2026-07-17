@@ -169,11 +169,35 @@ function ProjectDetail() {
           </div>
         )}
 
-        <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {project.media.map((m, i) => (
-            <MediaItem key={m.src + i} m={m} eager={i === 0} />
-          ))}
-        </div>
+        {project.beforeAfter && (
+          <div className="mt-12">
+            <p className="text-xs uppercase tracking-[0.28em] text-accent">Vorher / Nachher</p>
+            <h2 className="mt-2 font-display text-2xl font-semibold tracking-tight sm:text-3xl">
+              Ziehen Sie den Regler.
+            </h2>
+            <div className="mt-6">
+              <BeforeAfterSlider
+                before={project.beforeAfter.before}
+                after={project.beforeAfter.after}
+                alt={project.beforeAfter.alt}
+                eager
+              />
+            </div>
+          </div>
+        )}
+
+        {project.media[0] && (
+          <div className="mt-12">
+            <MediaItem m={project.media[0]} eager />
+          </div>
+        )}
+        {project.media.length > 1 && (
+          <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {project.media.slice(1).map((m, i) => (
+              <MediaItem key={m.src + i} m={m} />
+            ))}
+          </div>
+        )}
       </Section>
 
       {related.length > 0 && (
