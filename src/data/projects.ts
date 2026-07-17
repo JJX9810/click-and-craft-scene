@@ -30,7 +30,7 @@ export type Project = {
   detail?: boolean;
   /** Echte Vorher-/Nachher-Bildpaare für den Slider. Nur setzen, wenn beide Bilder aus demselben Blickwinkel entstanden sind. */
   beforeAfter?: { before: string; after: string; alt: string }[];
-  testimonial?: { quote: string; author: string; source: string };
+  testimonial?: { quote: string; author: string; source: string; shortQuote?: string };
 };
 
 
