@@ -52,7 +52,7 @@ export const Route = createFileRoute("/kuechenmontage-in-wilhelmshaven")({
           id: SERVICE_IDS.kuechenmontage,
           name: "Küchenmontage",
           description: "Küchenaufbau, Restmontage und Anpassung – von der Front über die Arbeitsplatte bis zur Spüle und Armatur. Wasseranschluss an bestehende Eckventile.",
-          serviceType: "Küchenmontage und Küchenservice",
+          serviceType: ["Küchenmontage", "Küchenmonteur", "Küchenaufbau"],
           areaServed: KM_AREA_SERVED,
           offers: [
             offerNode({ name: "Küchenmontage", price: KUECHE_MONTAGE_PRICE, unitText: "lfm" }),
