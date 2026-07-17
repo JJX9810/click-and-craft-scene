@@ -73,6 +73,14 @@ export const Route = createFileRoute("/")({
     ],
     links: [
       { rel: "canonical", href: "https://verlegt-verschraubt.de/" },
+      {
+        rel: "preload",
+        as: "image",
+        href: "/hero-flooring.webp",
+        imagesrcset: "/hero-flooring-mobile.webp 800w, /hero-flooring.webp 1600w",
+        imagesizes: "(max-width: 768px) 100vw, 50vw",
+        fetchpriority: "high",
+      },
     ],
     scripts: [
       jsonLdScript([
@@ -258,25 +266,32 @@ function Index() {
           </div>
 
           <div className="relative">
-            <div className="relative w-full overflow-hidden rounded-3xl border border-border/60 shadow-2xl">
-              <BeforeAfterSlider
-                before="/projects/teppichboden-schortens-01-vorher.webp"
-                after="/projects/teppichboden-schortens-02-nachher.webp"
-                alt="Vorher-Nachher-Vergleich aus Schortens: Untergrund mit alten Kleberesten, danach frisch verlegter grauer Teppichboden"
-                aspect="16/9"
+            <div className="relative aspect-[16/11] w-full overflow-hidden rounded-3xl border border-border/60 shadow-2xl">
+              <picture>
+                <source
+                  type="image/webp"
+                  srcSet="/hero-flooring-mobile.webp 800w, /hero-flooring.webp 1600w"
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                />
+                <img
+                  src="/hero-flooring.webp"
+                  alt="Bodenleger verlegt Laminatplanke in Holzoptik auf dunklem Holzboden"
+                  title="Bodenverlegung durch Verlegt & Verschraubt in Wilhelmshaven"
+                  className="h-full w-full object-cover"
+                  width={1024}
+                  height={704}
+                  fetchPriority="high"
+                  decoding="async"
+                  loading="eager"
+                />
+              </picture>
+              <div
+                className="pointer-events-none absolute inset-0"
+                style={{
+                  background:
+                    "linear-gradient(180deg, transparent 55%, oklch(0.14 0.012 60 / 0.55) 100%), linear-gradient(90deg, oklch(0.16 0.012 60 / 0.45) 0%, transparent 40%)",
+                }}
               />
-              <div className="flex items-center justify-between gap-3 border-t border-border/60 bg-card/60 px-5 py-3 backdrop-blur">
-                <p className="text-xs text-muted-foreground sm:text-sm">
-                  Ziehen Sie den Regler – echtes Projekt aus Schortens.
-                </p>
-                <Link
-                  to="/showroom/$slug"
-                  params={{ slug: "renovierung-aus-einer-hand-schortens" }}
-                  className="shrink-0 text-xs font-medium text-accent hover:underline sm:text-sm"
-                >
-                  Zum Projekt →
-                </Link>
-              </div>
             </div>
           </div>
         </div>
@@ -353,6 +368,17 @@ function Index() {
             <Button asChild variant="outline" className="rounded-full border-border bg-transparent">
               <Link to="/showroom">Zum gesamten Showroom <ArrowRight className="ml-1 h-4 w-4" /></Link>
             </Button>
+          </div>
+          <div className="mx-auto mt-12 max-w-4xl">
+            <BeforeAfterSlider
+              before="/projects/teppichboden-schortens-01-vorher.webp"
+              after="/projects/teppichboden-schortens-02-nachher.webp"
+              alt="Vorher-Nachher-Vergleich aus Schortens: Untergrund mit alten Kleberesten, danach frisch verlegter grauer Teppichboden"
+              aspect="3/2"
+            />
+            <p className="mt-3 text-center text-sm text-muted-foreground">
+              Ziehen Sie den Regler – echtes Projekt aus Schortens.
+            </p>
           </div>
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {featuredProjects.slice(0, 3).map((p) => (
