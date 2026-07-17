@@ -211,7 +211,7 @@ export function offerNode({ name, price, unitText, priceCurrency = "EUR" }: Offe
 }
 
 export interface ServiceInput {
-  url: string; name: string; description: string; serviceType: string;
+  url: string; name: string; description: string; serviceType: string | string[];
   areaServed?: string | string[];
   id?: string;
   offers?: ReturnType<typeof offerNode>[];
