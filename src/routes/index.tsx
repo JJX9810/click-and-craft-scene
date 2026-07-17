@@ -31,6 +31,7 @@ import { EinsatzgebietMap } from "@/components/site/EinsatzgebietMap";
 import { Kostenrechner } from "@/components/site/Kostenrechner";
 import { OnlinePresenceSection } from "@/components/site/OnlinePresenceSection";
 import { SawdustParticles } from "@/components/site/SawdustParticles";
+import { PlankHero } from "@/components/site/PlankHero";
 import {
   HOME_WEBPAGE_ID,
   breadcrumbNode,
@@ -73,14 +74,6 @@ export const Route = createFileRoute("/")({
     ],
     links: [
       { rel: "canonical", href: "https://verlegt-verschraubt.de/" },
-      {
-        rel: "preload",
-        as: "image",
-        href: "/hero-flooring.webp",
-        imagesrcset: "/hero-flooring-mobile.webp 800w, /hero-flooring.webp 1600w",
-        imagesizes: "(max-width: 768px) 100vw, 50vw",
-        fetchpriority: "high",
-      },
     ],
     scripts: [
       jsonLdScript([
@@ -266,32 +259,8 @@ function Index() {
           </div>
 
           <div className="relative">
-            <div className="relative aspect-[16/11] w-full overflow-hidden rounded-3xl border border-border/60 shadow-2xl">
-              <picture>
-                <source
-                  type="image/webp"
-                  srcSet="/hero-flooring-mobile.webp 800w, /hero-flooring.webp 1600w"
-                  sizes="(max-width: 768px) 100vw, 50vw"
-                />
-                <img
-                  src="/hero-flooring.webp"
-                  alt="Bodenleger verlegt Laminatplanke in Holzoptik auf dunklem Holzboden"
-                  title="Bodenverlegung durch Verlegt & Verschraubt in Wilhelmshaven"
-                  className="h-full w-full object-cover"
-                  width={1024}
-                  height={704}
-                  fetchPriority="high"
-                  decoding="async"
-                  loading="eager"
-                />
-              </picture>
-              <div
-                className="pointer-events-none absolute inset-0"
-                style={{
-                  background:
-                    "linear-gradient(180deg, transparent 55%, oklch(0.14 0.012 60 / 0.55) 100%), linear-gradient(90deg, oklch(0.16 0.012 60 / 0.45) 0%, transparent 40%)",
-                }}
-              />
+            <div className="relative w-full overflow-hidden rounded-3xl border border-border/60 bg-card/20 shadow-2xl">
+              <PlankHero />
             </div>
           </div>
         </div>
