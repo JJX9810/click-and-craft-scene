@@ -184,16 +184,8 @@ function Index() {
           className="pointer-events-none absolute inset-0"
           style={{ background: "var(--gradient-hero)", opacity: 0.85 }}
         />
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 opacity-30 mix-blend-screen animate-aurora-shift"
-          style={{
-            background:
-              "radial-gradient(60% 50% at 20% 30%, oklch(0.55 0.12 60 / 0.18), transparent 60%), radial-gradient(50% 45% at 80% 70%, oklch(0.45 0.10 40 / 0.15), transparent 60%), radial-gradient(40% 40% at 50% 100%, oklch(0.50 0.14 80 / 0.12), transparent 60%)",
-            backgroundSize: "200% 200%",
-          }}
-        />
         <SawdustParticles density={28} />
+
 
         <div className="relative mx-auto grid max-w-7xl grid-cols-1 items-center gap-12 px-6 pb-24 pt-12 lg:grid-cols-2 lg:gap-10 lg:pt-20">
           <div className="relative z-10 max-w-xl">
