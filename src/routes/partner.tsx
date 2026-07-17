@@ -383,7 +383,15 @@ function Page() {
           <figcaption className="mt-5 text-xs uppercase tracking-[0.25em] text-muted-foreground">
             Familie Kolb · 5 Sterne · Google-Bewertung, Juli 2026
           </figcaption>
+          <Link
+            to="/showroom/$slug"
+            params={{ slug: "renovierung-aus-einer-hand-schortens" }}
+            className="mt-4 inline-block text-sm text-accent hover:underline"
+          >
+            Zum Projekt: Renovierung aus einer Hand in Schortens →
+          </Link>
         </figure>
+
       </Section>
 
       {/* ZWEI SPALTEN */}
