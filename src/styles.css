@@ -116,77 +116,24 @@
   will-change: transform, filter;
 }
 
-@keyframes marquee-x {
-  0%   { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
-.animate-marquee {
-  animation: marquee-x 45s linear infinite;
-  will-change: transform;
-}
-
 @keyframes fade-up {
   from { opacity: 0; transform: translateY(16px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 .animate-fade-up { animation: fade-up 0.8s ease-out both; }
 
-@keyframes aurora-shift {
-  0%   { background-position: 0% 50%, 100% 50%, 50% 100%; transform: translate3d(0,0,0); }
-  50%  { background-position: 100% 50%, 0% 50%, 50% 0%;   transform: translate3d(0,-6px,0); }
-  100% { background-position: 0% 50%, 100% 50%, 50% 100%; transform: translate3d(0,0,0); }
+/* Scroll-Reveal: einmalig sanftes Einblenden je Section */
+.reveal-on-scroll {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.7s ease-out, transform 0.7s ease-out;
+  will-change: opacity, transform;
 }
-.animate-aurora-shift {
-  animation: aurora-shift 18s ease-in-out infinite;
-  will-change: background-position, transform;
+.reveal-on-scroll.is-visible {
+  opacity: 1;
+  transform: translateY(0);
 }
 
-@keyframes shimmer-line {
-  0%   { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
-}
-.animate-shimmer { animation: shimmer-line 3.5s ease-in-out infinite; }
-
-/* Shader-artiger Glanz auf Kacheln: dezenter Sheen, sweept automatisch */
-@keyframes tile-sweep {
-  0%   { transform: translateX(-130%); }
-  60%  { transform: translateX(130%); }
-  100% { transform: translateX(130%); }
-}
-.tile-shader {
-  position: relative;
-  isolation: isolate;
-}
-.tile-shader::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  pointer-events: none;
-  background:
-    radial-gradient(120% 80% at 0% 0%, oklch(0.85 0.06 80 / 0.035), transparent 55%),
-    radial-gradient(120% 80% at 100% 100%, oklch(0.55 0.10 50 / 0.03), transparent 55%);
-  z-index: 0;
-}
-.tile-shader::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  pointer-events: none;
-  background: linear-gradient(115deg, transparent 42%, oklch(0.95 0.04 80 / 0.07) 50%, transparent 58%);
-  transform: translateX(-130%);
-  animation: tile-sweep 9s ease-in-out infinite;
-  z-index: 0;
-  mix-blend-mode: screen;
-}
-.tile-shader:hover::after {
-  background: linear-gradient(115deg, transparent 42%, oklch(0.95 0.04 80 / 0.12) 50%, transparent 58%);
-}
-.tile-shader > * {
-  position: relative;
-  z-index: 1;
-}
 
 /* Premium dark laminate background — subtle real wood photo with heavy darkening */
 .bg-wood-grain {
