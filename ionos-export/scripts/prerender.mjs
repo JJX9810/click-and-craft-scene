@@ -54,6 +54,7 @@ if (fs.existsSync(registryPath)) {
     "/handwerkerservice-jever",
     "/handwerkerservice-varel",
     "/handwerkerservice-wangerland",
+    "/handwerkerservice-wittmund",
   ];
 }
 
