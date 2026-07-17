@@ -3,7 +3,8 @@ export type ProjectCategory =
   | "Küchenmontage"
   | "Küchenfolierung"
   | "Treppenbelag"
-  | "Detailarbeiten";
+  | "Detailarbeiten"
+  | "Komplettprojekt";
 
 export type ProjectMedia = {
   type: "image" | "video";
@@ -29,7 +30,9 @@ export type Project = {
   detail?: boolean;
   /** Echte Vorher-/Nachher-Bildpaare für den Slider. Nur setzen, wenn beide Bilder aus demselben Blickwinkel entstanden sind. */
   beforeAfter?: { before: string; after: string; alt: string }[];
+  testimonial?: { quote: string; author: string; source: string };
 };
+
 
 const BASE = "https://verlegt-verschraubt.de/wp-content/uploads/2026/05";
 
@@ -438,15 +441,21 @@ export const projects: Project[] = [
     ],
   },
   {
-    slug: "teppichboden-schortens",
-    title: "Teppichboden verlegt in Schortens",
+    slug: "renovierung-aus-einer-hand-schortens",
+    title: "Renovierung aus einer Hand in Schortens – Boden, Küche & Umzug",
     ort: "Schortens",
-    category: "Bodenverlegung",
-    services: ["Teppichboden verlegen", "Altbelag entfernen", "Untergrund vorbereiten"],
+    category: "Komplettprojekt",
+    services: [
+      "Boden und Wände spachteln",
+      "Teppichboden verlegen",
+      "Vinylboden verlegen",
+      "Küchenmontage",
+      "Koordination von Umzug, Elektrik und Malerarbeiten über Partnerbetriebe",
+    ],
     description:
-      "In Schortens wurde ein Wohnraum mit neuem Teppichboden ausgestattet. Der alte Belag wurde entfernt, der Untergrund geprüft und der graue Teppich anschließend sauber und faltenfrei verlegt – bis in die Ecken und bündig an die Sockelleisten.",
-    cover: "/projects/teppichboden-schortens-02-nachher.webp",
-    coverAlt: "Neu verlegter grauer Teppichboden in einem Wohnraum in Schortens",
+      "Aus einem Auftrag für Teppich, Vinyl und Küchenmontage wurde ein komplettes Umzugsprojekt: Als das Umzugsunternehmen der Familie kurzfristig absprang, haben wir über unser Netzwerk einen Umzugspartner, einen Elektriker und einen Maler vermittelt und alle Gewerke koordiniert – gemeinsam mit JS Küchenduo, das in Düren Demontage und Verladung übernahm. Eigene Gewerke haben wir selbst ausgeführt, Partnerleistungen liefen eigenverantwortlich über die Fachbetriebe. Nach drei Wochen war das Haus in Schortens einzugsbereit.",
+    cover: "/projects/kueche-marmoroptik-schortens-01.webp",
+    coverAlt: "Montierte Küche mit weißen Hochglanzfronten und Arbeitsplatten in dunkler Marmoroptik in Schortens",
     featured: true,
     detail: true,
     beforeAfter: [
@@ -455,8 +464,37 @@ export const projects: Project[] = [
         after: "/projects/teppichboden-schortens-02-nachher.webp",
         alt: "Vorher-Nachher-Vergleich aus Schortens: Untergrund mit alten Kleberesten, danach frisch verlegter grauer Teppichboden",
       },
+      {
+        before: "/projects/spachteln-schortens-01-vorher.webp",
+        after: "/projects/spachteln-schortens-02-nachher.webp",
+        alt: "Vorher-Nachher-Vergleich aus Schortens: roher Raum mit unverputztem Mauerwerk, danach gespachtelte Wände und geglätteter Boden",
+      },
     ],
+    testimonial: {
+      quote:
+        "Was ursprünglich nur mit der Bodenverlegung und der Küchenmontage begann, entwickelte sich zu einer vollständigen Organisation unseres Umzugs. Herr Brosch kümmerte sich um einen Umzugspartner, einen Elektriker und einen Maler und koordinierte alle beteiligten Gewerke – und das alles innerhalb von nur drei Wochen. Aus einer Situation, die zunächst wie eine Vollkatastrophe aussah, wurde einer der entspanntesten Umzüge, die wir je erlebt haben.",
+      author: "Familie Kolb",
+      source: "5 Sterne · Google-Bewertung, Juli 2026",
+    },
     media: [
+      {
+        type: "image",
+        src: "/projects/spachteln-schortens-01-vorher.webp",
+        alt: "Vorher: roher Raum mit unverputztem Mauerwerk und frischem Estrich in Schortens",
+        caption: "Ausgangszustand: unverputztes Mauerwerk, offene Leitungen, frischer Estrich.",
+        longDescription:
+          "Vorher-Aufnahme aus dem Haus in Schortens: Der kleine Raum zeigt rohes, unverputztes Mauerwerk, ein eingebautes Vorwandelement und einen frisch eingebrachten Estrich. Diese Aufnahme dokumentiert den Sanierungszustand vor den Spachtelarbeiten an Wand und Boden.",
+        phase: "Vorher",
+      },
+      {
+        type: "image",
+        src: "/projects/spachteln-schortens-02-nachher.webp",
+        alt: "Gespachtelte Wände und geglätteter Boden im selben Raum in Schortens",
+        caption: "Nach den Spachtelarbeiten: glatte Wände, ebener Boden – bereit für die Endbeläge.",
+        longDescription:
+          "Derselbe Raum nach den Spachtelarbeiten: Wände und Boden wurden vollflächig gespachtelt und geglättet. Ein ebener, tragfähiger Untergrund ist die unsichtbare Grundlage für jedes saubere Endergebnis – vom Fliesenbelag bis zum Bodenbelag.",
+        phase: "Vorbereitung",
+      },
       {
         type: "image",
         src: "/projects/teppichboden-schortens-01-vorher.webp",
@@ -475,8 +513,18 @@ export const projects: Project[] = [
           "Nachher-Aufnahme aus demselben Blickwinkel: Der neue graue Teppichboden wurde flächig verlegt, sauber an Wänden und Sockelleisten eingepasst und macht den Raum sofort wohnlich und ruhig. Das Bildpaar eignet sich als direkter Vorher-Nachher-Vergleich.",
         phase: "Nachher",
       },
+      {
+        type: "image",
+        src: "/projects/kueche-marmoroptik-schortens-01.webp",
+        alt: "Montierte Küche mit weißen Hochglanzfronten und dunkler Marmoroptik in Schortens",
+        caption: "Die montierte Küche: weiße Hochglanzfronten, Arbeitsplatten und Rückwand in dunkler Marmoroptik.",
+        longDescription:
+          "Die im Projekt montierte Küche in Schortens: weiße Hochglanzfronten, Arbeitsplatten und Nischenrückwand in dunkler Marmoroptik, integrierte Beleuchtung und Einbaugeräte. Aufgebaut und ausgerichtet im Rahmen des koordinierten Gesamtprojekts.",
+        phase: "Nachher",
+      },
     ],
   },
+
   {
     slug: "laminatverlegung-bremerhaven",
     title: "Laminatverlegung in Bremerhaven",
