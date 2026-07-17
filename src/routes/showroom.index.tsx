@@ -116,8 +116,43 @@ function ShowroomPage() {
           ))}
         </div>
 
+        {active === "Alle" && filtered.length > 0 && (
+          <Link
+            to="/showroom/$slug"
+            params={{ slug: filtered[0].slug }}
+            className="group mt-10 relative block overflow-hidden rounded-2xl border border-border/70 bg-card/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          >
+            <div className="relative aspect-[16/9] w-full sm:aspect-[21/9]">
+              <img
+                src={filtered[0].cover}
+                alt={filtered[0].coverAlt}
+                loading="eager"
+                decoding="async"
+                className="h-full w-full object-cover"
+              />
+              <div
+                aria-hidden
+                className="absolute inset-0"
+                style={{
+                  background:
+                    "linear-gradient(to top, oklch(0.15 0.012 60 / 0.85) 0%, oklch(0.15 0.012 60 / 0.35) 45%, transparent 75%)",
+                }}
+              />
+              <div className="absolute inset-x-0 bottom-0 p-6 sm:p-10">
+                <p className="text-xs uppercase tracking-[0.28em] text-accent">Aktuelles Projekt</p>
+                <h2 className="mt-2 font-display text-2xl font-semibold tracking-tight text-foreground sm:text-4xl">
+                  {filtered[0].title}
+                </h2>
+                <p className="mt-1 flex items-center gap-1 text-sm text-muted-foreground">
+                  <span className="opacity-80">{filtered[0].ort}</span>
+                </p>
+              </div>
+            </div>
+          </Link>
+        )}
+
         <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {filtered.map((p, i) => (
+          {(active === "Alle" ? filtered.slice(1) : filtered).map((p, i) => (
             <ProjectCard key={p.slug} project={p} eager={i < 3} />
           ))}
         </div>
