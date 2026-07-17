@@ -376,23 +376,38 @@ function Page() {
 
       {/* GOOGLE-BEWERTUNG ZITAT */}
       <Section eyebrow="Aus einer echten Google-Bewertung" bordered>
-        <figure className="max-w-3xl border-l-2 border-accent pl-6">
-          <blockquote className="text-lg leading-relaxed text-foreground/90 sm:text-xl">
-            „Während Herr Brosch bei uns den Boden verlegte, sagte plötzlich unser Umzugsunternehmen ab. Er vermittelte uns einen passenden Partner aus seinem Netzwerk. Was mit Bodenverlegung und Küchenmontage begann, entwickelte sich zu einer vollständigen Organisation unseres Umzugs – koordiniert innerhalb von nur drei Wochen. Aus einer Situation, die zunächst wie eine Vollkatastrophe aussah, wurde einer der entspanntesten Umzüge, die wir je erlebt haben."
-          </blockquote>
-          <figcaption className="mt-5 text-xs uppercase tracking-[0.25em] text-muted-foreground">
-            Familie Kolb · 5 Sterne · Google-Bewertung, Juli 2026
-          </figcaption>
-          <Link
-            to="/showroom/$slug"
-            params={{ slug: "renovierung-aus-einer-hand-schortens" }}
-            className="mt-4 inline-block text-sm text-accent hover:underline"
-          >
-            Zum Projekt: Renovierung aus einer Hand in Schortens →
-          </Link>
-        </figure>
-
+        <div className="grid gap-10 lg:grid-cols-2 lg:items-center">
+          <figure className="border-l-2 border-accent pl-6">
+            <blockquote className="text-lg leading-relaxed text-foreground/90 sm:text-xl">
+              „Während Herr Brosch bei uns den Boden verlegte, sagte plötzlich unser Umzugsunternehmen ab. Er vermittelte uns einen passenden Partner aus seinem Netzwerk. Was mit Bodenverlegung und Küchenmontage begann, entwickelte sich zu einer vollständigen Organisation unseres Umzugs – koordiniert innerhalb von nur drei Wochen. Aus einer Situation, die zunächst wie eine Vollkatastrophe aussah, wurde einer der entspanntesten Umzüge, die wir je erlebt haben."
+            </blockquote>
+            <figcaption className="mt-5 text-xs uppercase tracking-[0.25em] text-muted-foreground">
+              Familie Kolb · 5 Sterne · Google-Bewertung, Juli 2026
+            </figcaption>
+            <Link
+              to="/showroom/$slug"
+              params={{ slug: "renovierung-aus-einer-hand-schortens" }}
+              className="mt-4 inline-block text-sm text-accent hover:underline"
+            >
+              Zum Projekt: Renovierung aus einer Hand in Schortens →
+            </Link>
+          </figure>
+          <figure className="overflow-hidden rounded-2xl border border-border/70">
+            <img
+              src="/projects/netzwerk-led-decke-malerarbeiten.webp"
+              alt="Wohnraum mit abgehängter Decke, indirekter LED-Beleuchtung und frischen Malerarbeiten – ausgeführt durch Partnerbetriebe"
+              width={960}
+              height={1280}
+              loading="lazy"
+              className="h-full w-full object-cover lg:max-h-[480px]"
+            />
+            <figcaption className="px-4 py-3 text-xs text-muted-foreground">
+              Abgehängte Decke, indirekte LED-Beleuchtung, Malerarbeiten: Gewerke wie diese realisieren geprüfte Partnerbetriebe – koordiniert von uns.
+            </figcaption>
+          </figure>
+        </div>
       </Section>
+
 
       {/* ZWEI SPALTEN */}
       <Section eyebrow="Rollenverteilung" title="Klare Rollen. Klare Verantwortung.">
