@@ -496,17 +496,18 @@ function Index() {
               Ehrliches Handwerk, ohne Umweg.
             </h2>
           </div>
-          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-12 grid gap-x-10 gap-y-2 sm:grid-cols-2">
             {reasons.map((r, i) => (
-              <div key={r.title} className="group rounded-2xl border border-border/70 bg-card/40 p-6 transition-colors hover:border-accent/50">
-                <div className="flex items-center justify-between">
-                  <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent/15 text-accent">
-                    <r.icon className="h-5 w-5" />
+              <div key={r.title} className="border-t border-border/60 py-6">
+                <div className="flex items-baseline gap-4">
+                  <span className="font-display text-2xl font-semibold text-accent tabular-nums">
+                    {String(i + 1).padStart(2, "0")}
                   </span>
-                  <span className="text-xs font-mono text-muted-foreground/60">0{i + 1}</span>
+                  <div>
+                    <h3 className="font-display text-lg font-semibold tracking-tight">{r.title}</h3>
+                    <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{r.desc}</p>
+                  </div>
                 </div>
-                <h3 className="mt-5 text-base font-semibold">{r.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{r.desc}</p>
               </div>
             ))}
           </div>
@@ -521,21 +522,14 @@ function Index() {
             So läuft eine Anfrage ab.
           </h2>
         </div>
-        <ol className="relative mt-12 grid gap-8 md:grid-cols-4">
-          <div
-            aria-hidden
-            className="absolute left-0 right-0 top-7 hidden h-px bg-gradient-to-r from-transparent via-border to-transparent md:block"
-          />
+        <ol className="mt-12 grid gap-x-10 md:grid-cols-2">
           {steps.map((step, i) => (
-            <li key={step.title} className="relative">
-              <div className="relative flex h-14 w-14 items-center justify-center rounded-full border border-accent/40 bg-background text-accent">
-                <step.icon className="h-6 w-6" />
-              </div>
-              <div className="mt-5">
-                <p className="text-[11px] uppercase tracking-[0.25em] text-muted-foreground">Schritt {i + 1}</p>
-                <h3 className="mt-1 text-lg font-semibold">{step.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{step.desc}</p>
-              </div>
+            <li key={step.title} className="border-t border-border/60 py-6">
+              <p className="font-display text-sm font-semibold text-accent tabular-nums">
+                Schritt {String(i + 1).padStart(2, "0")}
+              </p>
+              <h3 className="mt-2 font-display text-xl font-semibold tracking-tight">{step.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{step.desc}</p>
             </li>
           ))}
         </ol>
