@@ -98,6 +98,7 @@ export const organizationNode = {
   knowsAbout: [
     "Bodenverlegung",
     "Küchenmontage",
+    "Küchenmonteur",
     "Entrümpelung",
     "Haushaltsauflösung",
     "Vinylboden",
