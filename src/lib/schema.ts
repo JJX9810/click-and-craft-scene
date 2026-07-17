@@ -99,6 +99,7 @@ export const organizationNode = {
     "Bodenverlegung",
     "Küchenmontage",
     "Entrümpelung",
+    "Haushaltsauflösung",
     "Vinylboden",
     "Laminat",
     "PVC-Boden",
@@ -150,10 +151,10 @@ export const serviceEntities = [
   {
     "@type": "Service",
     "@id": SERVICE_IDS.entruempelung,
-    name: "Entrümpelung & Entsorgung in Wilhelmshaven",
+    name: "Entrümpelung & Haushaltsauflösung in Wilhelmshaven",
     description:
-      "Wohnungs-, Keller- und Dachbodenentrümpelung, Möbel- und Sperrmüllentsorgung sowie Räumung vor Renovierung.",
-    serviceType: "Entrümpelung und Entsorgung",
+      "Wohnungs-, Keller- und Dachbodenentrümpelung, Möbel- und Sperrmüllentsorgung sowie komplette Haushaltsauflösung und Räumung vor Renovierung.",
+    serviceType: ["Entrümpelung und Entsorgung", "Haushaltsauflösung"],
     url: `${SITE_URL}/entruempelung-entsorgung-in-wilhelmshaven`,
     provider: { "@id": ORG_ID },
     areaServed: AREA_SERVED,
