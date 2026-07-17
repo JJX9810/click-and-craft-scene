@@ -31,12 +31,14 @@ const filters: Filter[] = [
 
 
 const categorySet: ProjectCategory[] = [
+  "Komplettprojekt",
   "Bodenverlegung",
   "Küchenmontage",
   "Küchenfolierung",
   "Treppenbelag",
   "Detailarbeiten",
 ];
+
 
 export const Route = createFileRoute("/showroom/")({
   component: ShowroomPage,
