@@ -143,7 +143,7 @@ export const serviceEntities = [
     name: "Küchenmontage in Wilhelmshaven & Umgebung",
     description:
       "Küchenaufbau nach Umzug, Restmontage und Anpassung – Arbeitsplatten, Spüle, Armatur sowie Sockel und Lichtleisten.",
-    serviceType: "Küchenmontage",
+    serviceType: ["Küchenmontage", "Küchenmonteur", "Küchenaufbau"],
     url: `${SITE_URL}/kuechenmontage-in-wilhelmshaven`,
     provider: { "@id": ORG_ID },
     areaServed: AREA_SERVED,
