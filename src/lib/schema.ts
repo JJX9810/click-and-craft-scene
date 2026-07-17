@@ -99,6 +99,7 @@ export const organizationNode = {
     "Bodenverlegung",
     "Küchenmontage",
     "Entrümpelung",
+    "Haushaltsauflösung",
     "Vinylboden",
     "Laminat",
     "PVC-Boden",
