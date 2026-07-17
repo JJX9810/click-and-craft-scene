@@ -59,7 +59,7 @@ export const projects: Project[] = [
       after: "/projects/coldewei-03-vinyl-flur.webp",
       alt: "Flur in Coldewei, Wilhelmshaven – Vorher mit altem Belag, Nachher mit Vinyl in Holzoptik",
     },
-    detail: true,
+    
     media: [
       {
         type: "image",
