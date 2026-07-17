@@ -244,6 +244,25 @@ function Page() {
 
       <PreisrechnerCTA variant="bodenverlegung" />
 
+      <Section eyebrow="Region" title="Bodenleger für Wilhelmshaven und Umgebung" bordered>
+        <p className="max-w-3xl text-base leading-relaxed text-muted-foreground">
+          Verlegt &amp; Verschraubt arbeitet als Bodenleger in{" "}
+          <Link to="/handwerkerservice-wilhelmshaven" className="text-accent hover:underline">Wilhelmshaven</Link>,{" "}
+          <Link to="/handwerkerservice-schortens" className="text-accent hover:underline">Schortens</Link>,{" "}
+          <Link to="/handwerkerservice-sande" className="text-accent hover:underline">Sande</Link>,{" "}
+          <Link to="/handwerkerservice-jever" className="text-accent hover:underline">Jever</Link>,{" "}
+          <Link to="/handwerkerservice-varel" className="text-accent hover:underline">Varel</Link>,{" "}
+          <Link to="/handwerkerservice-wangerland" className="text-accent hover:underline">Wangerland</Link> und{" "}
+          <Link to="/handwerkerservice-wittmund" className="text-accent hover:underline">Wittmund</Link>. Wir
+          übernehmen Bodenlegearbeiten für Privatkunden aus der ganzen Region – vom
+          Wohnzimmer in der Südstadt bis zur Ferienwohnung an der Küste. Die
+          Fußbodenverlegung planen wir jeweils mit Blick auf Untergrund, gewünschten
+          Belag und saubere Abschlüsse. Sie erhalten aus Wilhelmshaven heraus eine
+          ehrliche Einschätzung, kurze Wege und einen festen Ansprechpartner für das
+          gesamte Projekt.
+        </p>
+      </Section>
+
       <Section eyebrow="Netzwerk" title="Ihr Projekt umfasst mehr als den Boden?" bordered>
         <p className="max-w-3xl text-base leading-relaxed text-muted-foreground">
           Über unser Partnernetzwerk koordinieren wir weitere Gewerke – von der
