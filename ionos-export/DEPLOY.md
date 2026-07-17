@@ -113,7 +113,7 @@ Bei Deploy Now zeigt IONOS die exakten Werte direkt im Projekt an — einfach 1:
 
 ## Funktionstest nach Upload
 
-1. **HTTPS + www-Redirect:** Aufrufen von `http://verlegt-verschraubt.de` → muss landen bei `https://verlegt-verschraubt.de/`.
+1. **HTTPS + non-www-Redirect:** Aufrufen von `http://www.verlegt-verschraubt.de` → muss landen bei `https://verlegt-verschraubt.de/`.
 2. **Direkter Aufruf einer Unterseite per URL:** `https://verlegt-verschraubt.de/bodenverlegung-wilhelmshaven` → muss sofort die Seite zeigen, nicht 404.
 3. **Reload auf Unterseite:** Auf `/showroom` F5 drücken → Seite bleibt da.
 4. **SEO-Quelltext:** Rechtsklick → Seitenquelltext anzeigen. Im `<head>` müssen Title und Description **dieser konkreten Seite** stehen (nicht der Startseite).
