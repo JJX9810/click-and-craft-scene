@@ -63,7 +63,7 @@ export const Route = createFileRoute("/bodenverlegung-wilhelmshaven")({
           id: SERVICE_IDS.bodenverlegung,
           name: "Bodenverlegung",
           description: "Verlegung von Vinyl, Designboden, Laminat, PVC und Teppich inklusive Untergrundprüfung, Altbelag entfernen, Treppenverkleidung sowie Sockelleisten und Übergängen.",
-          serviceType: "Bodenverlegung (Vinyl, Laminat, PVC, Teppich)",
+          serviceType: ["Bodenverlegung", "Bodenleger", "Fußbodenverlegung"],
           areaServed: BODEN_AREA_SERVED,
           offers: [
             offerNode({ name: "Laminat schwimmend verlegen", price: PRICE_LAMINAT_SCHWIMMEND, unitText: "m²" }),
