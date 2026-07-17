@@ -301,7 +301,7 @@ function Page() {
       {/* WARUM ES UNS GIBT */}
       <Section
         eyebrow="Warum es uns gibt"
-        title="Renovierung aus einer Hand – so funktioniert es bei uns."
+        title="Renovierung in Wilhelmshaven – so funktioniert es aus einer Hand."
       >
         <div className="max-w-3xl space-y-5 text-base leading-relaxed text-muted-foreground">
           <p>
