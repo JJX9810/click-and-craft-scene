@@ -17,6 +17,7 @@ type Filter =
 
 const filters: Filter[] = [
   "Alle",
+  "Komplettprojekt",
   "Bodenverlegung",
   "Küchenmontage",
   "Küchenfolierung",
@@ -27,6 +28,7 @@ const filters: Filter[] = [
   "Hooksiel",
   "Coldewei",
 ];
+
 
 const categorySet: ProjectCategory[] = [
   "Bodenverlegung",
