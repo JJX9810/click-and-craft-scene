@@ -383,9 +383,17 @@ function Page() {
             </p>
             <ul className="mt-5 space-y-3 text-sm text-muted-foreground">
               {ownServices.map((s) => (
-                <li key={s} className="flex items-start gap-3">
+                <li key={s.label} className="flex items-start gap-3">
                   <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
-                  <span>{s}</span>
+                  <span>
+                    {s.to ? (
+                      <Link to={s.to} className="text-accent hover:underline">
+                        {s.label}
+                      </Link>
+                    ) : (
+                      s.label
+                    )}
+                  </span>
                 </li>
               ))}
             </ul>
