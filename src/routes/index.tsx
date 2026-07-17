@@ -103,7 +103,7 @@ export const Route = createFileRoute("/")({
 const services = [
   {
     icon: Layers,
-    title: "Bodenverlegung",
+    title: "Bodenleger & Bodenverlegung",
     desc: "Laminat, Vinyl, PVC und Teppich – fachgerecht verlegt mit sauberen Kanten und stimmigem Verlegebild.",
     points: ["Vinyl, Laminat, PVC & Teppich", "Sockelleisten & Übergänge", "Untergrund prüfen & vorbereiten"],
     to: "/bodenverlegung-wilhelmshaven",
