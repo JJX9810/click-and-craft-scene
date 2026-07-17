@@ -39,7 +39,7 @@ export function OrtsSeite({
     ? (projectSlugs.map((s) => projects.find((p) => p.slug === s)).filter(Boolean) as Project[])
     : projects.filter((p) => p.ort.toLowerCase().includes(ort.toLowerCase()));
   const services = [
-    { icon: Layers, title: `Bodenverlegung in ${ort}`, desc: "Vinyl, Laminat, PVC und Teppich – sauber verlegt.", to: "/bodenverlegung-wilhelmshaven" },
+    { icon: Layers, title: `Bodenleger in ${ort}`, desc: "Vinyl, Laminat, PVC und Teppich – sauber verlegt.", to: "/bodenverlegung-wilhelmshaven" },
     { icon: Wrench, title: `Küchenmontage in ${ort}`, desc: "Aufbau nach Umzug, Restmontage, Arbeitsplatten.", to: "/kuechenmontage-in-wilhelmshaven" },
     { icon: Trash2, title: `Entrümpelung in ${ort}`, desc: "Wohnung, Keller, Dachboden – planbar und besenrein.", to: "/entruempelung-entsorgung-in-wilhelmshaven" },
   ];
