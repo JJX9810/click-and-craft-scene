@@ -41,7 +41,7 @@ export function PageHero({
           </nav>
         )}
         <p className="text-xs uppercase tracking-[0.28em] text-accent">{eyebrow}</p>
-        <h1 className="mt-3 max-w-3xl text-balance text-4xl font-semibold leading-[1.08] tracking-tight sm:text-5xl">
+        <h1 className="mt-3 max-w-3xl text-balance text-[2.5rem] font-semibold leading-[1.05] tracking-tight sm:text-5xl lg:text-6xl">
           {title}
         </h1>
         <p className="mt-5 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
