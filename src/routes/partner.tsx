@@ -446,7 +446,44 @@ function Page() {
       </Section>
 
       {/* PARTNER-VORSTELLUNG */}
+      {/* FAQ */}
+      <Section eyebrow="FAQ" title="Häufige Fragen zur Renovierung aus einer Hand" bordered>
+        <div className="max-w-3xl space-y-3">
+          {[
+            {
+              q: "Seid ihr ein Generalunternehmer?",
+              a: "Nein. Wir treten nicht als Generalunternehmer auf. Unsere eigenen Gewerke – Boden, Küche, Entrümpelung – führen wir selbst aus. Für weitere Gewerke vermitteln und koordinieren wir geprüfte Partnerbetriebe, die ihre Leistungen eigenverantwortlich erbringen. Sie haben dabei durchgehend einen Ansprechpartner: uns.",
+            },
+            {
+              q: "Was kostet eine Renovierung aus einer Hand?",
+              a: "Für unsere eigenen Leistungen gibt der Kostenrechner eine erste Orientierung. Partnerleistungen kalkulieren die jeweiligen Fachbetriebe. Verbindliche Preise gibt es erst nach Prüfung von Fotos, Maßen bzw. einer Besichtigung – ehrlich und ohne Überraschungen.",
+            },
+            {
+              q: "Welche Gewerke deckt das Netzwerk aktuell ab?",
+              a: "Selbst übernehmen wir Bodenverlegung, Küchenmontage, Küchenfolierung sowie Entrümpelung und Entsorgung. Über Partner laufen aktuell vor allem Küchen- und Umbauprojekte gemeinsam mit JS Küchenduo. Weitere Gewerke wie Elektro, Sanitär und Malerarbeiten ergänzen wir nur mit bestätigten, geprüften Partnern – solange sagen wir offen, was noch nicht abgedeckt ist.",
+            },
+            {
+              q: "Arbeitet ihr auch außerhalb von Wilhelmshaven?",
+              a: "Ja. Unser Kerngebiet ist Wilhelmshaven mit Schortens, Sande, Jever, Varel, Wangerland und Wittmund. Gemeinsam mit JS Küchenduo (Zentrale West, Raum Ruhrgebiet/Rheinland) prüfen wir auch überregionale Projekte – individuell nach Umfang und Terminlage.",
+            },
+          ].map((f) => (
+            <details
+              key={f.q}
+              className="group rounded-xl border border-border/70 bg-card/40 p-5 backdrop-blur"
+            >
+              <summary className="cursor-pointer list-none text-base font-medium text-foreground marker:hidden">
+                {f.q}
+              </summary>
+              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                {f.a}
+              </p>
+            </details>
+          ))}
+        </div>
+      </Section>
+
       <Section eyebrow="Unser Partner" title="Mit wem wir gerne zusammenarbeiten.">
+
         <PartnerCard />
       </Section>
 
