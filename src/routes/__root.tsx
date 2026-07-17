@@ -163,6 +163,7 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isHome = pathname === "/";
+  const hideMobileBar = pathname.startsWith("/impressum") || pathname.startsWith("/datenschutz");
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -182,6 +183,8 @@ function RootComponent() {
           <Outlet />
         </main>
         <Footer />
+        {!hideMobileBar && <div aria-hidden className="h-20 md:hidden" />}
+        {!hideMobileBar && <MobileContactBar />}
         <Toaster />
         <AttributionTracker />
         <AnalyticsTracker />
