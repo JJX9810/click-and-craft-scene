@@ -1,10 +1,14 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { PageHero, Section, CtaBlock, Bullet } from "@/components/site/PageShell";
+import { Section, CtaBlock, Bullet } from "@/components/site/PageShell";
 import { ProjectCard } from "@/components/site/ProjectCard";
 import { BeforeAfterSlider } from "@/components/site/BeforeAfterSlider";
+import { Button } from "@/components/ui/button";
 import { getProject, projects, type ProjectMedia } from "@/data/projects";
-import { ArrowRight, MapPin } from "lucide-react";
+import { ArrowRight, ChevronRight, MapPin, MessageCircle, Phone, Star } from "lucide-react";
 import { breadcrumbNode, jsonLdScript, webPageNode } from "@/lib/schema";
+
+const WA_HREF =
+  "https://wa.me/491634799286?text=Hallo%2C%20ich%20habe%20ein%20Projekt%3A%20";
 
 export const Route = createFileRoute("/showroom/$slug")({
   component: ProjectDetail,
@@ -122,15 +126,88 @@ function ProjectDetail() {
 
   return (
     <>
-      <PageHero
-        eyebrow={project.category}
-        title={project.title}
-        intro={project.description}
-        breadcrumbs={[
-          { label: "Showroom", to: "/showroom" },
-          { label: project.title },
-        ]}
-      />
+      <section className="relative border-b border-border/60">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0"
+          style={{ background: "var(--gradient-hero)", opacity: 0.85 }}
+        />
+        <div className="relative mx-auto max-w-7xl px-6 pb-16 pt-16 lg:pt-24">
+          <div className="grid gap-10 lg:grid-cols-[1fr,380px] lg:items-start">
+            <div>
+              <nav aria-label="Breadcrumb" className="mb-6 flex flex-wrap items-center gap-1 text-xs text-muted-foreground">
+                <Link to="/" className="hover:text-foreground">Start</Link>
+                <span className="flex items-center gap-1">
+                  <ChevronRight className="h-3 w-3" />
+                  <Link to="/showroom" className="hover:text-foreground">Showroom</Link>
+                </span>
+                <span className="flex items-center gap-1">
+                  <ChevronRight className="h-3 w-3" />
+                  <span className="text-foreground">{project.title}</span>
+                </span>
+              </nav>
+              <p className="text-xs uppercase tracking-[0.28em] text-accent">{project.category}</p>
+              <h1 className="mt-3 max-w-3xl text-balance text-[2.5rem] font-semibold leading-[1.05] tracking-tight sm:text-5xl lg:text-6xl">
+                {project.title}
+              </h1>
+              <p className="mt-5 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
+                {project.description}
+              </p>
+              <div className="mt-8 flex flex-wrap gap-3">
+                <Button
+                  asChild
+                  size="lg"
+                  className="h-12 rounded-full bg-[#25D366] px-7 text-white shadow-lg shadow-[#25D366]/25 hover:bg-[#25D366]/90"
+                >
+                  <a href={WA_HREF} target="_blank" rel="noopener noreferrer">
+                    <MessageCircle className="mr-1 h-4 w-4" /> WhatsApp schreiben
+                  </a>
+                </Button>
+                <Button
+                  asChild
+                  size="lg"
+                  variant="outline"
+                  className="h-12 rounded-full border-border bg-transparent px-7 hover:bg-card"
+                >
+                  <a href="tel:+491634799286">
+                    <Phone className="mr-1 h-4 w-4" /> 0163 4799286
+                  </a>
+                </Button>
+                <Button
+                  asChild
+                  size="lg"
+                  className="h-12 rounded-full bg-accent px-7 text-accent-foreground hover:bg-accent/90"
+                >
+                  <Link to="/kontakt">
+                    Projekt anfragen <ArrowRight className="ml-1 h-4 w-4" />
+                  </Link>
+                </Button>
+              </div>
+            </div>
+            {project.testimonial && (
+              <aside className="rounded-2xl border border-border/70 bg-card/40 p-6 backdrop-blur">
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-0.5" aria-label="5 von 5 Sternen">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <Star key={i} className="h-4 w-4 fill-accent text-accent" aria-hidden />
+                    ))}
+                  </div>
+                  <span className="text-sm font-medium">5,0</span>
+                </div>
+                <blockquote className="mt-4 text-sm leading-relaxed text-foreground/90">
+                  „{project.testimonial.shortQuote ?? project.testimonial.quote}"
+                </blockquote>
+                <figcaption className="mt-4 not-italic">
+                  <span className="block font-medium">{project.testimonial.author}</span>
+                  <span className="mt-1 block text-xs text-muted-foreground">
+                    Google-Bewertung · 5 Sterne · Juli 2026
+                  </span>
+                </figcaption>
+              </aside>
+            )}
+          </div>
+        </div>
+      </section>
 
       <Section>
         <div className="flex flex-wrap items-center justify-between gap-4">
@@ -175,31 +252,22 @@ function ProjectDetail() {
             <h2 className="mt-2 font-display text-2xl font-semibold tracking-tight sm:text-3xl">
               Ziehen Sie den Regler.
             </h2>
-            <div className="mt-6 space-y-8">
+            <div
+              className={`mt-6 grid gap-8 md:grid-cols-2 ${
+                project.beforeAfter.length === 1 ? "max-w-2xl" : ""
+              }`}
+            >
               {project.beforeAfter.map((pair, i) => (
-                <BeforeAfterSlider
-                  key={pair.before + i}
-                  before={pair.before}
-                  after={pair.after}
-                  alt={pair.alt}
-                  eager={i === 0}
-                />
+                <div key={pair.before + i} className="mx-auto w-full max-w-sm md:max-w-none">
+                  <BeforeAfterSlider
+                    before={pair.before}
+                    after={pair.after}
+                    alt={pair.alt}
+                    eager={i === 0}
+                  />
+                </div>
               ))}
             </div>
-          </div>
-        )}
-
-        {project.testimonial && (
-          <div className="mt-14">
-            <p className="text-xs uppercase tracking-[0.28em] text-accent">Stimme aus dem Projekt</p>
-            <figure className="mt-4 max-w-3xl border-l-2 border-accent pl-6">
-              <blockquote className="text-lg leading-relaxed text-foreground/90 sm:text-xl">
-                „{project.testimonial.quote}"
-              </blockquote>
-              <figcaption className="mt-5 text-xs uppercase tracking-[0.25em] text-muted-foreground">
-                {project.testimonial.author} · {project.testimonial.source}
-              </figcaption>
-            </figure>
           </div>
         )}
 

@@ -30,7 +30,7 @@ export type Project = {
   detail?: boolean;
   /** Echte Vorher-/Nachher-Bildpaare für den Slider. Nur setzen, wenn beide Bilder aus demselben Blickwinkel entstanden sind. */
   beforeAfter?: { before: string; after: string; alt: string }[];
-  testimonial?: { quote: string; author: string; source: string };
+  testimonial?: { quote: string; author: string; source: string; shortQuote?: string };
 };
 
 
@@ -473,6 +473,8 @@ export const projects: Project[] = [
     testimonial: {
       quote:
         "Was ursprünglich nur mit der Bodenverlegung und der Küchenmontage begann, entwickelte sich zu einer vollständigen Organisation unseres Umzugs. Herr Brosch kümmerte sich um einen Umzugspartner, einen Elektriker und einen Maler und koordinierte alle beteiligten Gewerke – und das alles innerhalb von nur drei Wochen. Aus einer Situation, die zunächst wie eine Vollkatastrophe aussah, wurde einer der entspanntesten Umzüge, die wir je erlebt haben.",
+      shortQuote:
+        "Was ursprünglich nur mit der Bodenverlegung und der Küchenmontage begann, entwickelte sich zu einer vollständigen Organisation unseres Umzugs. Aus einer Situation, die zunächst wie eine Vollkatastrophe aussah, wurde einer der entspanntesten Umzüge, die wir je erlebt haben.",
       author: "Familie Kolb",
       source: "5 Sterne · Google-Bewertung, Juli 2026",
     },
