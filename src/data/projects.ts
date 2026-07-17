@@ -54,6 +54,12 @@ export const projects: Project[] = [
     coverAlt: "Vinylboden in Holzoptik im Wohnzimmer in Coldewei, Wilhelmshaven",
     featured: true,
     detail: true,
+    beforeAfter: {
+      before: "/projects/coldewei-01-vorher-flur.webp",
+      after: "/projects/coldewei-03-vinyl-flur.webp",
+      alt: "Flur in Coldewei, Wilhelmshaven – Vorher mit altem Belag, Nachher mit Vinyl in Holzoptik",
+    },
+    detail: true,
     media: [
       {
         type: "image",
