@@ -116,10 +116,10 @@ function Page() {
       <Section eyebrow="Kurzfassung" title="Bodenverlegung in Wilhelmshaven">
         <div className="grid gap-6 lg:grid-cols-2">
           <QuickAnswer>
-            Verlegt &amp; Verschraubt übernimmt Bodenverlegung in Wilhelmshaven
-            und Umgebung. Dazu gehören Vinyl, Laminat, PVC, Teppich,
-            Untergrundprüfung, Zuschnitt, Verlegung und auf Wunsch
-            Sockelleisten.
+            Verlegt &amp; Verschraubt ist Ihr Bodenleger für Wilhelmshaven und
+            Umgebung und übernimmt die Bodenverlegung. Dazu gehören Vinyl,
+            Laminat, PVC, Teppich, Untergrundprüfung, Zuschnitt, Verlegung und
+            auf Wunsch Sockelleisten.
           </QuickAnswer>
           <FactBox />
         </div>
