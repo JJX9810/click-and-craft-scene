@@ -89,18 +89,18 @@ function Page() {
     <>
       <PageHero
         eyebrow="Leistung"
-        title="Küchenmontage in Wilhelmshaven & Umgebung"
-        intro="Aufbau nach Umzug, Restmontage, neue Module, Arbeitsplatten und Anschluss von Spüle und Armatur. Saubere Ausführung mit ordentlichen Übergängen und einer dokumentierten Übergabe."
+        title="Ihr Küchenmonteur in Wilhelmshaven – Küchenmontage & Aufbau nach Umzug"
+        intro="Als Küchenmonteur aus Wilhelmshaven übernehmen wir Aufbau nach Umzug, Restmontage, neue Module, Arbeitsplatten sowie den Anschluss von Spüle und Armatur. Saubere Ausführung mit ordentlichen Übergängen und einer dokumentierten Übergabe."
         breadcrumbs={[{ label: "Leistungen" }, { label: "Küchenmontage" }]}
       />
 
       <Section eyebrow="Kurzfassung" title="Küchenmontage in Wilhelmshaven">
         <div className="grid gap-6 lg:grid-cols-2">
           <QuickAnswer>
-            Verlegt &amp; Verschraubt übernimmt Küchenmontage in Wilhelmshaven
-            und Umgebung. Dazu gehören Aufbau nach Umzug, Restmontage,
-            Küchenmodule, Arbeitsplatten sowie Spüle und Armatur an vorhandenen
-            Anschlüssen.
+            Verlegt &amp; Verschraubt ist Ihr Küchenmonteur für Wilhelmshaven
+            und Umgebung und übernimmt die Küchenmontage. Dazu gehören Aufbau
+            nach Umzug, Restmontage, Küchenmodule, Arbeitsplatten sowie Spüle
+            und Armatur an vorhandenen Anschlüssen.
           </QuickAnswer>
           <FactBox />
         </div>
