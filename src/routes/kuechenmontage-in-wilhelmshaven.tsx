@@ -201,6 +201,25 @@ function Page() {
 
       <PreisrechnerCTA variant="kuechenmontage" />
 
+      <Section eyebrow="Region" title="Küchenmonteur für Wilhelmshaven und Umgebung" bordered>
+        <p className="max-w-3xl text-base leading-relaxed text-muted-foreground">
+          Verlegt &amp; Verschraubt arbeitet als Küchenmonteur in{" "}
+          <Link to="/handwerkerservice-wilhelmshaven" className="text-accent hover:underline">Wilhelmshaven</Link>,{" "}
+          <Link to="/handwerkerservice-schortens" className="text-accent hover:underline">Schortens</Link>,{" "}
+          <Link to="/handwerkerservice-sande" className="text-accent hover:underline">Sande</Link>,{" "}
+          <Link to="/handwerkerservice-jever" className="text-accent hover:underline">Jever</Link>,{" "}
+          <Link to="/handwerkerservice-varel" className="text-accent hover:underline">Varel</Link>,{" "}
+          <Link to="/handwerkerservice-wangerland" className="text-accent hover:underline">Wangerland</Link> und{" "}
+          <Link to="/handwerkerservice-wittmund" className="text-accent hover:underline">Wittmund</Link>. Wenn
+          Sie in der Region Ihre Küche aufbauen lassen möchten, übernehmen wir
+          den kompletten Küchenaufbau nach Umzug ebenso wie die Restmontage,
+          das Einpassen der Arbeitsplatte und den Anschluss von Spüle und
+          Armatur an vorhandene Eckventile. Elektro- und Sanitärarbeiten, die
+          außerhalb unseres zulässigen Rahmens liegen, laufen bei Bedarf über
+          geprüfte Fachbetriebe – wir stimmen uns dazu direkt mit Ihnen ab.
+        </p>
+      </Section>
+
       <Section eyebrow="Netzwerk" title="Ihr Projekt umfasst mehr als die Küche?" bordered>
         <p className="max-w-3xl text-base leading-relaxed text-muted-foreground">
           Über unser Partnernetzwerk koordinieren wir weitere Gewerke – vom
