@@ -81,6 +81,13 @@ for (const p of paths) {
     const attrs = htmlAttrs.includes('lang=') ? htmlAttrs : `lang="de" ${htmlAttrs}`;
     out = out.replace('<html lang="de">', `<html ${attrs}>`);
   }
+  // Explizites robots-Meta für alle Seiten, die keins setzen (Impressum/Datenschutz behalten ihr noindex)
+  if (!out.includes('name="robots"')) {
+    out = out.replace(
+      "</head>",
+      '<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"/></head>',
+    );
+  }
 
   const targetDir = p === "/" ? distDir : path.join(distDir, p);
   fs.mkdirSync(targetDir, { recursive: true });
