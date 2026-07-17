@@ -17,6 +17,7 @@ type Filter =
 
 const filters: Filter[] = [
   "Alle",
+  "Komplettprojekt",
   "Bodenverlegung",
   "Küchenmontage",
   "Küchenfolierung",
@@ -28,13 +29,16 @@ const filters: Filter[] = [
   "Coldewei",
 ];
 
+
 const categorySet: ProjectCategory[] = [
+  "Komplettprojekt",
   "Bodenverlegung",
   "Küchenmontage",
   "Küchenfolierung",
   "Treppenbelag",
   "Detailarbeiten",
 ];
+
 
 export const Route = createFileRoute("/showroom/")({
   component: ShowroomPage,
