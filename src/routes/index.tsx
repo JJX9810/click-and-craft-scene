@@ -368,8 +368,19 @@ function Index() {
               <Link to="/showroom">Zum gesamten Showroom <ArrowRight className="ml-1 h-4 w-4" /></Link>
             </Button>
           </div>
+          <div className="mx-auto mt-12 max-w-4xl">
+            <BeforeAfterSlider
+              before="/projects/coldewei-01-vorher-flur.webp"
+              after="/projects/coldewei-03-vinyl-flur.webp"
+              alt="Bodenverlegung in Coldewei, Wilhelmshaven – Vorher mit altem Belag, Nachher mit Vinyl in Holzoptik"
+              aspect="3/2"
+            />
+            <p className="mt-3 text-center text-sm text-muted-foreground">
+              Ziehen Sie den Regler – echtes Projekt aus Coldewei, Wilhelmshaven.
+            </p>
+          </div>
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {featuredProjects.slice(0, 3).map((p, i) => (
+            {featuredProjects.slice(0, 3).map((p) => (
               <ProjectCard key={p.slug} project={p} eager={false} />
             ))}
           </div>
