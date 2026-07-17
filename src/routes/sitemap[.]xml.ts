@@ -3,12 +3,6 @@ import type {} from "@tanstack/react-start";
 import { projects } from "@/data/projects";
 
 const BASE_URL = "https://verlegt-verschraubt.de";
-// lastmod wird pro Request auf das heutige Datum gesetzt. Da die Sitemap
-// bei jedem Request dynamisch aus dem aktuellen Code erzeugt wird, ist das
-// heutige Datum ein robuster Proxy für „zuletzt (potenziell) geändert“ –
-// wir müssen so kein Datum pro Release manuell pflegen und riskieren keine
-// veralteten Werte wie beim vorherigen hartcodierten LAST_MOD.
-const LAST_MOD = new Date().toISOString().slice(0, 10);
 
 interface SitemapEntry {
   path: string;
