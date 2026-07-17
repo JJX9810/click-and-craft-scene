@@ -374,6 +374,18 @@ function Page() {
         </div>
       </section>
 
+      {/* GOOGLE-BEWERTUNG ZITAT */}
+      <Section eyebrow="Aus einer echten Google-Bewertung" bordered>
+        <figure className="max-w-3xl border-l-2 border-accent pl-6">
+          <blockquote className="text-lg leading-relaxed text-foreground/90 sm:text-xl">
+            „Während Herr Brosch bei uns den Boden verlegte, sagte plötzlich unser Umzugsunternehmen ab. Er vermittelte uns einen passenden Partner aus seinem Netzwerk. Was mit Bodenverlegung und Küchenmontage begann, entwickelte sich zu einer vollständigen Organisation unseres Umzugs – koordiniert innerhalb von nur drei Wochen. Aus einer Situation, die zunächst wie eine Vollkatastrophe aussah, wurde einer der entspanntesten Umzüge, die wir je erlebt haben."
+          </blockquote>
+          <figcaption className="mt-5 text-xs uppercase tracking-[0.25em] text-muted-foreground">
+            Familie Kolb · 5 Sterne · Google-Bewertung, Juli 2026
+          </figcaption>
+        </figure>
+      </Section>
+
       {/* ZWEI SPALTEN */}
       <Section eyebrow="Rollenverteilung" title="Klare Rollen. Klare Verantwortung.">
         <div className="grid gap-6 lg:grid-cols-2">
