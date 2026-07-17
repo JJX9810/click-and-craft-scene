@@ -167,11 +167,11 @@ function Page() {
       </Section>
 
       <Section eyebrow="Ablauf" title="So arbeiten wir">
-        <ol className="grid gap-6 md:grid-cols-4">
+        <ol className="grid gap-x-10 md:grid-cols-2">
           {["Anfrage & Fotos", "Einschätzung & Termin", "Vorbereitung & Verlegung", "Abschluss & Übergabe"].map((t, i) => (
-            <li key={t} className="rounded-2xl border border-border/70 bg-card/40 p-6">
-              <p className="text-[11px] uppercase tracking-[0.25em] text-muted-foreground">Schritt {i + 1}</p>
-              <h3 className="mt-1 text-base font-semibold">{t}</h3>
+            <li key={t} className="border-t border-border/60 py-6">
+              <p className="font-display text-sm font-semibold text-accent tabular-nums">Schritt {String(i + 1).padStart(2, "0")}</p>
+              <h3 className="mt-2 font-display text-lg font-semibold tracking-tight">{t}</h3>
             </li>
           ))}
         </ol>
