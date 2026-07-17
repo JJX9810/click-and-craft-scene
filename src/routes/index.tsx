@@ -76,9 +76,7 @@ export const Route = createFileRoute("/")({
       {
         rel: "preload",
         as: "image",
-        href: "/hero-flooring.webp",
-        imagesrcset: "/hero-flooring-mobile.webp 800w, /hero-flooring.webp 1600w",
-        imagesizes: "(max-width: 768px) 100vw, 50vw",
+        href: "/projects/kueche-marmoroptik-schortens-01.webp",
         fetchpriority: "high",
       },
     ],
@@ -266,32 +264,43 @@ function Index() {
           </div>
 
           <div className="relative">
-            <div className="relative aspect-[16/11] w-full overflow-hidden rounded-3xl border border-border/60 shadow-2xl">
-              <picture>
-                <source
-                  type="image/webp"
-                  srcSet="/hero-flooring-mobile.webp 800w, /hero-flooring.webp 1600w"
-                  sizes="(max-width: 768px) 100vw, 50vw"
-                />
+            <div className="relative h-[380px] sm:h-[460px] lg:h-[540px]">
+              <figure className="absolute left-0 top-0 h-[62%] w-[74%] -rotate-2 overflow-hidden rounded-2xl border border-border/70 bg-card shadow-2xl">
                 <img
-                  src="/hero-flooring.webp"
-                  alt="Bodenleger verlegt Laminatplanke in Holzoptik auf dunklem Holzboden"
-                  title="Bodenverlegung durch Verlegt & Verschraubt in Wilhelmshaven"
+                  src="/projects/kueche-marmoroptik-schortens-01.webp"
+                  alt="Montierte Küche mit weißen Hochglanzfronten und dunkler Marmoroptik in Schortens"
                   className="h-full w-full object-cover"
-                  width={1024}
-                  height={704}
+                  width={900}
+                  height={1280}
                   fetchPriority="high"
                   decoding="async"
                   loading="eager"
                 />
-              </picture>
+                <figcaption className="absolute bottom-3 left-3 rounded-full border border-border/70 bg-background/75 px-3 py-1.5 text-[10px] uppercase tracking-[0.14em] text-foreground backdrop-blur">
+                  Küche · Schortens
+                </figcaption>
+              </figure>
+              <figure className="absolute bottom-0 right-0 z-[2] h-[50%] w-[60%] rotate-[1.5deg] overflow-hidden rounded-2xl border border-border/70 bg-card shadow-2xl">
+                <img
+                  src="/projects/coldewei-06-vinyl-wohnzimmer.webp"
+                  alt="Vinylboden in Holzoptik im Wohnzimmer in Coldewei, Wilhelmshaven"
+                  className="h-full w-full object-cover"
+                  width={1200}
+                  height={800}
+                  decoding="async"
+                  loading="eager"
+                />
+                <figcaption className="absolute bottom-3 left-3 rounded-full border border-border/70 bg-background/75 px-3 py-1.5 text-[10px] uppercase tracking-[0.14em] text-foreground backdrop-blur">
+                  Vinylboden · Coldewei
+                </figcaption>
+              </figure>
               <div
-                className="pointer-events-none absolute inset-0"
-                style={{
-                  background:
-                    "linear-gradient(180deg, transparent 55%, oklch(0.14 0.012 60 / 0.55) 100%), linear-gradient(90deg, oklch(0.16 0.012 60 / 0.45) 0%, transparent 40%)",
-                }}
-              />
+                aria-hidden
+                className="absolute right-[6%] top-[2%] z-[3] flex h-24 w-24 rotate-[8deg] items-center justify-center rounded-full text-center font-display text-xs font-bold leading-tight text-[#241a0e] shadow-2xl"
+                style={{ background: "radial-gradient(circle at 30% 30%, oklch(0.82 0.11 80), oklch(0.62 0.11 75))" }}
+              >
+                5,0 ★<br />Google
+              </div>
             </div>
           </div>
         </div>
