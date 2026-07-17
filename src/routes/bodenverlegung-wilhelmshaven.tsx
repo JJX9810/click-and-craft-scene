@@ -100,7 +100,7 @@ const faqs = [
   { q: "Wie wird der Untergrund geprüft?", a: "Wir prüfen Ebenheit, Restfeuchte und Tragfähigkeit. Bei Bedarf gleichen wir Unebenheiten aus oder empfehlen die passende Vorbereitung." },
   { q: "Müssen die Räume leer sein?", a: "Idealerweise ja. Auf Wunsch übernehmen wir Möbelumstellung im überschaubaren Rahmen oder organisieren das gemeinsam." },
   { q: "Entfernt ihr den Altbelag?", a: "Ja. Altbelag entfernen, entsorgen und Untergrund vorbereiten gehört zum Leistungsumfang." },
-  { q: "Was kostet Bodenverlegung in Wilhelmshaven?", a: "Der Preis hängt von Bodenart, m², Vorbereitung und Zubehör ab. Im Preisrechner bekommen Sie eine erste Orientierung." },
+  { q: "Was kostet ein Bodenleger in Wilhelmshaven?", a: `Der Preis hängt von Bodenart, m², Vorbereitung und Zubehör ab. Zur Orientierung: Laminat schwimmend ab ${priceOf("laminat_schwimmend")} €/m², Vinyl schwimmend ab ${priceOf("vinyl_schwimmend")} €/m², PVC schwimmend ab ${priceOf("pvc_schwimmend")} €/m² (Arbeitslohn). Verbindlich wird der Preis erst nach Prüfung von Fotos und Maßen – eine erste Einschätzung liefert der Preisrechner.` },
 ];
 
 function Page() {
