@@ -8,7 +8,7 @@ Dieser Ordner ist ein **eigenständiger statischer Build** der Website für IONO
 - Ein Vite-Alias mappt `@tanstack/react-router` auf einen kleinen Shim (`src/tanstack-shim.tsx`), der intern `react-router-dom` + `react-helmet-async` nutzt – so kompilieren die existierenden Route-Dateien unverändert.
 - Beim Build wird **jede wichtige Route zu einer eigenen `index.html` prerendert**, inklusive Title, Description, Open-Graph-Tags, Canonical, JSON-LD und sichtbarem HTML-Inhalt.
 - Das Kontaktformular läuft ohne Backend: **mailto:**, **WhatsApp** und **tel:**-Buttons. CTAs: Anrufen / WhatsApp / E-Mail / Projekt mit Bildern und Maßen.
-- Die kanonische Hauptdomain ist **`https://verlegt-verschraubt.de`**. Non-www → 301 auf www, HTTP → HTTPS, beides via `.htaccess`.
+- Die kanonische Hauptdomain ist **`https://verlegt-verschraubt.de`** (OHNE www). www → 301 auf non-www, HTTP → HTTPS, beides via `.htaccess`.
 
 ## Build erzeugen
 
