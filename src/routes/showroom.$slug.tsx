@@ -189,6 +189,20 @@ function ProjectDetail() {
           </div>
         )}
 
+        {project.testimonial && (
+          <div className="mt-14">
+            <p className="text-xs uppercase tracking-[0.28em] text-accent">Stimme aus dem Projekt</p>
+            <figure className="mt-4 max-w-3xl border-l-2 border-accent pl-6">
+              <blockquote className="text-lg leading-relaxed text-foreground/90 sm:text-xl">
+                „{project.testimonial.quote}"
+              </blockquote>
+              <figcaption className="mt-5 text-xs uppercase tracking-[0.25em] text-muted-foreground">
+                {project.testimonial.author} · {project.testimonial.source}
+              </figcaption>
+            </figure>
+          </div>
+        )}
+
         {project.media[0] && (
           <div className="mt-12">
             <MediaItem m={project.media[0]} eager />
@@ -201,6 +215,7 @@ function ProjectDetail() {
             ))}
           </div>
         )}
+
       </Section>
 
       {related.length > 0 && (
