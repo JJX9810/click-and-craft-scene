@@ -25,6 +25,7 @@ import {
   Star,
 } from "lucide-react";
 import { ProjectCard } from "@/components/site/ProjectCard";
+import { BeforeAfterSlider } from "@/components/site/BeforeAfterSlider";
 import { featuredProjects } from "@/data/projects";
 import { EinsatzgebietMap } from "@/components/site/EinsatzgebietMap";
 import { Kostenrechner } from "@/components/site/Kostenrechner";
