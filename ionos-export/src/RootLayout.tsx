@@ -1,6 +1,9 @@
 import { Helmet } from "react-helmet-async";
+import { useLocation } from "react-router-dom";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
+import { MobileContactBar } from "@/components/site/MobileContactBar";
+import { ChatWidget } from "@/components/site/ChatWidget";
 import { RouteRenderer } from "./RouteRenderer";
 
 const PROFILE_URLS = [
@@ -43,6 +46,8 @@ const ORG_JSONLD = {
  * die TanStack-Shell (HeadContent/Scripts/html-Wrapping) wird hier nicht gebraucht.
  */
 export function RootLayout() {
+  const { pathname } = useLocation();
+  const hideMobileBar = pathname.startsWith("/impressum") || pathname.startsWith("/datenschutz");
   return (
     <>
       <Helmet>
@@ -63,6 +68,9 @@ export function RootLayout() {
           <RouteRenderer />
         </main>
         <Footer />
+        {!hideMobileBar && <div aria-hidden className="h-20 md:hidden" />}
+        {!hideMobileBar && <MobileContactBar />}
+        {!hideMobileBar && <ChatWidget />}
       </div>
     </>
   );
