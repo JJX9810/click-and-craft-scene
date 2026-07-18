@@ -45,12 +45,12 @@ export function Header() {
       <div className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-6 xl:gap-8">
         <Link to="/" className="flex shrink-0 items-center gap-3 max-w-[280px]">
           <img
-            src="/logo-medaillon.webp"
+            src="/logo-plakette2.webp"
             alt="Firmenlogo von Verlegt & Verschraubt Handwerkerservice"
             title="Verlegt & Verschraubt Handwerkerservice"
             className="h-10 w-auto shrink-0 rounded-md border border-accent/25"
-            width={1200}
-            height={654}
+            width={1060}
+            height={675}
             decoding="async"
           />
           <span className="hidden flex-col leading-tight md:flex">

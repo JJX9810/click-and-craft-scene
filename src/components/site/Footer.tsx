@@ -10,11 +10,11 @@ export function Footer() {
           <div>
             <div className="flex items-center gap-3">
               <img
-                src="/logo-medaillon.webp"
+                src="/logo-badge-rund.webp"
                 alt="Firmenlogo von Verlegt & Verschraubt Handwerkerservice"
-                className="h-14 w-auto rounded-lg"
-                width={1200}
-                height={654}
+                className="h-14 w-14 rounded-full"
+                width={512}
+                height={512}
                 loading="lazy"
                 decoding="async"
               />
