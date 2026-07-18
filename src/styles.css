@@ -241,3 +241,14 @@
     border-radius: 6px;
   }
 }
+
+/* Mobile-Härtung */
+html, body {
+  overflow-x: clip;
+}
+@media (max-width: 640px) {
+  h1, h2, h3 {
+    overflow-wrap: break-word;
+    hyphens: auto;
+  }
+}

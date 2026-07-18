@@ -950,7 +950,7 @@ export function Kostenrechner() {
   );
 }
 
-const input = "w-full rounded-md border border-border bg-background px-3 py-2.5 text-sm focus:border-accent focus:outline-none";
+const input = "w-full rounded-md border border-border bg-background px-3 py-2.5 text-base focus:border-accent focus:outline-none";
 
 function Stepper({ step, hasService }: { step: 1 | 2 | 3; hasService: boolean }) {
   const items = [
