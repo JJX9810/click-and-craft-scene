@@ -128,6 +128,19 @@ export function ChatWidget() {
                 >
                   {m.text}
                 </div>
+                {i === 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {ANSWERS.map((x) => (
+                      <button
+                        key={x.key}
+                        onClick={() => ask(x.q, x.a)}
+                        className="min-h-[38px] rounded-full border border-accent/40 bg-accent/10 px-3.5 py-1.5 text-[13px] text-accent transition hover:bg-accent/20"
+                      >
+                        {x.q}
+                      </button>
+                    ))}
+                  </div>
+                )}
                 {m.wa && (
                   <a
                     href={m.wa}
@@ -141,19 +154,6 @@ export function ChatWidget() {
                 )}
               </div>
             ))}
-            {started && (
-              <div className="flex flex-wrap gap-2">
-                {ANSWERS.map((x) => (
-                  <button
-                    key={x.key}
-                    onClick={() => ask(x.q, x.a)}
-                    className="min-h-[38px] rounded-full border border-accent/40 bg-accent/10 px-3.5 py-1.5 text-[13px] text-accent transition hover:bg-accent/20"
-                  >
-                    {x.q}
-                  </button>
-                ))}
-              </div>
-            )}
           </div>
 
           <div className="flex gap-2 border-t border-border bg-secondary/60 p-3">
