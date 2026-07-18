@@ -22,7 +22,7 @@ const ORG_JSONLD = {
   "@type": "LocalBusiness",
   name: "Verlegt & Verschraubt Handwerkerservice",
   description:
-    "Bodenverlegung, Küchenmontage, Entrümpelung und kleine Reparaturen in Wilhelmshaven & Umgebung.",
+    "Bodenverlegung (Laminat, Vinyl, PVC, Teppich), Küchenmontage und Entrümpelung in Wilhelmshaven und Umgebung – vom einzelnen Raum bis zum koordinierten Komplettprojekt mit geprüften Partnerbetrieben. Ein Ansprechpartner statt zehn Handwerker.",
   url: "https://verlegt-verschraubt.de/",
   image: "https://verlegt-verschraubt.de/logo.png",
   logo: "https://verlegt-verschraubt.de/logo.png",
