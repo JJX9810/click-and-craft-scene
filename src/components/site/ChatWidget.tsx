@@ -38,6 +38,11 @@ const ANSWERS: { key: string; q: string; a: string }[] = [
     a: "Ganz unkompliziert:\n1. Sie schicken Fotos + grobe Maße per WhatsApp\n2. Sie erhalten eine ehrliche Einschätzung\n3. Termin – bei Bedarf mit Aufmaß vor Ort\n4. Saubere Ausführung und Übergabe\n\nEin Ansprechpartner von Anfang bis Ende.",
   },
   {
+    key: "besichtigung",
+    q: "Was kostet die Besichtigung?",
+    a: "Die Vor-Ort-Besichtigung kostet pauschal 39 €. Bei Auftragserteilung wird die Pauschale vollständig verrechnet – wer beauftragt, zahlt dafür im Ergebnis nichts. Danach bekommen Sie ein verbindliches Angebot statt einer Schätzung.",
+  },
+  {
     key: "netzwerk",
     q: "Macht ihr auch andere Gewerke?",
     a: "Selbst übernehmen wir Boden, Küche, Küchenfolierung und Entrümpelung. Für Gewerke wie Elektrik, Sanitär oder Malerarbeiten vermitteln und koordinieren wir geprüfte Partnerbetriebe – Sie behalten einen Ansprechpartner: uns.",

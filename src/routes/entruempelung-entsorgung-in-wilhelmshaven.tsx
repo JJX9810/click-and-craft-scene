@@ -42,7 +42,7 @@ export const Route = createFileRoute("/entruempelung-entsorgung-in-wilhelmshaven
           url: EN_URL,
           id: SERVICE_IDS.entruempelung,
           name: "Entrümpelung & Haushaltsauflösung",
-          description: "Wohnungs-, Keller- und Dachbodenentrümpelung, Möbel- und Sperrmüllentsorgung sowie komplette Haushaltsauflösung und Räumung vor Renovierung in Wilhelmshaven und Umgebung. Preis nach Besichtigung.",
+          description: "Wohnungs-, Keller- und Dachbodenentrümpelung, Möbel- und Sperrmüllentsorgung sowie komplette Haushaltsauflösung und Räumung vor Renovierung in Wilhelmshaven und Umgebung. Verbindliches Angebot nach Vor-Ort-Besichtigung (39 € Pauschale, bei Auftrag verrechnet).",
           serviceType: ["Entrümpelung und Entsorgung", "Haushaltsauflösung", "Wohnungsauflösung"],
           areaServed: [
             "Wilhelmshaven", "Schortens", "Sande", "Jever", "Varel", "Wangerland", "Wittmund", "Friesland",
@@ -92,8 +92,9 @@ function Page() {
             und Entsorgung in Wilhelmshaven, Schortens, Sande, Jever, Varel,
             Wangerland und Wittmund. Wohnungen, Häuser, Keller und Dachböden
             werden planbar, diskret und auf Wunsch besenrein geräumt – inklusive
-            fachgerechter Entsorgung. Anfrage per WhatsApp mit Fotos, Angebot
-            nach Besichtigung vor Ort.
+            fachgerechter Entsorgung. Anfrage per WhatsApp mit Fotos –
+            verbindliches Angebot nach Besichtigung vor Ort (39 € Pauschale,
+            wird bei Auftragserteilung vollständig verrechnet).
           </QuickAnswer>
           <FactBox />
         </div>
