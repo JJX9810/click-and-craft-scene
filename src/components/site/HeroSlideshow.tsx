@@ -99,14 +99,14 @@ export function HeroSlideshow() {
       <div className="relative z-[2] flex max-w-4xl flex-col items-center gap-5 px-6 pb-16 pt-10 text-center">
         <div className="flex flex-col items-center gap-4">
           <img
-            src="/logo-emblem-rund.webp"
+            src="/logo-badge-rund.webp"
             alt=""
             aria-hidden
             width={512}
             height={512}
             fetchPriority="high"
             decoding="async"
-            className="h-24 w-24 rounded-full border border-accent/40 shadow-[0_12px_36px_rgba(0,0,0,0.55)] sm:h-28 sm:w-28"
+            className="h-28 w-28 rounded-full shadow-[0_12px_36px_rgba(0,0,0,0.55)] sm:h-32 sm:w-32"
           />
           <div className="font-display text-xl font-semibold uppercase tracking-[0.32em] [text-indent:0.32em] text-foreground [text-shadow:0_2px_18px_rgba(0,0,0,0.5)] sm:text-3xl">
             Verlegt &amp; Verschraubt
