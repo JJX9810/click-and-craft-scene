@@ -400,3 +400,15 @@ html, body {
 @media (prefers-reduced-motion: reduce) {
   .krv2-in, .krv2-opt, .krv2-sel { animation: none; transition: none; transform: none; }
 }
+
+.krv2-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+}
+.krv2-grid-sm { grid-template-columns: repeat(auto-fill, minmax(126px, 1fr)); }
+.krv2-opt { min-width: 0; }
+.krv2-opt b, .krv2-opt small {
+  overflow-wrap: break-word;
+  hyphens: auto;
+}

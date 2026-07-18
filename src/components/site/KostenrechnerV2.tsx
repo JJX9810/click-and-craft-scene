@@ -422,7 +422,7 @@ export function KostenrechnerV2() {
             <div className="krv2-in">
               <Snum>01 · Leistung</Snum>
               <StepTitle t="Womit dürfen wir helfen?" hint="Wählen Sie eine Karte – alle weiteren Fragen passen sich an." />
-              <div className="grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-3">
+              <div className="krv2-grid">
                 <OptCard sel={st.svc === "boden"} onClick={() => pickService("boden")} title="Bodenverlegung" desc="Laminat, Vinyl, PVC, Teppich" icon={Icons.boden} />
                 <OptCard sel={st.svc === "kueche"} onClick={() => pickService("kueche")} title="Küchenmontage" desc="Aufbau, Umbau, Demontage" icon={Icons.kueche} />
                 <OptCard sel={st.svc === "ent"} onClick={() => pickService("ent")} title="Entrümpelung" desc="Wohnung, Keller, Dachboden" icon={Icons.ent} />
@@ -441,7 +441,7 @@ export function KostenrechnerV2() {
             <div className="krv2-in">
               <Snum>02 · Details</Snum>
               <StepTitle t="Ihr neuer Boden" hint="Belag wählen, Fläche angeben – wir kalkulieren im Hintergrund mit unserer internen Preisbasis." />
-              <div className="grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-3">
+              <div className="krv2-grid">
                 {BODEN_VARIANTEN.map((b) => (
                   <OptCard key={b.key} sel={st.belag === b.key} onClick={() => pickBelag(b.key)} title={BELAG_LABELS[b.key] ?? b.label} desc={BELAG_DESC[b.key]} />
                 ))}
@@ -537,7 +537,7 @@ export function KostenrechnerV2() {
             <div className="krv2-in">
               <Snum>02 · Details</Snum>
               <StepTitle t="Ihre Entrümpelung" hint="Für ein seriöses Angebot schauen wir vor Ort – dafür ist es danach verbindlich, kein Schätzwert." />
-              <div className="grid grid-cols-[repeat(auto-fill,minmax(130px,1fr))] gap-3">
+              <div className="krv2-grid krv2-grid-sm">
                 {["Wohnung", "Haus", "Keller", "Dachboden", "Garage"].map((o) => (
                   <OptCard key={o} sel={st.ent === o} onClick={() => up({ ent: o })} title={o} />
                 ))}
