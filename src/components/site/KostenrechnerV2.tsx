@@ -329,12 +329,18 @@ export function KostenrechnerV2() {
     if (typeof window === "undefined") return;
     const p = new URLSearchParams(window.location.search).get("leistung");
     const map: Record<string, Service> = {
-      boden: "boden",
       bodenverlegung: "boden",
-      kueche: "kueche",
+      boden: "boden",
+      laminat: "boden",
+      vinyl: "boden",
+      pvc: "boden",
+      teppichboden: "boden",
+      teppich: "boden",
       kuechenmontage: "kueche",
+      kueche: "kueche",
       entruempelung: "ent",
-      ent: "ent",
+      entsorgung: "ent",
+      handwerkerservice: "sonst",
       sonstiges: "sonst",
     };
     const svc = p ? map[p] : undefined;
