@@ -98,9 +98,10 @@ function Page() {
         <div className="grid gap-6 lg:grid-cols-2">
           <QuickAnswer>
             Verlegt &amp; Verschraubt ist Ihr Küchenmonteur für Wilhelmshaven
-            und Umgebung und übernimmt die Küchenmontage. Dazu gehören Aufbau
-            nach Umzug, Restmontage, Küchenmodule, Arbeitsplatten sowie Spüle
-            und Armatur an vorhandenen Anschlüssen.
+            und Umgebung: Küchenmontage für 189 €/lfm Arbeitslohn. Dazu gehören
+            Aufbau nach Umzug, Restmontage, Küchenmodule, Arbeitsplatten sowie
+            Spüle und Armatur an vorhandenen Anschlüssen. Anfrage per WhatsApp
+            mit Fotos – Einschätzung meist am selben Werktag.
           </QuickAnswer>
           <FactBox />
         </div>

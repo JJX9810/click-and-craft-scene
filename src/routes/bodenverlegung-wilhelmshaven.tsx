@@ -117,9 +117,11 @@ function Page() {
         <div className="grid gap-6 lg:grid-cols-2">
           <QuickAnswer>
             Verlegt &amp; Verschraubt ist Ihr Bodenleger für Wilhelmshaven und
-            Umgebung und übernimmt die Bodenverlegung. Dazu gehören Vinyl,
-            Laminat, PVC, Teppich, Untergrundprüfung, Zuschnitt, Verlegung und
-            auf Wunsch Sockelleisten.
+            Umgebung: Laminat verlegen wir für 16 €/m², Vinyl ab 18 €/m²,
+            Teppich ab 10 €/m² (jeweils Arbeitslohn). Dazu gehören
+            Untergrundprüfung, Zuschnitt, Verlegung und auf Wunsch
+            Sockelleisten. Anfrage per WhatsApp mit Fotos – Einschätzung meist
+            am selben Werktag.
           </QuickAnswer>
           <FactBox />
         </div>

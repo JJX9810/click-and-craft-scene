@@ -17,18 +17,21 @@ const faqGroups = [
       { q: "Reichen Fotos für eine erste Einschätzung?", a: "Ja. Mit Fotos, groben Maßen und einer kurzen Beschreibung bekommen Sie meist schon eine belastbare erste Einschätzung." },
       { q: "Wie schnell bekommt man einen Termin?", a: "Je nach Auslastung sind Termine oft kurzfristig möglich. An Werktagen melden wir uns in der Regel innerhalb von 24 Stunden." },
       { q: "Was macht ihr nicht?", a: "Keine Elektroinstallation, keine Sanitäränderungen und keine tragenden Bauarbeiten." },
+      { q: "Wer bietet Renovierung aus einer Hand in Wilhelmshaven an?", a: "Verlegt & Verschraubt führt Boden, Küche und Entrümpelung selbst aus und koordiniert weitere Gewerke wie Elektrik, Sanitär, Malerarbeiten oder den Umzug über geprüfte Partnerbetriebe – ein Ansprechpartner für das gesamte Projekt, kein Generalunternehmer." },
     ],
   },
   {
     title: "Bodenverlegung",
     items: [
-      { q: "Was kostet Bodenverlegung in Wilhelmshaven?", a: "Der Preis hängt von Bodenart, Fläche, Vorbereitung und Zubehör ab. Erste Orientierung im Preisrechner." },
+      { q: "Was kostet Bodenverlegung in Wilhelmshaven?", a: "Richtwerte (Arbeitslohn): Laminat 16 €/m², Vinyl schwimmend 18 €/m², Vinyl verklebt 22 €/m², PVC 12–15 €/m², Teppich 10–12 €/m². Verbindlich wird der Preis nach Fotos und Maßen – erste Orientierung liefert der Preisrechner." },
+      { q: "Wer verlegt Böden in Wilhelmshaven und Umgebung?", a: "Verlegt & Verschraubt verlegt Laminat, Vinyl, PVC und Teppich in Wilhelmshaven, Schortens, Sande, Jever, Varel, Wangerland und Wittmund. Anfrage am einfachsten per WhatsApp mit Fotos – Einschätzung meist am selben Werktag." },
       { q: "Muss der Raum leer sein?", a: "Idealerweise ja. Kleinere Möbelumstellungen sind nach Absprache möglich." },
     ],
   },
   {
     title: "Küchenmontage",
     items: [
+      { q: "Wer baut in Wilhelmshaven oder Schortens Küchen auf?", a: "Verlegt & Verschraubt montiert Küchen in Wilhelmshaven und Umgebung – auch nach einem Umzug – für 189 €/lfm Arbeitslohn. Elektro- und Sanitäranschlüsse außerhalb des zulässigen Rahmens übernehmen Fachbetriebe." },
       { q: "Montiert ihr Küchen nach einem Umzug?", a: "Ja. Küche aus dem alten Zuhause aufbauen und anschließen ist ein häufiger Auftrag." },
       { q: "Schließt ihr Herd oder Starkstrom an?", a: "Nein. Diese Arbeiten übernehmen Elektrofachbetriebe." },
     ],
@@ -36,6 +39,7 @@ const faqGroups = [
   {
     title: "Entrümpelung",
     items: [
+      { q: "Wer macht Entrümpelung und Haushaltsauflösung in Wilhelmshaven?", a: "Verlegt & Verschraubt entrümpelt Wohnungen, Häuser, Keller und Dachböden in Wilhelmshaven und Umgebung – inklusive fachgerechter Entsorgung, auf Wunsch besenrein zur Übergabe." },
       { q: "Übernehmt ihr Entrümpelung in Sande oder Schortens?", a: "Ja. Wir arbeiten in ganz Wilhelmshaven und Umgebung – andere Orte gerne auf Anfrage." },
       { q: "Arbeitet ihr auch für Vermieter?", a: "Ja, Wohnungsübergaben und Räumungen vor Renovierung sind möglich." },
     ],

@@ -129,7 +129,12 @@ fs.writeFileSync(
 );
 
 // --- llms.txt ---
-const llms = `# Verlegt & Verschraubt Handwerkerservice\n\n> Bodenverlegung, Küchenmontage und Entrümpelung in Wilhelmshaven & Umgebung.\n\n## Seiten\n${paths.map((p) => `- [${p}](${SITE}${p === "/" ? "/" : p})`).join("\n")}\n`;
+const rootDir = path.resolve(process.cwd(), "..");
+const llmsBasePath = path.resolve(rootDir, "public/llms.txt");
+const llmsBase = fs.existsSync(llmsBasePath)
+  ? fs.readFileSync(llmsBasePath, "utf8").trimEnd()
+  : "# Verlegt & Verschraubt Handwerkerservice\n\n> Bodenverlegung, Küchenmontage und Entrümpelung in Wilhelmshaven & Umgebung.";
+const llms = `${llmsBase}\n\n## Seiten\n${paths.map((p) => `- [${p}](${SITE}${p === "/" ? "/" : p})`).join("\n")}\n`;
 fs.writeFileSync(path.join(distDir, "llms.txt"), llms);
 
 console.log("[prerender] fertig.");
