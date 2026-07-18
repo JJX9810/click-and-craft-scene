@@ -31,7 +31,6 @@ const SLIDES: Slide[] = [
   { src: "/projects/kueche-marmoroptik-schortens-01.webp", label: "Küche Marmoroptik · Schortens", review: R.kolbKurz },
   { src: "/projects/kueche-wilhelmshaven-01.webp", label: "Küche · Wilhelmshaven", review: R.pauline },
   { src: "/projects/kueche-schortens-modern-01.webp", label: "Einbauküche · Schortens" },
-  { src: "/projects/kuechenfolierung-hooksiel-poster.webp", label: "Küchenfolierung · Hooksiel" },
   { src: "/projects/coldewei-04-vinyl-flur-treppe.webp", label: "Flur & Treppe · Coldewei", review: R.euphoria },
   { src: "/projects/laminat-bremerhaven-03-nachher.webp", label: "Laminat · Bremerhaven", review: R.haysam },
   { src: "/projects/netzwerk-led-decke-malerarbeiten.webp", label: "LED-Decke · Partnerprojekt", review: R.kolbNetz },
