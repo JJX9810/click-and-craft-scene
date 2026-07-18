@@ -274,6 +274,22 @@ html, body {
   from { transform: scale(1.14) translateX(-1.5%); }
   to { transform: scale(1.02) translateX(1%); }
 }
+.hero-slide-blur {
+  position: absolute;
+  inset: 0;
+  background-position: center;
+  background-size: cover;
+  filter: blur(22px) brightness(0.45) saturate(0.9);
+  transform: scale(1.12);
+}
+.hero-slide-fit {
+  position: absolute;
+  inset: 4% 0;
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+  filter: drop-shadow(0 20px 50px rgba(0, 0, 0, 0.5));
+}
 .hero-scrim {
   position: absolute;
   inset: 0;

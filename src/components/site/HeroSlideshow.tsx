@@ -13,6 +13,8 @@ type Slide = {
   src: string;
   label: string;
   review?: { q: string; w: string };
+  /** Hochkant-Bilder: mittig in Originalproportion, dahinter weichgezeichnete Fläche */
+  portrait?: boolean;
 };
 
 const R = {
@@ -27,14 +29,13 @@ const R = {
 
 const SLIDES: Slide[] = [
   { src: "/projects/coldewei-06-vinyl-wohnzimmer.webp", label: "Vinyl-Wohnzimmer · Coldewei", review: R.euphoria },
-  { src: "/projects/coldewei-16-vinyl-wohnzimmer-kamin.webp", label: "Wohnzimmer mit Kamin · Coldewei", review: R.kraushaar },
-  { src: "/projects/kueche-marmoroptik-schortens-01.webp", label: "Küche Marmoroptik · Schortens", review: R.kolbKurz },
+  { src: "/projects/kueche-marmoroptik-schortens-01.webp", label: "Küche Marmoroptik · Schortens", review: R.kolbKurz, portrait: true },
   { src: "/projects/kueche-wilhelmshaven-01.webp", label: "Küche · Wilhelmshaven", review: R.pauline },
   { src: "/projects/kueche-schortens-modern-01.webp", label: "Einbauküche · Schortens" },
   { src: "/projects/laminat-wittmund-01.webp", label: "Laminat im Altbau · Wittmund", review: R.haysam },
-  { src: "/projects/coldewei-04-vinyl-flur-treppe.webp", label: "Flur & Treppe · Coldewei", review: R.euphoria },
+  { src: "/projects/coldewei-04-vinyl-flur-treppe.webp", label: "Flur & Treppe · Coldewei", review: R.kraushaar },
   { src: "/projects/laminat-bremerhaven-03-nachher.webp", label: "Laminat · Bremerhaven", review: R.haysam },
-  { src: "/projects/netzwerk-led-decke-malerarbeiten.webp", label: "LED-Decke · Partnerprojekt", review: R.kolbNetz },
+  { src: "/projects/netzwerk-led-decke-malerarbeiten.webp", label: "LED-Decke · Partnerprojekt", review: R.kolbNetz, portrait: true },
   { src: "/projects/teppichboden-schortens-02-nachher.webp", label: "Teppichboden · Schortens", review: R.kolbStart },
 ];
 
@@ -82,9 +83,16 @@ export function HeroSlideshow() {
         <div
           key={s.src}
           aria-hidden={n !== index}
-          className={`hero-slide ${n === index ? "on" : ""} ${animate ? "animate" : ""} ${n % 2 === 1 ? "alt" : ""}`}
-          style={{ backgroundImage: `url('${s.src}')` }}
-        />
+          className={`hero-slide ${n === index ? "on" : ""} ${animate && !s.portrait ? "animate" : ""} ${n % 2 === 1 ? "alt" : ""}`}
+          style={s.portrait ? undefined : { backgroundImage: `url('${s.src}')` }}
+        >
+          {s.portrait && (
+            <>
+              <div className="hero-slide-blur" style={{ backgroundImage: `url('${s.src}')` }} />
+              <div className="hero-slide-fit" style={{ backgroundImage: `url('${s.src}')` }} />
+            </>
+          )}
+        </div>
       ))}
       <div className="hero-scrim" aria-hidden />
 
