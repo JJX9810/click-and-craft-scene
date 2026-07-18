@@ -114,7 +114,7 @@ export function ChatWidget() {
           className="fixed right-4 z-50 flex w-[min(380px,calc(100vw-2rem))] flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-2xl bottom-40 max-h-[min(560px,calc(100svh-12rem))] md:bottom-24 md:right-5 md:max-h-[min(600px,calc(100svh-8rem))]"
         >
           <div className="flex items-center gap-3 border-b border-border bg-secondary/60 px-4 py-3">
-            <img src="/logo-badge-rund.webp" alt="" className="h-9 w-9 rounded-full" width={512} height={512} />
+            <img src="/logo-medaillon.webp" alt="" className="h-9 w-auto rounded-md" width={1200} height={654} />
             <div className="min-w-0">
               <p className="font-display text-sm font-semibold">Verlegt &amp; Verschraubt</p>
               <p className="truncate text-xs text-muted-foreground">Schnelle Antworten · direkter Draht zu Justus</p>
