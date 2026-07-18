@@ -121,7 +121,11 @@ function Page() {
             Teppich ab 10 €/m² (jeweils Arbeitslohn). Dazu gehören
             Untergrundprüfung, Zuschnitt, Verlegung und auf Wunsch
             Sockelleisten. Anfrage per WhatsApp mit Fotos – Einschätzung meist
-            am selben Werktag.
+            am selben Werktag. Unsicher beim Belag? Unser Ratgeber{" "}
+            <Link to="/vinyl-oder-laminat" className="font-medium text-accent hover:underline">
+              Vinyl oder Laminat?
+            </Link>{" "}
+            hilft bei der Entscheidung.
           </QuickAnswer>
           <FactBox />
         </div>

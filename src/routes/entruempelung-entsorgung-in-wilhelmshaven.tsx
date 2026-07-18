@@ -88,11 +88,12 @@ function Page() {
       <Section eyebrow="Kurzfassung" title="Entrümpelung in Wilhelmshaven">
         <div className="grid gap-6 lg:grid-cols-2">
           <QuickAnswer>
-            Verlegt &amp; Verschraubt übernimmt Entrümpelung und Entsorgung in
-            Wilhelmshaven und Umgebung. Wohnungen, Keller, Dachböden, Möbel und
-            Sperrmüll werden planbar, diskret und besenrein geräumt. Auch
-            komplette Haushaltsauflösungen und Wohnungsauflösungen übernehmen
-            wir – planbar und diskret.
+            Verlegt &amp; Verschraubt übernimmt Entrümpelung, Haushaltsauflösung
+            und Entsorgung in Wilhelmshaven, Schortens, Sande, Jever, Varel,
+            Wangerland und Wittmund. Wohnungen, Häuser, Keller und Dachböden
+            werden planbar, diskret und auf Wunsch besenrein geräumt – inklusive
+            fachgerechter Entsorgung. Anfrage per WhatsApp mit Fotos, Angebot
+            nach Besichtigung vor Ort.
           </QuickAnswer>
           <FactBox />
         </div>
