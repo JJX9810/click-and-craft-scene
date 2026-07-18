@@ -317,6 +317,27 @@ export const projects: Project[] = [
     ],
   },
   {
+    slug: "laminatverlegung-wittmund",
+    title: "Laminatverlegung im Altbau in Wittmund",
+    ort: "Wittmund",
+    category: "Bodenverlegung",
+    description:
+      "In einem Altbau in Wittmund wurde Laminat in warmer Eiche-Optik verlegt – durchgehend über zwei Räume, sauber an Türzargen und weißen Sockelleisten eingepasst. Das Bogenfenster und die hohen Decken zeigen, wie ein neuer Boden den Charakter eines Altbaus unterstreicht.",
+    cover: "/projects/laminat-wittmund-01.webp",
+    coverAlt: "Frisch verlegtes Laminat in Eiche-Optik in einem hellen Altbauzimmer mit Bogenfenster in Wittmund",
+    media: [
+      {
+        type: "image",
+        src: "/projects/laminat-wittmund-01.webp",
+        alt: "Frisch verlegtes Laminat in Eiche-Optik in einem hellen Altbauzimmer mit Bogenfenster in Wittmund",
+        caption: "Laminat in Eiche-Optik, durchgehend über zwei Räume verlegt – Altbau in Wittmund.",
+        longDescription:
+          "Blick durch die geöffneten Flügeltüren eines Altbaus in Wittmund: Das neu verlegte Laminat in Eiche-Optik läuft durchgehend über beide Räume und wurde exakt an Türzargen und Sockelleisten eingepasst. Helle Wände, hohe Decken und das Bogenfenster lassen den warmen Holzton besonders zur Geltung kommen.",
+        phase: "Nachher",
+      },
+    ],
+  },
+  {
     slug: "silikonfuge-wilhelmshaven",
     title: "Silikonfuge an Küchenarbeitsplatte in Wilhelmshaven",
     ort: "Wilhelmshaven",

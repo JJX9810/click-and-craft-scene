@@ -7,6 +7,12 @@ export const Route = createFileRoute("/handwerkerservice-wittmund")({
     <OrtsSeite
       ort="Wittmund"
       umgebung={["Jever", "Wangerland", "Wilhelmshaven", "Schortens"]}
+      projekt={{
+        src: "/projects/laminat-wittmund-01.webp",
+        alt: "Frisch verlegtes Laminat in Eiche-Optik in einem hellen Altbauzimmer mit Bogenfenster in Wittmund",
+        caption: "Laminat in Eiche-Optik, durchgehend über zwei Räume – Altbau in Wittmund.",
+        slug: "laminatverlegung-wittmund",
+      }}
     />
   ),
   head: () => ({

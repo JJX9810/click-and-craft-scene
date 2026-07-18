@@ -29,10 +29,17 @@ const ORT_EINLEITUNG: Record<string, string> = {
 export function OrtsSeite({
   ort,
   umgebung,
+  projekt,
   projectSlugs,
 }: {
   ort: string;
   umgebung: string[];
+  projekt?: {
+    src: string;
+    alt: string;
+    caption: string;
+    slug: string;
+  };
   projectSlugs?: string[];
 }) {
   const ortProjects: Project[] = projectSlugs
@@ -93,6 +100,31 @@ export function OrtsSeite({
           ))}
         </div>
       </Section>
+
+      {projekt && (
+        <Section eyebrow="Aus der Praxis" title={`Aktuelles Projekt aus ${ort}`} bordered>
+          <figure className="overflow-hidden rounded-2xl border border-border/70">
+            <img
+              src={projekt.src}
+              alt={projekt.alt}
+              className="h-auto w-full object-cover"
+              loading="lazy"
+              width={1200}
+              height={896}
+            />
+            <figcaption className="flex flex-wrap items-center justify-between gap-3 border-t border-border/60 bg-card/60 px-5 py-3 text-sm text-muted-foreground">
+              <span>{projekt.caption}</span>
+              <Link
+                to="/showroom/$slug"
+                params={{ slug: projekt.slug }}
+                className="shrink-0 font-medium text-accent hover:underline"
+              >
+                Zum Projekt →
+              </Link>
+            </figcaption>
+          </figure>
+        </Section>
+      )}
 
       <Section eyebrow="Ablauf" title={`So läuft eine Anfrage in ${ort}`}>
         <ol className="grid gap-x-10 md:grid-cols-2">
