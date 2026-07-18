@@ -13,6 +13,7 @@ import appCss from "../styles.css?url";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { MobileContactBar } from "@/components/site/MobileContactBar";
+import { ChatWidget } from "@/components/site/ChatWidget";
 import { Toaster } from "@/components/ui/sonner";
 import { AttributionTracker } from "@/components/AttributionTracker";
 import { AnalyticsTracker } from "@/components/AnalyticsTracker";
@@ -185,6 +186,7 @@ function RootComponent() {
         <Footer />
         {!hideMobileBar && <div aria-hidden className="h-20 md:hidden" />}
         {!hideMobileBar && <MobileContactBar />}
+        {!hideMobileBar && <ChatWidget />}
         <Toaster />
         <AttributionTracker />
         <AnalyticsTracker />

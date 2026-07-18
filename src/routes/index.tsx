@@ -31,6 +31,7 @@ import { EinsatzgebietMap } from "@/components/site/EinsatzgebietMap";
 import { Kostenrechner } from "@/components/site/Kostenrechner";
 import { OnlinePresenceSection } from "@/components/site/OnlinePresenceSection";
 import { SawdustParticles } from "@/components/site/SawdustParticles";
+import { HeroSlideshow } from "@/components/site/HeroSlideshow";
 import {
   HOME_WEBPAGE_ID,
   breadcrumbNode,
@@ -76,7 +77,7 @@ export const Route = createFileRoute("/")({
       {
         rel: "preload",
         as: "image",
-        href: "/projects/kueche-marmoroptik-schortens-01.webp",
+        href: "/projects/coldewei-06-vinyl-wohnzimmer.webp",
         fetchpriority: "high",
       },
     ],
@@ -177,134 +178,7 @@ function Index() {
   return (
     <>
       {/* HERO */}
-      <section id="top" className="relative overflow-hidden">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0"
-          style={{ background: "var(--gradient-hero)", opacity: 0.85 }}
-        />
-        <SawdustParticles density={28} />
-
-
-        <div className="relative mx-auto grid max-w-7xl grid-cols-1 items-center gap-12 px-6 pb-24 pt-12 lg:grid-cols-2 lg:gap-10 lg:pt-20">
-          <div className="relative z-10 max-w-xl">
-            <span className="inline-block rounded-full border border-accent/30 bg-accent/10 px-4 py-1.5 text-[11px] uppercase tracking-[0.28em] text-accent">
-              Z.O.Z. · Zuverlässig · Ordentlich · Zügig
-            </span>
-            <h1 className="mt-6 text-balance text-4xl font-semibold leading-[1.05] tracking-tight sm:text-5xl lg:text-[3.5rem]">
-              Bodenverlegung, Küchenmontage &amp; Entrümpelung in{" "}
-              <span className="text-accent">Wilhelmshaven</span> &amp; Umgebung
-            </h1>
-            <p className="mt-6 max-w-lg text-base leading-relaxed text-muted-foreground sm:text-lg">
-              Verlegt &amp; Verschraubt unterstützt Privatkunden bei sauberen
-              Innenarbeiten – zuverlässig, ordentlich und zügig. Auf Wunsch
-              koordinieren wir weitere Gewerke über geprüfte Partnerbetriebe.
-            </p>
-            <div className="mt-10 flex flex-wrap gap-3">
-              <Button
-                asChild
-                size="lg"
-                className="h-12 rounded-full bg-[#25D366] px-7 text-white shadow-lg shadow-[#25D366]/25 hover:bg-[#25D366]/90"
-              >
-                <a
-                  href="https://wa.me/491634799286?text=Hallo%2C%20ich%20habe%20ein%20Projekt%3A%20"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <MessageSquare className="mr-1 h-4 w-4" /> WhatsApp schreiben
-                </a>
-              </Button>
-              <Button
-                asChild
-                size="lg"
-                variant="outline"
-                className="h-12 rounded-full border-border bg-transparent px-7 hover:bg-card"
-              >
-                <a href="tel:+491634799286">
-                  <Phone className="mr-1 h-4 w-4" /> Direkt anrufen
-                </a>
-              </Button>
-              <Button
-                asChild
-                size="lg"
-                className="group h-12 rounded-full bg-accent px-7 text-accent-foreground shadow-lg shadow-accent/20 hover:bg-accent/90"
-              >
-                <Link to="/kontakt">
-                  Projekt anfragen
-                  <ArrowRight className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                </Link>
-              </Button>
-              <Button
-                asChild
-                size="lg"
-                variant="outline"
-                className="h-12 rounded-full border-border bg-transparent px-7 hover:bg-card"
-              >
-                <Link to="/preise">Kosten einschätzen</Link>
-              </Button>
-            </div>
-
-            <ul className="mt-10 flex flex-wrap gap-2 border-t border-border/70 pt-6">
-              {[
-                "Lokal aus Wilhelmshaven",
-                "Direkter Inhaber-Kontakt",
-                "Klare Absprachen",
-                "Saubere Übergabe",
-                "Z.O.Z. – zuverlässig, ordentlich, zügig",
-              ].map((t) => (
-                <li
-                  key={t}
-                  className="inline-flex items-center rounded-full border border-border/70 bg-card/50 px-3 py-1.5 text-xs text-muted-foreground backdrop-blur"
-                >
-                  <span className="mr-2 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
-                  {t}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="relative">
-            <div className="relative h-[380px] sm:h-[460px] lg:h-[540px]">
-              <figure className="absolute left-0 top-0 h-[62%] w-[74%] -rotate-2 overflow-hidden rounded-2xl border border-border/70 bg-card shadow-2xl">
-                <img
-                  src="/projects/kueche-marmoroptik-schortens-01.webp"
-                  alt="Montierte Küche mit weißen Hochglanzfronten und dunkler Marmoroptik in Schortens"
-                  className="h-full w-full object-cover"
-                  width={900}
-                  height={1280}
-                  fetchPriority="high"
-                  decoding="async"
-                  loading="eager"
-                />
-                <figcaption className="absolute bottom-3 left-3 rounded-full border border-border/70 bg-background/75 px-3 py-1.5 text-[10px] uppercase tracking-[0.14em] text-foreground backdrop-blur">
-                  Küche · Schortens
-                </figcaption>
-              </figure>
-              <figure className="absolute bottom-0 right-0 z-[2] h-[50%] w-[60%] rotate-[1.5deg] overflow-hidden rounded-2xl border border-border/70 bg-card shadow-2xl">
-                <img
-                  src="/projects/coldewei-06-vinyl-wohnzimmer.webp"
-                  alt="Vinylboden in Holzoptik im Wohnzimmer in Coldewei, Wilhelmshaven"
-                  className="h-full w-full object-cover"
-                  width={1200}
-                  height={800}
-                  decoding="async"
-                  loading="eager"
-                />
-                <figcaption className="absolute bottom-3 left-3 rounded-full border border-border/70 bg-background/75 px-3 py-1.5 text-[10px] uppercase tracking-[0.14em] text-foreground backdrop-blur">
-                  Vinylboden · Coldewei
-                </figcaption>
-              </figure>
-              <div
-                aria-hidden
-                className="absolute right-[6%] top-[2%] z-[3] flex h-24 w-24 rotate-[8deg] items-center justify-center rounded-full text-center font-display text-xs font-bold leading-tight text-[#241a0e] shadow-2xl"
-                style={{ background: "radial-gradient(circle at 30% 30%, oklch(0.82 0.11 80), oklch(0.62 0.11 75))" }}
-              >
-                5,0 ★<br />Google
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      <HeroSlideshow />
 
 
       {/* KURZANTWORT + FAKTEN */}

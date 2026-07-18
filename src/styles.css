@@ -252,3 +252,71 @@ html, body {
     hyphens: auto;
   }
 }
+
+/* === Vollbild-Hero-Slideshow ============================================ */
+.hero-slide {
+  position: absolute;
+  inset: 0;
+  background-position: center;
+  background-size: cover;
+  opacity: 0;
+  transform: scale(1.02);
+  transition: opacity 1.6s ease;
+}
+.hero-slide.on { opacity: 1; }
+.hero-slide.on.animate { animation: hero-zoom-l 7s ease-out forwards; }
+.hero-slide.on.animate.alt { animation-name: hero-zoom-r; }
+@keyframes hero-zoom-l {
+  from { transform: scale(1.14) translateX(1.5%); }
+  to { transform: scale(1.02) translateX(-1%); }
+}
+@keyframes hero-zoom-r {
+  from { transform: scale(1.14) translateX(-1.5%); }
+  to { transform: scale(1.02) translateX(1%); }
+}
+.hero-scrim {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(120% 120% at 50% 40%, transparent 30%, oklch(0.13 0.012 58 / 0.85) 100%),
+    linear-gradient(0deg, oklch(0.13 0.012 58 / 0.9) 0%, oklch(0.13 0.012 58 / 0.25) 32%, oklch(0.13 0.012 58 / 0.35) 100%);
+}
+.hero-stage { animation: hero-fade 1.2s ease both; }
+@keyframes hero-fade { from { opacity: 0; } to { opacity: 1; } }
+.hero-goldline {
+  width: min(380px, 66vw);
+  height: 1px;
+  background: linear-gradient(90deg, transparent, oklch(0.72 0.11 80 / 0.85), transparent);
+}
+.hero-dot {
+  position: relative;
+  width: 22px;
+  height: 3px;
+  border: none;
+  border-radius: 2px;
+  background: oklch(0.95 0.01 80 / 0.3);
+  cursor: pointer;
+  padding: 0;
+  overflow: hidden;
+}
+.hero-dot.on { background: oklch(0.95 0.01 80 / 0.3); }
+.hero-dot.on::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--accent, oklch(0.72 0.11 80));
+  transform: scaleX(1);
+  transform-origin: left;
+}
+.hero-dot.on.animate::after { animation: hero-dotfill 6.5s linear forwards; }
+@keyframes hero-dotfill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.hero-scrollcue { animation: hero-bob 2.4s ease-in-out infinite; }
+@keyframes hero-bob {
+  0%, 100% { transform: translate(-50%, 0); }
+  50% { transform: translate(-50%, 8px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-stage, .hero-scrollcue { animation: none; }
+  .hero-slide, .hero-slide.on.animate { animation: none; transition: none; transform: none; }
+  .hero-dot.on.animate::after { animation: none; }
+}
