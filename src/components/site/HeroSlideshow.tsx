@@ -97,24 +97,15 @@ export function HeroSlideshow() {
       <div className="hero-scrim" aria-hidden />
 
       <div className="relative z-[2] flex max-w-4xl flex-col items-center gap-5 px-6 pb-16 pt-10 text-center">
-        <div className="flex flex-col items-center gap-4">
-          <img
-            src="/logo.webp"
-            alt=""
-            aria-hidden
-            width={144}
-            height={135}
-            className="h-14 w-auto drop-shadow-[0_4px_16px_rgba(0,0,0,0.5)]"
-            fetchPriority="high"
-          />
-          <div className="font-display text-xl font-semibold uppercase tracking-[0.32em] [text-indent:0.32em] text-foreground [text-shadow:0_2px_18px_rgba(0,0,0,0.5)] sm:text-3xl">
-            Verlegt &amp; Verschraubt
-          </div>
-          <div className="hero-goldline" aria-hidden />
-          <div className="text-[11px] uppercase tracking-[0.42em] [text-indent:0.42em] text-muted-foreground sm:text-xs">
-            Boden &nbsp;·&nbsp; Küche &nbsp;·&nbsp; Entrümpelung
-          </div>
-        </div>
+        <img
+          src="/logo-plakette.webp"
+          alt="Verlegt & Verschraubt Handwerkerservice – Markenschild mit V&V-Monogramm"
+          width={1046}
+          height={572}
+          fetchPriority="high"
+          decoding="async"
+          className="w-[min(440px,82vw)] rounded-xl border border-accent/25 shadow-[0_24px_60px_rgba(0,0,0,0.55)]"
+        />
 
         <h1 className="font-display text-3xl font-bold uppercase leading-[1.05] text-foreground [text-shadow:0_4px_30px_rgba(0,0,0,0.55)] sm:text-5xl lg:text-6xl">
           Räume, die wirken.
