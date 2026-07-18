@@ -1,7 +1,7 @@
 import { breadcrumbNode, jsonLdScript, webPageNode } from "@/lib/schema";
 import { createFileRoute } from "@tanstack/react-router";
 import { PageHero, Section, CtaBlock } from "@/components/site/PageShell";
-import { Kostenrechner } from "@/components/site/Kostenrechner";
+import { KostenrechnerV2 } from "@/components/site/KostenrechnerV2";
 import { QuickAnswer, FactBox, InternalLinks } from "@/components/site/InfoBlocks";
 import {
   TrustBar,
@@ -79,7 +79,7 @@ function Page() {
 
         <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start">
           <div className="min-w-0">
-            <Kostenrechner />
+            <KostenrechnerV2 />
           </div>
           <div className="lg:sticky lg:top-24">
             <ReviewsAside />
