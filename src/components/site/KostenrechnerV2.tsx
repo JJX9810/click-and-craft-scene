@@ -470,18 +470,6 @@ export function KostenrechnerV2() {
                   <Chip sel={st.adds.has("sockel")} onClick={() => toggle("adds", "sockel")}>Sockelleisten montieren</Chip>
                   <Chip sel={st.adds.has("material")} onClick={() => toggle("adds", "material")}>Material über uns beziehen</Chip>
                 </div>
-                {st.adds.has("alt") && (
-                  <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                    <Field label="Alter Belag (der raus soll)">
-                      <select className={inputCls} value={st.altArt} onChange={(e) => up({ altArt: e.target.value as St["altArt"] })}>
-                        <option value="schwimmend">Lag schwimmend (Laminat, Klick-Vinyl)</option>
-                        <option value="verklebt">War verklebt (Vinyl, PVC, Linoleum)</option>
-                        <option value="tep_l">Teppich, lose verlegt</option>
-                        <option value="tep_k">Teppich, verklebt</option>
-                      </select>
-                    </Field>
-                  </div>
-                )}
                 {st.adds.has("sockel") && (
                   <div className="mt-4 grid gap-4 sm:grid-cols-2">
                     <Field label="Sockelleisten (lfm)">
