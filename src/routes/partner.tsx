@@ -400,6 +400,14 @@ function Page() {
         </div>
       </Section>
 
+      {/* PARTNER-VORSTELLUNG */}
+      <Section eyebrow="Unsere Partnerbetriebe" title="Das Netzwerk hinter dem Versprechen." bordered>
+        <div className="grid gap-6 lg:grid-cols-2">
+          <PartnerCard />
+          <MalerPartnerCard />
+        </div>
+      </Section>
+
       {/* ABLAUF */}
       <section className="border-y border-border/60 bg-background/40">
         <div className="mx-auto max-w-7xl px-6 py-20">
@@ -594,12 +602,6 @@ function Page() {
             </details>
           ))}
         </div>
-      </Section>
-
-      <Section eyebrow="Unser Partner" title="Mit wem wir gerne zusammenarbeiten.">
-
-        <PartnerCard />
-        <MalerPartnerCard />
       </Section>
 
       {/* NETZWERK IM AUFBAU */}
