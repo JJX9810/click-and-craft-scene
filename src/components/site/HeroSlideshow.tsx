@@ -112,19 +112,19 @@ export function HeroSlideshow() {
             Verlegt &amp; Verschraubt
           </div>
           <div className="hero-goldline" aria-hidden />
-          <div className="text-[11px] uppercase tracking-[0.42em] [text-indent:0.42em] text-muted-foreground sm:text-xs">
+          <div className="text-[11px] uppercase tracking-[0.42em] [text-indent:0.42em] text-foreground/85 [text-shadow:0_1px_10px_rgba(0,0,0,0.7)] sm:text-xs">
             Boden &nbsp;·&nbsp; Küche &nbsp;·&nbsp; Entrümpelung
           </div>
         </div>
 
         <h1 className="font-display text-3xl font-bold uppercase leading-[1.05] text-foreground [text-shadow:0_4px_30px_rgba(0,0,0,0.55)] sm:text-5xl lg:text-6xl">
           Räume, die wirken.
-          <span className="mt-3 block text-[0.4em] font-medium normal-case tracking-[0.2em] text-muted-foreground">
+          <span className="mt-3 block text-[0.4em] font-medium normal-case tracking-[0.2em] text-foreground/85 [text-shadow:0_1px_12px_rgba(0,0,0,0.7)]">
             Handwerkerservice in Wilhelmshaven &amp; Umgebung
           </span>
         </h1>
 
-        <p className="max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
+        <p className="max-w-2xl text-base leading-relaxed text-foreground/90 [text-shadow:0_1px_12px_rgba(0,0,0,0.65)] sm:text-lg">
           Ein Ansprechpartner statt zehn Handwerker – eigene Gewerke, geprüfte Partnerbetriebe, ein Ergebnis.
         </p>
 

@@ -294,8 +294,9 @@ html, body {
   position: absolute;
   inset: 0;
   background:
+    radial-gradient(58% 72% at 50% 56%, oklch(0.13 0.012 58 / 0.55) 0%, transparent 78%),
     radial-gradient(120% 120% at 50% 40%, transparent 30%, oklch(0.13 0.012 58 / 0.85) 100%),
-    linear-gradient(0deg, oklch(0.13 0.012 58 / 0.9) 0%, oklch(0.13 0.012 58 / 0.25) 32%, oklch(0.13 0.012 58 / 0.35) 100%);
+    linear-gradient(0deg, oklch(0.13 0.012 58 / 0.9) 0%, oklch(0.13 0.012 58 / 0.3) 32%, oklch(0.13 0.012 58 / 0.4) 100%);
 }
 .hero-stage { animation: hero-fade 1.2s ease both; }
 @keyframes hero-fade { from { opacity: 0; } to { opacity: 1; } }
