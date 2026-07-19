@@ -105,7 +105,7 @@ const partnerServices = [
   "Elektroinstallation (Herd, Starkstrom, neue Leitungen)",
   "Sanitäranlagen und Wasserleitungen",
   "Heizungs- und Klimatechnik",
-  "Malerarbeiten (sobald Partner bestätigt)",
+  "Malerarbeiten – Maler Manufaktur Wand & Wirkung (Wilhelmshaven)",
   "weitere Gewerke nach individueller Prüfung",
 ];
 
@@ -254,6 +254,82 @@ function PartnerCard() {
           className="h-11 rounded-full border-border bg-transparent px-5"
         >
           <a href="tel:+4915757941442">
+            <Phone className="mr-1 h-4 w-4" /> Anrufen
+          </a>
+        </Button>
+      </div>
+    </article>
+  );
+}
+
+function MalerPartnerCard() {
+  return (
+    <article className="group relative overflow-hidden rounded-2xl border border-border/70 bg-card/60 p-7 backdrop-blur transition hover:border-accent/50 hover:shadow-[0_24px_60px_-30px_rgba(201,168,76,0.45)]">
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <p className="text-xs uppercase tracking-[0.22em] text-accent">
+            Partnerbetrieb · Malerarbeiten
+          </p>
+          <h3 className="mt-2 text-xl font-semibold tracking-tight sm:text-2xl">
+            Maler Manufaktur Wand &amp; Wirkung
+          </h3>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Malerarbeiten &amp; Wandgestaltung · Inhaber Andreas Wagner
+          </p>
+        </div>
+        <div className="flex items-center gap-2 rounded-full border border-accent/40 bg-accent/10 px-3 py-1.5 text-xs">
+          <Star aria-hidden="true" className="h-3.5 w-3.5 fill-accent text-accent" />
+          <span className="font-medium text-foreground">5,0</span>
+          <span className="text-muted-foreground">· 10 Google-Rezensionen</span>
+        </div>
+      </div>
+
+      <div className="mt-5 space-y-3 text-sm leading-relaxed text-muted-foreground">
+        <p>
+          Die Maler Manufaktur Wand &amp; Wirkung von Andreas Wagner übernimmt in unseren
+          Projekten die Malerarbeiten – von frischen Wänden und Decken vor der
+          Bodenverlegung bis zur kompletten Wandgestaltung bei Renovierungen. Ein
+          Wilhelmshavener Betrieb mit Bestbewertung, der für dieselbe Arbeitsweise steht
+          wie wir: sauber, zuverlässig, termintreu.
+        </p>
+        <p>
+          Boden, Küche und Malerarbeiten aus einem Guss: Sie stellen Ihre Anfrage bei
+          uns, wir stimmen die Gewerke aufeinander ab – ein Ansprechpartner, ein Termin­plan.
+        </p>
+      </div>
+
+      <div className="mt-6 grid gap-3 text-sm text-muted-foreground sm:grid-cols-2">
+        <p className="flex items-start gap-2">
+          <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-accent" />
+          <span>
+            Virchowstraße 58A
+            <br />
+            26382 Wilhelmshaven
+          </span>
+        </p>
+        <p className="flex items-center gap-2">
+          <Phone className="h-3.5 w-3.5 shrink-0 text-accent" />
+          <a href="tel:+4915565904328" className="hover:text-foreground">
+            015565 904328
+          </a>
+        </p>
+      </div>
+
+      <div className="mt-6 flex flex-wrap gap-3">
+        <Button
+          asChild
+          className="h-11 rounded-full bg-accent px-5 text-accent-foreground hover:bg-accent/90"
+        >
+          <a href="https://www.wand-wirkung.de" target="_blank" rel="noreferrer">
+            <Globe className="mr-1 h-4 w-4" /> Website besuchen
+          </a>
+        </Button>
+        <Button
+          asChild
+          variant="outline"
+          className="h-11 rounded-full border-border bg-transparent px-5"
+        >
+          <a href="tel:+4915565904328">
             <Phone className="mr-1 h-4 w-4" /> Anrufen
           </a>
         </Button>
@@ -495,7 +571,7 @@ function Page() {
             },
             {
               q: "Welche Gewerke deckt das Netzwerk aktuell ab?",
-              a: "Selbst übernehmen wir Bodenverlegung, Küchenmontage, Küchenfolierung sowie Entrümpelung und Entsorgung. Über Partner laufen aktuell vor allem Küchen- und Umbauprojekte gemeinsam mit JS Küchenduo. Weitere Gewerke wie Elektro, Sanitär und Malerarbeiten ergänzen wir nur mit bestätigten, geprüften Partnern – solange sagen wir offen, was noch nicht abgedeckt ist.",
+              a: "Selbst übernehmen wir Bodenverlegung, Küchenmontage, Küchenfolierung sowie Entrümpelung und Entsorgung. Über Partner laufen Küchen- und Umbauprojekte gemeinsam mit JS Küchenduo sowie Malerarbeiten mit der Maler Manufaktur Wand & Wirkung aus Wilhelmshaven. Weitere Gewerke wie Elektro und Sanitär ergänzen wir nur mit bestätigten, geprüften Partnern – solange sagen wir offen, was noch nicht abgedeckt ist.",
             },
             {
               q: "Arbeitet ihr auch außerhalb von Wilhelmshaven?",
@@ -520,6 +596,7 @@ function Page() {
       <Section eyebrow="Unser Partner" title="Mit wem wir gerne zusammenarbeiten.">
 
         <PartnerCard />
+        <MalerPartnerCard />
       </Section>
 
       {/* NETZWERK IM AUFBAU */}
