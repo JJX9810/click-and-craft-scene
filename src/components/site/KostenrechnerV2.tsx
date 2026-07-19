@@ -375,7 +375,14 @@ export function KostenrechnerV2() {
   const goto = (n: number) => {
     setStep(n);
     if (n === 4) trackEvent("preisrechner_result", { selected_service: st.svc ?? "", total: round10(sum) });
-    if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
+    if (typeof window !== "undefined") {
+      // Zum Rechner-Anfang scrollen (nicht zum Seitenanfang) – und nur, wenn nötig
+      const el = document.getElementById("rechner");
+      if (el) {
+        const top = el.getBoundingClientRect().top;
+        if (top < -8 || top > 140) el.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
   };
   const pickService = (v: Service) => {
     up({ svc: v });
