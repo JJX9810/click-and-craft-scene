@@ -274,7 +274,7 @@ function MalerPartnerCard() {
             Maler Manufaktur Wand &amp; Wirkung
           </h3>
           <p className="mt-1 text-xs text-muted-foreground">
-            Malerarbeiten &amp; Wandgestaltung · Inhaber Andreas Wagner
+            Malerarbeiten · Kreative Wandgestaltung · Inhaber Andreas Wagner
           </p>
         </div>
         <div className="flex items-center gap-2 rounded-full border border-accent/40 bg-accent/10 px-3 py-1.5 text-xs">
@@ -288,13 +288,16 @@ function MalerPartnerCard() {
         <p>
           Die Maler Manufaktur Wand &amp; Wirkung von Andreas Wagner übernimmt in unseren
           Projekten die Malerarbeiten – von frischen Wänden und Decken vor der
-          Bodenverlegung bis zur kompletten Wandgestaltung bei Renovierungen. Ein
-          Wilhelmshavener Betrieb mit Bestbewertung, der für dieselbe Arbeitsweise steht
-          wie wir: sauber, zuverlässig, termintreu.
+          Bodenverlegung bis zur kompletten Renovierung. Seine Spezialität geht dabei
+          über das klassische Streichen hinaus: kreative Wandgestaltung und perfekte
+          Spachteloberflächen, die aus einer Wand ein Gestaltungselement machen. Ein
+          Wilhelmshavener Betrieb mit Bestbewertung und demselben Anspruch wie wir:
+          Präzision, Sauberkeit, Termintreue.
         </p>
         <p>
           Boden, Küche und Malerarbeiten aus einem Guss: Sie stellen Ihre Anfrage bei
-          uns, wir stimmen die Gewerke aufeinander ab – ein Ansprechpartner, ein Termin­plan.
+          uns, wir stimmen die Gewerke aufeinander ab – ein Ansprechpartner, ein Terminplan.
+          Einsatzgebiet: Wilhelmshaven, Friesland, Oldenburg, Ostfriesland und Umgebung.
         </p>
       </div>
 
