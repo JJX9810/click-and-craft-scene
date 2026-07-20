@@ -22,6 +22,41 @@ const guides = [
       "Realistische Preisspannen, die vier echten Preisfaktoren, Warnsignale unseriöser Anbieter – und warum ein verbindliches Angebot nach Besichtigung fairer ist als jeder Telefon-Festpreis.",
   },
   {
+    to: "/renovierung-reihenfolge",
+    eyebrow: 'Renovierung',
+    title: 'Renovierung: die richtige Reihenfolge der Gewerke',
+    teaser:
+      'Erst Elektrik, dann Wände, dann Boden – und die Küche zum Schluss? Die bewährte Reihenfolge, die teure Doppelarbeit verhindert, Schritt für Schritt erklärt.',
+  },
+  {
+    to: "/boden-selbst-verlegen",
+    eyebrow: 'Bodenverlegung',
+    title: 'Boden selbst verlegen oder verlegen lassen?',
+    teaser:
+      'Klick-Laminat kann fast jeder – oder? Die ehrliche Grenze zwischen Wochenendprojekt und Handwerkerjob, mit Rechenbeispiel und den drei Aufgaben, an denen Selbermacher scheitern.',
+  },
+  {
+    to: "/gebrauchte-kueche-kaufen",
+    eyebrow: 'Küchenmontage',
+    title: 'Gebrauchte Küche kaufen: Die Checkliste',
+    teaser:
+      'Kleinanzeigen-Küchen können Schnäppchen oder Geldgräber sein. Worauf Sie bei Besichtigung, Maßen und Geräten achten – vom Monteur, der sie regelmäßig ab- und wieder aufbaut.',
+  },
+  {
+    to: "/haushaltsaufloesung-nachlass",
+    eyebrow: 'Entrümpelung',
+    title: 'Haushaltsauflösung im Trauerfall: Schritt für Schritt',
+    teaser:
+      'Wenn eine Wohnung aufgelöst werden muss, während die Trauer noch frisch ist: der einfühlsame, praktische Leitfaden – von den Fristen über das Sortieren bis zur besenreinen Übergabe.',
+  },
+  {
+    to: "/bodenverlegung-kosten",
+    eyebrow: 'Bodenverlegung',
+    title: 'Was kostet Bodenverlegung? Alle Posten erklärt',
+    teaser:
+      'Verlegen ab 16 €/m² – aber was kommt dazu? Altbelag, Spachteln, Sockelleisten, Anfahrt: jede Position transparent erklärt, mit Rechenbeispiel für ein 25-m²-Wohnzimmer.',
+  },
+  {
     to: "/vinyl-oder-laminat",
     eyebrow: "Bodenverlegung",
     title: "Vinyl oder Laminat – was passt zu welchem Raum?",

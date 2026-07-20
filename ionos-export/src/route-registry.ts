@@ -35,6 +35,11 @@ import { Route as VinylOderLaminatRoute } from "@/routes/vinyl-oder-laminat";
 import { Route as EntruempelungKostenRoute } from "@/routes/entruempelung-kosten";
 import { Route as RatgeberRoute } from "@/routes/ratgeber";
 import { Route as KuecheUmzugRoute } from "@/routes/kueche-umzug-checkliste";
+import { Route as G0Route } from "@/routes/renovierung-reihenfolge";
+import { Route as G1Route } from "@/routes/boden-selbst-verlegen";
+import { Route as G2Route } from "@/routes/gebrauchte-kueche-kaufen";
+import { Route as G3Route } from "@/routes/haushaltsaufloesung-nachlass";
+import { Route as G4Route } from "@/routes/bodenverlegung-kosten";
 
 // IONOS-Override: Kontaktformular ohne Backend (mailto/WhatsApp/Tel)
 import { IonosKontakt } from "./IonosKontakt";
@@ -71,6 +76,11 @@ export const routes: RouteRecord[] = [
   EntruempelungKostenRoute,
   RatgeberRoute,
   KuecheUmzugRoute,
+  G0Route,
+  G1Route,
+  G2Route,
+  G3Route,
+  G4Route,
 ];
 
 /** Liste aller Pfade, die prerendert werden sollen (inkl. Showroom-Slugs). */
