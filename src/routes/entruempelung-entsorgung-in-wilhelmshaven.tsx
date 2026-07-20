@@ -94,7 +94,12 @@ function Page() {
             werden planbar, diskret und auf Wunsch besenrein geräumt – inklusive
             fachgerechter Entsorgung. Anfrage per WhatsApp mit Fotos –
             verbindliches Angebot nach Besichtigung vor Ort (39 € Pauschale,
-            wird bei Auftragserteilung vollständig verrechnet).
+            wird bei Auftragserteilung vollständig verrechnet). Was realistisch
+            kostet und woran Sie unseriöse Anbieter erkennen, zeigt unser
+            Ratgeber{" "}
+            <Link to="/entruempelung-kosten" className="font-medium text-accent hover:underline">
+              Was kostet eine Entrümpelung?
+            </Link>
           </QuickAnswer>
           <FactBox />
         </div>
