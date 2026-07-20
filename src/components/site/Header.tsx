@@ -21,6 +21,7 @@ const nav: NavItem[] = [
     children: [
       { label: "Über uns", to: "/ueber-uns" },
       { label: "Referenzen", to: "/referenzen" },
+      { label: "Ratgeber", to: "/ratgeber" },
       { label: "Wilhelmshaven", to: "/handwerkerservice-wilhelmshaven" },
       { label: "Schortens", to: "/handwerkerservice-schortens" },
       { label: "Sande", to: "/handwerkerservice-sande" },

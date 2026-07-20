@@ -82,6 +82,7 @@ export function Footer() {
               <li><Link to="/ueber-uns" className="hover:text-foreground">Über uns</Link></li>
               <li><Link to="/partner" className="hover:text-foreground">Netzwerk</Link></li>
               <li><Link to="/wir-unterstuetzen" className="hover:text-foreground">Wir unterstützen</Link></li>
+              <li><Link to="/ratgeber" className="hover:text-foreground">Ratgeber</Link></li>
               <li><Link to="/faq" className="hover:text-foreground">FAQ</Link></li>
               <li><Link to="/impressum" className="hover:text-foreground">Impressum</Link></li>
               <li><Link to="/datenschutz" className="hover:text-foreground">Datenschutz</Link></li>
