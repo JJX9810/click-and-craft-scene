@@ -101,7 +101,12 @@ function Page() {
             und Umgebung: Küchenmontage für 189 €/lfm Arbeitslohn. Dazu gehören
             Aufbau nach Umzug, Restmontage, Küchenmodule, Arbeitsplatten sowie
             Spüle und Armatur an vorhandenen Anschlüssen. Anfrage per WhatsApp
-            mit Fotos – Einschätzung meist am selben Werktag.
+            mit Fotos – Einschätzung meist am selben Werktag. Die Küche zieht
+            mit um? Unser Ratgeber{" "}
+            <Link to="/kueche-umzug-checkliste" className="font-medium text-accent hover:underline">
+              Küche umziehen: Die komplette Checkliste
+            </Link>{" "}
+            führt Schritt für Schritt durch.
           </QuickAnswer>
           <FactBox />
         </div>

@@ -34,6 +34,7 @@ import { Route as HwsWittmundRoute } from "@/routes/handwerkerservice-wittmund";
 import { Route as VinylOderLaminatRoute } from "@/routes/vinyl-oder-laminat";
 import { Route as EntruempelungKostenRoute } from "@/routes/entruempelung-kosten";
 import { Route as RatgeberRoute } from "@/routes/ratgeber";
+import { Route as KuecheUmzugRoute } from "@/routes/kueche-umzug-checkliste";
 
 // IONOS-Override: Kontaktformular ohne Backend (mailto/WhatsApp/Tel)
 import { IonosKontakt } from "./IonosKontakt";
@@ -69,6 +70,7 @@ export const routes: RouteRecord[] = [
   VinylOderLaminatRoute,
   EntruempelungKostenRoute,
   RatgeberRoute,
+  KuecheUmzugRoute,
 ];
 
 /** Liste aller Pfade, die prerendert werden sollen (inkl. Showroom-Slugs). */

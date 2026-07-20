@@ -8,6 +8,13 @@ const URL = "https://verlegt-verschraubt.de/ratgeber";
 /** Neue Ratgeber hier eintragen – die Übersicht wächst automatisch mit. */
 const guides = [
   {
+    to: "/kueche-umzug-checkliste",
+    eyebrow: "Küchenmontage",
+    title: "Küche umziehen: Die komplette Checkliste",
+    teaser:
+      "Vom Lohnt-sich-Check über die richtige Demontage-Reihenfolge bis zum Funktionstest – der komplette Küchenumzug Schritt für Schritt, inklusive Kosten und Steuer-Tipp.",
+  },
+  {
     to: "/entruempelung-kosten",
     eyebrow: "Entrümpelung",
     title: "Was kostet eine Entrümpelung?",
