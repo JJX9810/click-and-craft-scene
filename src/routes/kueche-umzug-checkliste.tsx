@@ -142,6 +142,21 @@ function RatgeberKuecheUmzug() {
         </ul>
       </Section>
 
+      <Section eyebrow="Vorbereitung" title="Das Werkzeug: Was bereitliegen muss" bordered>
+        <p className="leading-relaxed text-muted-foreground">
+          Nichts kostet mehr Nerven als die Baumarkt-Fahrt mitten in der Demontage.
+          Diese Ausstattung deckt einen kompletten Küchenumzug ab:
+        </p>
+        <ul className="mt-5 space-y-3">
+          <Punkt><b className="text-foreground">Akkuschrauber mit vollständigem Bit-Satz</b> – Küchen kombinieren gern Kreuz, Torx und Pozidriv in einem einzigen Schrank.</Punkt>
+          <Punkt><b className="text-foreground">Wasserwaage (mind. 60 cm)</b> – fürs Ausrichten beim Aufbau unverzichtbar, denn kein Altbauboden ist gerade.</Punkt>
+          <Punkt><b className="text-foreground">Kreppband, wasserfester Stift, Gefrierbeutel</b> – das Nummerier- und Schrauben-System steht und fällt damit.</Punkt>
+          <Punkt><b className="text-foreground">Cuttermesser</b> – zum Aufschneiden der Silikonfugen an Arbeitsplatte und Nischenrückwand, bevor gezogen wird.</Punkt>
+          <Punkt><b className="text-foreground">Maulschlüssel/Wasserpumpenzange, Eimer und alte Handtücher</b> – in Zu- und Ablaufschläuchen steht immer Restwasser.</Punkt>
+          <Punkt><b className="text-foreground">Umzugsdecken und Spanngurte</b> – Fronten und Arbeitsplatten überleben den Transport nur gepolstert und fixiert.</Punkt>
+        </ul>
+      </Section>
+
       <Section eyebrow="Schritt 3" title="Demontage im alten Zuhause: die richtige Reihenfolge" bordered>
         <p className="leading-relaxed text-muted-foreground">
           Hier entscheidet sich, ob der Aufbau später zwei Stunden oder zwei Tage
@@ -178,6 +193,35 @@ function RatgeberKuecheUmzug() {
             <b className="text-foreground">Alle Schrauben in EIN System:</b> Pro Schrank ein beschrifteter
             Beutel, alle Beutel in eine Kiste. Der Klassiker unter den Aufbau-Katastrophen
             ist die verschwundene Spezialschraube.
+          </Punkt>
+        </ul>
+      </Section>
+
+      <Section eyebrow="Zwischenschritt" title="Der Transport: Wo Küchen wirklich sterben">
+        <p className="leading-relaxed text-muted-foreground">
+          Die meisten Küchenschäden passieren nicht beim Schrauben, sondern auf der
+          Ladefläche. Die vier Regeln:
+        </p>
+        <ul className="mt-5 space-y-3">
+          <Punkt>
+            <b className="text-foreground">Arbeitsplatten hochkant transportieren</b> – flach liegend
+            brechen sie beim ersten Schlagloch am Ausschnitt für Spüle oder Kochfeld.
+            Hochkant an der Bordwand, gepolstert und verzurrt.
+          </Punkt>
+          <Punkt>
+            <b className="text-foreground">Kühlschrank stehend fahren – und danach warten:</b> Nach dem
+            Transport mindestens 12, nach liegendem Transport 24 Stunden stehen lassen,
+            bevor er eingesteckt wird. Das Kältemittel-Öl muss zurücklaufen – wer zu früh
+            einschaltet, riskiert den Kompressor.
+          </Punkt>
+          <Punkt>
+            <b className="text-foreground">Geschirrspüler nicht kippen:</b> Restwasser läuft sonst in die
+            Elektronik. Aufrecht tragen, aufrecht fahren.
+          </Punkt>
+          <Punkt>
+            <b className="text-foreground">Fronten wie Möbelstücke behandeln:</b> Türen und Blenden
+            paarweise Front an Front mit Decke dazwischen – Kratzer auf Hochglanzfronten
+            sind der teuerste Transportschaden pro Quadratzentimeter.
           </Punkt>
         </ul>
       </Section>
@@ -231,6 +275,79 @@ function RatgeberKuecheUmzug() {
             Gerät einmal in Betrieb. Erst wenn alles läuft, ist der Küchenumzug fertig.
           </Punkt>
         </ul>
+      </Section>
+
+      <Section eyebrow="Sonderfälle" title="Drei Küchen, drei Eigenheiten" bordered>
+        <ul className="space-y-3">
+          <Punkt>
+            <b className="text-foreground">IKEA-Küchen (Metod &amp; Co.):</b> Die Hängeschienen-Montage ist
+            beim Umzug ein Vorteil – im neuen Raum wird zuerst die Schiene exakt
+            ausgerichtet, dann hängen die Schränke in Serie. Dafür sind die Korpusse
+            empfindlicher: Einmal ausgerissene Verbindungen halten beim zweiten Aufbau
+            oft nur noch mit Nachrüst-Lösungen.
+          </Punkt>
+          <Punkt>
+            <b className="text-foreground">Gebraucht gekaufte Küchen:</b> Der Abbau passiert beim Verkäufer –
+            meist unter Zeitdruck und in fremder Umgebung. Hier sind Fotos und Nummerierung
+            doppelt wichtig, und: Vor dem Kauf die eigenen Raummaße mitnehmen, nicht nur
+            die Küche anschauen. Wir bauen regelmäßig Kleinanzeigen-Küchen ab und im neuen
+            Zuhause wieder auf.
+          </Punkt>
+          <Punkt>
+            <b className="text-foreground">Stein-Arbeitsplatten (Granit, Quarz, Keramik):</b> Bei 60–120 kg
+            pro Platte ist das keine Zwei-Mann-Aufgabe mehr. Steinplatten brechen ohne
+            Vorwarnung bei Punktbelastung – Transport nur hochkant im Gestell und mit
+            genug Händen. Im Zweifel die Platte dem Profi überlassen und den Rest selbst
+            machen.
+          </Punkt>
+        </ul>
+      </Section>
+
+      <Section eyebrow="Aus der Praxis" title="Die fünf klassischen Küchenumzugs-Pannen">
+        <ul className="space-y-3">
+          <Punkt><b className="text-foreground">Der zu früh eingeschaltete Kühlschrank</b> – Kompressorschaden am ersten Abend. Die Wartezeit ist keine Legende.</Punkt>
+          <Punkt><b className="text-foreground">Die nicht aufgeschnittene Silikonfuge</b> – wer die Arbeitsplatte oder Nischenrückwand einfach abreißt, nimmt Fliesen und Putz gleich mit. Erst schneiden, dann lösen.</Punkt>
+          <Punkt><b className="text-foreground">Der Schraubenbeutel im Nirgendwo</b> – ohne System fehlen beim Aufbau garantiert genau die vier Spezialschrauben der Hängeschränke. Ein Beutel pro Schrank, eine Kiste für alle.</Punkt>
+          <Punkt><b className="text-foreground">Der unterschätzte Herdanschluss</b> – Starkstrom ist kein Steckdosen-Thema. Wer den Elektriker erst am Aufbautag sucht, kocht die erste Woche mit der Mikrowelle.</Punkt>
+          <Punkt><b className="text-foreground">Die Küche vor dem Boden</b> – der Klassiker: Erst steht die Zeile, dann fällt auf, dass der neue Vinyl noch fehlt. Jetzt heißt es: alles nochmal raus – oder für immer mit sichtbaren Kanten leben.</Punkt>
+        </ul>
+      </Section>
+
+      <Section eyebrow="Häufige Fragen" title="Kurz beantwortet" bordered>
+        <div className="space-y-6">
+          <div>
+            <h3 className="font-display text-base font-semibold">Wie lange dauert ein Küchenumzug insgesamt?</h3>
+            <p className="mt-1.5 leading-relaxed text-muted-foreground">Für eine durchschnittliche Küche (3–4 m): Demontage 3–5 Stunden, Aufbau mit Anpassungen 4–8 Stunden – plus Transport. Realistisch also zwei Arbeitstage. In Eigenregie ohne Routine gern das Doppelte.</p>
+          </div>
+          <div>
+            <h3 className="font-display text-base font-semibold">Kann ich die Küche komplett selbst abbauen?</h3>
+            <p className="mt-1.5 leading-relaxed text-muted-foreground">Schränke, Fronten und Einlegeböden: ja, mit Sorgfalt und dieser Checkliste. Die Grenzen: Gasgeräte (nur Fachbetrieb), Starkstrom-Herd (Elektriker) und schwere Steinplatten. Eine beliebte Arbeitsteilung: Sie räumen aus und demontieren die Schränke, wir übernehmen Geräte, Platte und den kompletten Wiederaufbau.</p>
+          </div>
+          <div>
+            <h3 className="font-display text-base font-semibold">Macht das nicht einfach die Umzugsfirma mit?</h3>
+            <p className="mt-1.5 leading-relaxed text-muted-foreground">Viele Umzugsfirmen transportieren die Küche, schließen aber Montage und Anschlüsse aus – oder berechnen sie als teure Zusatzposition ohne Küchen-Spezialisierung. Nachfragen lohnt sich: „Ist die Remontage inklusive Ausrichten, Arbeitsplatte und Geräteanschluss enthalten?" Die Antwort entscheidet, ob Sie zusätzlich einen Küchenmonteur brauchen.</p>
+          </div>
+          <div>
+            <h3 className="font-display text-base font-semibold">Alte Geräte mitnehmen oder neue kaufen?</h3>
+            <p className="mt-1.5 leading-relaxed text-muted-foreground">Faustregel: Geräte über zehn Jahre lohnen den Umzug selten – der Stromverbrauch alter Kühlschränke und Spüler frisst den gesparten Neupreis in wenigen Jahren auf, und ein Transportschaden trifft dann ein Gerät ohne Restwert. Jüngere Geräte: mitnehmen.</p>
+          </div>
+        </div>
+      </Section>
+
+      <Section eyebrow="Zum Abhaken" title="Die Checkliste auf einen Blick">
+        <div className="rounded-2xl border border-accent/30 bg-card/50 p-6 sm:p-8">
+          <ul className="space-y-2.5">
+            <Punkt>Neuen Raum ausmessen, Anschlüsse fotografieren, Lohnt-sich-Entscheidung treffen</Punkt>
+            <Punkt>Monteur-/Transporttermin sichern, Anpassungen und ggf. Elektriker klären</Punkt>
+            <Punkt>Küche ausräumen, Kühlschrank 24 h vorher abtauen</Punkt>
+            <Punkt>Sicherungen raus, Wasser zu, alles fotografieren und nummerieren</Punkt>
+            <Punkt>Geräte zuerst raus, dann Hängeschränke, Platte, Unterschränke – Schrauben pro Schrank in beschriftete Beutel</Punkt>
+            <Punkt>Transport: Platten hochkant, Kühlschrank stehend, Spüler nicht kippen, Fronten gepolstert</Punkt>
+            <Punkt>Neues Zuhause: Boden VOR der Küche verlegen, Anschlüsse abgleichen, Wände prüfen</Punkt>
+            <Punkt>Aufbau: ausrichten, verbinden, anschließen – Wasserverbindungen 10 Minuten beobachten</Punkt>
+            <Punkt>Kühlschrank-Wartezeit einhalten, Funktionstest aller Geräte und Auszüge</Punkt>
+          </ul>
+        </div>
       </Section>
 
       <Section eyebrow="Kosten & Steuer" title="Was kostet das – und was zahlt das Finanzamt mit?">
