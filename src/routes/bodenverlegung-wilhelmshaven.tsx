@@ -36,7 +36,7 @@ export const Route = createFileRoute("/bodenverlegung-wilhelmshaven")({
   component: Page,
   head: () => ({
     meta: [
-      { title: "Bodenleger Wilhelmshaven – Laminat, Vinyl & Teppich" },
+      { title: "Bodenverlegung Wilhelmshaven – Laminat, Vinyl, Teppich | Bodenleger" },
       { name: "description", content: "Ihr Bodenleger in Wilhelmshaven: Laminat, Vinyl, PVC & Teppich fachgerecht verlegt – inkl. Untergrund & Sockelleisten. Jetzt Fotos senden, ehrliche Einschätzung am selben Tag." },
       { property: "og:title", content: "Bodenleger Wilhelmshaven – Verlegt & Verschraubt" },
       { property: "og:description", content: "Vinyl, Laminat, PVC und Teppich – fachgerecht verlegt von Verlegt & Verschraubt." },
@@ -55,7 +55,7 @@ export const Route = createFileRoute("/bodenverlegung-wilhelmshaven")({
         webPageNode({
           url: PAGE_URL,
           name: "Bodenverlegung in Wilhelmshaven & Umgebung",
-          description: "Vinyl, Laminat, PVC, Teppich, Treppen und Sockelleisten – sauber verlegt, mit ordentlichen Kanten und stimmigem Verlegebild. Für Privatkunden in Wilhelmshaven, Schortens, Sande, Jever, Varel und Wangerland.",
+          description: "Bodenverlegearbeiten in Wilhelmshaven und Umgebung: Vinyl, Laminat, PVC, Teppich, Treppen, Sockelleisten – sauber verlegt, mit ordentlichen Kanten. Für Privatkunden, Hausverwaltungen und Firmen in Wilhelmshaven, Schortens, Sande, Jever, Varel und Wangerland.",
           about: { "@id": SERVICE_IDS.bodenverlegung },
         }),
         serviceNode({
