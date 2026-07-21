@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PageHero, Section, CtaBlock } from "@/components/site/PageShell";
 import { QuickAnswer } from "@/components/site/InfoBlocks";
+import { RelatedTopics } from "@/components/site/RelatedTopics";
 import { breadcrumbNode, jsonLdScript, webPageNode } from "@/lib/schema";
 
 const URL = "https://verlegt-verschraubt.de/bodenverlegung-kosten";
@@ -96,6 +97,14 @@ function Page() {
           Alle genannten Preise sind unsere echten Arbeitslohn-Sätze – verbindlich wird ein Angebot nach Fotos mit Maßen oder einem Aufmaß vor Ort, denn Untergrund und Details entscheiden mit. Erste Einschätzung in zwei Minuten: der <Link to="/preise" className="font-medium text-accent hover:underline">Kostenrechner</Link>. Und falls die Belagsfrage noch offen ist: <Link to="/vinyl-oder-laminat" className="font-medium text-accent hover:underline">Vinyl oder Laminat?</Link> klärt sie ehrlich.
         </p>
       </Section>
+
+      <RelatedTopics
+        links={[
+          { to: "/vinyl-oder-laminat", eyebrow: 'Bodenverlegung', title: 'Vinyl oder Laminat?' },
+          { to: "/boden-selbst-verlegen", eyebrow: 'Bodenverlegung', title: 'Selbst verlegen oder Handwerker?' },
+          { to: "/bodenverlegung-wilhelmshaven", eyebrow: 'Leistung', title: 'Bodenverlegung in Wilhelmshaven' },
+        ]}
+      />
 
       <CtaBlock title={'Was kostet Ihr Boden?'} text={'Fotos und Maße per WhatsApp – ehrliche Einschätzung meist am selben Werktag.'} />
     </>

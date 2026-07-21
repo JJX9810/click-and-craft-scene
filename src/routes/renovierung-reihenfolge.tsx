@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PageHero, Section, CtaBlock } from "@/components/site/PageShell";
 import { QuickAnswer } from "@/components/site/InfoBlocks";
+import { RelatedTopics } from "@/components/site/RelatedTopics";
 import { breadcrumbNode, jsonLdScript, webPageNode } from "@/lib/schema";
 
 const URL = "https://verlegt-verschraubt.de/renovierung-reihenfolge";
@@ -96,6 +97,14 @@ function Page() {
           Die Reihenfolge zu kennen ist das eine – sechs Gewerke terminlich ineinanderzuschieben das andere. Genau dafür gibt es unser Modell: Wir übernehmen Boden, Küche und Entrümpelung selbst und koordinieren Malerarbeiten, Elektrik oder Sanitär über geprüfte Partnerbetriebe wie die <Link to="/partner" className="font-medium text-accent hover:underline">Maler Manufaktur Wand & Wirkung</Link>. Sie haben einen Ansprechpartner und einen Terminplan – mehr auf unserer <Link to="/partner" className="font-medium text-accent hover:underline">Netzwerk-Seite</Link>.
         </p>
       </Section>
+
+      <RelatedTopics
+        links={[
+          { to: "/altbau-renovieren-wilhelmshaven", eyebrow: 'Renovierung', title: 'Altbau renovieren in Wilhelmshaven' },
+          { to: "/kueche-umzug-checkliste", eyebrow: 'Küchenmontage', title: 'Küche umziehen: Die Checkliste' },
+          { to: "/partner", eyebrow: 'Netzwerk', title: 'Renovierung aus einer Hand' },
+        ]}
+      />
 
       <CtaBlock title={'Renovierung geplant?'} text={'Schicken Sie uns Fotos und Ihr Vorhaben per WhatsApp – wir sagen ehrlich, was wir übernehmen und was Partner machen.'} />
     </>

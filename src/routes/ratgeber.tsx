@@ -22,6 +22,48 @@ const guides = [
       "Realistische Preisspannen, die vier echten Preisfaktoren, Warnsignale unseriöser Anbieter – und warum ein verbindliches Angebot nach Besichtigung fairer ist als jeder Telefon-Festpreis.",
   },
   {
+    to: "/bodenverlegung-fussbodenheizung",
+    eyebrow: 'Bodenverlegung',
+    title: 'Bodenverlegung mit Fußbodenheizung: Welcher Belag passt?',
+    teaser:
+      'Wärmedurchgang, Aufbauhöhe, Trittschall: welche Böden mit Fußbodenheizung wirklich funktionieren – und welche Sie vergessen können.',
+  },
+  {
+    to: "/vinyl-kueche-bad",
+    eyebrow: 'Bodenverlegung',
+    title: 'Vinyl in Küche und Bad: Was funktioniert wirklich?',
+    teaser:
+      'Wasserfest ist nicht wasserdicht: welches Vinyl in Küche und Bad wirklich hält – und wo die Grenze zur Fliese liegt.',
+  },
+  {
+    to: "/ikea-kueche-montieren-lassen",
+    eyebrow: 'Küchenmontage',
+    title: "IKEA-Küche montieren lassen: So läuft's",
+    teaser:
+      'METOD-Aufbau in Wilhelmshaven – warum die Hängeschiene ein Vorteil ist, wo IKEA-typische Anpassungen nötig sind und was die Montage kostet.',
+  },
+  {
+    to: "/kuechenmontage-steuerlich-absetzen",
+    eyebrow: 'Küchenmontage',
+    title: "Küchenmontage steuerlich absetzen: So geht's",
+    teaser:
+      '20 % Handwerkerbonus mit einfacher Regel: was in der Rechnung stehen muss, was nicht absetzbar ist, und wie Sie im Nebeneffekt legal Geld sparen.',
+  },
+  {
+    to: "/messie-wohnung-raeumen",
+    eyebrow: 'Entrümpelung',
+    title: 'Messie-Wohnung räumen: Diskret und ohne Vorwurf',
+    teaser:
+      'Wenn ein Haushalt außer Kontrolle geraten ist: der ruhige, praktische Weg zurück – ohne Belehrung, mit Respekt für die Betroffenen.',
+  },
+  {
+    to: "/altbau-renovieren-wilhelmshaven",
+    eyebrow: 'Renovierung',
+    title: 'Altbau renovieren in Wilhelmshaven: Was zuerst?',
+    teaser:
+      'Wilhelmshavener Altbau hat Eigenheiten – von Lehmwänden bis Klinkerfassade. Der regionale Renovierungs-Fahrplan mit ehrlicher Reihenfolge.',
+  },
+  {
     to: "/renovierung-reihenfolge",
     eyebrow: 'Renovierung',
     title: 'Renovierung: die richtige Reihenfolge der Gewerke',

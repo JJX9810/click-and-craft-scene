@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PageHero, Section, CtaBlock } from "@/components/site/PageShell";
 import { QuickAnswer } from "@/components/site/InfoBlocks";
+import { RelatedTopics } from "@/components/site/RelatedTopics";
 import { breadcrumbNode, jsonLdScript, webPageNode } from "@/lib/schema";
 
 const URL = "https://verlegt-verschraubt.de/vinyl-oder-laminat";
@@ -154,6 +155,14 @@ function RatgeberVinylLaminat() {
           .
         </p>
       </Section>
+
+      <RelatedTopics
+        links={[
+          { to: "/bodenverlegung-kosten", eyebrow: 'Bodenverlegung', title: 'Was kostet Bodenverlegung?' },
+          { to: "/bodenverlegung-fussbodenheizung", eyebrow: 'Bodenverlegung', title: 'Bodenverlegung mit Fußbodenheizung' },
+          { to: "/bodenverlegung-wilhelmshaven", eyebrow: 'Leistung', title: 'Bodenverlegung in Wilhelmshaven' },
+        ]}
+      />
 
       <CtaBlock
         title="Boden gefunden? Dann verlegen wir ihn."

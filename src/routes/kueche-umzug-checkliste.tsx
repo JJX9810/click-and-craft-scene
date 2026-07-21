@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PageHero, Section, CtaBlock } from "@/components/site/PageShell";
 import { QuickAnswer } from "@/components/site/InfoBlocks";
+import { RelatedTopics } from "@/components/site/RelatedTopics";
 import { breadcrumbNode, jsonLdScript, webPageNode } from "@/lib/schema";
 
 const URL = "https://verlegt-verschraubt.de/kueche-umzug-checkliste";
@@ -384,6 +385,14 @@ function RatgeberKuecheUmzug() {
           .
         </p>
       </Section>
+
+      <RelatedTopics
+        links={[
+          { to: "/gebrauchte-kueche-kaufen", eyebrow: 'Küchenmontage', title: 'Gebrauchte Küche kaufen' },
+          { to: "/ikea-kueche-montieren-lassen", eyebrow: 'Küchenmontage', title: 'IKEA-Küche montieren lassen' },
+          { to: "/kuechenmontage-in-wilhelmshaven", eyebrow: 'Leistung', title: 'Küchenmontage in Wilhelmshaven' },
+        ]}
+      />
 
       <CtaBlock
         title="Küche zieht um?"

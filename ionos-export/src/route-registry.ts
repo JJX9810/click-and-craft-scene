@@ -40,6 +40,12 @@ import { Route as G1Route } from "@/routes/boden-selbst-verlegen";
 import { Route as G2Route } from "@/routes/gebrauchte-kueche-kaufen";
 import { Route as G3Route } from "@/routes/haushaltsaufloesung-nachlass";
 import { Route as G4Route } from "@/routes/bodenverlegung-kosten";
+import { Route as C0Route } from "@/routes/bodenverlegung-fussbodenheizung";
+import { Route as C1Route } from "@/routes/vinyl-kueche-bad";
+import { Route as C2Route } from "@/routes/ikea-kueche-montieren-lassen";
+import { Route as C3Route } from "@/routes/kuechenmontage-steuerlich-absetzen";
+import { Route as C4Route } from "@/routes/messie-wohnung-raeumen";
+import { Route as C5Route } from "@/routes/altbau-renovieren-wilhelmshaven";
 
 // IONOS-Override: Kontaktformular ohne Backend (mailto/WhatsApp/Tel)
 import { IonosKontakt } from "./IonosKontakt";
@@ -81,6 +87,12 @@ export const routes: RouteRecord[] = [
   G2Route,
   G3Route,
   G4Route,
+  C0Route,
+  C1Route,
+  C2Route,
+  C3Route,
+  C4Route,
+  C5Route,
 ];
 
 /** Liste aller Pfade, die prerendert werden sollen (inkl. Showroom-Slugs). */

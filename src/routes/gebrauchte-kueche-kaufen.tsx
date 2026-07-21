@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PageHero, Section, CtaBlock } from "@/components/site/PageShell";
 import { QuickAnswer } from "@/components/site/InfoBlocks";
+import { RelatedTopics } from "@/components/site/RelatedTopics";
 import { breadcrumbNode, jsonLdScript, webPageNode } from "@/lib/schema";
 
 const URL = "https://verlegt-verschraubt.de/gebrauchte-kueche-kaufen";
@@ -96,6 +97,14 @@ function Page() {
           Abbau beim Verkäufer, Transport-Beratung, Aufbau mit Anpassungen bei Ihnen – als Monteure für IKEA-, Poco- und Gebrauchtküchen ist das unser Alltag. Auf Wunsch schauen wir vor dem Kauf auf die Anzeige und sagen ehrlich, ob sich die Küche lohnt. Details und Preise: <Link to="/kuechenmontage-in-wilhelmshaven" className="font-medium text-accent hover:underline">Küchenmontage in Wilhelmshaven</Link> – und für den Umzug selbst: <Link to="/kueche-umzug-checkliste" className="font-medium text-accent hover:underline">die komplette Küchenumzugs-Checkliste</Link>.
         </p>
       </Section>
+
+      <RelatedTopics
+        links={[
+          { to: "/kueche-umzug-checkliste", eyebrow: 'Küchenmontage', title: 'Küche umziehen: Die Checkliste' },
+          { to: "/ikea-kueche-montieren-lassen", eyebrow: 'Küchenmontage', title: 'IKEA-Küche montieren lassen' },
+          { to: "/kuechenmontage-in-wilhelmshaven", eyebrow: 'Leistung', title: 'Küchenmontage in Wilhelmshaven' },
+        ]}
+      />
 
       <CtaBlock title={'Küche auf Kleinanzeigen gefunden?'} text={'Schicken Sie uns den Link oder Fotos – ehrliche Einschätzung, ob sich Kauf und Umzug lohnen.'} />
     </>

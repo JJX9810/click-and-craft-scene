@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PageHero, Section, CtaBlock } from "@/components/site/PageShell";
 import { QuickAnswer } from "@/components/site/InfoBlocks";
+import { RelatedTopics } from "@/components/site/RelatedTopics";
 import { breadcrumbNode, jsonLdScript, webPageNode } from "@/lib/schema";
 
 const URL = "https://verlegt-verschraubt.de/entruempelung-kosten";
@@ -139,6 +140,14 @@ function RatgeberEntruempelungKosten() {
           .
         </p>
       </Section>
+
+      <RelatedTopics
+        links={[
+          { to: "/haushaltsaufloesung-nachlass", eyebrow: 'Entrümpelung', title: 'Haushaltsauflösung im Trauerfall' },
+          { to: "/messie-wohnung-raeumen", eyebrow: 'Entrümpelung', title: 'Messie-Wohnung räumen' },
+          { to: "/entruempelung-entsorgung-in-wilhelmshaven", eyebrow: 'Leistung', title: 'Entrümpelung & Haushaltsauflösung' },
+        ]}
+      />
 
       <CtaBlock
         title="Klarheit statt Schätzung?"

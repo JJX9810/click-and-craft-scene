@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PageHero, Section, CtaBlock } from "@/components/site/PageShell";
 import { QuickAnswer } from "@/components/site/InfoBlocks";
+import { RelatedTopics } from "@/components/site/RelatedTopics";
 import { breadcrumbNode, jsonLdScript, webPageNode } from "@/lib/schema";
 
 const URL = "https://verlegt-verschraubt.de/boden-selbst-verlegen";
@@ -96,6 +97,14 @@ function Page() {
           Schicken Sie uns Fotos von Raum und Untergrund – wir sagen Ihnen ehrlich, ob Ihr Projekt ein gutes Wochenendprojekt ist oder in Profihände gehört. Preise und Details auf der Seite <Link to="/bodenverlegung-wilhelmshaven" className="font-medium text-accent hover:underline">Bodenleger & Bodenverlegung in Wilhelmshaven</Link>, die Belagswahl klärt der Ratgeber <Link to="/vinyl-oder-laminat" className="font-medium text-accent hover:underline">Vinyl oder Laminat?</Link>.
         </p>
       </Section>
+
+      <RelatedTopics
+        links={[
+          { to: "/bodenverlegung-kosten", eyebrow: 'Bodenverlegung', title: 'Was kostet Bodenverlegung?' },
+          { to: "/vinyl-oder-laminat", eyebrow: 'Bodenverlegung', title: 'Vinyl oder Laminat?' },
+          { to: "/bodenverlegung-wilhelmshaven", eyebrow: 'Leistung', title: 'Bodenverlegung in Wilhelmshaven' },
+        ]}
+      />
 
       <CtaBlock title={'Unsicher, ob DIY reicht?'} text={'Fotos per WhatsApp – ehrliche Einschätzung, ob Selbermachen sinnvoll ist. Versprochen ohne Verkaufsdruck.'} />
     </>

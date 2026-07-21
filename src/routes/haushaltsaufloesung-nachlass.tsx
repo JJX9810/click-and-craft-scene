@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PageHero, Section, CtaBlock } from "@/components/site/PageShell";
 import { QuickAnswer } from "@/components/site/InfoBlocks";
+import { RelatedTopics } from "@/components/site/RelatedTopics";
 import { breadcrumbNode, jsonLdScript, webPageNode } from "@/lib/schema";
 
 const URL = "https://verlegt-verschraubt.de/haushaltsaufloesung-nachlass";
@@ -91,6 +92,14 @@ function Page() {
           Wir übernehmen Haushaltsauflösungen in Wilhelmshaven und Umgebung diskret und planbar – von der Besichtigung (39 € Pauschale, bei Auftrag vollständig verrechnet) über die Räumung bis zur besenreinen Übergabe zum vereinbarten Termin. Gefundene persönliche Dinge legen wir zur Seite. Mehr zur Leistung: <Link to="/entruempelung-entsorgung-in-wilhelmshaven" className="font-medium text-accent hover:underline">Entrümpelung & Haushaltsauflösung in Wilhelmshaven</Link> – und zur Kostenfrage: <Link to="/entruempelung-kosten" className="font-medium text-accent hover:underline">Was kostet eine Entrümpelung?</Link>.
         </p>
       </Section>
+
+      <RelatedTopics
+        links={[
+          { to: "/entruempelung-kosten", eyebrow: 'Entrümpelung', title: 'Was kostet eine Entrümpelung?' },
+          { to: "/messie-wohnung-raeumen", eyebrow: 'Entrümpelung', title: 'Messie-Wohnung räumen' },
+          { to: "/entruempelung-entsorgung-in-wilhelmshaven", eyebrow: 'Leistung', title: 'Entrümpelung & Haushaltsauflösung' },
+        ]}
+      />
 
       <CtaBlock title={'Sie stehen gerade vor dieser Aufgabe?'} text={'Melden Sie sich, wenn Sie so weit sind – wir besprechen alles in Ruhe und ohne Druck.'} />
     </>
