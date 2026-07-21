@@ -109,7 +109,7 @@ function Page() {
       <PageHero
         eyebrow="Leistung"
         title="Ihr Bodenleger in Wilhelmshaven – Bodenverlegung von Laminat, Vinyl, PVC & Teppich"
-        intro="Als Bodenleger aus Wilhelmshaven verlegen wir Vinyl, Laminat, PVC, Teppich, Treppen und Sockelleisten – sauber, mit ordentlichen Kanten und stimmigem Verlegebild. Für Privatkunden in Wilhelmshaven, Schortens, Sande, Jever, Varel, Wangerland und Wittmund."
+        intro="Als Bodenleger aus Wilhelmshaven verlegen wir Vinyl, Laminat, PVC, Teppich, Treppen und Sockelleisten – sauber, mit ordentlichen Kanten und stimmigem Verlegebild. Für Privatkunden in Wilhelmshaven, Schortens, Sande, Jever, Varel, Wangerland und Wittmund. Für Privatpersonen ebenso wie für Hausverwaltungen und Firmen, die Bodenverlegearbeiten koordiniert vergeben möchten."
         breadcrumbs={[{ label: "Leistungen" }, { label: "Bodenverlegung" }]}
       />
 
