@@ -62,8 +62,8 @@
     animation:sparkrun var(--dur,6s) linear infinite;animation-delay:var(--delay,0s)}
   @keyframes sparkrun{0%{stroke-dashoffset:100;opacity:0}9%{opacity:1}52%{opacity:1}
     68%{stroke-dashoffset:-5;opacity:0}100%{stroke-dashoffset:-5;opacity:0}}
-  .veins-svg[data-glow="on"] .veins-base{opacity:1;filter:brightness(1.25)}
-  .veins-svg[data-glow="on"] .spark{animation-duration:calc(var(--dur,6s) * .55)}
+  .veins-svg[data-glow="on"] .veins-base{opacity:1}
+  .veins-svg[data-glow="on"] .spark{animation-duration:calc(var(--dur,6s) * .6)}
   .veins-svg.surge .spark{animation-duration:calc(var(--dur,6s) * .32)!important}
   .veins-svg.surge .veins-base{opacity:1;filter:brightness(1.5)}
 
@@ -182,49 +182,47 @@
       <linearGradient id="sparkg" x1="0" y1="0" x2="1" y2="1">
         <stop offset="0%" stop-color="#fff7dc"/><stop offset="100%" stop-color="#f6dd8a"/>
       </linearGradient>
-      <radialGradient id="baseGrad" cx="66%" cy="32%" r="95%">
-        <stop offset="0%" stop-color="#1a3a2a"/><stop offset="42%" stop-color="#0e2418"/>
-        <stop offset="100%" stop-color="#050d08"/>
-      </radialGradient>
-      <!-- heller polierter Diagonalstreifen wie auf echtem Marmor -->
-      <linearGradient id="sheen" x1="0" y1="1" x2="1" y2="0">
-        <stop offset="0%" stop-color="#2a5842" stop-opacity="0"/>
-        <stop offset="52%" stop-color="#356c52" stop-opacity=".55"/>
-        <stop offset="70%" stop-color="#2a5842" stop-opacity="0"/>
+      <!-- Matte grüne Wand: gleichmäßiger Grundton, sanftes Licht von oben -->
+      <linearGradient id="wallGrad" x1="0.12" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#183d2d"/><stop offset="48%" stop-color="#123026"/>
+        <stop offset="100%" stop-color="#0a2017"/>
       </linearGradient>
-      <radialGradient id="vign" cx="50%" cy="42%" r="75%">
-        <stop offset="0%" stop-color="#000" stop-opacity="0"/>
-        <stop offset="70%" stop-color="#000" stop-opacity="0"/>
-        <stop offset="100%" stop-color="#020805" stop-opacity=".8"/>
+      <radialGradient id="wallLight" cx="50%" cy="4%" r="82%">
+        <stop offset="0%" stop-color="#2c5842" stop-opacity=".5"/>
+        <stop offset="55%" stop-color="#2c5842" stop-opacity="0"/>
       </radialGradient>
-      <!-- Marmor-Wolken: weiches fraktales Rauschen, grün getönt -->
-      <filter id="clouds" x="0" y="0" width="100%" height="100%">
-        <feTurbulence type="fractalNoise" baseFrequency="0.006 0.011" numOctaves="4" seed="11" stitchTiles="stitch" result="n"/>
-        <feColorMatrix in="n" type="matrix" values="0 0 0 0 0.10  0 0 0 0 0.24  0 0 0 0 0.17  0 0 0 0.5 0"/>
+      <radialGradient id="vign" cx="50%" cy="45%" r="82%">
+        <stop offset="0%" stop-color="#000" stop-opacity="0"/>
+        <stop offset="74%" stop-color="#000" stop-opacity="0"/>
+        <stop offset="100%" stop-color="#06120c" stop-opacity=".5"/>
+      </radialGradient>
+      <!-- breite, weiche Spachtel-/Trowel-Tonschwankung einer Wand -->
+      <filter id="mottle" x="0" y="0" width="100%" height="100%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.0035 0.003" numOctaves="2" seed="3" stitchTiles="stitch" result="n"/>
+        <feColorMatrix in="n" type="matrix" values="0 0 0 0 0.10  0 0 0 0 0.22  0 0 0 0 0.16  0 0 0 0.26 0"/>
       </filter>
-      <!-- feine Steinkörnung -->
+      <!-- feine matte Wandkörnung (Putz) -->
       <filter id="grain" x="0" y="0" width="100%" height="100%">
-        <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="7" result="g"/>
-        <feColorMatrix in="g" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.06 0"/>
+        <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="7" result="g"/>
+        <feColorMatrix in="g" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.05 0"/>
       </filter>
-      <!-- Organische Goldadern: verzerrt per Turbulenz + Glühen -->
-      <filter id="veinfx" x="-15%" y="-15%" width="130%" height="130%">
-        <feTurbulence type="fractalNoise" baseFrequency="0.008 0.013" numOctaves="3" seed="4" result="t"/>
-        <feDisplacementMap in="SourceGraphic" in2="t" scale="52" xChannelSelector="R" yChannelSelector="G" result="disp"/>
-        <feGaussianBlur in="disp" stdDeviation="0.7" result="b"/>
+      <!-- Organische Goldadern: glatt verzerrt (kein Aufspalten) + weiches Glühen -->
+      <filter id="veinfx" x="-20%" y="-20%" width="140%" height="140%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.005 0.006" numOctaves="2" seed="4" result="t"/>
+        <feDisplacementMap in="SourceGraphic" in2="t" scale="30" xChannelSelector="R" yChannelSelector="G" result="disp"/>
+        <feGaussianBlur in="disp" stdDeviation="0.6" result="b"/>
         <feMerge><feMergeNode in="b"/><feMergeNode in="disp"/></feMerge>
       </filter>
       <filter id="sparkfx" x="-40%" y="-40%" width="180%" height="180%">
-        <feTurbulence type="fractalNoise" baseFrequency="0.008 0.013" numOctaves="3" seed="4" result="t"/>
-        <feDisplacementMap in="SourceGraphic" in2="t" scale="58" xChannelSelector="R" yChannelSelector="G" result="disp"/>
-        <feGaussianBlur in="disp" stdDeviation="2.6"/>
+        <feTurbulence type="fractalNoise" baseFrequency="0.005 0.006" numOctaves="2" seed="4" result="t"/>
+        <feDisplacementMap in="SourceGraphic" in2="t" scale="30" xChannelSelector="R" yChannelSelector="G" result="disp"/>
+        <feGaussianBlur in="disp" stdDeviation="2.2"/>
       </filter>
     </defs>
-    <rect width="1440" height="900" fill="url(#baseGrad)"/>
-    <rect width="1440" height="900" filter="url(#clouds)" style="mix-blend-mode:soft-light;opacity:.8"/>
-    <rect width="1440" height="900" filter="url(#clouds)" style="mix-blend-mode:multiply;opacity:.4"/>
-    <rect width="1440" height="900" fill="url(#sheen)" style="mix-blend-mode:screen;opacity:.6"/>
-    <rect width="1440" height="900" filter="url(#grain)" style="mix-blend-mode:overlay;opacity:.55"/>
+    <rect width="1440" height="900" fill="url(#wallGrad)"/>
+    <rect width="1440" height="900" filter="url(#mottle)" style="mix-blend-mode:soft-light;opacity:.7"/>
+    <rect width="1440" height="900" fill="url(#wallLight)" style="mix-blend-mode:screen;opacity:.5"/>
+    <rect width="1440" height="900" filter="url(#grain)" style="mix-blend-mode:overlay;opacity:.5"/>
     <rect width="1440" height="900" fill="url(#vign)"/>
   </svg>
 
@@ -271,9 +269,10 @@
 <!-- ================= LEISTUNGEN ================= -->
 <section id="leistungen" class="leistungen marble">
   <svg class="marble-svg" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-    <rect width="1440" height="900" fill="url(#baseGrad)"/>
-    <rect width="1440" height="900" filter="url(#clouds)" style="mix-blend-mode:soft-light;opacity:.6"/>
-    <g class="veins-base" filter="url(#veinfx)" id="baseG2" style="opacity:.55"></g>
+    <rect width="1440" height="900" fill="url(#wallGrad)"/>
+    <rect width="1440" height="900" filter="url(#mottle)" style="mix-blend-mode:soft-light;opacity:.55"/>
+    <rect width="1440" height="900" fill="url(#wallLight)" style="mix-blend-mode:screen;opacity:.4"/>
+    <g class="veins-base" filter="url(#veinfx)" id="baseG2" style="opacity:.5"></g>
     <rect width="1440" height="900" filter="url(#grain)" style="mix-blend-mode:overlay;opacity:.4"/>
   </svg>
   <div class="wrap">
@@ -296,8 +295,8 @@
 <!-- ================= FOOTER ================= -->
 <footer id="kontakt" class="marble">
   <svg class="marble-svg" viewBox="0 0 1440 400" preserveAspectRatio="xMidYMid slice" aria-hidden="true" style="opacity:.7">
-    <rect width="1440" height="400" fill="url(#baseGrad)"/>
-    <rect width="1440" height="400" filter="url(#clouds)" style="mix-blend-mode:soft-light;opacity:.5"/>
+    <rect width="1440" height="400" fill="url(#wallGrad)"/>
+    <rect width="1440" height="400" filter="url(#mottle)" style="mix-blend-mode:soft-light;opacity:.45"/>
   </svg>
   <div class="wrap foot">
     <span class="fname">
@@ -316,25 +315,25 @@
 
   // Goldadern – diagonale Hauptadern + feine Verästelungen, mit Deckkraft-Varianz.
   // Durch den SVG-Displacement-Filter werden sie organisch/wellig wie echter Marmor.
+  // Mäandernde Adern (mehrere S-Kurven je Ader) – rechts/oben konzentriert,
+  // links ruhig. Durch den weichen Displacement-Filter wirken sie natürlich,
+  // ohne aufzuspalten oder als gerade Linie zu lesen.
   var VEINS=[
-    {d:"M -80 120 C 260 200 430 250 690 320 S 1120 450 1560 580",w:1.5,o:.9,delay:0.0,dur:5.6},
-    {d:"M 120 -60 C 320 200 470 320 660 440 S 1030 660 1260 940",w:1.2,o:.85,delay:1.2,dur:6.3},
-    {d:"M 520 -40 C 690 160 800 320 980 450 S 1300 660 1520 720",w:1.0,o:.8,delay:2.4,dur:5.9},
-    {d:"M -60 380 C 220 430 430 490 660 540 S 1130 660 1560 720",w:1.1,o:.7,delay:0.7,dur:6.7},
-    {d:"M 900 -40 C 990 180 1010 330 1130 480 S 1340 740 1440 960",w:1.0,o:.8,delay:1.8,dur:6.1},
-    {d:"M -40 660 C 320 660 520 630 780 660 S 1200 780 1540 820",w:.75,o:.5,delay:3.2,dur:5.3},
-    {d:"M 300 -30 C 420 180 470 330 560 470 S 720 720 760 940",w:.7,o:.5,delay:2.1,dur:6.0},
-    // feine Verästelungen / Haarrisse
-    {d:"M 690 320 C 770 380 840 450 860 570",w:.6,o:.65,delay:2.9,dur:4.4},
-    {d:"M 660 440 C 730 490 820 520 930 520",w:.55,o:.55,delay:3.6,dur:4.1},
-    {d:"M 660 540 C 750 580 840 620 900 700",w:.55,o:.55,delay:4.2,dur:4.7},
-    {d:"M 980 450 C 1040 490 1060 540 1040 620",w:.5,o:.5,delay:1.5,dur:5.0},
-    {d:"M 430 250 C 480 320 440 380 480 460",w:.45,o:.45,delay:3.9,dur:4.9},
-    {d:"M 1130 480 C 1180 520 1220 560 1210 640",w:.5,o:.45,delay:2.6,dur:5.2},
-    {d:"M 560 470 C 620 520 700 540 780 520",w:.42,o:.4,delay:4.6,dur:4.3},
-    {d:"M 800 360 C 850 400 870 450 930 470",w:.4,o:.4,delay:5.0,dur:4.5},
-    {d:"M 1000 250 C 1080 300 1140 360 1180 470",w:.6,o:.55,delay:0.9,dur:5.6},
-    {d:"M 1180 470 C 1240 520 1300 540 1360 620",w:.45,o:.4,delay:3.3,dur:4.8}
+    {d:"M 470 -40 C 600 110 520 230 660 320 S 900 380 980 520 S 1120 650 1180 900",w:1.3,o:.85,delay:0.0,dur:6.0},
+    {d:"M 760 -40 C 860 120 780 250 940 340 S 1180 460 1250 610 S 1360 760 1440 900",w:1.15,o:.8,delay:1.3,dur:6.4},
+    {d:"M 1040 -30 C 1120 110 1040 240 1200 340 S 1400 470 1470 600",w:0.95,o:.75,delay:2.5,dur:5.8},
+    {d:"M 250 40 C 430 110 470 260 660 320 S 940 400 1080 360",w:1.0,o:.6,delay:0.8,dur:6.6},
+    {d:"M 660 320 C 700 420 640 500 720 600 S 820 760 800 900",w:0.8,o:.6,delay:1.9,dur:5.6},
+    // Verästelungen von den Hauptadern
+    {d:"M 940 340 C 1000 390 1090 400 1150 470",w:.6,o:.6,delay:2.9,dur:4.4},
+    {d:"M 980 520 C 1050 560 1140 570 1200 660",w:.6,o:.55,delay:3.6,dur:4.6},
+    {d:"M 660 320 C 730 360 800 350 870 300",w:.5,o:.45,delay:4.2,dur:4.7},
+    {d:"M 1200 340 C 1260 390 1320 400 1380 490",w:.5,o:.5,delay:1.5,dur:5.0},
+    {d:"M 720 600 C 800 630 900 620 960 690",w:.45,o:.4,delay:3.9,dur:4.9},
+    {d:"M 1250 610 C 1300 650 1360 660 1420 730",w:.45,o:.4,delay:2.6,dur:5.2},
+    // wenige feine Haarrisse oben rechts
+    {d:"M 1120 150 C 1180 210 1240 230 1300 330",w:.42,o:.45,delay:0.9,dur:5.4},
+    {d:"M 860 200 C 900 260 880 320 930 380",w:.38,o:.4,delay:5.0,dur:4.5}
   ];
   function buildVeins(baseG,sparkG){
     VEINS.forEach(function(v){
