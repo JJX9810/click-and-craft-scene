@@ -49,16 +49,23 @@
   /* ---------- Marmor ---------- */
   .marble{position:relative;isolation:isolate;background:var(--green-800)}
   .marble-svg{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+  /* Hybrid: optionales Marmor-Foto als Hintergrund. Datei "marble-hero.jpg"
+     neben die HTML legen -> wird automatisch genutzt. Fehlt sie, greift der
+     prozedurale Marmor darunter. */
+  .hero-photo{position:absolute;inset:0;z-index:1;pointer-events:none;
+    background-position:center;background-size:cover;background-repeat:no-repeat;
+    background-image:url("./marble-hero.jpg")}
+  .veins-svg{position:absolute;inset:0;width:100%;height:100%;z-index:2;pointer-events:none}
   .veins-base{animation:breathe 8s ease-in-out infinite}
   @keyframes breathe{0%,100%{opacity:.85}50%{opacity:1}}
   .spark{stroke-dasharray:5 100;stroke-dashoffset:100;opacity:0;
     animation:sparkrun var(--dur,6s) linear infinite;animation-delay:var(--delay,0s)}
   @keyframes sparkrun{0%{stroke-dashoffset:100;opacity:0}9%{opacity:1}52%{opacity:1}
     68%{stroke-dashoffset:-5;opacity:0}100%{stroke-dashoffset:-5;opacity:0}}
-  .marble-svg[data-glow="on"] .veins-base{opacity:1;filter:brightness(1.25)}
-  .marble-svg[data-glow="on"] .spark{animation-duration:calc(var(--dur,6s) * .55)}
-  .marble-svg.surge .spark{animation-duration:calc(var(--dur,6s) * .32)!important}
-  .marble-svg.surge .veins-base{opacity:1;filter:brightness(1.5)}
+  .veins-svg[data-glow="on"] .veins-base{opacity:1;filter:brightness(1.25)}
+  .veins-svg[data-glow="on"] .spark{animation-duration:calc(var(--dur,6s) * .55)}
+  .veins-svg.surge .spark{animation-duration:calc(var(--dur,6s) * .32)!important}
+  .veins-svg.surge .veins-base{opacity:1;filter:brightness(1.5)}
 
   /* ---------- Hero ---------- */
   .hero{position:relative;min-height:100vh;display:flex;align-items:center;overflow:hidden}
@@ -217,10 +224,17 @@
     <rect width="1440" height="900" filter="url(#clouds)" style="mix-blend-mode:soft-light;opacity:.8"/>
     <rect width="1440" height="900" filter="url(#clouds)" style="mix-blend-mode:multiply;opacity:.4"/>
     <rect width="1440" height="900" fill="url(#sheen)" style="mix-blend-mode:screen;opacity:.6"/>
-    <g class="veins-base" filter="url(#veinfx)" id="baseG"></g>
-    <g class="veins-spark" filter="url(#sparkfx)" id="sparkG"></g>
     <rect width="1440" height="900" filter="url(#grain)" style="mix-blend-mode:overlay;opacity:.55"/>
     <rect width="1440" height="900" fill="url(#vign)"/>
+  </svg>
+
+  <!-- Optionales Marmor-Foto (marble-hero.jpg) – liegt zwischen Fallback und Adern -->
+  <div class="hero-photo"></div>
+
+  <!-- Leuchtende Gold-Adern als eigene Ebene ÜBER dem Foto -->
+  <svg class="veins-svg" id="veinsHero" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <g class="veins-base" filter="url(#veinfx)" id="baseG"></g>
+    <g class="veins-spark" filter="url(#sparkfx)" id="sparkG"></g>
   </svg>
 
   <div class="hero-scrim"></div>
@@ -347,7 +361,7 @@
   var eb=document.getElementById("edgeBottom"); if(eb){eb.appendChild(mk({d:edgePath(23),fill:"var(--green-800)"}));}
 
   // Aufleuchten: verstärkt beim Hover über den Hero + window.wwSurge() für Events
-  var hero=document.getElementById("start"), mv=document.getElementById("marbleHero");
+  var hero=document.getElementById("start"), mv=document.getElementById("veinsHero");
   hero.addEventListener("mouseenter",function(){mv.setAttribute("data-glow","on");});
   hero.addEventListener("mouseleave",function(){mv.setAttribute("data-glow","off");});
   window.wwSurge=function(ms){mv.classList.add("surge");setTimeout(function(){mv.classList.remove("surge");},ms||1400);};
