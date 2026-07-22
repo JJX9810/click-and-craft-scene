@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Wand &amp; Wirkung – Wandgestaltung auf höchstem Niveau</title>
+<meta name="description" content="Andreas Wagner gestaltet Wände und Böden – fugenlose Systeme, Spachteltechnik und Harz. Kreative Wandgestaltung in Wilhelmshaven & Umgebung." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --green-900:#0a1c16; --green-800:#0e2620; --green-700:#143229; --green-600:#1b4034;
+    --cream:#efe9dd; --cream-2:#f4efe4;
+    --gold:#d3ad57; --gold-bright:#e8cf86; --gold-deep:#b8923f;
+    --serif:"Playfair Display","Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+    --sans:"Source Sans 3",ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:var(--sans);background:var(--green-800);color:var(--cream);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  a{text-decoration:none;color:inherit}
+  h1,h2,h3{font-family:var(--serif);letter-spacing:-.01em;font-weight:600}
+  .wrap{max-width:1200px;margin:0 auto;padding:0 24px}
+
+  /* ---------- Header ---------- */
+  header{position:absolute;inset:0 0 auto 0;z-index:30}
+  .hbar{display:flex;align-items:center;justify-content:space-between;padding:22px 0}
+  .brand{display:flex;align-items:center;gap:14px}
+  .logo{display:flex;align-items:center;gap:12px}
+  .logo .ic{color:var(--gold)}
+  .logo .name{font-family:var(--serif);font-size:20px;font-weight:600;letter-spacing:.04em;color:var(--gold);line-height:1}
+  .logo .sub{font-size:10px;font-style:italic;color:rgba(211,173,87,.7);margin-top:4px;display:block}
+  .socials{display:flex;gap:8px;margin-left:6px}
+  .soc{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;
+       background:linear-gradient(135deg,var(--gold-bright),var(--gold-deep));color:#3a2f12}
+  nav.main{display:flex;gap:34px}
+  nav.main a{font-size:14px;color:rgba(239,233,221,.85);transition:color .2s}
+  nav.main a:hover{color:var(--gold)}
+  .btn-gold{display:inline-block;border:0;cursor:pointer;font-family:var(--sans);border-radius:999px;
+    padding:13px 26px;font-size:14px;font-weight:600;color:#3a2f12;
+    background:linear-gradient(180deg,var(--gold-bright),var(--gold));
+    box-shadow:0 10px 24px -8px rgba(211,173,87,.55);transition:transform .2s}
+  .btn-gold:hover{transform:translateY(-2px)}
+  .btn-ghost{display:inline-block;border:1px solid rgba(239,233,221,.25);border-radius:999px;
+    padding:14px 30px;font-size:14px;font-weight:600;color:var(--cream);transition:.2s}
+  .btn-ghost:hover{border-color:var(--gold);color:var(--gold)}
+
+  /* ---------- Marmor + Goldadern ---------- */
+  .marble{position:relative;background-color:var(--green-800);isolation:isolate;
+    background-image:
+      radial-gradient(120% 90% at 70% 28%,#1c3d31 0%,transparent 55%),
+      radial-gradient(140% 120% at 50% 120%,#06120e 0%,transparent 60%),
+      linear-gradient(160deg,#123027 0%,#0d241d 45%,#0a1c16 100%);}
+  .marble::before{content:"";position:absolute;inset:0;pointer-events:none;z-index:0;opacity:.5;mix-blend-mode:soft-light;
+    background:radial-gradient(60% 40% at 25% 30%,rgba(255,255,255,.05) 0%,transparent 60%),
+              radial-gradient(50% 40% at 80% 70%,rgba(0,0,0,.19) 0%,transparent 60%)}
+  .veins{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
+  .veins-base{opacity:.62;animation:breathe 7s ease-in-out infinite}
+  @keyframes breathe{0%,100%{opacity:.52}50%{opacity:.78}}
+  .spark{stroke-dasharray:6 100;stroke-dashoffset:100;opacity:0;
+    animation:sparkrun var(--dur,6s) linear infinite;animation-delay:var(--delay,0s)}
+  @keyframes sparkrun{0%{stroke-dashoffset:100;opacity:0}8%{opacity:1}55%{opacity:1}
+    70%{stroke-dashoffset:-6;opacity:0}100%{stroke-dashoffset:-6;opacity:0}}
+  /* verstärktes / getriggertes Aufleuchten */
+  .veins[data-glow="on"] .veins-base{opacity:1}
+  .veins[data-glow="on"] .spark{animation-duration:calc(var(--dur,6s) * .55)}
+  .veins.surge .spark{animation-duration:calc(var(--dur,6s) * .35)!important}
+  .veins.surge .veins-base{opacity:1}
+
+  /* ---------- Hero ---------- */
+  .hero{position:relative;min-height:100vh;display:flex;align-items:center;overflow:hidden}
+  .hero-scrim{position:absolute;inset:0;z-index:1;pointer-events:none;
+    background:linear-gradient(90deg,rgba(6,18,14,.72) 0%,rgba(6,18,14,.35) 45%,transparent 75%)}
+  .hero-inner{position:relative;z-index:10;width:100%;padding-top:96px}
+  .eyebrow{display:flex;align-items:center;gap:16px;font-size:12px;font-weight:500;letter-spacing:.28em;
+    text-transform:uppercase;color:var(--gold)}
+  .eyebrow .line{width:40px;height:1px;background:rgba(211,173,87,.7)}
+  h1.title{margin-top:30px;font-size:clamp(38px,6.4vw,76px);line-height:1.05;color:var(--cream);max-width:15ch}
+  .lead{margin-top:30px;max-width:34rem;font-size:18px;line-height:1.65;color:rgba(239,233,221,.75)}
+  .cta-row{margin-top:38px;display:flex;flex-wrap:wrap;gap:16px}
+  .scrollcue{position:absolute;left:50%;bottom:30px;transform:translateX(-50%);z-index:10;color:rgba(239,233,221,.5)}
+  .scrollcue svg{animation:bob 2s ease-in-out infinite}
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(8px)}}
+
+  /* ---------- Brush edges ---------- */
+  .edge{display:block;width:100%;height:clamp(28px,4vw,58px);position:absolute;left:0;right:0}
+  .edge.flip{transform:scaleY(-1)}
+
+  /* ---------- Vorteile (creme) ---------- */
+  .vorteile{position:relative;background:var(--cream);padding:96px 0}
+  .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
+  .card{background:rgba(255,255,255,.6);border-radius:18px;padding:28px;
+    box-shadow:0 18px 40px -24px rgba(20,50,41,.5)}
+  .card .chk{width:44px;height:44px;border-radius:999px;display:flex;align-items:center;justify-content:center;
+    background:var(--green-700);color:var(--gold-bright)}
+  .card h3{margin-top:24px;font-size:19px;color:var(--green-800)}
+  .card p{margin-top:12px;font-size:14px;line-height:1.6;color:rgba(14,38,32,.7)}
+
+  /* ---------- Leistungen ---------- */
+  .leistungen{position:relative;padding:112px 0;overflow:hidden}
+  .sec-head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:24px;position:relative;z-index:10}
+  .kicker{font-size:12px;font-weight:500;letter-spacing:.28em;text-transform:uppercase;color:var(--gold)}
+  .leistungen h2{margin-top:16px;font-size:clamp(30px,4.4vw,50px);line-height:1.1;color:var(--cream);max-width:16ch}
+  .more-link{display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:500;color:var(--gold);transition:gap .2s}
+  .more-link:hover{gap:12px}
+  .grid3{position:relative;z-index:10;margin-top:56px;display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+  .svc{border:1px solid rgba(239,233,221,.1);border-radius:18px;overflow:hidden;
+    background:rgba(10,28,22,.6);box-shadow:0 24px 60px -30px rgba(0,0,0,.8);transition:transform .3s}
+  .svc:hover{transform:translateY(-6px)}
+  .svc .thumb{aspect-ratio:4/3;width:100%;transition:transform .5s}
+  .svc:hover .thumb{transform:scale(1.05)}
+  .svc .body{padding:24px}
+  .svc h3{font-size:21px;color:var(--cream)}
+  .svc p{margin-top:8px;font-size:14px;color:rgba(239,233,221,.65)}
+  .svc .more{margin-top:20px;display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:500;
+    letter-spacing:.18em;text-transform:uppercase;color:var(--gold);transition:gap .2s}
+  .svc:hover .more{gap:12px}
+
+  /* ---------- Footer ---------- */
+  footer{background:var(--green-900);padding:64px 0}
+  .foot{display:flex;flex-direction:column;align-items:center;text-align:center;gap:16px}
+  .foot .fname{display:flex;align-items:center;gap:12px;color:var(--gold);font-family:var(--serif);font-size:20px;font-weight:600;letter-spacing:.04em}
+  .foot p{max-width:28rem;font-size:14px;color:rgba(239,233,221,.55)}
+
+  /* ---------- Responsive ---------- */
+  .menu-btn{display:none}
+  @media(max-width:900px){
+    nav.main,.socials,.header-cta{display:none}
+    .cards{grid-template-columns:repeat(2,1fr)}
+    .grid3{grid-template-columns:1fr}
+  }
+  @media(max-width:560px){
+    .cards{grid-template-columns:1fr}
+    .cta-row .btn-gold,.cta-row .btn-ghost{width:100%;text-align:center}
+  }
+  @media(prefers-reduced-motion:reduce){
+    .veins-base{animation:none}.spark{animation:none;opacity:0}.scrollcue svg{animation:none}
+    html{scroll-behavior:auto}
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= HEADER ================= -->
+<header>
+  <div class="wrap hbar">
+    <div class="brand">
+      <a class="logo" href="#start">
+        <span class="ic" aria-hidden="true">
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" style="transform:rotate(-45deg)"><path d="M18.37 2.63 14 7l-1.59-1.59a2 2 0 0 0-2.82 0L8 7l9 9 1.59-1.59a2 2 0 0 0 0-2.82L17 10l4.37-4.37a2.12 2.12 0 1 0-3-3Z"/><path d="M9 8c-2 3-4 3.5-7 4l8 10c2-1 6-5 6-7"/><path d="M14.5 17.5 4.5 15"/></svg>
+        </span>
+        <span>
+          <span class="name">WAND &amp; WIRKUNG</span>
+          <span class="sub">auf höchstem Niveau</span>
+        </span>
+      </a>
+      <div class="socials">
+        <span class="soc" aria-label="Instagram"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="20" x="2" y="2" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37Z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg></span>
+        <span class="soc" aria-label="Facebook"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></span>
+      </div>
+    </div>
+    <nav class="main">
+      <a href="#start">Start</a><a href="#leistungen">Leistungen</a>
+      <a href="#projekte">Projekte</a><a href="#start">Über mich</a><a href="#kontakt">Kontakt</a>
+    </nav>
+    <a class="btn-gold header-cta" href="#kontakt">Projekt anfragen</a>
+  </div>
+</header>
+
+<!-- ================= HERO ================= -->
+<section id="start" class="hero marble">
+  <svg class="veins" id="veins" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <defs>
+      <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#8a6d2f"/><stop offset="45%" stop-color="#d8b45a"/>
+        <stop offset="70%" stop-color="#f2e0a3"/><stop offset="100%" stop-color="#b8923f"/>
+      </linearGradient>
+      <linearGradient id="sparkg" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#fff6d8"/><stop offset="100%" stop-color="#f4d982"/>
+      </linearGradient>
+      <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+        <feGaussianBlur stdDeviation="2.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <filter id="sglow" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="3"/></filter>
+    </defs>
+    <g class="veins-base" filter="url(#glow)" id="baseG"></g>
+    <g class="veins-spark" filter="url(#sglow)" id="sparkG"></g>
+  </svg>
+
+  <div class="hero-scrim"></div>
+
+  <div class="wrap hero-inner">
+    <p class="eyebrow"><span class="line"></span>Angehender Malermeister · Wilhelmshaven &amp; Umgebung</p>
+    <h1 class="title">Wände, die wirken.<br>Oberflächen, die bleiben.</h1>
+    <p class="lead">Andreas Wagner gestaltet Wände und Böden – kreative Wandgestaltung mit fugenlosen Systemen, Spachteltechnik und Harz, persönlich geplant, sauber ausgeführt und passend zu Ihrem Raum.</p>
+    <div class="cta-row">
+      <a class="btn-gold" href="#kontakt">Unverbindlich beraten lassen</a>
+      <a class="btn-ghost" href="#projekte">Arbeiten ansehen</a>
+    </div>
+  </div>
+
+  <a class="scrollcue" href="#vorteile" aria-label="Nach unten scrollen">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>
+  </a>
+</section>
+
+<!-- ================= VORTEILE ================= -->
+<section id="vorteile" class="vorteile">
+  <svg class="edge flip" id="edgeTop" viewBox="0 0 1440 60" preserveAspectRatio="none" aria-hidden="true" style="top:0;transform:translateY(-98%) scaleY(-1)"></svg>
+  <div class="wrap">
+    <div class="cards">
+      <div class="card"><span class="chk"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><h3>Ein Ansprechpartner</h3><p>Persönlich betreut vom Erstgespräch bis zur gemeinsamen Abnahme – ohne wechselndes Team.</p></div>
+      <div class="card"><span class="chk"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><h3>Ehrliche Beratung</h3><p>Offene Material- und Machbarkeitsberatung. Ich sage Ihnen, was in Ihrem Raum wirklich sinnvoll ist.</p></div>
+      <div class="card"><span class="chk"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><h3>Sauberer Untergrund</h3><p>Sorgfältige Vorbereitung ist die halbe Miete – erst dann kommt die Oberfläche.</p></div>
+      <div class="card"><span class="chk"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><h3>Privat &amp; Gewerbe</h3><p>Von der einzelnen Akzentwand bis zum kompletten Gewerbeobjekt in Wilhelmshaven und Umgebung.</p></div>
+    </div>
+  </div>
+  <svg class="edge" id="edgeBottom" viewBox="0 0 1440 60" preserveAspectRatio="none" aria-hidden="true" style="bottom:0"></svg>
+</section>
+
+<!-- ================= LEISTUNGEN ================= -->
+<section id="leistungen" class="leistungen marble">
+  <svg class="veins" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true" style="opacity:.5">
+    <g class="veins-base" filter="url(#glow)" id="baseG2"></g>
+  </svg>
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <p class="kicker">Leistungen</p>
+        <h2>Welche Oberfläche passt zu Ihrem Raum?</h2>
+      </div>
+      <a class="more-link" href="#leistungen">Alle Leistungen ansehen
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
+    </div>
+    <div id="projekte" class="grid3">
+      <article class="svc"><div class="thumb" style="background:linear-gradient(135deg,#b7a893,#8f8069)"></div><div class="body"><h3>Glatte Oberflächen</h3><p>Für ruhige, makellose Wände und Decken</p><span class="more">Mehr erfahren <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span></div></article>
+      <article class="svc"><div class="thumb" style="background:linear-gradient(135deg,#b9bdbe,#7d8486)"></div><div class="body"><h3>Fugenlose Oberflächen</h3><p>Für großzügige Bäder und moderne Wohnräume</p><span class="more">Mehr erfahren <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span></div></article>
+      <article class="svc"><div class="thumb" style="background:linear-gradient(135deg,#5b86a8,#caa94f)"></div><div class="body"><h3>Oberflächenveredelungen</h3><p>Für individuelle Akzentwände mit Charakter</p><span class="more">Mehr erfahren <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span></div></article>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FOOTER ================= -->
+<footer id="kontakt">
+  <div class="wrap foot">
+    <span class="fname">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" style="transform:rotate(-45deg)"><path d="M18.37 2.63 14 7l-1.59-1.59a2 2 0 0 0-2.82 0L8 7l9 9 1.59-1.59a2 2 0 0 0 0-2.82L17 10l4.37-4.37a2.12 2.12 0 1 0-3-3Z"/><path d="M9 8c-2 3-4 3.5-7 4l8 10c2-1 6-5 6-7"/><path d="M14.5 17.5 4.5 15"/></svg>
+      WAND &amp; WIRKUNG
+    </span>
+    <p>Wandgestaltung auf höchstem Niveau – Wilhelmshaven &amp; Umgebung.</p>
+    <a class="btn-gold" href="#start">Projekt anfragen</a>
+  </div>
+</footer>
+
+<script>
+(function(){
+  // --- Goldadern: organische Marmoradern, grob diagonal ---
+  var VEINS=[
+    {d:"M -60 90 C 260 170 430 230 690 300 S 1120 430 1520 560",w:1.6,delay:0,dur:5.5},
+    {d:"M 180 -40 C 340 190 470 300 660 420 S 1030 640 1240 900",w:1.3,delay:1.1,dur:6.2},
+    {d:"M 560 -30 C 690 150 800 300 980 430 S 1280 630 1500 690",w:1.1,delay:2.3,dur:5.8},
+    {d:"M -50 360 C 210 410 430 470 660 520 S 1130 640 1520 700",w:1.2,delay:0.6,dur:6.6},
+    {d:"M 40 640 C 320 640 520 610 760 640 S 1180 760 1500 800",w:0.9,delay:3.1,dur:5.2},
+    {d:"M 900 -30 C 980 170 1010 320 1120 470 S 1330 720 1420 900",w:1.0,delay:1.7,dur:6.0},
+    {d:"M 690 300 C 760 360 820 430 840 540",w:0.7,delay:2.9,dur:4.4},
+    {d:"M 660 420 C 720 470 800 500 900 500",w:0.6,delay:3.6,dur:4.0},
+    {d:"M 660 520 C 740 560 820 600 880 680",w:0.6,delay:4.2,dur:4.6},
+    {d:"M 980 430 C 1030 470 1050 520 1030 590",w:0.55,delay:1.4,dur:5.0},
+    {d:"M 430 230 C 470 300 430 360 470 430",w:0.5,delay:3.9,dur:4.8}
+  ];
+  var NS="http://www.w3.org/2000/svg";
+  function path(a){var p=document.createElementNS(NS,"path");for(var k in a)p.setAttribute(k,a[k]);return p;}
+  function buildVeins(baseG,sparkG){
+    VEINS.forEach(function(v){
+      baseG.appendChild(path({d:v.d,fill:"none",stroke:"url(#gold)","stroke-width":v.w,"stroke-linecap":"round"}));
+      if(sparkG){
+        var s=path({d:v.d,fill:"none",stroke:"url(#sparkg)","stroke-width":v.w+0.7,"stroke-linecap":"round","pathLength":"100"});
+        s.setAttribute("class","spark");
+        s.style.setProperty("--delay",v.delay+"s");
+        s.style.setProperty("--dur",v.dur+"s");
+        sparkG.appendChild(s);
+      }
+    });
+  }
+  buildVeins(document.getElementById("baseG"),document.getElementById("sparkG"));
+  var b2=document.getElementById("baseG2"); if(b2) buildVeins(b2,null);
+
+  // --- Reißkanten (deterministisch, wie im Design) ---
+  function makeRand(seed){var a=seed;return function(){a|=0;a=(a+0x6d2b79f5)|0;var t=Math.imul(a^(a>>>15),1|a);t=(t+Math.imul(t^(t>>>7),61|t))^t;return((t^(t>>>14))>>>0)/4294967296;};}
+  function edgePath(seed,w,h,spikes){w=w||1440;h=h||60;spikes=spikes||130;var rand=makeRand(seed);var step=w/spikes;var d="M 0 "+h+" L 0 "+(h*0.55).toFixed(1);for(var i=0;i<=spikes;i++){var x=i*step;var r=rand();var y=h*0.5+(rand()-0.5)*h*0.22;if(r>0.88)y=h*(0.05+rand()*0.12);else if(r<0.12)y=h*(0.72+rand()*0.2);y=Math.max(1,Math.min(h-1,y));d+=" L "+x.toFixed(1)+" "+y.toFixed(1);}d+=" L "+w+" "+h+" Z";return d;}
+  function fillEdge(el,seed,color){if(!el)return;var p=path({d:edgePath(seed),fill:color});el.appendChild(p);}
+  fillEdge(document.getElementById("edgeTop"),7,"var(--cream)");
+  fillEdge(document.getElementById("edgeBottom"),23,"var(--green-800)");
+
+  // --- Aufleucht-Trigger: verstärkt beim Hover über den Hero + öffentliche API ---
+  var veins=document.getElementById("veins");
+  var hero=document.getElementById("start");
+  hero.addEventListener("mouseenter",function(){veins.setAttribute("data-glow","on");});
+  hero.addEventListener("mouseleave",function(){veins.setAttribute("data-glow","off");});
+  // window.wwSurge(): einmaliges kräftiges Aufleuchten – an jedes Event hängbar
+  window.wwSurge=function(ms){veins.classList.add("surge");setTimeout(function(){veins.classList.remove("surge");},ms||1400);};
+})();
+</script>
+</body>
+</html>
