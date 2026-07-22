@@ -24,6 +24,7 @@
   --font-display: var(--font-display);
   --font-body: var(--font-body);
   --font-sans: var(--font-body);
+  --font-serif: var(--font-serif);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -70,6 +71,9 @@
   --radius: 0.5rem;
   --font-display: "Bricolage Grotesque Variable", "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
   --font-body: "Source Sans 3 Variable", "Source Sans 3", ui-sans-serif, system-ui, sans-serif;
+  /* Eleganter, hochkontrastiger Serifen-Stack für die "Wand & Wirkung"-Headlines.
+     Später bei Bedarf durch einen selbstgehosteten Webfont (z.B. Fraunces/Playfair) ersetzbar. */
+  --font-serif: "Iowan Old Style", "Palatino Linotype", "Palatino", "Book Antiqua", Georgia, Cambria, "Times New Roman", serif;
   --background: oklch(0.26 0.014 60);
   --foreground: oklch(0.95 0.015 70);
   --card: oklch(0.22 0.015 60);
@@ -412,4 +416,99 @@ html, body {
 .krv2-opt b, .krv2-opt small {
   overflow-wrap: break-word;
   hyphens: auto;
+}
+
+/* === "Wand & Wirkung" – Marmor & leuchtende Goldadern ==================== */
+
+:root {
+  --ww-green-900: #0a1c16;
+  --ww-green-800: #0e2620;
+  --ww-green-700: #143229;
+  --ww-green-600: #1b4034;
+  --ww-cream: #efe9dd;
+  --ww-cream-2: #f4efe4;
+  --ww-gold: #d3ad57;
+  --ww-gold-bright: #e8cf86;
+  --ww-gold-deep: #b8923f;
+}
+
+.font-serif { font-family: var(--font-serif); }
+
+/* Dunkelgrüner Marmor-Hintergrund mit sanftem Licht oben rechts */
+.ww-marble {
+  position: relative;
+  background-color: var(--ww-green-800);
+  background-image:
+    radial-gradient(120% 90% at 70% 28%, #1c3d31 0%, transparent 55%),
+    radial-gradient(90% 80% at 12% 8%, #12302700 0%, transparent 45%),
+    radial-gradient(140% 120% at 50% 120%, #06120e 0%, transparent 60%),
+    linear-gradient(160deg, #123027 0%, #0d241d 45%, #0a1c16 100%);
+  isolation: isolate;
+}
+/* feine Stein-/Rauch-Textur über die Fläche */
+.ww-marble::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.5;
+  background:
+    radial-gradient(60% 40% at 25% 30%, #ffffff0c 0%, transparent 60%),
+    radial-gradient(50% 40% at 80% 70%, #00000030 0%, transparent 60%);
+  mix-blend-mode: soft-light;
+}
+
+/* Die Goldadern-SVG-Ebene füllt den Container */
+.gold-veins {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Grundglühen der Adern – atmet dezent */
+.veins-base {
+  opacity: 0.62;
+  animation: veins-breathe 7s ease-in-out infinite;
+}
+@keyframes veins-breathe {
+  0%, 100% { opacity: 0.52; }
+  50%      { opacity: 0.78; }
+}
+
+/* Wandernder Funke: heller Lichtpunkt läuft an der Ader entlang (aufleuchten) */
+.vein-spark {
+  stroke-dasharray: 6 100;
+  stroke-dashoffset: 100;
+  opacity: 0;
+  animation: vein-spark-run var(--spark-dur, 6s) linear infinite;
+  animation-delay: var(--spark-delay, 0s);
+}
+@keyframes vein-spark-run {
+  0%   { stroke-dashoffset: 100; opacity: 0; }
+  8%   { opacity: 1; }
+  55%  { opacity: 1; }
+  70%  { stroke-dashoffset: -9;  opacity: 0; }
+  100% { stroke-dashoffset: -9;  opacity: 0; }
+}
+
+/* Verstärkter/triggerbarer Zustand – z.B. beim Hover über den Hero.
+   data-glow="on" lässt alle Adern kräftiger und schneller aufleuchten. */
+.gold-veins[data-glow="on"] .veins-base { opacity: 1; }
+.gold-veins[data-glow="on"] .vein-spark { animation-duration: calc(var(--spark-dur, 6s) * 0.6); }
+
+/* Gerissene Pinselkante zwischen den Sektionen */
+.ww-brush-edge {
+  display: block;
+  width: 100%;
+  height: clamp(28px, 4vw, 60px);
+}
+.ww-brush-edge.flip { transform: scaleY(-1); }
+
+@media (prefers-reduced-motion: reduce) {
+  .veins-base { animation: none; }
+  .vein-spark { animation: none; opacity: 0; }
 }

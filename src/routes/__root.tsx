@@ -164,7 +164,20 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isHome = pathname === "/";
+  // Eigenständiges "Wand & Wirkung"-Design ohne globale Chrome rendern
+  const isStandalone = pathname.startsWith("/wand-und-wirkung");
   const hideMobileBar = pathname.startsWith("/impressum") || pathname.startsWith("/datenschutz");
+
+  if (isStandalone) {
+    return (
+      <QueryClientProvider client={queryClient}>
+        <Outlet />
+        <Toaster />
+        <AttributionTracker />
+        <AnalyticsTracker />
+      </QueryClientProvider>
+    );
+  }
 
   return (
     <QueryClientProvider client={queryClient}>
