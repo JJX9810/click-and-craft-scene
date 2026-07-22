@@ -175,9 +175,20 @@
       <linearGradient id="sparkg" x1="0" y1="0" x2="1" y2="1">
         <stop offset="0%" stop-color="#fff7dc"/><stop offset="100%" stop-color="#f6dd8a"/>
       </linearGradient>
-      <radialGradient id="baseGrad" cx="68%" cy="30%" r="90%">
-        <stop offset="0%" stop-color="#1c3d2d"/><stop offset="45%" stop-color="#123024"/>
-        <stop offset="100%" stop-color="#08150e"/>
+      <radialGradient id="baseGrad" cx="66%" cy="32%" r="95%">
+        <stop offset="0%" stop-color="#1a3a2a"/><stop offset="42%" stop-color="#0e2418"/>
+        <stop offset="100%" stop-color="#050d08"/>
+      </radialGradient>
+      <!-- heller polierter Diagonalstreifen wie auf echtem Marmor -->
+      <linearGradient id="sheen" x1="0" y1="1" x2="1" y2="0">
+        <stop offset="0%" stop-color="#2a5842" stop-opacity="0"/>
+        <stop offset="52%" stop-color="#356c52" stop-opacity=".55"/>
+        <stop offset="70%" stop-color="#2a5842" stop-opacity="0"/>
+      </linearGradient>
+      <radialGradient id="vign" cx="50%" cy="42%" r="75%">
+        <stop offset="0%" stop-color="#000" stop-opacity="0"/>
+        <stop offset="70%" stop-color="#000" stop-opacity="0"/>
+        <stop offset="100%" stop-color="#020805" stop-opacity=".8"/>
       </radialGradient>
       <!-- Marmor-Wolken: weiches fraktales Rauschen, grün getönt -->
       <filter id="clouds" x="0" y="0" width="100%" height="100%">
@@ -192,8 +203,8 @@
       <!-- Organische Goldadern: verzerrt per Turbulenz + Glühen -->
       <filter id="veinfx" x="-15%" y="-15%" width="130%" height="130%">
         <feTurbulence type="fractalNoise" baseFrequency="0.008 0.013" numOctaves="3" seed="4" result="t"/>
-        <feDisplacementMap in="SourceGraphic" in2="t" scale="58" xChannelSelector="R" yChannelSelector="G" result="disp"/>
-        <feGaussianBlur in="disp" stdDeviation="1.4" result="b"/>
+        <feDisplacementMap in="SourceGraphic" in2="t" scale="52" xChannelSelector="R" yChannelSelector="G" result="disp"/>
+        <feGaussianBlur in="disp" stdDeviation="0.7" result="b"/>
         <feMerge><feMergeNode in="b"/><feMergeNode in="disp"/></feMerge>
       </filter>
       <filter id="sparkfx" x="-40%" y="-40%" width="180%" height="180%">
@@ -203,11 +214,13 @@
       </filter>
     </defs>
     <rect width="1440" height="900" fill="url(#baseGrad)"/>
-    <rect width="1440" height="900" filter="url(#clouds)" style="mix-blend-mode:soft-light;opacity:.75"/>
-    <rect width="1440" height="900" filter="url(#clouds)" style="mix-blend-mode:multiply;opacity:.35"/>
+    <rect width="1440" height="900" filter="url(#clouds)" style="mix-blend-mode:soft-light;opacity:.8"/>
+    <rect width="1440" height="900" filter="url(#clouds)" style="mix-blend-mode:multiply;opacity:.4"/>
+    <rect width="1440" height="900" fill="url(#sheen)" style="mix-blend-mode:screen;opacity:.6"/>
     <g class="veins-base" filter="url(#veinfx)" id="baseG"></g>
     <g class="veins-spark" filter="url(#sparkfx)" id="sparkG"></g>
-    <rect width="1440" height="900" filter="url(#grain)" style="mix-blend-mode:overlay;opacity:.5"/>
+    <rect width="1440" height="900" filter="url(#grain)" style="mix-blend-mode:overlay;opacity:.55"/>
+    <rect width="1440" height="900" fill="url(#vign)"/>
   </svg>
 
   <div class="hero-scrim"></div>
@@ -290,21 +303,24 @@
   // Goldadern – diagonale Hauptadern + feine Verästelungen, mit Deckkraft-Varianz.
   // Durch den SVG-Displacement-Filter werden sie organisch/wellig wie echter Marmor.
   var VEINS=[
-    {d:"M -80 120 C 260 200 430 250 690 320 S 1120 450 1560 580",w:2.2,o:.95,delay:0.0,dur:5.6},
-    {d:"M 120 -60 C 320 200 470 320 660 440 S 1030 660 1260 940",w:1.8,o:.9,delay:1.2,dur:6.3},
-    {d:"M 520 -40 C 690 160 800 320 980 450 S 1300 660 1520 720",w:1.5,o:.85,delay:2.4,dur:5.9},
-    {d:"M -60 380 C 220 430 430 490 660 540 S 1130 660 1560 720",w:1.6,o:.8,delay:0.7,dur:6.7},
-    {d:"M 900 -40 C 990 180 1010 330 1130 480 S 1340 740 1440 960",w:1.4,o:.85,delay:1.8,dur:6.1},
-    {d:"M -40 660 C 320 660 520 630 780 660 S 1200 780 1540 820",w:1.1,o:.6,delay:3.2,dur:5.3},
-    {d:"M 300 -30 C 420 180 470 330 560 470 S 720 720 760 940",w:1.0,o:.55,delay:2.1,dur:6.0},
-    // Verästelungen
-    {d:"M 690 320 C 770 380 840 450 860 570",w:.9,o:.7,delay:2.9,dur:4.4},
-    {d:"M 660 440 C 730 490 820 520 930 520",w:.8,o:.6,delay:3.6,dur:4.1},
-    {d:"M 660 540 C 750 580 840 620 900 700",w:.8,o:.6,delay:4.2,dur:4.7},
-    {d:"M 980 450 C 1040 490 1060 540 1040 620",w:.7,o:.55,delay:1.5,dur:5.0},
-    {d:"M 430 250 C 480 320 440 380 480 460",w:.65,o:.5,delay:3.9,dur:4.9},
-    {d:"M 1130 480 C 1180 520 1220 560 1210 640",w:.7,o:.5,delay:2.6,dur:5.2},
-    {d:"M 560 470 C 620 520 700 540 780 520",w:.6,o:.45,delay:4.6,dur:4.3}
+    {d:"M -80 120 C 260 200 430 250 690 320 S 1120 450 1560 580",w:1.5,o:.9,delay:0.0,dur:5.6},
+    {d:"M 120 -60 C 320 200 470 320 660 440 S 1030 660 1260 940",w:1.2,o:.85,delay:1.2,dur:6.3},
+    {d:"M 520 -40 C 690 160 800 320 980 450 S 1300 660 1520 720",w:1.0,o:.8,delay:2.4,dur:5.9},
+    {d:"M -60 380 C 220 430 430 490 660 540 S 1130 660 1560 720",w:1.1,o:.7,delay:0.7,dur:6.7},
+    {d:"M 900 -40 C 990 180 1010 330 1130 480 S 1340 740 1440 960",w:1.0,o:.8,delay:1.8,dur:6.1},
+    {d:"M -40 660 C 320 660 520 630 780 660 S 1200 780 1540 820",w:.75,o:.5,delay:3.2,dur:5.3},
+    {d:"M 300 -30 C 420 180 470 330 560 470 S 720 720 760 940",w:.7,o:.5,delay:2.1,dur:6.0},
+    // feine Verästelungen / Haarrisse
+    {d:"M 690 320 C 770 380 840 450 860 570",w:.6,o:.65,delay:2.9,dur:4.4},
+    {d:"M 660 440 C 730 490 820 520 930 520",w:.55,o:.55,delay:3.6,dur:4.1},
+    {d:"M 660 540 C 750 580 840 620 900 700",w:.55,o:.55,delay:4.2,dur:4.7},
+    {d:"M 980 450 C 1040 490 1060 540 1040 620",w:.5,o:.5,delay:1.5,dur:5.0},
+    {d:"M 430 250 C 480 320 440 380 480 460",w:.45,o:.45,delay:3.9,dur:4.9},
+    {d:"M 1130 480 C 1180 520 1220 560 1210 640",w:.5,o:.45,delay:2.6,dur:5.2},
+    {d:"M 560 470 C 620 520 700 540 780 520",w:.42,o:.4,delay:4.6,dur:4.3},
+    {d:"M 800 360 C 850 400 870 450 930 470",w:.4,o:.4,delay:5.0,dur:4.5},
+    {d:"M 1000 250 C 1080 300 1140 360 1180 470",w:.6,o:.55,delay:0.9,dur:5.6},
+    {d:"M 1180 470 C 1240 520 1300 540 1360 620",w:.45,o:.4,delay:3.3,dur:4.8}
   ];
   function buildVeins(baseG,sparkG){
     VEINS.forEach(function(v){
