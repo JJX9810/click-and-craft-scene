@@ -75,7 +75,7 @@ function Page() {
       <PageHero eyebrow="Ratgeber" title={'Messie-Wohnung räumen – der ruhige Weg zurück.'} intro={'Wenn ein Haushalt über Jahre außer Kontrolle geraten ist, ist der schwierigste Schritt der erste – jemanden zu holen, ohne dass es sich anfühlt wie eine Kapitulation. Dieser Ratgeber ist bewusst nüchtern geschrieben: keine Belehrung, keine Diagnose, sondern der praktische Weg zurück in einen Raum, in dem man leben kann.'} />
 
       <Section eyebrow="Kurzfassung" title="Die Antwort in drei Sätzen">
-        <QuickAnswer>Eine Messie-Wohnung räumen wir in Wilhelmshaven und Umgebung diskret und mit Respekt – ohne markierte Fahrzeuge vor der Tür, wenn gewünscht, und ohne Bewertung des Zustands. Der Ablauf: Besichtigung in Ruhe (39 € Pauschale, bei Auftrag verrechnet), verbindliches Angebot, gemeinsam vereinbaren, was gesichert und was entsorgt wird, dann Räumung in geordneter Reihenfolge, auf Wunsch mit besenreiner Übergabe. Sensible und persönliche Gegenstände werden zur Seite gelegt und mit der beauftragenden Person besprochen, nicht selbstständig entsorgt.</QuickAnswer>
+        <QuickAnswer>Eine Messie-Wohnung räumen wir in Wilhelmshaven und Umgebung diskret und mit Respekt – ohne markierte Fahrzeuge vor der Tür, wenn gewünscht, und ohne Bewertung des Zustands. Der Ablauf: kostenlose Besichtigung in Ruhe, verbindliches Angebot, gemeinsam vereinbaren, was gesichert und was entsorgt wird, dann Räumung in geordneter Reihenfolge, auf Wunsch mit besenreiner Übergabe. Sensible und persönliche Gegenstände werden zur Seite gelegt und mit der beauftragenden Person besprochen, nicht selbstständig entsorgt.</QuickAnswer>
       </Section>
 
       <Section eyebrow="Im Detail" title={'Sechs Punkte, die den Unterschied machen'} bordered>

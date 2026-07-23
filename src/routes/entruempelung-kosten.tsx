@@ -25,7 +25,7 @@ const fragen = [
   {
     frage: "Was bedeutet 'kostenlose Besichtigung' bei vielen Anbietern?",
     antwort:
-      "Oft ist sie ein Verkaufstermin: Der Anbieter investiert die Anfahrt und will den Auftrag im Wohnzimmer abschließen – mit entsprechendem Druck. Wir gehen einen anderen Weg: Unsere Besichtigung kostet pauschal 39 € und wird bei Auftragserteilung vollständig verrechnet. Wer beauftragt, zahlt dafür im Ergebnis nichts – und bekommt statt einer Schätzung ein verbindliches Angebot ohne Verkaufsdruck.",
+      "Oft ist sie ein Verkaufstermin: Der Anbieter investiert die Anfahrt und will den Auftrag im Wohnzimmer abschließen – mit entsprechendem Druck. Bei uns ist die Besichtigung ebenfalls kostenlos und unverbindlich – aber ohne Abschlussdruck vor Ort: Sie erhalten danach in Ruhe ein schriftliches, verbindliches Angebot und entscheiden selbst.",
   },
   {
     frage: "Kann verwertbares Inventar den Preis senken?",
@@ -99,10 +99,9 @@ function RatgeberEntruempelungKosten() {
           Realistisch liegen Keller und Garagen häufig bei 150–500 €, Wohnungen
           bei 600–1.500 €, Häuser ab etwa 1.500 € aufwärts – abhängig von Menge,
           Inventar, Zugang und Endzustand. Einen seriösen Festpreis gibt es erst
-          nach einem Blick vor Ort. Bei Verlegt &amp; Verschraubt kostet diese
-          Besichtigung pauschal 39 €, die bei Auftragserteilung vollständig
-          verrechnet werden – danach erhalten Sie ein verbindliches Angebot
-          statt einer Schätzung.
+          nach einem Blick vor Ort. Bei Verlegt &amp; Verschraubt ist diese
+          Besichtigung kostenlos und unverbindlich – danach erhalten Sie ein
+          schriftliches, verbindliches Angebot statt einer Schätzung.
         </QuickAnswer>
       </Section>
 
@@ -124,8 +123,8 @@ function RatgeberEntruempelungKosten() {
         <p className="leading-relaxed text-muted-foreground">
           Sie schicken uns per WhatsApp ein paar Fotos und sagen, worum es geht –
           Wohnung, Haus, Keller oder Dachboden, grober Füllgrad, Etage. Dann
-          vereinbaren wir die Besichtigung vor Ort (39 € Pauschale, bei Auftrag
-          vollständig verrechnet). Danach haben Sie ein schriftliches,
+          vereinbaren wir die kostenlose, unverbindliche Besichtigung vor Ort.
+          Danach haben Sie ein schriftliches,
           verbindliches Angebot inklusive fachgerechter Entsorgung – auf Wunsch
           mit besenreiner Übergabe zum Wunschtermin. Wir arbeiten in
           Wilhelmshaven, Schortens, Sande, Jever, Varel, Wangerland und

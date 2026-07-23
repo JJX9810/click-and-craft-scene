@@ -17,7 +17,7 @@ export const Route = createFileRoute("/entruempelung-entsorgung-in-wilhelmshaven
   head: () => ({
     meta: [
       { title: "Entrümpelung Wilhelmshaven – Festpreis, diskret & besenrein" },
-      { name: "description", content: "Entrümpelung in Wilhelmshaven: Wohnung, Keller, Dachboden & Haushaltsauflösung. Festpreis nach Besichtigung, besenreine Übergabe. Fotos senden – schnelle Einschätzung." },
+      { name: "description", content: "Entrümpelung in Wilhelmshaven: Wohnung, Keller, Dachboden & Haushaltsauflösung. Kostenlose Besichtigung, Festpreis, besenreine Übergabe. Fotos senden – schnelle Einschätzung." },
       { property: "og:title", content: "Entrümpelung Wilhelmshaven – Festpreis, diskret & besenrein" },
       { property: "og:description", content: "Wohnungs-, Keller- und Dachbodenräumung, Sperrmüllentsorgung und komplette Haushaltsauflösung in Wilhelmshaven & Umgebung. Festpreis nach Besichtigung, besenreine Übergabe." },
       { property: "og:url", content: EN_URL },
@@ -42,7 +42,7 @@ export const Route = createFileRoute("/entruempelung-entsorgung-in-wilhelmshaven
           url: EN_URL,
           id: SERVICE_IDS.entruempelung,
           name: "Entrümpelung & Haushaltsauflösung",
-          description: "Wohnungs-, Keller- und Dachbodenentrümpelung, Möbel- und Sperrmüllentsorgung sowie komplette Haushaltsauflösung und Räumung vor Renovierung in Wilhelmshaven und Umgebung. Verbindliches Festpreis-Angebot nach Vor-Ort-Besichtigung (39 € Pauschale, bei Auftrag verrechnet).",
+          description: "Wohnungs-, Keller- und Dachbodenentrümpelung, Möbel- und Sperrmüllentsorgung sowie komplette Haushaltsauflösung und Räumung vor Renovierung in Wilhelmshaven und Umgebung. Kostenlose, unverbindliche Vor-Ort-Besichtigung, danach verbindliches Festpreis-Angebot.",
           serviceType: ["Entrümpelung und Entsorgung", "Haushaltsauflösung", "Wohnungsauflösung"],
           areaServed: [
             "Wilhelmshaven", "Schortens", "Sande", "Jever", "Varel", "Wangerland", "Wittmund", "Friesland",
@@ -93,8 +93,8 @@ function Page() {
             Wangerland und Wittmund. Wohnungen, Häuser, Keller und Dachböden
             werden planbar, diskret und auf Wunsch besenrein geräumt – inklusive
             fachgerechter Entsorgung. Anfrage per WhatsApp mit Fotos –
-            verbindliches Angebot nach Besichtigung vor Ort (39 € Pauschale,
-            wird bei Auftragserteilung vollständig verrechnet). Wir übernehmen einzelne
+            verbindliches Angebot nach kostenloser, unverbindlicher Besichtigung
+            vor Ort. Wir übernehmen einzelne
             Entrümpelungen genauso wie komplette Haushaltsauflösungen. Was realistisch
             kostet und woran Sie unseriöse Anbieter erkennen, zeigt unser
             Ratgeber{" "}

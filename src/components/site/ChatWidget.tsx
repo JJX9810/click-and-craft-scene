@@ -40,7 +40,7 @@ const ANSWERS: { key: string; q: string; a: string }[] = [
   {
     key: "besichtigung",
     q: "Was kostet die Besichtigung?",
-    a: "Die Vor-Ort-Besichtigung kostet pauschal 39 €. Bei Auftragserteilung wird die Pauschale vollständig verrechnet – wer beauftragt, zahlt dafür im Ergebnis nichts. Danach bekommen Sie ein verbindliches Angebot statt einer Schätzung.",
+    a: "Die Vor-Ort-Besichtigung ist kostenlos und unverbindlich. Danach bekommen Sie ein schriftliches, verbindliches Angebot statt einer Schätzung.",
   },
   {
     key: "netzwerk",

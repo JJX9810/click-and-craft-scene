@@ -40,7 +40,7 @@ const faqGroups = [
     title: "Entrümpelung",
     items: [
       { q: "Wer macht Entrümpelung und Haushaltsauflösung in Wilhelmshaven?", a: "Verlegt & Verschraubt entrümpelt Wohnungen, Häuser, Keller und Dachböden in Wilhelmshaven und Umgebung – inklusive fachgerechter Entsorgung, auf Wunsch besenrein zur Übergabe." },
-      { q: "Was kostet die Besichtigung vor Ort?", a: "Die Vor-Ort-Besichtigung kostet pauschal 39 €. Bei Auftragserteilung wird die Pauschale vollständig mit dem Auftrag verrechnet – wer beauftragt, zahlt für die Besichtigung im Ergebnis also nichts. Danach erhalten Sie ein verbindliches Angebot statt einer groben Schätzung." },
+      { q: "Was kostet die Besichtigung vor Ort?", a: "Die Vor-Ort-Besichtigung ist kostenlos und unverbindlich. Danach erhalten Sie ein schriftliches, verbindliches Angebot statt einer groben Schätzung." },
       { q: "Übernehmt ihr Entrümpelung in Sande oder Schortens?", a: "Ja. Wir arbeiten in ganz Wilhelmshaven und Umgebung – andere Orte gerne auf Anfrage." },
       { q: "Arbeitet ihr auch für Vermieter?", a: "Ja, Wohnungsübergaben und Räumungen vor Renovierung sind möglich." },
     ],

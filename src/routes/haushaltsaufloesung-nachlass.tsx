@@ -70,7 +70,7 @@ function Page() {
       <PageHero eyebrow="Ratgeber" title={'Haushaltsauflösung im Trauerfall – Schritt für Schritt.'} intro={'Eine Wohnung aufzulösen, während die Trauer noch frisch ist, gehört zu den schwersten Aufgaben, die Angehörige übernehmen. Dieser Leitfaden ordnet die praktischen Schritte – damit der Kopf frei bleibt für das, was wirklich zählt. Ohne Zeitdruck-Panik, ohne falsche Versprechen.'} />
 
       <Section eyebrow="Kurzfassung" title="Die Antwort in drei Sätzen">
-        <QuickAnswer>Der bewährte Weg in fünf Schritten: erst die Fristen klären (Mietvertrag endet nicht automatisch – das Gespräch mit dem Vermieter schafft oft Spielraum), dann Dokumente und Wertsachen sichern, dann in Ruhe sortieren, was bleibt, verschenkt oder verkauft wird – und erst danach die eigentliche Räumung beauftragen, auf Wunsch bis zur besenreinen Übergabe. Seriöse Anbieter machen ein verbindliches Angebot nach Besichtigung; bei uns kostet diese 39 €, die bei Auftrag vollständig verrechnet werden.</QuickAnswer>
+        <QuickAnswer>Der bewährte Weg in fünf Schritten: erst die Fristen klären (Mietvertrag endet nicht automatisch – das Gespräch mit dem Vermieter schafft oft Spielraum), dann Dokumente und Wertsachen sichern, dann in Ruhe sortieren, was bleibt, verschenkt oder verkauft wird – und erst danach die eigentliche Räumung beauftragen, auf Wunsch bis zur besenreinen Übergabe. Seriöse Anbieter machen ein verbindliches Angebot nach Besichtigung; bei uns ist diese kostenlos und unverbindlich.</QuickAnswer>
       </Section>
 
       <Section eyebrow="Im Detail" title={'Die fünf Schritte in Ruhe erklärt'} bordered>
@@ -89,7 +89,7 @@ function Page() {
 
       <Section eyebrow="So helfen wir" title={'Diskret, planbar, mit festem Übergabetermin'}>
         <p className="leading-relaxed text-muted-foreground">
-          Wir übernehmen Haushaltsauflösungen in Wilhelmshaven und Umgebung diskret und planbar – von der Besichtigung (39 € Pauschale, bei Auftrag vollständig verrechnet) über die Räumung bis zur besenreinen Übergabe zum vereinbarten Termin. Gefundene persönliche Dinge legen wir zur Seite. Mehr zur Leistung: <Link to="/entruempelung-entsorgung-in-wilhelmshaven" className="font-medium text-accent hover:underline">Entrümpelung & Haushaltsauflösung in Wilhelmshaven</Link> – und zur Kostenfrage: <Link to="/entruempelung-kosten" className="font-medium text-accent hover:underline">Was kostet eine Entrümpelung?</Link>.
+          Wir übernehmen Haushaltsauflösungen in Wilhelmshaven und Umgebung diskret und planbar – von der kostenlosen, unverbindlichen Besichtigung über die Räumung bis zur besenreinen Übergabe zum vereinbarten Termin. Gefundene persönliche Dinge legen wir zur Seite. Mehr zur Leistung: <Link to="/entruempelung-entsorgung-in-wilhelmshaven" className="font-medium text-accent hover:underline">Entrümpelung & Haushaltsauflösung in Wilhelmshaven</Link> – und zur Kostenfrage: <Link to="/entruempelung-kosten" className="font-medium text-accent hover:underline">Was kostet eine Entrümpelung?</Link>.
         </p>
       </Section>
 
