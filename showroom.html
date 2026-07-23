@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Showroom – Wand &amp; Wirkung · Andy Wagner</title>
+<meta name="description" content="Ausgewählte Projekte von Andy Wagner – fugenlose Oberflächen, Spachteltechnik, Veredelungen und Böden in Wilhelmshaven & Umgebung." />
+<meta name="theme-color" content="#0c2117" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --green-900:#08170f; --green-800:#0c2117; --green-700:#123024; --green-600:#1a3f2e;
+    --cream:#efe9dd; --gold:#d3ad57; --gold-bright:#f0dc9a; --gold-deep:#b8923f;
+    --serif:"Cormorant Garamond","Playfair Display",Palatino,Georgia,serif;
+    --sans:"Source Sans 3",ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    --maxw:1220px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:var(--sans);background:var(--green-800);color:var(--cream);-webkit-font-smoothing:antialiased;overflow-x:hidden;line-height:1.5}
+  a{text-decoration:none;color:inherit}
+  h1,h2,h3,h4{font-family:var(--serif);font-weight:600;line-height:1.1}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 28px}
+  .kicker{font-size:12px;font-weight:600;letter-spacing:.3em;text-transform:uppercase;color:var(--gold)}
+  .btn-gold{display:inline-flex;align-items:center;gap:10px;border:0;cursor:pointer;font-family:var(--sans);border-radius:999px;
+    padding:14px 28px;font-size:15px;font-weight:600;color:#382d0e;background:linear-gradient(180deg,var(--gold-bright),var(--gold));
+    box-shadow:0 12px 28px -10px rgba(211,173,87,.7),inset 0 1px 0 rgba(255,255,255,.4);transition:transform .2s,box-shadow .2s}
+  .btn-gold:hover{transform:translateY(-2px);box-shadow:0 18px 34px -10px rgba(211,173,87,.85)}
+  .btn-ghost{display:inline-flex;align-items:center;gap:10px;border:1px solid rgba(239,233,221,.28);border-radius:999px;
+    padding:14px 28px;font-size:15px;font-weight:600;color:var(--cream);transition:.2s;background:transparent}
+  .btn-ghost:hover{border-color:var(--gold);color:var(--gold);background:rgba(211,173,87,.06)}
+
+  /* Header */
+  header{position:fixed;inset:0 0 auto 0;z-index:50;transition:background .3s,box-shadow .3s}
+  .hbar{display:flex;align-items:center;justify-content:space-between;padding:20px 0}
+  header.scrolled{background:rgba(9,26,18,.9);backdrop-filter:blur(12px);box-shadow:0 8px 30px -12px rgba(0,0,0,.6)}
+  header.scrolled .hbar{padding:12px 0}
+  .brand{display:flex;align-items:center;gap:16px}
+  .logo{display:flex;align-items:center;gap:12px}
+  .logo .ic{color:var(--gold)}
+  .logo .name{font-family:var(--serif);font-size:23px;font-weight:600;letter-spacing:.06em;color:var(--gold);line-height:1}
+  .logo .sub{font-size:10px;font-style:italic;color:rgba(211,173,87,.7);margin-top:5px;display:block;letter-spacing:.02em}
+  .socials{display:flex;gap:8px;margin-left:6px}
+  .soc{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--gold-bright),var(--gold-deep));color:#3a2f12}
+  nav.main{display:flex;gap:34px}
+  nav.main a{font-size:15px;color:rgba(239,233,221,.85);transition:color .2s}
+  nav.main a:hover,nav.main a.active{color:var(--gold)}
+  .head-right{display:flex;align-items:center;gap:14px}
+  .burger{display:none;width:44px;height:44px;border:1px solid rgba(239,233,221,.25);border-radius:12px;background:transparent;color:var(--cream);cursor:pointer;align-items:center;justify-content:center}
+  .mobile-menu{display:none;border-top:1px solid rgba(239,233,221,.12);background:rgba(9,26,18,.97);backdrop-filter:blur(12px)}
+  .mobile-menu.open{display:block}
+  .mobile-menu nav{display:flex;flex-direction:column;padding:14px 0}
+  .mobile-menu a{padding:14px 28px;font-size:17px;color:var(--cream);border-bottom:1px solid rgba(239,233,221,.06)}
+  .mobile-menu .mm-cta{padding:18px 28px}
+
+  /* Marmor */
+  .marble{position:relative;isolation:isolate;background:var(--green-800)}
+  .marble-svg{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+  .veins-base{animation:breathe 8s ease-in-out infinite}
+  @keyframes breathe{0%,100%{opacity:.85}50%{opacity:1}}
+  .spark{stroke-dasharray:5 100;stroke-dashoffset:100;opacity:0;animation:sparkrun var(--dur,6s) linear infinite;animation-delay:var(--delay,0s)}
+  @keyframes sparkrun{0%{stroke-dashoffset:100;opacity:0}9%{opacity:1}52%{opacity:1}68%{stroke-dashoffset:-5;opacity:0}100%{stroke-dashoffset:-5;opacity:0}}
+
+  /* Page hero */
+  .page-hero{position:relative;overflow:hidden;padding:170px 0 90px}
+  .page-hero .scrim{position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(0deg,rgba(4,14,9,.6),transparent 40%),linear-gradient(90deg,rgba(4,14,9,.5),transparent 60%)}
+  .page-hero .inner{position:relative;z-index:10}
+  .page-hero .eyebrow{display:flex;align-items:center;gap:14px;color:var(--gold);font-size:12px;font-weight:600;letter-spacing:.3em;text-transform:uppercase}
+  .page-hero .eyebrow .line{width:40px;height:1px;background:linear-gradient(90deg,var(--gold),transparent)}
+  .page-hero h1{margin-top:22px;font-size:clamp(44px,7vw,82px);color:var(--cream);text-shadow:0 2px 30px rgba(0,0,0,.4)}
+  .page-hero p{margin-top:20px;max-width:40rem;font-size:19px;line-height:1.6;color:rgba(239,233,221,.78)}
+  .crumbs{margin-bottom:8px;font-size:13px;color:rgba(239,233,221,.55)}
+  .crumbs a:hover{color:var(--gold)}
+
+  /* Filter + Galerie */
+  .gallery-sec{padding:64px 0 110px}
+  .filters{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:36px}
+  .chip{font-family:var(--sans);font-size:14px;font-weight:600;color:rgba(239,233,221,.8);cursor:pointer;
+    border:1px solid rgba(239,233,221,.2);background:transparent;border-radius:999px;padding:9px 18px;transition:.2s}
+  .chip:hover{border-color:var(--gold);color:var(--gold)}
+  .chip.active{background:linear-gradient(180deg,var(--gold-bright),var(--gold));color:#382d0e;border-color:transparent}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+  .shot{position:relative;border-radius:16px;overflow:hidden;aspect-ratio:4/3;border:1px solid rgba(239,233,221,.08);
+    box-shadow:0 26px 56px -34px rgba(0,0,0,.85);transition:transform .3s,box-shadow .3s,border-color .3s}
+  .shot.big{grid-column:span 2;aspect-ratio:16/9}
+  .shot:hover{transform:translateY(-5px);border-color:rgba(211,173,87,.35);box-shadow:0 34px 66px -32px rgba(0,0,0,.9)}
+  .shot .img{position:absolute;inset:0;background-size:cover;background-position:center;transition:transform .55s}
+  .shot:hover .img{transform:scale(1.06)}
+  .shot::after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(4,14,9,.85),transparent 55%)}
+  .shot .tag{position:absolute;top:14px;left:14px;z-index:2;font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--gold-bright);background:rgba(9,26,18,.7);backdrop-filter:blur(6px);border:1px solid rgba(211,173,87,.25);border-radius:999px;padding:6px 12px}
+  .shot figcaption{position:absolute;left:0;right:0;bottom:0;z-index:2;padding:18px}
+  .shot figcaption b{font-family:var(--serif);font-size:19px;color:var(--cream);display:block}
+  .shot figcaption span{font-size:13px;color:rgba(239,233,221,.62)}
+  .shot.hide{display:none}
+
+  /* Vorher/Nachher */
+  .ba{margin:14px 0 46px;position:relative;border-radius:18px;overflow:hidden;aspect-ratio:16/9;border:1px solid rgba(239,233,221,.12);box-shadow:0 40px 80px -40px #000;user-select:none;touch-action:none}
+  .ba .layer{position:absolute;inset:0;background-size:cover;background-position:center}
+  .ba .after{clip-path:inset(0 0 0 var(--split,50%))}
+  .ba .lbl{position:absolute;top:16px;padding:6px 14px;border-radius:999px;font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;background:rgba(9,26,18,.7);color:var(--cream);backdrop-filter:blur(6px)}
+  .ba .lbl.l{left:16px}.ba .lbl.r{right:16px}
+  .ba .handle{position:absolute;top:0;bottom:0;left:var(--split,50%);width:2px;background:var(--gold-bright);transform:translateX(-1px)}
+  .ba .grip{position:absolute;top:50%;left:var(--split,50%);transform:translate(-50%,-50%);width:46px;height:46px;border-radius:999px;background:linear-gradient(180deg,var(--gold-bright),var(--gold));display:flex;align-items:center;justify-content:center;color:#382d0e;box-shadow:0 8px 20px -6px rgba(0,0,0,.6);cursor:ew-resize}
+  .sub-head{margin:0 0 22px}
+  .sub-head h2{font-size:clamp(26px,3.4vw,40px);color:var(--cream)}
+
+  /* CTA */
+  .cta{position:relative;overflow:hidden;padding:96px 0}
+  .cta .inner{position:relative;z-index:10;text-align:center;max-width:640px;margin:0 auto}
+  .cta h2{font-size:clamp(30px,4vw,50px);color:var(--cream)}
+  .cta p{margin-top:16px;font-size:18px;color:rgba(239,233,221,.75)}
+  .cta .row{margin-top:30px;display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+
+  /* Footer */
+  footer{position:relative;background:var(--green-900);padding:56px 0 36px;overflow:hidden}
+  .foot-grid{position:relative;z-index:10;display:flex;flex-wrap:wrap;gap:24px;justify-content:space-between;align-items:center}
+  .foot .fname{display:flex;align-items:center;gap:12px;color:var(--gold);font-family:var(--serif);font-size:20px;font-weight:600;letter-spacing:.06em}
+  .foot-links{display:flex;gap:22px;flex-wrap:wrap}
+  .foot-links a{font-size:14.5px;color:rgba(239,233,221,.72)}
+  .foot-links a:hover{color:var(--gold)}
+  .copy{position:relative;z-index:10;margin-top:28px;padding-top:20px;border-top:1px solid rgba(239,233,221,.1);font-size:13px;color:rgba(239,233,221,.5)}
+
+  @media(max-width:900px){
+    nav.main,.socials,.head-right .btn-gold{display:none}
+    .burger{display:flex}
+    .grid{grid-template-columns:1fr}
+    .shot.big{grid-column:span 1;aspect-ratio:4/3}
+  }
+  @media(prefers-reduced-motion:reduce){.veins-base{animation:none}.spark{animation:none;opacity:0}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header id="siteHeader">
+  <div class="wrap hbar">
+    <div class="brand">
+      <a class="logo" href="wand-und-wirkung.html" aria-label="Wand & Wirkung Startseite">
+        <span class="ic" aria-hidden="true"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" style="transform:rotate(-45deg)"><path d="M18.37 2.63 14 7l-1.59-1.59a2 2 0 0 0-2.82 0L8 7l9 9 1.59-1.59a2 2 0 0 0 0-2.82L17 10l4.37-4.37a2.12 2.12 0 1 0-3-3Z"/><path d="M9 8c-2 3-4 3.5-7 4l8 10c2-1 6-5 6-7"/><path d="M14.5 17.5 4.5 15"/></svg></span>
+        <span><span class="name">WAND &amp; WIRKUNG</span><span class="sub">auf höchstem Niveau</span></span>
+      </a>
+      <div class="socials">
+        <a class="soc" href="#" aria-label="Instagram"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="20" x="2" y="2" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37Z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg></a>
+        <a class="soc" href="#" aria-label="Facebook"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></a>
+      </div>
+    </div>
+    <nav class="main">
+      <a href="wand-und-wirkung.html#leistungen">Leistungen</a>
+      <a href="showroom.html" class="active">Showroom</a>
+      <a href="wand-und-wirkung.html#ueber">Über mich</a>
+      <a href="wand-und-wirkung.html#ablauf">Ablauf</a>
+      <a href="wand-und-wirkung.html#kontakt">Kontakt</a>
+    </nav>
+    <div class="head-right">
+      <a class="btn-gold" href="wand-und-wirkung.html#kontakt">Projekt anfragen</a>
+      <button class="burger" id="burger" aria-label="Menü öffnen" aria-expanded="false"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+    </div>
+  </div>
+  <div class="mobile-menu" id="mobileMenu">
+    <nav>
+      <a href="wand-und-wirkung.html#leistungen">Leistungen</a>
+      <a href="showroom.html">Showroom</a>
+      <a href="wand-und-wirkung.html#ueber">Über mich</a>
+      <a href="wand-und-wirkung.html#ablauf">Ablauf</a>
+      <a href="wand-und-wirkung.html#kontakt">Kontakt</a>
+      <div class="mm-cta"><a class="btn-gold" href="wand-und-wirkung.html#kontakt" style="width:100%;justify-content:center">Projekt anfragen</a></div>
+    </nav>
+  </div>
+</header>
+
+<!-- PAGE HERO -->
+<section class="page-hero marble">
+  <svg class="marble-svg" viewBox="0 0 1440 700" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <defs>
+      <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#7a5f28"/><stop offset="40%" stop-color="#d3ad57"/><stop offset="65%" stop-color="#f4e6ad"/><stop offset="100%" stop-color="#a67f34"/></linearGradient>
+      <linearGradient id="sparkg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#fff7dc"/><stop offset="100%" stop-color="#f6dd8a"/></linearGradient>
+      <radialGradient id="baseGrad" cx="66%" cy="32%" r="95%"><stop offset="0%" stop-color="#1a3a2a"/><stop offset="42%" stop-color="#0e2418"/><stop offset="100%" stop-color="#050d08"/></radialGradient>
+      <linearGradient id="sheen" x1="0" y1="1" x2="1" y2="0"><stop offset="0%" stop-color="#2a5842" stop-opacity="0"/><stop offset="52%" stop-color="#356c52" stop-opacity=".55"/><stop offset="70%" stop-color="#2a5842" stop-opacity="0"/></linearGradient>
+      <radialGradient id="vign" cx="50%" cy="42%" r="80%"><stop offset="0%" stop-color="#000" stop-opacity="0"/><stop offset="72%" stop-color="#000" stop-opacity="0"/><stop offset="100%" stop-color="#020805" stop-opacity=".7"/></radialGradient>
+      <filter id="clouds" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.006 0.011" numOctaves="4" seed="11" stitchTiles="stitch" result="n"/><feColorMatrix in="n" type="matrix" values="0 0 0 0 0.10  0 0 0 0 0.24  0 0 0 0 0.17  0 0 0 0.5 0"/></filter>
+      <filter id="grain" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="7" result="g"/><feColorMatrix in="g" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.06 0"/></filter>
+      <filter id="veinfx" x="-15%" y="-15%" width="130%" height="130%"><feTurbulence type="fractalNoise" baseFrequency="0.008 0.013" numOctaves="3" seed="4" result="t"/><feDisplacementMap in="SourceGraphic" in2="t" scale="52" xChannelSelector="R" yChannelSelector="G" result="disp"/><feGaussianBlur in="disp" stdDeviation="0.7" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="disp"/></feMerge></filter>
+      <filter id="sparkfx" x="-40%" y="-40%" width="180%" height="180%"><feTurbulence type="fractalNoise" baseFrequency="0.008 0.013" numOctaves="3" seed="4" result="t"/><feDisplacementMap in="SourceGraphic" in2="t" scale="58" xChannelSelector="R" yChannelSelector="G" result="disp"/><feGaussianBlur in="disp" stdDeviation="2.6"/></filter>
+    </defs>
+    <rect width="1440" height="700" fill="url(#baseGrad)"/>
+    <rect width="1440" height="700" filter="url(#clouds)" style="mix-blend-mode:soft-light;opacity:.8"/>
+    <rect width="1440" height="700" fill="url(#sheen)" style="mix-blend-mode:screen;opacity:.55"/>
+    <g class="veins-base" filter="url(#veinfx)" id="baseG"></g>
+    <g class="veins-spark" filter="url(#sparkfx)" id="sparkG"></g>
+    <rect width="1440" height="700" filter="url(#grain)" style="mix-blend-mode:overlay;opacity:.5"/>
+    <rect width="1440" height="700" fill="url(#vign)"/>
+  </svg>
+  <div class="scrim"></div>
+  <div class="wrap inner">
+    <p class="crumbs"><a href="wand-und-wirkung.html">Start</a> &nbsp;/&nbsp; Showroom</p>
+    <p class="eyebrow"><span class="line"></span>Ausgewählte Arbeiten</p>
+    <h1>Showroom</h1>
+    <p>Ein Einblick in Andys Projekte – von ruhigen, makellosen Flächen über fugenlose Bäder bis zu Akzentwänden mit Charakter. Echte Projektfotos folgen laufend.</p>
+  </div>
+</section>
+
+<!-- GALERIE -->
+<section class="gallery-sec marble">
+  <div class="wrap">
+    <div class="sub-head">
+      <h2>Vorher – nachher</h2>
+    </div>
+    <div class="ba" id="ba">
+      <div class="layer before" style="background:linear-gradient(135deg,#5b5346,#3f3a31)"></div>
+      <div class="layer after" id="baAfter" style="background:linear-gradient(135deg,#25604a,#123026 60%,#c9a24f)"></div>
+      <span class="lbl l">Vorher</span><span class="lbl r">Nachher</span>
+      <div class="handle" id="baHandle"></div>
+      <div class="grip" id="baGrip" role="slider" aria-label="Vorher-Nachher-Regler" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" tabindex="0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6-6 6 6 6"/><path d="m15 6 6 6-6 6"/></svg></div>
+    </div>
+
+    <div class="filters" id="filters">
+      <button class="chip active" data-f="all">Alle</button>
+      <button class="chip" data-f="glatt">Glatte Oberflächen</button>
+      <button class="chip" data-f="fugenlos">Fugenlos</button>
+      <button class="chip" data-f="veredelung">Veredelung</button>
+      <button class="chip" data-f="boden">Boden &amp; Harz</button>
+    </div>
+
+    <div class="grid" id="grid">
+      <figure class="shot" data-cat="veredelung"><div class="img" style="background:linear-gradient(135deg,#8f8069,#5f5443)"></div><span class="tag">Veredelung</span><figcaption><b>Spachtel-Akzentwand</b><span>Wohnzimmer · Wilhelmshaven</span></figcaption></figure>
+      <figure class="shot" data-cat="fugenlos"><div class="img" style="background:linear-gradient(135deg,#cdd0d0,#727978)"></div><span class="tag">Fugenlos</span><figcaption><b>Fugenloses Bad</b><span>Mikrozement · Schortens</span></figcaption></figure>
+      <figure class="shot" data-cat="glatt"><div class="img" style="background:linear-gradient(135deg,#d8cdb8,#a89a7d)"></div><span class="tag">Glatt</span><figcaption><b>Makellose Wände</b><span>Neubau · Sande</span></figcaption></figure>
+      <figure class="shot" data-cat="veredelung"><div class="img" style="background:linear-gradient(135deg,#4f7ea3,#caa94f)"></div><span class="tag">Veredelung</span><figcaption><b>Metall-Effekt</b><span>Gewerbe-Empfang · Jever</span></figcaption></figure>
+      <figure class="shot" data-cat="boden"><div class="img" style="background:linear-gradient(135deg,#6b5b48,#3c3327)"></div><span class="tag">Boden</span><figcaption><b>Harzboden</b><span>Wohnraum · Varel</span></figcaption></figure>
+      <figure class="shot" data-cat="fugenlos"><div class="img" style="background:linear-gradient(135deg,#b7bfbc,#7f8a86)"></div><span class="tag">Fugenlos</span><figcaption><b>Dusche fugenlos</b><span>Bad · Wangerland</span></figcaption></figure>
+      <figure class="shot" data-cat="glatt"><div class="img" style="background:linear-gradient(135deg,#e0d6c2,#b3a487)"></div><span class="tag">Glatt</span><figcaption><b>Decken &amp; Wände Q4</b><span>Altbau · Wilhelmshaven</span></figcaption></figure>
+      <figure class="shot" data-cat="veredelung"><div class="img" style="background:linear-gradient(135deg,#3f6f57,#c9a24f)"></div><span class="tag">Veredelung</span><figcaption><b>Kalk-Effektwand</b><span>Schlafzimmer · Sande</span></figcaption></figure>
+      <figure class="shot" data-cat="boden"><div class="img" style="background:linear-gradient(135deg,#7a6a52,#463b2c)"></div><span class="tag">Boden</span><figcaption><b>Designboden</b><span>Ladenfläche · Jever</span></figcaption></figure>
+    </div>
+    <p style="margin-top:20px;font-size:13px;color:rgba(239,233,221,.45)">Platzhalter-Motive – hier kommen die echten Projektfotos rein.</p>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta marble">
+  <svg class="marble-svg" viewBox="0 0 1440 500" preserveAspectRatio="xMidYMid slice" aria-hidden="true" style="opacity:.7">
+    <rect width="1440" height="500" fill="url(#baseGrad)"/>
+    <rect width="1440" height="500" filter="url(#clouds)" style="mix-blend-mode:soft-light;opacity:.5"/>
+  </svg>
+  <div class="wrap inner">
+    <p class="kicker">Dein Projekt</p>
+    <h2>Deine Wand könnte die nächste hier sein.</h2>
+    <p>Erzähl Andy kurz von deinem Raum – du bekommst eine ehrliche Ersteinschätzung, in der Regel innerhalb von 24 Stunden.</p>
+    <div class="row">
+      <a class="btn-gold" href="wand-und-wirkung.html#kontakt">Projekt anfragen</a>
+      <a class="btn-ghost" href="wand-und-wirkung.html#leistungen">Leistungen ansehen</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="marble">
+  <svg class="marble-svg" viewBox="0 0 1440 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true" style="opacity:.6">
+    <rect width="1440" height="300" fill="url(#baseGrad)"/>
+    <rect width="1440" height="300" filter="url(#clouds)" style="mix-blend-mode:soft-light;opacity:.4"/>
+  </svg>
+  <div class="wrap">
+    <div class="foot-grid">
+      <span class="fname"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" style="transform:rotate(-45deg)"><path d="M18.37 2.63 14 7l-1.59-1.59a2 2 0 0 0-2.82 0L8 7l9 9 1.59-1.59a2 2 0 0 0 0-2.82L17 10l4.37-4.37a2.12 2.12 0 1 0-3-3Z"/><path d="M9 8c-2 3-4 3.5-7 4l8 10c2-1 6-5 6-7"/><path d="M14.5 17.5 4.5 15"/></svg> WAND &amp; WIRKUNG</span>
+      <div class="foot-links">
+        <a href="wand-und-wirkung.html#leistungen">Leistungen</a>
+        <a href="showroom.html">Showroom</a>
+        <a href="wand-und-wirkung.html#ueber">Über mich</a>
+        <a href="wand-und-wirkung.html#kontakt">Kontakt</a>
+        <a href="#">Impressum</a>
+        <a href="#">Datenschutz</a>
+      </div>
+    </div>
+    <div class="copy">© <span id="year"></span> Wand &amp; Wirkung · Andy Wagner · Wilhelmshaven &amp; Umgebung</div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var NS="http://www.w3.org/2000/svg";
+  function mk(a){var p=document.createElementNS(NS,"path");for(var k in a)p.setAttribute(k,a[k]);return p;}
+  var VEINS=[
+    {d:"M -80 120 C 260 200 430 250 690 320 S 1120 450 1560 580",w:1.5,o:.9,delay:0.0,dur:5.6},
+    {d:"M 120 -60 C 320 200 470 320 660 440 S 1030 660 1260 940",w:1.2,o:.85,delay:1.2,dur:6.3},
+    {d:"M 520 -40 C 690 160 800 320 980 450 S 1300 660 1520 720",w:1.0,o:.8,delay:2.4,dur:5.9},
+    {d:"M 900 -40 C 990 180 1010 330 1130 480 S 1340 740 1440 960",w:1.0,o:.8,delay:1.8,dur:6.1},
+    {d:"M 690 320 C 770 380 840 450 860 570",w:.6,o:.6,delay:2.9,dur:4.4},
+    {d:"M 1000 250 C 1080 300 1140 360 1180 470",w:.6,o:.55,delay:0.9,dur:5.6},
+    {d:"M 660 440 C 730 490 820 520 930 520",w:.55,o:.5,delay:3.6,dur:4.1},
+    {d:"M 1130 480 C 1180 520 1220 560 1210 640",w:.5,o:.45,delay:2.6,dur:5.2}
+  ];
+  var baseG=document.getElementById("baseG"), sparkG=document.getElementById("sparkG");
+  VEINS.forEach(function(v){
+    baseG.appendChild(mk({d:v.d,fill:"none",stroke:"url(#gold)","stroke-width":v.w,"stroke-linecap":"round","stroke-opacity":v.o}));
+    var s=mk({d:v.d,fill:"none",stroke:"url(#sparkg)","stroke-width":v.w+0.6,"stroke-linecap":"round","pathLength":"100"});
+    s.setAttribute("class","spark"); s.style.setProperty("--delay",v.delay+"s"); s.style.setProperty("--dur",v.dur+"s");
+    sparkG.appendChild(s);
+  });
+
+  var header=document.getElementById("siteHeader");
+  function onScroll(){header.classList.toggle("scrolled",window.scrollY>40);}
+  onScroll(); window.addEventListener("scroll",onScroll,{passive:true});
+
+  var burger=document.getElementById("burger"), mm=document.getElementById("mobileMenu");
+  burger.addEventListener("click",function(){var open=mm.classList.toggle("open");burger.setAttribute("aria-expanded",open?"true":"false");});
+
+  /* Filter */
+  var chips=document.querySelectorAll("#filters .chip"), shots=document.querySelectorAll("#grid .shot");
+  chips.forEach(function(c){c.addEventListener("click",function(){
+    chips.forEach(function(x){x.classList.remove("active");}); c.classList.add("active");
+    var f=c.getAttribute("data-f");
+    shots.forEach(function(s){s.classList.toggle("hide", f!=="all" && s.getAttribute("data-cat")!==f);});
+  });});
+
+  /* Vorher/Nachher */
+  var ba=document.getElementById("ba");
+  if(ba){
+    var after=document.getElementById("baAfter"),handle=document.getElementById("baHandle"),grip=document.getElementById("baGrip");
+    function setSplit(p){p=Math.max(0,Math.min(100,p));after.style.clipPath="inset(0 0 0 "+p+"%)";handle.style.left=p+"%";grip.style.left=p+"%";grip.setAttribute("aria-valuenow",Math.round(p));}
+    function fromE(x){var r=ba.getBoundingClientRect();setSplit((x-r.left)/r.width*100);}
+    var drag=false;
+    ba.addEventListener("pointerdown",function(e){drag=true;ba.setPointerCapture(e.pointerId);fromE(e.clientX);});
+    ba.addEventListener("pointermove",function(e){if(drag)fromE(e.clientX);});
+    ba.addEventListener("pointerup",function(){drag=false;});
+    grip.addEventListener("keydown",function(e){var c=parseFloat(grip.getAttribute("aria-valuenow"))||50;if(e.key==="ArrowLeft"){setSplit(c-4);e.preventDefault();}if(e.key==="ArrowRight"){setSplit(c+4);e.preventDefault();}});
+    setSplit(50);
+  }
+
+  var y=document.getElementById("year"); if(y) y.textContent=new Date().getFullYear();
+})();
+</script>
+</body>
+</html>
