@@ -20,6 +20,7 @@ export const SERVICE_IDS = {
 export const PROFILE_URLS = [
   "https://share.google/47AcEDNTSDkltR1un",
   "https://www.facebook.com/profile.php?id=61579455697023",
+  "https://www.linkedin.com/in/justus-brosch-67985a318",
   "https://www.my-hammer.de/auftragnehmer/justus-1",
   "https://www.kleinanzeigen.de/s-bestandsliste.html?userId=162496234",
   "https://www.gelbeseiten.de/gsbiz/cb6b8b66-db85-4b56-8397-4a920963c6d1",

@@ -24,6 +24,13 @@ const platforms: PlatformEntry[] = [
     active: true,
   },
   {
+    name: "LinkedIn",
+    url: "https://www.linkedin.com/in/justus-brosch-67985a318",
+    description:
+      "Justus Brosch auf LinkedIn – Einblicke für Hausverwaltungen, Küchenstudios und Partner.",
+    active: true,
+  },
+  {
     name: "MyHammer",
     url: "https://www.my-hammer.de/auftragnehmer/justus-1",
     description:
