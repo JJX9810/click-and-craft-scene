@@ -43,7 +43,7 @@ const categorySet: ProjectCategory[] = [
 export const Route = createFileRoute("/showroom/")({
   component: ShowroomPage,
   head: () => {
-    const ogImage = "https://verlegt-verschraubt.de/projects/coldewei-03-vinyl-flur.webp";
+    const ogImage = "https://verlegt-verschraubt.de/projects/vinylboden-verlegen-wilhelmshaven-coldewei-03-flur.webp";
     const ogDesc = "Ausgewählte Projekte aus Wilhelmshaven, Coldewei, Schortens, Hooksiel und Umgebung.";
     const ogTitle = "Showroom – Projekte von Verlegt & Verschraubt";
     return {

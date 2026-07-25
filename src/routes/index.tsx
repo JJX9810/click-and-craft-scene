@@ -77,7 +77,7 @@ export const Route = createFileRoute("/")({
       {
         rel: "preload",
         as: "image",
-        href: "/projects/coldewei-06-vinyl-wohnzimmer.webp",
+        href: "/projects/vinylboden-verlegen-wilhelmshaven-coldewei-06-wohnzimmer.webp",
         fetchpriority: "high",
       },
     ],

@@ -46,6 +46,7 @@ import { Route as C2Route } from "@/routes/ikea-kueche-montieren-lassen";
 import { Route as C3Route } from "@/routes/kuechenmontage-steuerlich-absetzen";
 import { Route as C4Route } from "@/routes/messie-wohnung-raeumen";
 import { Route as C5Route } from "@/routes/altbau-renovieren-wilhelmshaven";
+import { Route as UmzugRoute } from "@/routes/umzuege-wilhelmshaven";
 
 // IONOS-Override: Kontaktformular ohne Backend (mailto/WhatsApp/Tel)
 import { IonosKontakt } from "./IonosKontakt";
@@ -93,6 +94,7 @@ export const routes: RouteRecord[] = [
   C3Route,
   C4Route,
   C5Route,
+  UmzugRoute,
 ];
 
 /** Liste aller Pfade, die prerendert werden sollen (inkl. Showroom-Slugs). */

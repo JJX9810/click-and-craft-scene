@@ -97,9 +97,36 @@ for (const p of paths) {
 
 // --- sitemap.xml ---
 const today = new Date().toISOString().slice(0, 10);
+// Prioritäten: Leistungsseiten sind das Profil der Domain (0.9),
+// Ortsseiten 0.8, leistungsnahe Unterseiten 0.6, reine Ratgeber bewusst
+// niedrig (0.4) – die Domain soll als lokaler Betrieb gelesen werden,
+// nicht als Ratgeber-Portal.
+const PRIO = {
+  "/bodenverlegung-wilhelmshaven": "0.9",
+  "/kuechenmontage-in-wilhelmshaven": "0.9",
+  "/entruempelung-entsorgung-in-wilhelmshaven": "0.9",
+  "/umzuege-wilhelmshaven": "0.9",
+  "/haushaltsaufloesung-nachlass": "0.6",
+  "/messie-wohnung-raeumen": "0.6",
+  "/ikea-kueche-montieren-lassen": "0.6",
+  "/ratgeber": "0.5",
+  "/bodenverlegung-kosten": "0.4",
+  "/entruempelung-kosten": "0.4",
+  "/vinyl-oder-laminat": "0.4",
+  "/renovierung-reihenfolge": "0.4",
+  "/altbau-renovieren-wilhelmshaven": "0.4",
+  "/kueche-umzug-checkliste": "0.4",
+  "/kuechenmontage-steuerlich-absetzen": "0.4",
+  "/gebrauchte-kueche-kaufen": "0.4",
+  "/boden-selbst-verlegen": "0.4",
+  "/bodenverlegung-fussbodenheizung": "0.4",
+  "/vinyl-kueche-bad": "0.4",
+  "/impressum": "0.3",
+  "/datenschutz": "0.3",
+};
 const urls = paths.map((p) => {
   const loc = SITE + (p === "/" ? "/" : p);
-  const priority = p === "/" ? "1.0" : p.startsWith("/showroom/") ? "0.7" : "0.8";
+  const priority = p === "/" ? "1.0" : PRIO[p] ?? (p.startsWith("/showroom/") ? "0.7" : "0.8");
   const changefreq = p === "/" ? "weekly" : "monthly";
   return `  <url>\n    <loc>${loc}</loc>\n    <lastmod>${today}</lastmod>\n    <changefreq>${changefreq}</changefreq>\n    <priority>${priority}</priority>\n  </url>`;
 }).join("\n");

@@ -53,14 +53,14 @@ export const projects: Project[] = [
     ],
     description:
       "In Coldewei, Wilhelmshaven wurde der vorhandene Teppichboden entfernt und der Untergrund vorbereitet. Untere Etage: Vinylboden in Holzoptik. Obere Etage: Schlingenteppich. Fokus auf saubere Übergänge, Sockelleisten auf Gehrung und ein stimmiges Gesamtbild.",
-    cover: "/projects/coldewei-06-vinyl-wohnzimmer.webp",
+    cover: "/projects/vinylboden-verlegen-wilhelmshaven-coldewei-06-wohnzimmer.webp",
     coverAlt: "Vinylboden in Holzoptik im Wohnzimmer in Coldewei, Wilhelmshaven",
     featured: true,
     detail: true,
     beforeAfter: [
       {
-        before: "/projects/coldewei-01-vorher-flur.webp",
-        after: "/projects/coldewei-04-vinyl-flur-treppe.webp",
+        before: "/projects/bodenverlegung-wilhelmshaven-coldewei-01-vorher-flur.webp",
+        after: "/projects/vinylboden-verlegen-wilhelmshaven-coldewei-04-flur-treppe.webp",
         alt: "Vorher-Nachher-Vergleich: Flur mit Treppe in Coldewei – vorher Altzustand, nachher neuer Vinylboden",
       },
     ],
@@ -68,7 +68,7 @@ export const projects: Project[] = [
     media: [
       {
         type: "image",
-        src: "/projects/coldewei-01-vorher-flur.webp",
+        src: "/projects/bodenverlegung-wilhelmshaven-coldewei-01-vorher-flur.webp",
         alt: "Vorher: Flur mit Materialkartons vor der Bodenverlegung in Coldewei, Wilhelmshaven",
         caption: "Ausgangszustand im Flur- und Treppenbereich vor Beginn der Bodenverlegung.",
         longDescription:
@@ -77,7 +77,7 @@ export const projects: Project[] = [
       },
       {
         type: "image",
-        src: "/projects/coldewei-02-untergrund-vorbereitet.webp",
+        src: "/projects/bodenverlegung-wilhelmshaven-coldewei-02-untergrund-vorbereitet.webp",
         alt: "Untergrund nach Entfernen des alten Teppichbodens in Coldewei, Wilhelmshaven",
         caption: "Alter Teppich entfernt, Estrich gereinigt und für den neuen Vinylboden vorbereitet.",
         longDescription:
@@ -86,7 +86,7 @@ export const projects: Project[] = [
       },
       {
         type: "image",
-        src: "/projects/coldewei-03-vinyl-flur.webp",
+        src: "/projects/vinylboden-verlegen-wilhelmshaven-coldewei-03-flur.webp",
         alt: "Frisch verlegter Vinylboden in Holzoptik im Flur in Coldewei, Wilhelmshaven",
         caption: "Vinyl in Holzoptik – frisch verlegt im Flur, noch während der Endmontage.",
         longDescription:
@@ -95,7 +95,7 @@ export const projects: Project[] = [
       },
       {
         type: "image",
-        src: "/projects/coldewei-04-vinyl-flur-treppe.webp",
+        src: "/projects/vinylboden-verlegen-wilhelmshaven-coldewei-04-flur-treppe.webp",
         alt: "Vinylboden im Eingangs- und Treppenbereich in Coldewei, Wilhelmshaven",
         caption: "Vinylboden im Übergang zwischen Eingang, Flur und offener Treppe.",
         longDescription:
@@ -104,7 +104,7 @@ export const projects: Project[] = [
       },
       {
         type: "image",
-        src: "/projects/coldewei-05-uebergangsschiene.webp",
+        src: "/projects/bodenverlegung-wilhelmshaven-coldewei-05-uebergangsschiene.webp",
         alt: "Vinylboden mit sauber gesetzter Übergangsschiene in Coldewei, Wilhelmshaven",
         caption: "Detail: sauber gesetzte Übergangsschiene zwischen zwei Räumen.",
         longDescription:
@@ -113,7 +113,7 @@ export const projects: Project[] = [
       },
       {
         type: "image",
-        src: "/projects/coldewei-06-vinyl-wohnzimmer.webp",
+        src: "/projects/vinylboden-verlegen-wilhelmshaven-coldewei-06-wohnzimmer.webp",
         alt: "Vinylboden in Holzoptik im Wohnzimmer mit Kaminofen in Coldewei, Wilhelmshaven",
         caption: "Vinylboden im Wohnzimmer – ruhiges, modernes Gesamtbild rund um den Kaminofen.",
         longDescription:
@@ -122,7 +122,7 @@ export const projects: Project[] = [
       },
       {
         type: "image",
-        src: "/projects/coldewei-07-teppich-2etage.webp",
+        src: "/projects/teppichboden-verlegen-wilhelmshaven-coldewei-07-2etage.webp",
         alt: "Schlingenteppich im Flur der zweiten Etage in Coldewei, Wilhelmshaven",
         caption: "Schlingenteppich im Flur- und Treppenpodest der zweiten Etage.",
         longDescription:
@@ -131,7 +131,7 @@ export const projects: Project[] = [
       },
       {
         type: "image",
-        src: "/projects/coldewei-08-teppich-flur.webp",
+        src: "/projects/teppichboden-verlegen-wilhelmshaven-coldewei-08-flur.webp",
         alt: "Schlingenteppich im oberen Flur mit sauberen Übergängen in Coldewei, Wilhelmshaven",
         caption: "Schlingenteppich auf dem Treppenpodest mit sauberen Anschlüssen zu den Zimmern.",
         longDescription:
@@ -140,7 +140,7 @@ export const projects: Project[] = [
       },
       {
         type: "image",
-        src: "/projects/coldewei-09-teppich-zimmer.webp",
+        src: "/projects/teppichboden-verlegen-wilhelmshaven-coldewei-09-zimmer.webp",
         alt: "Schlingenteppich in einem Dachschrägen-Zimmer in Coldewei, Wilhelmshaven",
         caption: "Fertig verlegter Schlingenteppich in einem Zimmer mit Dachschräge.",
         longDescription:
@@ -149,7 +149,7 @@ export const projects: Project[] = [
       },
       {
         type: "image",
-        src: "/projects/coldewei-10-teppich-gehrungen.webp",
+        src: "/projects/teppichboden-verlegen-wilhelmshaven-coldewei-10-gehrungen.webp",
         alt: "Detail: Schlingenteppich mit sauberen Anschlüssen in Coldewei, Wilhelmshaven",
         caption: "Detailbild: sauber ausgeführte Anschlüsse und Sockelleisten an der Wandkante.",
         longDescription:
@@ -158,7 +158,7 @@ export const projects: Project[] = [
       },
       {
         type: "image",
-        src: "/projects/coldewei-11-untergrund-flur.webp",
+        src: "/projects/bodenverlegung-wilhelmshaven-coldewei-11-untergrund-flur.webp",
         alt: "Freigelegter Untergrund im Eingangsbereich in Coldewei vor der neuen Bodenverlegung",
         caption: "Vorbereitung im Flur: Altbelag entfernt und Untergrund für den neuen Boden freigelegt.",
         longDescription:
@@ -167,7 +167,7 @@ export const projects: Project[] = [
       },
       {
         type: "image",
-        src: "/projects/coldewei-12-teppich-podest.webp",
+        src: "/projects/teppichboden-verlegen-wilhelmshaven-coldewei-12-podest.webp",
         alt: "Schlingenteppich auf dem Podest in der oberen Etage in Coldewei, Wilhelmshaven",
         caption: "Obere Etage mit fertig verlegtem Schlingenteppich am Podest und in den Zimmerzugängen.",
         longDescription:
@@ -176,7 +176,7 @@ export const projects: Project[] = [
       },
       {
         type: "image",
-        src: "/projects/coldewei-13-vinyl-flur-treppe-oben.webp",
+        src: "/projects/vinylboden-verlegen-wilhelmshaven-coldewei-13-flur-treppe-oben.webp",
         alt: "Vinylboden im Flur und an der offenen Treppe in Coldewei, Wilhelmshaven",
         caption: "Vinylboden im Flur mit sauberem Anschluss an Treppe und angrenzende Räume.",
         longDescription:
@@ -185,7 +185,7 @@ export const projects: Project[] = [
       },
       {
         type: "image",
-        src: "/projects/coldewei-14-uebergangsschiene-detail.webp",
+        src: "/projects/bodenverlegung-wilhelmshaven-coldewei-14-uebergangsschiene-detail.webp",
         alt: "Detail einer weißen Übergangsschiene zwischen zwei Bodenbereichen in Coldewei",
         caption: "Detailaufnahme der Übergangsschiene zwischen Flur und angrenzendem Raum.",
         longDescription:
@@ -194,7 +194,7 @@ export const projects: Project[] = [
       },
       {
         type: "image",
-        src: "/projects/coldewei-15-untergrund-material.webp",
+        src: "/projects/bodenverlegung-wilhelmshaven-coldewei-15-untergrund-material.webp",
         alt: "Vorbereitung im Flur mit Material und freigelegtem Untergrund in Coldewei",
         caption: "Sanierungsphase im Flur mit vorbereitetem Untergrund und angeliefertem Material.",
         longDescription:
@@ -203,7 +203,7 @@ export const projects: Project[] = [
       },
       {
         type: "image",
-        src: "/projects/coldewei-16-vinyl-wohnzimmer-kamin.webp",
+        src: "/projects/vinylboden-verlegen-wilhelmshaven-coldewei-16-wohnzimmer-kamin.webp",
         alt: "Vinylboden im Wohnzimmer mit Kaminofen in Coldewei, Wilhelmshaven",
         caption: "Wohnzimmeransicht mit fertig verlegtem Vinylboden rund um den Kaminofen.",
         longDescription:

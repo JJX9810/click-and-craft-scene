@@ -11,6 +11,7 @@ const WA_HREF =
 
 type Slide = {
   src: string;
+  alt: string;
   label: string;
   review?: { q: string; w: string };
   /** Hochkant-Bilder: mittig in Originalproportion, dahinter weichgezeichnete Fläche */
@@ -28,15 +29,15 @@ const R = {
 };
 
 const SLIDES: Slide[] = [
-  { src: "/projects/coldewei-06-vinyl-wohnzimmer.webp", label: "Vinyl-Wohnzimmer · Coldewei", review: R.euphoria },
-  { src: "/projects/kueche-marmoroptik-schortens-01.webp", label: "Küche Marmoroptik · Schortens", review: R.kolbKurz, portrait: true },
-  { src: "/projects/kueche-wilhelmshaven-01.webp", label: "Küche · Wilhelmshaven", review: R.pauline },
-  { src: "/projects/kueche-schortens-modern-01.webp", label: "Einbauküche · Schortens" },
-  { src: "/projects/laminat-wittmund-01.webp", label: "Laminat im Altbau · Wittmund", review: R.haysam },
-  { src: "/projects/coldewei-04-vinyl-flur-treppe.webp", label: "Flur & Treppe · Coldewei", review: R.kraushaar },
-  { src: "/projects/laminat-bremerhaven-03-nachher.webp", label: "Laminat · Bremerhaven", review: R.haysam },
-  { src: "/projects/netzwerk-led-decke-malerarbeiten.webp", label: "LED-Decke · Partnerprojekt", review: R.kolbNetz, portrait: true },
-  { src: "/projects/teppichboden-schortens-02-nachher.webp", label: "Teppichboden · Schortens", review: R.kolbStart },
+  { src: "/projects/vinylboden-verlegen-wilhelmshaven-coldewei-06-wohnzimmer.webp", alt: "Vinylboden verlegt im Wohnzimmer in Wilhelmshaven-Coldewei durch Verlegt & Verschraubt", label: "Vinyl-Wohnzimmer · Coldewei", review: R.euphoria },
+  { src: "/projects/kueche-marmoroptik-schortens-01.webp", alt: "Küchenmontage in Schortens: fertig montierte Küche in Marmoroptik durch Verlegt & Verschraubt", label: "Küche Marmoroptik · Schortens", review: R.kolbKurz, portrait: true },
+  { src: "/projects/kueche-wilhelmshaven-01.webp", alt: "Küchenmontage in Wilhelmshaven: fertig aufgebaute Einbauküche durch Verlegt & Verschraubt", label: "Küche · Wilhelmshaven", review: R.pauline },
+  { src: "/projects/kueche-schortens-modern-01.webp", alt: "Moderne Einbauküche montiert in Schortens durch Verlegt & Verschraubt Handwerkerservice", label: "Einbauküche · Schortens" },
+  { src: "/projects/laminat-wittmund-01.webp", alt: "Laminat verlegt im Altbau in Wittmund durch Verlegt & Verschraubt Handwerkerservice", label: "Laminat im Altbau · Wittmund", review: R.haysam },
+  { src: "/projects/vinylboden-verlegen-wilhelmshaven-coldewei-04-flur-treppe.webp", alt: "Vinylboden in Flur und auf Treppe verlegt in Wilhelmshaven-Coldewei durch Verlegt & Verschraubt", label: "Flur & Treppe · Coldewei", review: R.kraushaar },
+  { src: "/projects/laminat-bremerhaven-03-nachher.webp", alt: "Laminatverlegung in Bremerhaven: fertiger Boden nach der Verlegung durch Verlegt & Verschraubt", label: "Laminat · Bremerhaven", review: R.haysam },
+  { src: "/projects/netzwerk-led-decke-malerarbeiten.webp", alt: "Partnerprojekt: LED-Decke und Malerarbeiten mit der Maler Manufaktur Wand & Wirkung", label: "LED-Decke · Partnerprojekt", review: R.kolbNetz, portrait: true },
+  { src: "/projects/teppichboden-schortens-02-nachher.webp", alt: "Teppichboden verlegt in Schortens: fertiges Ergebnis durch Verlegt & Verschraubt", label: "Teppichboden · Schortens", review: R.kolbStart },
 ];
 
 const INTERVAL = 6500;
@@ -83,6 +84,8 @@ export function HeroSlideshow() {
         <div
           key={s.src}
           aria-hidden={n !== index}
+          role="img"
+          aria-label={s.alt}
           className={`hero-slide ${n === index ? "on" : ""} ${animate && !s.portrait ? "animate" : ""} ${n % 2 === 1 ? "alt" : ""}`}
           style={s.portrait ? undefined : { backgroundImage: `url('${s.src}')` }}
         >
