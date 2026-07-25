@@ -24,6 +24,7 @@ export const Route = createFileRoute("/sitemap.xml")({
           { path: "/bodenverlegung-wilhelmshaven", changefreq: "monthly", priority: "0.9" },
           { path: "/kuechenmontage-in-wilhelmshaven", changefreq: "monthly", priority: "0.9" },
           { path: "/entruempelung-entsorgung-in-wilhelmshaven", changefreq: "monthly", priority: "0.9" },
+          { path: "/umzuege-wilhelmshaven", changefreq: "monthly", priority: "0.9" },
           { path: "/handwerkerservice-wilhelmshaven", changefreq: "monthly", priority: "0.8" },
           { path: "/handwerkerservice-jever", changefreq: "monthly", priority: "0.8" },
           { path: "/handwerkerservice-sande", changefreq: "monthly", priority: "0.8" },

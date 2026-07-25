@@ -381,6 +381,10 @@ function RatgeberKuecheUmzug() {
           . Mehr zur Leistung:{" "}
           <Link to="/kuechenmontage-in-wilhelmshaven" className="font-medium text-accent hover:underline">
             Küchenmontage in Wilhelmshaven
+          </Link>{" "}
+          – und wenn der ganze Haushalt umzieht:{" "}
+          <Link to="/umzuege-wilhelmshaven" className="font-medium text-accent hover:underline">
+            Umzüge &amp; Umzugsservice in Wilhelmshaven
           </Link>
           .
         </p>

@@ -12,6 +12,7 @@ const nav: NavItem[] = [
   { label: "Bodenverlegung", to: "/bodenverlegung-wilhelmshaven" },
   { label: "Küchenmontage", to: "/kuechenmontage-in-wilhelmshaven" },
   { label: "Entrümpelung", to: "/entruempelung-entsorgung-in-wilhelmshaven" },
+  { label: "Umzüge", to: "/umzuege-wilhelmshaven" },
   { label: "Showroom", to: "/showroom" },
   { label: "Preise", to: "/preise" },
   { label: "FAQ", to: "/faq" },

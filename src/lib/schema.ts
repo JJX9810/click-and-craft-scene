@@ -14,6 +14,7 @@ export const SERVICE_IDS = {
   bodenverlegung: `${SITE_URL}/#service-bodenverlegung`,
   kuechenmontage: `${SITE_URL}/#service-kuechenmontage`,
   entruempelung: `${SITE_URL}/#service-entruempelung`,
+  umzug: `${SITE_URL}/#service-umzug`,
 } as const;
 
 export const PROFILE_URLS = [
@@ -71,6 +72,7 @@ const OFFER_CATALOG = {
     { "@type": "OfferCatalog", name: "Bodenverlegung", url: `${SITE_URL}/bodenverlegung-wilhelmshaven` },
     { "@type": "OfferCatalog", name: "Küchenmontage", url: `${SITE_URL}/kuechenmontage-in-wilhelmshaven` },
     { "@type": "OfferCatalog", name: "Entrümpelung & Entsorgung", url: `${SITE_URL}/entruempelung-entsorgung-in-wilhelmshaven` },
+    { "@type": "OfferCatalog", name: "Umzüge & Umzugsservice", url: `${SITE_URL}/umzuege-wilhelmshaven` },
   ],
 };
 

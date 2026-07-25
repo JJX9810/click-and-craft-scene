@@ -40,6 +40,7 @@ export function Footer() {
               <li><Link to="/bodenverlegung-wilhelmshaven" className="hover:text-foreground">Bodenleger &amp; Bodenverlegung</Link></li>
               <li><Link to="/kuechenmontage-in-wilhelmshaven" className="hover:text-foreground">Küchenmonteur & Küchenmontage</Link></li>
               <li><Link to="/entruempelung-entsorgung-in-wilhelmshaven" className="hover:text-foreground">Entrümpelung & Haushaltsauflösung</Link></li>
+              <li><Link to="/umzuege-wilhelmshaven" className="hover:text-foreground">Umzüge & Umzugsservice</Link></li>
               <li><Link to="/preise" className="hover:text-foreground">Preise</Link></li>
               <li><Link to="/wunschtermin" className="hover:text-foreground">Wunschtermin</Link></li>
               <li><Link to="/referenzen" className="hover:text-foreground">Referenzen</Link></li>
