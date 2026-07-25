@@ -7,30 +7,16 @@ import { ArrowRight } from "lucide-react";
 import { ProjectCard } from "@/components/site/ProjectCard";
 import { projects } from "@/data/projects";
 import {
-  breadcrumbNode, jsonLdScript, offerNode, serviceNode, webPageNode, SERVICE_IDS,
+  breadcrumbNode, jsonLdScript, serviceNode, webPageNode, SERVICE_IDS,
 } from "@/lib/schema";
 import { QuickAnswer, FactBox, LimitsBox, InternalLinks } from "@/components/site/InfoBlocks";
 import { PreisrechnerCTA } from "@/components/site/PreisrechnerCTA";
-import { BODEN_VARIANTEN, SOCKEL_PRICE, SPACHTELN_PRICE } from "@/lib/pricing";
 
 const PAGE_URL = "https://verlegt-verschraubt.de/bodenverlegung-wilhelmshaven";
 
 const BODEN_AREA_SERVED = [
   "Wilhelmshaven", "Schortens", "Sande", "Jever", "Varel", "Wangerland", "Wittmund", "Friesland",
 ];
-
-// Preise aus zentraler Quelle (src/lib/pricing.ts) referenzieren – so bleibt
-// das JSON-LD automatisch synchron mit dem Kostenrechner.
-const priceOf = (key: string): number => {
-  const v = BODEN_VARIANTEN.find((b) => b.key === key);
-  if (!v || v.price === null) throw new Error(`Missing price for ${key}`);
-  return v.price;
-};
-const PRICE_LAMINAT_SCHWIMMEND = priceOf("laminat_schwimmend");
-const PRICE_VINYL_SCHWIMMEND = priceOf("vinyl_schwimmend");
-const PRICE_VINYL_VERKLEBT = priceOf("vinyl_verklebt");
-const PRICE_PVC_SCHWIMMEND = priceOf("pvc_schwimmend");
-const PRICE_PVC_VERKLEBT = priceOf("pvc_verklebt");
 
 export const Route = createFileRoute("/bodenverlegung-wilhelmshaven")({
   component: Page,
@@ -65,15 +51,6 @@ export const Route = createFileRoute("/bodenverlegung-wilhelmshaven")({
           description: "Verlegung von Vinyl, Designboden, Laminat, PVC und Teppich inklusive Untergrundprüfung, Altbelag entfernen, Treppenverkleidung sowie Sockelleisten und Übergängen.",
           serviceType: ["Bodenverlegung", "Bodenleger", "Fußbodenverlegung"],
           areaServed: BODEN_AREA_SERVED,
-          offers: [
-            offerNode({ name: "Laminat schwimmend verlegen", price: PRICE_LAMINAT_SCHWIMMEND, unitText: "m²" }),
-            offerNode({ name: "Vinyl schwimmend verlegen", price: PRICE_VINYL_SCHWIMMEND, unitText: "m²" }),
-            offerNode({ name: "Vinyl verklebt verlegen", price: PRICE_VINYL_VERKLEBT, unitText: "m²" }),
-            offerNode({ name: "PVC schwimmend verlegen", price: PRICE_PVC_SCHWIMMEND, unitText: "m²" }),
-            offerNode({ name: "PVC verklebt verlegen", price: PRICE_PVC_VERKLEBT, unitText: "m²" }),
-            offerNode({ name: "Sockelleisten montieren", price: SOCKEL_PRICE, unitText: "lfm" }),
-            offerNode({ name: "Spachteln inkl. Grundierung", price: SPACHTELN_PRICE, unitText: "m²" }),
-          ],
         }),
         breadcrumbNode([
           { name: "Startseite", url: "https://verlegt-verschraubt.de/" },
@@ -100,7 +77,7 @@ const faqs = [
   { q: "Wie wird der Untergrund geprüft?", a: "Wir prüfen Ebenheit, Restfeuchte und Tragfähigkeit. Bei Bedarf gleichen wir Unebenheiten aus oder empfehlen die passende Vorbereitung." },
   { q: "Müssen die Räume leer sein?", a: "Idealerweise ja. Auf Wunsch übernehmen wir Möbelumstellung im überschaubaren Rahmen oder organisieren das gemeinsam." },
   { q: "Entfernt ihr den Altbelag?", a: "Ja. Altbelag entfernen, entsorgen und Untergrund vorbereiten gehört zum Leistungsumfang." },
-  { q: "Was kostet ein Bodenleger in Wilhelmshaven?", a: `Der Preis hängt von Bodenart, m², Vorbereitung und Zubehör ab. Zur Orientierung: Laminat schwimmend ab ${priceOf("laminat_schwimmend")} €/m², Vinyl schwimmend ab ${priceOf("vinyl_schwimmend")} €/m², PVC schwimmend ab ${priceOf("pvc_schwimmend")} €/m² (Arbeitslohn). Verbindlich wird der Preis erst nach Prüfung von Fotos und Maßen – eine erste Einschätzung liefert der Preisrechner.` },
+  { q: "Was kostet ein Bodenleger in Wilhelmshaven?", a: "Der Preis hängt von Bodenart, Fläche, Untergrund, Vorbereitung und Zubehör wie Sockelleisten ab – pauschale Zahlen ohne diese Angaben wären unseriös. Eine erste Orientierung liefert unser Preisrechner; verbindlich wird der Preis nach Prüfung von Fotos und Maßen als schriftliches Festpreis-Angebot." },
 ];
 
 function Page() {
@@ -117,10 +94,11 @@ function Page() {
         <div className="grid gap-6 lg:grid-cols-2">
           <QuickAnswer>
             Verlegt &amp; Verschraubt ist Ihr Bodenleger für Wilhelmshaven und
-            Umgebung: Laminat verlegen wir für 16 €/m², Vinyl ab 18 €/m²,
-            Teppich ab 10 €/m² (jeweils Arbeitslohn). Dazu gehören
+            Umgebung: Wir verlegen Laminat, Vinyl, PVC und Teppich – inklusive
             Untergrundprüfung, Zuschnitt, Verlegung und auf Wunsch
-            Sockelleisten. Anfrage per WhatsApp mit Fotos – Einschätzung meist
+            Sockelleisten. Den Preis erhalten Sie als schriftliches
+            Festpreis-Angebot; eine erste Orientierung liefert der
+            Preisrechner. Anfrage per WhatsApp mit Fotos – Einschätzung meist
             am selben Werktag. Unsicher beim Belag? Unser Ratgeber{" "}
             <Link to="/vinyl-oder-laminat" className="font-medium text-accent hover:underline">
               Vinyl oder Laminat?

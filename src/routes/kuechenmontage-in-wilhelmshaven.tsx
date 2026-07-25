@@ -7,11 +7,10 @@ import { ArrowRight } from "lucide-react";
 import { ProjectCard } from "@/components/site/ProjectCard";
 import { projects } from "@/data/projects";
 import {
-  breadcrumbNode, jsonLdScript, offerNode, serviceNode, webPageNode, SERVICE_IDS,
+  breadcrumbNode, jsonLdScript, serviceNode, webPageNode, SERVICE_IDS,
 } from "@/lib/schema";
 import { QuickAnswer, FactBox, LimitsBox, InternalLinks } from "@/components/site/InfoBlocks";
 import { PreisrechnerCTA } from "@/components/site/PreisrechnerCTA";
-import { KUECHE_MONTAGE_PRICE } from "@/lib/pricing";
 
 const KM_AREA_SERVED = [
   "Wilhelmshaven", "Schortens", "Sande", "Jever", "Varel", "Wangerland", "Wittmund", "Friesland",
@@ -54,9 +53,6 @@ export const Route = createFileRoute("/kuechenmontage-in-wilhelmshaven")({
           description: "Küchenaufbau, Restmontage und Anpassung – von der Front über die Arbeitsplatte bis zur Spüle und Armatur. Wasseranschluss an bestehende Eckventile.",
           serviceType: ["Küchenmontage", "Küchenmonteur", "Küchenaufbau"],
           areaServed: KM_AREA_SERVED,
-          offers: [
-            offerNode({ name: "Küchenmontage", price: KUECHE_MONTAGE_PRICE, unitText: "lfm" }),
-          ],
         }),
         breadcrumbNode([
           { name: "Startseite", url: "https://verlegt-verschraubt.de/" },
@@ -77,7 +73,7 @@ const scope = [
 ];
 
 const faqs = [
-  { q: "Was kostet ein Küchenmonteur in Wilhelmshaven?", a: `Zur Orientierung: Die Küchenmontage kostet ${KUECHE_MONTAGE_PRICE} €/lfm (Arbeitslohn). Der Gesamtpreis hängt von Küchenlänge, Umfang (Komplett- oder Restmontage) und Arbeitsplatte ab. Verbindlich wird der Preis erst nach Prüfung von Fotos und Maßen – eine erste Einschätzung liefert der Preisrechner.` },
+  { q: "Was kostet ein Küchenmonteur in Wilhelmshaven?", a: "Der Preis hängt von Küchenlänge, Umfang (Komplett- oder Restmontage), Arbeitsplatte und Anschlusssituation ab. Eine erste Orientierung liefert unser Preisrechner; verbindlich wird der Preis nach Prüfung von Fotos und Maßen als schriftliches Festpreis-Angebot." },
   { q: "Montiert ihr Küchen nach einem Umzug?", a: "Ja. Wir bauen bestehende Küchen ab, transportieren sie und bauen sie im neuen Zuhause sauber wieder auf." },
   { q: "Schließt ihr Herd oder Starkstrom an?", a: "Nein. Elektroinstallationen übernehmen Fachbetriebe. Bei Bedarf stimmen wir uns ab." },
   { q: "Macht ihr Sanitäranschlüsse?", a: "Wasseranschlüsse an bestehende Eckventile inklusive Spüle und Armatur ja, neue Sanitäranlagen nein." },
@@ -98,9 +94,11 @@ function Page() {
         <div className="grid gap-6 lg:grid-cols-2">
           <QuickAnswer>
             Verlegt &amp; Verschraubt ist Ihr Küchenmonteur für Wilhelmshaven
-            und Umgebung: Küchenmontage für 189 €/lfm Arbeitslohn. Dazu gehören
-            Aufbau nach Umzug, Restmontage, Küchenmodule, Arbeitsplatten sowie
-            Spüle und Armatur an vorhandenen Anschlüssen. Anfrage per WhatsApp
+            und Umgebung. Dazu gehören Aufbau nach Umzug, Restmontage,
+            Küchenmodule, Arbeitsplatten sowie Spüle und Armatur an vorhandenen
+            Anschlüssen – den Preis erhalten Sie als schriftliches
+            Festpreis-Angebot, eine erste Orientierung liefert der
+            Preisrechner. Anfrage per WhatsApp
             mit Fotos – Einschätzung meist am selben Werktag. Die Küche zieht
             mit um? Unser Ratgeber{" "}
             <Link to="/kueche-umzug-checkliste" className="font-medium text-accent hover:underline">
