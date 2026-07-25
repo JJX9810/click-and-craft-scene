@@ -18,7 +18,7 @@ export const Route = createFileRoute("/sitemap.xml")({
         // Seiten dieses Datum manuell auf das Release-Datum aktualisieren.
         // Kein dynamisches new Date(): würde bei jedem Request ein falsches
         // "geändert"-Signal an Crawler senden.
-        const LAST_MOD = "2026-07-17";
+        const LAST_MOD = "2026-07-25";
         const staticPaths: SitemapEntry[] = [
           { path: "/", changefreq: "weekly", priority: "1.0" },
           { path: "/bodenverlegung-wilhelmshaven", changefreq: "monthly", priority: "0.9" },
@@ -33,6 +33,23 @@ export const Route = createFileRoute("/sitemap.xml")({
           { path: "/handwerkerservice-wangerland", changefreq: "monthly", priority: "0.8" },
           { path: "/handwerkerservice-wittmund", changefreq: "monthly", priority: "0.8" },
           { path: "/showroom", changefreq: "weekly", priority: "0.8" },
+          // Leistungsnahe Unterseiten – mittlere Priorität
+          { path: "/haushaltsaufloesung-nachlass", changefreq: "yearly", priority: "0.6" },
+          { path: "/messie-wohnung-raeumen", changefreq: "yearly", priority: "0.6" },
+          { path: "/ikea-kueche-montieren-lassen", changefreq: "yearly", priority: "0.6" },
+          // Ratgeber – bewusst niedrige Priorität: Leistungsseiten bleiben das Profil der Domain
+          { path: "/ratgeber", changefreq: "monthly", priority: "0.5" },
+          { path: "/bodenverlegung-kosten", changefreq: "yearly", priority: "0.4" },
+          { path: "/entruempelung-kosten", changefreq: "yearly", priority: "0.4" },
+          { path: "/vinyl-oder-laminat", changefreq: "yearly", priority: "0.4" },
+          { path: "/renovierung-reihenfolge", changefreq: "yearly", priority: "0.4" },
+          { path: "/altbau-renovieren-wilhelmshaven", changefreq: "yearly", priority: "0.4" },
+          { path: "/kueche-umzug-checkliste", changefreq: "yearly", priority: "0.4" },
+          { path: "/kuechenmontage-steuerlich-absetzen", changefreq: "yearly", priority: "0.4" },
+          { path: "/gebrauchte-kueche-kaufen", changefreq: "yearly", priority: "0.4" },
+          { path: "/boden-selbst-verlegen", changefreq: "yearly", priority: "0.4" },
+          { path: "/bodenverlegung-fussbodenheizung", changefreq: "yearly", priority: "0.4" },
+          { path: "/vinyl-kueche-bad", changefreq: "yearly", priority: "0.4" },
           { path: "/referenzen", changefreq: "monthly", priority: "0.7" },
           { path: "/preise", changefreq: "monthly", priority: "0.7" },
           { path: "/ueber-uns", changefreq: "yearly", priority: "0.6" },
