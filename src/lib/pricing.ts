@@ -15,6 +15,7 @@ export const BODEN_VARIANTEN: BodenVariante[] = [
   { key: "pvc_verklebt", label: "PVC verklebt", price: 15 },
   { key: "vinyl_schwimmend", label: "Vinyl schwimmend", price: 18 },
   { key: "vinyl_verklebt", label: "Vinyl verklebt", price: 22 },
+  { key: "vinyl_fischgraet", label: "Vinyl Klick Fischgrätmuster", price: 27 },
   { key: "linoleum_verklebt", label: "Linoleum verklebt", price: null },
   { key: "teppich_lose", label: "Teppich lose verlegt / lose verklebt", price: 10 },
   { key: "teppich_vollflaechig", label: "Teppich vollflächig verklebt", price: 12 },
