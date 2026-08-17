@@ -67,9 +67,17 @@ export function HeroSlideshow() {
   }, []);
 
   // Nächstes Bild vorladen
+  // Nur Slides laden, die gezeigt wurden oder als nächstes drankommen –
+  // spart auf Mobilgeräten das Sofort-Laden aller Hero-Bilder (LCP).
+  const [loaded, setLoaded] = useState<Set<number>>(() => new Set([0]));
   useEffect(() => {
+    const nextIdx = (index + 1) % SLIDES.length;
     const next = new Image();
-    next.src = SLIDES[(index + 1) % SLIDES.length].src;
+    next.src = SLIDES[nextIdx].src;
+    setLoaded((prev) => {
+      if (prev.has(index) && prev.has(nextIdx)) return prev;
+      const s = new Set(prev); s.add(index); s.add(nextIdx); return s;
+    });
   }, [index]);
 
   const goTo = (n: number) => setIndex(n % SLIDES.length);
@@ -87,9 +95,9 @@ export function HeroSlideshow() {
           role="img"
           aria-label={s.alt}
           className={`hero-slide ${n === index ? "on" : ""} ${animate && !s.portrait ? "animate" : ""} ${n % 2 === 1 ? "alt" : ""}`}
-          style={s.portrait ? undefined : { backgroundImage: `url('${s.src}')` }}
+          style={s.portrait || !loaded.has(n) ? undefined : { backgroundImage: `url('${s.src}')` }}
         >
-          {s.portrait && (
+          {s.portrait && loaded.has(n) && (
             <>
               <div className="hero-slide-blur" style={{ backgroundImage: `url('${s.src}')` }} />
               <div className="hero-slide-fit" style={{ backgroundImage: `url('${s.src}')` }} />

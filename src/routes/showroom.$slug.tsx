@@ -7,6 +7,14 @@ import { getProject, projects, type ProjectMedia } from "@/data/projects";
 import { ArrowRight, ChevronRight, MapPin, MessageCircle, Phone, Star } from "lucide-react";
 import { breadcrumbNode, jsonLdScript, webPageNode } from "@/lib/schema";
 
+// Meta-Descriptions auf Snippet-Länge begrenzen (Audit: teils >500 Zeichen).
+function metaDesc(text: string, max = 155): string {
+  if (text.length <= max) return text;
+  const cut = text.slice(0, max);
+  return cut.slice(0, Math.max(cut.lastIndexOf(" "), 80)).trimEnd() + " …";
+}
+
+
 const WA_HREF =
   "https://wa.me/491634799286?text=Hallo%2C%20ich%20habe%20ein%20Projekt%3A%20";
 
@@ -47,15 +55,15 @@ export const Route = createFileRoute("/showroom/$slug")({
     return {
       meta: [
         { title: `${p.title} – Showroom Verlegt & Verschraubt` },
-        { name: "description", content: p.description },
+        { name: "description", content: metaDesc(p.description) },
         { property: "og:title", content: p.title },
-        { property: "og:description", content: p.description },
+        { property: "og:description", content: metaDesc(p.description) },
         { property: "og:url", content: url },
         { property: "og:image", content: ogImage },
       { property: "og:image:alt", content: "Projektbeispiel von Verlegt & Verschraubt aus Wilhelmshaven und Umgebung" },
         { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:title", content: p.title },
-        { name: "twitter:description", content: p.description },
+        { name: "twitter:description", content: metaDesc(p.description) },
         { name: "twitter:image", content: ogImage },
       { name: "twitter:image:alt", content: "Projektbeispiel von Verlegt & Verschraubt aus Wilhelmshaven und Umgebung" },
       ],

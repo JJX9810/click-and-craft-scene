@@ -92,16 +92,16 @@ export function IonosKontakt() {
           className="mt-8 grid gap-5 rounded-2xl border border-border/70 bg-card/50 p-6 backdrop-blur sm:grid-cols-2 sm:p-8"
         >
           <Field label="Name" required>
-            <input required value={form.name} onChange={update("name")} className={input} />
+            <input required name="name" autoComplete="name" value={form.name} onChange={update("name")} className={input} />
           </Field>
           <Field label="Telefon">
-            <input type="tel" value={form.telefon} onChange={update("telefon")} className={input} />
+            <input type="tel" name="phone" autoComplete="tel" value={form.telefon} onChange={update("telefon")} className={input} />
           </Field>
           <Field label="E-Mail" required>
-            <input required type="email" value={form.email} onChange={update("email")} className={input} />
+            <input required type="email" name="email" autoComplete="email" value={form.email} onChange={update("email")} className={input} />
           </Field>
           <Field label="Ort">
-            <input value={form.ort} onChange={update("ort")} className={input} placeholder="Wilhelmshaven" />
+            <input name="city" autoComplete="address-level2" value={form.ort} onChange={update("ort")} className={input} placeholder="Wilhelmshaven" />
           </Field>
           <Field label="Gewünschte Leistung">
             <select value={form.leistung} onChange={update("leistung")} className={input}>
@@ -125,7 +125,7 @@ export function IonosKontakt() {
             </select>
           </Field>
           <Field label="Kurze Beschreibung" className="sm:col-span-2">
-            <textarea rows={5} value={form.text} onChange={update("text")} className={input} placeholder="Räume, ungefähre Größe, Besonderheiten…" />
+            <textarea rows={5} name="message" value={form.text} onChange={update("text")} className={input} placeholder="Räume, ungefähre Größe, Besonderheiten…" />
           </Field>
           <p className="sm:col-span-2 text-xs text-muted-foreground">
             Hinweis: Fotos bitte direkt aus dem E-Mail-Programm bzw. WhatsApp anhängen – das Senden erfolgt aus Datenschutzgründen über Ihren eigenen Mail-/WhatsApp-Client.

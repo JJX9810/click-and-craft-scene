@@ -92,6 +92,11 @@ for (const p of paths) {
   const targetDir = p === "/" ? distDir : path.join(distDir, p);
   fs.mkdirSync(targetDir, { recursive: true });
   fs.writeFileSync(path.join(targetDir, "index.html"), out, "utf-8");
+  // Zusätzlich <pfad>.html schreiben: GitHub Pages liefert damit auch die
+  // slashlose URL (Canonical-/Sitemap-Form) direkt mit 200 aus – ohne Redirect.
+  if (p !== "/" && !p.endsWith("/")) {
+    fs.writeFileSync(path.join(distDir, `${p.replace(/^\//, "")}.html`), out, "utf-8");
+  }
   console.log(`  ✓ ${p}`);
 }
 

@@ -307,26 +307,42 @@ html, body {
 }
 .hero-dot {
   position: relative;
-  width: 22px;
-  height: 3px;
+  width: 24px;
+  height: 24px;
   border: none;
   border-radius: 2px;
-  background: oklch(0.95 0.01 80 / 0.3);
+  background: transparent;
   cursor: pointer;
   padding: 0;
-  overflow: hidden;
+  overflow: visible;
+}
+/* Sichtbarer Strich bleibt schlank – die Klickfläche ist jetzt 24×24 px (WCAG 2.2) */
+.hero-dot::before {
+  content: "";
+  position: absolute;
+  left: 1px;
+  right: 1px;
+  top: 50%;
+  height: 3px;
+  transform: translateY(-50%);
+  border-radius: 2px;
+  background: oklch(0.95 0.01 80 / 0.3);
 }
 .hero-dot.on { background: oklch(0.95 0.01 80 / 0.3); }
 .hero-dot.on::after {
   content: "";
   position: absolute;
-  inset: 0;
-  background: var(--accent, oklch(0.72 0.11 80));
-  transform: scaleX(1);
+  left: 1px;
+  right: 1px;
+  top: 50%;
+  height: 3px;
+  transform: translateY(-50%) scaleX(1);
   transform-origin: left;
+  border-radius: 2px;
+  background: var(--accent, oklch(0.72 0.11 80));
 }
 .hero-dot.on.animate::after { animation: hero-dotfill 6.5s linear forwards; }
-@keyframes hero-dotfill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes hero-dotfill { from { transform: translateY(-50%) scaleX(0); } to { transform: translateY(-50%) scaleX(1); } }
 .hero-scrollcue { animation: hero-bob 2.4s ease-in-out infinite; }
 @keyframes hero-bob {
   0%, 100% { transform: translate(-50%, 0); }

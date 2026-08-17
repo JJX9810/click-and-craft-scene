@@ -47,6 +47,7 @@ import { Route as C3Route } from "@/routes/kuechenmontage-steuerlich-absetzen";
 import { Route as C4Route } from "@/routes/messie-wohnung-raeumen";
 import { Route as C5Route } from "@/routes/altbau-renovieren-wilhelmshaven";
 import { Route as UmzugRoute } from "@/routes/umzuege-wilhelmshaven";
+import { Route as WunschterminRoute } from "@/routes/wunschtermin";
 
 // IONOS-Override: Kontaktformular ohne Backend (mailto/WhatsApp/Tel)
 import { IonosKontakt } from "./IonosKontakt";
@@ -95,6 +96,7 @@ export const routes: RouteRecord[] = [
   C4Route,
   C5Route,
   UmzugRoute,
+  WunschterminRoute,
 ];
 
 /** Liste aller Pfade, die prerendert werden sollen (inkl. Showroom-Slugs). */
@@ -108,12 +110,17 @@ export function getPrerenderPaths(): string[] {
 }
 
 /** Ermittelt den passenden Route-Record für eine konkrete URL. */
-export function matchRoute(pathname: string): { route: RouteRecord; params: Record<string, string> } | null {
+export function matchRoute(rawPathname: string): { route: RouteRecord; params: Record<string, string> } | null {
+  // URL-Normalisierung: Trailing Slash entfernen (außer Root), doppelte Slashes
+  // zusammenfassen – behebt Hydration-404 bei Aufrufen wie /kontakt/
+  let pathname = rawPathname.replace(/\/{2,}/g, "/");
+  if (pathname.length > 1 && pathname.endsWith("/")) pathname = pathname.replace(/\/+$/, "");
+  if (pathname === "") pathname = "/";
   // 1. exakter Pfad
   for (const r of routes) {
     if (r.path === pathname) return { route: r, params: {} };
   }
-  // 2. /showroom → /showroom/
+  // 2. /showroom → Registry-Pfad "/showroom/"
   if (pathname === "/showroom") {
     const r = routes.find((x) => x.path === "/showroom/");
     if (r) return { route: r, params: {} };

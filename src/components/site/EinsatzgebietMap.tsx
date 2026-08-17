@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "leaflet/dist/leaflet.css";
 
 type Props = {
@@ -34,7 +34,26 @@ export function EinsatzgebietMap({
     Tooltip: any;
   }>(null);
 
+  // Erst laden, wenn die Karte in den Viewport rückt (Audit: Kacheln luden
+  // sofort, obwohl die Karte weit unten steht).
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const [inView, setInView] = useState(false);
   useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    if (typeof IntersectionObserver === "undefined") { setInView(true); return; }
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) { setInView(true); io.disconnect(); }
+      },
+      { rootMargin: "400px" },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!inView) return;
     let alive = true;
     (async () => {
       const mod = await import("react-leaflet");
@@ -51,10 +70,11 @@ export function EinsatzgebietMap({
     return () => {
       alive = false;
     };
-  }, []);
+  }, [inView]);
 
   return (
     <div
+      ref={containerRef}
       className="relative overflow-hidden rounded-2xl border border-border/70 bg-card/40"
       style={{ height }}
     >
