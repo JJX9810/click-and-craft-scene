@@ -150,11 +150,14 @@ export function Section({
   );
 }
 
-export function Bullet({ children }: { children: React.ReactNode }) {
+export function Bullet({ title, children }: { title?: string; children: React.ReactNode }) {
   return (
     <li className="flex items-start gap-2">
       <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-accent" />
-      <span>{children}</span>
+      <span>
+        {title ? <strong className="font-semibold text-foreground">{title}: </strong> : null}
+        {children}
+      </span>
     </li>
   );
 }

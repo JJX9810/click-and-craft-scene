@@ -26,6 +26,82 @@ const ORT_EINLEITUNG: Record<string, string> = {
     "Wittmund ist die Kreisstadt des Landkreises Wittmund. Aufträge in Wittmund und Umgebung übernehmen wir aus Wilhelmshaven – ohne lange Wege.",
 };
 
+
+// Echte Unterscheidungsmerkmale pro Ort: Anfahrtssituation auf Basis der
+// realen Preisregel (Anfahrt frei bis 30 km ab Wilhelmshaven), typische
+// Objektarten und – wo vorhanden – echtes Kundenfeedback. Keine erfundenen
+// Projekte, keine erfundenen Bewertungen.
+type OrtDetails = {
+  anfahrt: string;
+  objekte: string[];
+  feedback?: { text: string; quelle: string };
+};
+
+const ORT_DETAILS: Record<string, OrtDetails> = {
+  Wilhelmshaven: {
+    anfahrt:
+      "Unser Standort: Weichselstraße 12. Innerhalb des Stadtgebiets fällt keine Anfahrtspauschale an – kurzfristige Besichtigungen sind hier am einfachsten zu legen.",
+    objekte: [
+      "Etagenwohnungen in Alt- und Nachkriegsbauten – oft mit Teppich- oder PVC-Altbelag, der vor Vinyl oder Laminat raus muss",
+      "Mietwohnungen mit Übergabetermin: Entrümpelung, Boden und besenreine Übergabe in einem Zug",
+      "Einfamilienhäuser in den Stadtrandlagen mit Küchen- und Bodenerneuerung",
+    ],
+  },
+  Schortens: {
+    anfahrt:
+      "Schortens liegt wenige Kilometer westlich von Wilhelmshaven – deutlich innerhalb unserer anfahrtsfreien Zone (bis 30 km). Termine lassen sich hier gut auch kurzfristig einplanen.",
+    objekte: [
+      "Einfamilienhäuser und Siedlungsbauten – häufig Komplettpakete aus Boden, Küche und weiteren Gewerken",
+      "Wohnungen mit Renovierung vor Neuvermietung oder Verkauf",
+    ],
+    feedback: {
+      text:
+        "Koordiniertes Komplettprojekt in Schortens: Boden, Küche, vermittelter Umzug, Elektriker und Maler innerhalb von drei Wochen – bewertet mit 5 Sternen.",
+      quelle: "Familie Kolb, Google-Bewertung, Juli 2026",
+    },
+  },
+  Sande: {
+    anfahrt:
+      "Sande grenzt direkt an Wilhelmshaven – die kürzeste Anfahrt in unserem Einsatzgebiet, selbstverständlich ohne Anfahrtskosten.",
+    objekte: [
+      "Ein- und Zweifamilienhäuser in Klinkerbauweise mit Boden- und Küchenerneuerung",
+      "Haushaltsauflösungen und Entrümpelungen mit kurzen Wegen zur Entsorgung",
+    ],
+  },
+  Jever: {
+    anfahrt:
+      "Die Kreisstadt Jever liegt gut innerhalb unserer anfahrtsfreien Zone (bis 30 km ab Wilhelmshaven) – Besichtigung und Ausführung ohne Anfahrtskosten.",
+    objekte: [
+      "Altbauten in der Innenstadt – hier zählen saubere Untergrundvorbereitung und Erfahrung mit schiefen Böden und alten Dielen",
+      "Einfamilienhäuser in den Wohngebieten mit klassischer Boden- und Küchenerneuerung",
+    ],
+  },
+  Varel: {
+    anfahrt:
+      "Varel am Westufer des Jadebusens liegt an der Grenze unserer anfahrtsfreien Zone – für die meisten Adressen fallen keine Anfahrtskosten an; falls doch, steht das transparent im Angebot.",
+    objekte: [
+      "Wohnhäuser in Stadt und Umland mit Boden-, Küchen- und Renovierungsprojekten",
+      "Ferienunterkünfte Richtung Dangast, bei denen zwischen den Belegungen renoviert wird – planbare Zeitfenster sind hier entscheidend",
+    ],
+  },
+  Wangerland: {
+    anfahrt:
+      "Die Küstengemeinde Wangerland (u. a. Hooksiel und Horumersiel) erreichen wir aus Wilhelmshaven ohne Umwege – der Großteil liegt in der anfahrtsfreien Zone, Details stehen transparent im Angebot.",
+    objekte: [
+      "Ferienwohnungen und Ferienhäuser an der Küste: strapazierfähige Böden (Vinyl statt Teppich) und Renovierung zwischen den Saisons",
+      "Wohnhäuser in den Ortskernen mit Küchen- und Bodenprojekten",
+    ],
+  },
+  Wittmund: {
+    anfahrt:
+      "Wittmund liegt etwas weiter westlich – je nach Adresse knapp außerhalb der anfahrtsfreien 30 km ab Wilhelmshaven. Ob eine kleine Anfahrtspauschale anfällt, steht vorab transparent im Angebot; bei größeren Projekten entfällt sie in der Regel.",
+    objekte: [
+      "Einfamilienhäuser und ländliche Objekte, auch Resthöfe – oft größere zusammenhängende Flächen",
+      "Altbauten mit Dielen- oder Estrichuntergrund, bei denen Spachteln und Dämmung eingeplant werden",
+    ],
+  },
+};
+
 export function OrtsSeite({
   ort,
   umgebung,
@@ -53,6 +129,7 @@ export function OrtsSeite({
 
   const einleitung = ORT_EINLEITUNG[ort];
   const faqs = ortFaqItems(ort);
+  const ortDetails = ORT_DETAILS[ort];
   const hasReferenzen = ortProjects.length > 0;
 
   return (
@@ -100,6 +177,29 @@ export function OrtsSeite({
           ))}
         </div>
       </Section>
+
+      {ortDetails && (
+        <Section eyebrow="Vor Ort" title={`Typische Projekte und Anfahrt in ${ort}`} bordered>
+          <p className="max-w-3xl text-base leading-relaxed text-muted-foreground">
+            {ortDetails.anfahrt}
+          </p>
+          <div className="mt-6 grid gap-4 sm:grid-cols-2">
+            {ortDetails.objekte.map((o) => (
+              <Bullet key={o}>{o}</Bullet>
+            ))}
+          </div>
+          {ortDetails.feedback && (
+            <figure className="mt-6 max-w-3xl rounded-2xl border border-accent/40 bg-card/50 p-6">
+              <blockquote className="text-base leading-relaxed">
+                {ortDetails.feedback.text}
+              </blockquote>
+              <figcaption className="mt-3 text-sm text-muted-foreground">
+                {ortDetails.feedback.quelle} – Auszug, Original auf unserem Google-Profil
+              </figcaption>
+            </figure>
+          )}
+        </Section>
+      )}
 
       {projekt && (
         <Section eyebrow="Aus der Praxis" title={`Aktuelles Projekt aus ${ort}`} bordered>
