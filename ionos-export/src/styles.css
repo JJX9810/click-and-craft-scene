@@ -4,4 +4,5 @@
  * und ergänzt den ionos-export-Pfad als zusätzliche Source.
  */
 @import "../../src/styles.css";
+@import "./compact.css";
 @source "../src";

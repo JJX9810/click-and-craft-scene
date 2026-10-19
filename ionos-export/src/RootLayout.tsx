@@ -1,4 +1,5 @@
 import { Helmet } from "react-helmet-async";
+import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
@@ -46,8 +47,12 @@ const ORG_JSONLD = {
  * die TanStack-Shell (HeadContent/Scripts/html-Wrapping) wird hier nicht gebraucht.
  */
 export function RootLayout() {
-  const { pathname } = useLocation();
+  const { pathname, hash } = useLocation();
   const hideMobileBar = pathname.startsWith("/impressum") || pathname.startsWith("/datenschutz");
+  useEffect(() => {
+    if (hash) document.getElementById(decodeURIComponent(hash.slice(1)))?.scrollIntoView();
+    else window.scrollTo(0, 0);
+  }, [pathname, hash]);
   return (
     <>
       <Helmet>
@@ -62,9 +67,10 @@ export function RootLayout() {
         <meta name="twitter:card" content="summary_large_image" />
         <script type="application/ld+json">{JSON.stringify(ORG_JSONLD)}</script>
       </Helmet>
+      <a className="vv-skip" href="#main-content">Zum Inhalt springen</a>
       <div className="bg-wood-grain relative flex min-h-screen flex-col overflow-x-hidden text-foreground">
         <Header />
-        <main className="flex-1">
+        <main id="main-content" className="flex-1">
           <RouteRenderer />
         </main>
         <Footer />
